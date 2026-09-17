@@ -237,7 +237,7 @@ export const WelcomeGatewayView: React.FC = () => {
   };
 
   return (
-    <div className="relative h-screen w-full flex flex-col justify-between overflow-y-auto md:overflow-hidden font-sans select-none bg-gradient-to-br from-[#0c1e13] via-[#09150e] to-[#040a06] text-slate-100">
+    <div className="relative h-screen w-full flex flex-col justify-between overflow-y-auto md:overflow-hidden font-sans select-none bg-slate-50 text-slate-900">
       
       {/* 🌾 Cinematic Scenic Farm Background */}
       <div 
@@ -245,28 +245,27 @@ export const WelcomeGatewayView: React.FC = () => {
         style={{ backgroundImage: "url('/farm2future-bg.jpg')" }}
       />
 
-      {/* Atmospheric Dark & Vignette Overlay for High Legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-[#07170c]/65 to-[#030905]/85 pointer-events-none backdrop-blur-[0.5px]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#06120a]/35 to-black/80 pointer-events-none" />
+      {/* Radiant Light Theme Frosted & Vignette Overlay */}
+      <div className="absolute inset-0 bg-white/40 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/45 to-white/85 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/30 via-transparent to-white/60 pointer-events-none" />
 
-      {/* Sleek Tech Matrix Background Grid & Ambient Glows */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b18_1px,transparent_1px),linear-gradient(to_bottom,#1e293b18_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
-      <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute -bottom-40 right-1/4 w-[500px] h-[500px] bg-teal-500/10 rounded-full blur-[140px] pointer-events-none" />
+      {/* Subtle Tech Grid overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a08_1px,transparent_1px),linear-gradient(to_bottom,#0f172a08_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
 
       {/* 🌟 Top Navigation Bar */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-2.5 flex items-center justify-between shrink-0 border-b border-white/10 bg-slate-950/40 backdrop-blur-md">
+      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-2.5 flex items-center justify-between shrink-0 border-b border-emerald-900/10 bg-white/80 backdrop-blur-md shadow-xs">
         <div 
           onClick={handleLogoClick}
           className="flex items-center gap-2.5 cursor-pointer select-none group"
           title="Farm2Future"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-green-400 flex items-center justify-center text-white text-lg shadow-[0_0_15px_rgba(16,185,129,0.35)] ring-1 ring-white/20 group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-green-500 flex items-center justify-center text-white text-lg shadow-md shadow-emerald-700/20 ring-1 ring-emerald-600/20 group-hover:scale-105 transition-transform">
             🌱
           </div>
           <div>
-            <span className="font-extrabold text-base sm:text-lg tracking-tight font-display bg-gradient-to-r from-white via-slate-100 to-emerald-300 bg-clip-text text-transparent">
-              Farm<span className="text-emerald-400">2Future</span>
+            <span className="font-extrabold text-base sm:text-lg tracking-tight font-display text-slate-900">
+              Farm<span className="text-emerald-600">2Future</span>
             </span>
           </div>
         </div>
@@ -275,9 +274,9 @@ export const WelcomeGatewayView: React.FC = () => {
         <div className="flex items-center gap-2.5 sm:gap-3">
           <button
             onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white text-xs font-bold shadow-md border border-white/15 transition-all cursor-pointer hover:scale-105"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 text-xs font-bold shadow-xs border border-slate-200/80 transition-all cursor-pointer hover:scale-105"
           >
-            <Globe className="w-3.5 h-3.5 text-emerald-400" />
+            <Globe className="w-3.5 h-3.5 text-emerald-600" />
             <span>{language === 'en' ? 'English' : 'हिंदी'}</span>
           </button>
         </div>
@@ -288,30 +287,30 @@ export const WelcomeGatewayView: React.FC = () => {
         
         {/* Main Hero Header */}
         <div className="space-y-1.5 sm:space-y-2 max-w-3xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display tracking-tight text-white leading-snug">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display tracking-tight text-slate-900 leading-snug">
             {language === 'hi' ? (
               <>
-                भारतीय कृषि का <span className="text-emerald-400">स्मार्ट डिजिटल नेटवर्क</span>
+                भारतीय कृषि का <span className="text-emerald-700 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">स्मार्ट डिजिटल नेटवर्क</span>
               </>
             ) : (
               <>
-                Connecting Indian Agriculture with <span className="text-emerald-400">Direct Markets</span> & Guaranteed Escrow
+                Connecting Indian Agriculture with <span className="text-emerald-700 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">Direct Markets</span> & Guaranteed Escrow
               </>
             )}
           </h1>
 
-          <p className="text-xs sm:text-sm text-slate-300 font-medium max-w-2xl mx-auto leading-normal line-clamp-2">
+          <p className="text-xs sm:text-sm text-slate-700 font-semibold max-w-2xl mx-auto leading-normal line-clamp-2">
             {language === 'hi'
               ? '4 महीने पहले अग्रिम अनुबंध, ₹0 खेत से परिवहन, NABL प्रमाणित गुणवत्ता और 100% सुरक्षित भुगतान प्रणाली के साथ किसान और खरीदार को सीधे जोड़ने वाला एकीकृत मंच।'
               : 'Direct farm-to-enterprise procurement with 4-month pre-harvest contracts, ₹0 farmgate logistics pickup, NABL quality grading, and automated escrow settlement.'}
           </p>
 
           <div className="pt-1 flex items-center justify-center gap-2">
-            <span className="h-px w-10 bg-emerald-500/40" />
-            <span className="text-[10px] sm:text-xs font-bold tracking-wider uppercase text-emerald-400 bg-emerald-950/60 px-3 py-0.5 rounded-full border border-emerald-500/30">
+            <span className="h-px w-10 bg-emerald-600/30" />
+            <span className="text-[10px] sm:text-xs font-extrabold tracking-wider uppercase text-emerald-900 bg-emerald-100/90 px-3 py-0.5 rounded-full border border-emerald-300 shadow-xs">
               🌱 {language === 'hi' ? 'रजिस्ट्रेशन या लॉगिन के लिए अपना पोर्टल चुनें' : 'Select your stakeholder portal to Register or Sign In'}
             </span>
-            <span className="h-px w-10 bg-emerald-500/40" />
+            <span className="h-px w-10 bg-emerald-600/30" />
           </div>
         </div>
 
@@ -321,23 +320,23 @@ export const WelcomeGatewayView: React.FC = () => {
           {/* Primary Public Card 1: Farmer */}
           <div 
             onClick={() => handleOpenRoleModal('farmer')}
-            className="group relative bg-gradient-to-b from-[#112a1a]/95 via-[#0e2215]/95 to-[#09170e]/95 rounded-2xl p-4 sm:p-5 border-2 border-emerald-500/35 shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:border-emerald-400 hover:shadow-[0_12px_30px_rgba(16,185,129,0.25)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
+            className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-emerald-500/40 hover:border-emerald-600 shadow-[0_10px_30px_rgba(16,185,129,0.14)] hover:shadow-[0_16px_36px_rgba(16,185,129,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
               <div className="flex items-center justify-between mb-2.5">
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-950/80 border-2 border-emerald-400/40 flex items-center justify-center text-2xl sm:text-3xl shadow-inner group-hover:scale-105 transition-transform">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform">
                   👨‍🌾
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
                   {language === 'hi' ? '🌾 किसान पोर्टल' : '🌾 Farmer Portal'}
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-black text-white group-hover:text-emerald-200 transition-colors font-display leading-tight">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-emerald-700 transition-colors font-display leading-tight">
                 {language === 'hi' ? 'भारतीय किसान (Kisan Portal)' : 'Farmers & Producers'}
               </h3>
               
-              <p className="text-xs text-slate-300 mt-1.5 leading-snug line-clamp-2">
+              <p className="text-xs text-slate-600 font-medium mt-1.5 leading-snug line-clamp-2">
                 {language === 'hi'
                   ? '4 महीने पहले अग्रिम कॉर्पोरेट अनुबंध, शून्य (₹0) खेत से परिवहन खर्च, NABL गुणवत्ता जांच और सीधे बैंक खाते में सुरक्षित एस्क्रो भुगतान।'
                   : 'Get guaranteed advance procurement contracts, ₹0 farmgate pickup logistics, transparent grading, and direct escrow bank payouts.'}
@@ -345,20 +344,20 @@ export const WelcomeGatewayView: React.FC = () => {
 
               {/* Feature Pills */}
               <div className="flex flex-wrap gap-1.5 mt-2.5">
-                <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 text-[10px] sm:text-[11px] font-bold border border-emerald-500/20">
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
                   ✓ ₹0 Farmgate Pickup
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 text-[10px] sm:text-[11px] font-bold border border-emerald-500/20">
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
                   ✓ 4-Month Contracts
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 text-[10px] sm:text-[11px] font-bold border border-emerald-500/20">
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
                   ✓ Guaranteed Escrow
                 </span>
               </div>
             </div>
 
-            <div className="pt-3 flex items-center justify-between border-t border-emerald-500/20 mt-3">
-              <div className="w-full py-2 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-emerald-950/50 group-hover:scale-[1.01] transition-transform">
+            <div className="pt-3 flex items-center justify-between border-t border-slate-100 mt-3">
+              <div className="w-full py-2 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-emerald-700/20 group-hover:scale-[1.01] transition-transform">
                 <span>{language === 'hi' ? 'किसान पोर्टल में प्रवेश करें →' : 'Enter Farmer Portal →'}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -368,23 +367,23 @@ export const WelcomeGatewayView: React.FC = () => {
           {/* Primary Public Card 2: Buyer */}
           <div 
             onClick={() => handleOpenRoleModal('buyer')}
-            className="group relative bg-gradient-to-b from-[#0f233a]/95 via-[#0b1b2d]/95 to-[#07121f]/95 rounded-2xl p-4 sm:p-5 border-2 border-blue-500/35 shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:border-blue-400 hover:shadow-[0_12px_30px_rgba(59,130,246,0.25)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
+            className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-blue-500/40 hover:border-blue-600 shadow-[0_10px_30px_rgba(37,99,235,0.14)] hover:shadow-[0_16px_36px_rgba(37,99,235,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
               <div className="flex items-center justify-between mb-2.5">
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-950/80 border-2 border-blue-400/40 flex items-center justify-center text-2xl sm:text-3xl shadow-inner group-hover:scale-105 transition-transform">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform">
                   🏢
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-blue-500/20 text-blue-300 border border-blue-400/40">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-blue-100 text-blue-800 border border-blue-300">
                   {language === 'hi' ? '🏢 खरीदार पोर्टल' : '🏢 Bulk Buyer Portal'}
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-black text-white group-hover:text-blue-200 transition-colors font-display leading-tight">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-blue-700 transition-colors font-display leading-tight">
                 {language === 'hi' ? 'थोक खरीदार एवं कॉर्पोरेट (Buyer Portal)' : 'Bulk Buyers & Retailers'}
               </h3>
               
-              <p className="text-xs text-slate-300 mt-1.5 leading-snug line-clamp-2">
+              <p className="text-xs text-slate-600 font-medium mt-1.5 leading-snug line-clamp-2">
                 {language === 'hi'
                   ? '50T–500T थोक मांग पूलिंग, NABL मान्यता प्राप्त प्रयोगशाला जांच, लाइव जीपीएस वाहन ट्रैकिंग और सुरक्षित एस्क्रो फंड सुरक्षा।'
                   : 'Pool 50T-500T bulk crop requirements, verify NABL lab quality parameters, track refrigerated delivery fleets, and secure payment via escrow.'}
@@ -392,20 +391,20 @@ export const WelcomeGatewayView: React.FC = () => {
 
               {/* Feature Pills */}
               <div className="flex flex-wrap gap-1.5 mt-2.5">
-                <span className="px-2 py-0.5 rounded-md bg-blue-950/60 text-blue-300 text-[10px] sm:text-[11px] font-bold border border-blue-500/20">
+                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
                   ✓ 50T–500T Pooling
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-blue-950/60 text-blue-300 text-[10px] sm:text-[11px] font-bold border border-blue-500/20">
+                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
                   ✓ NABL Lab Quality
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-blue-950/60 text-blue-300 text-[10px] sm:text-[11px] font-bold border border-blue-500/20">
+                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
                   ✓ Escrow Protection
                 </span>
               </div>
             </div>
 
-            <div className="pt-3 flex items-center justify-between border-t border-blue-500/20 mt-3">
-              <div className="w-full py-2 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-blue-950/50 group-hover:scale-[1.01] transition-transform">
+            <div className="pt-3 flex items-center justify-between border-t border-slate-100 mt-3">
+              <div className="w-full py-2 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-blue-700/20 group-hover:scale-[1.01] transition-transform">
                 <span>{language === 'hi' ? 'खरीदार पोर्टल में प्रवेश करें →' : 'Enter Buyer Portal →'}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -417,30 +416,30 @@ export const WelcomeGatewayView: React.FC = () => {
 
       {/* 🌿 Bottom Pillar Ribbon */}
       <footer className="relative z-10 w-full max-w-4xl mx-auto px-4 pb-2.5 pt-1 shrink-0">
-        <div className="bg-slate-900/90 backdrop-blur-md text-slate-200 rounded-xl sm:rounded-full py-1.5 sm:py-2 px-4 sm:px-6 border border-white/10 shadow-lg flex items-center justify-around gap-2 text-[11px] sm:text-xs font-bold">
+        <div className="bg-white/85 backdrop-blur-md text-slate-700 rounded-xl sm:rounded-full py-1.5 sm:py-2 px-4 sm:px-6 border border-white/60 shadow-md flex items-center justify-around gap-2 text-[11px] sm:text-xs font-bold">
           
-          <div className="flex items-center gap-1.5 text-emerald-300">
+          <div className="flex items-center gap-1.5 text-emerald-800">
             <span className="text-sm">🌱</span>
             <span className="font-extrabold tracking-wide">Stronger Farms</span>
           </div>
 
-          <span className="text-slate-700 hidden sm:inline">|</span>
+          <span className="text-slate-300 hidden sm:inline">|</span>
 
-          <div className="flex items-center gap-1.5 text-blue-300">
+          <div className="flex items-center gap-1.5 text-blue-800">
             <span className="text-sm">👥</span>
             <span className="font-extrabold tracking-wide">Fairer Markets</span>
           </div>
 
-          <span className="text-slate-700 hidden sm:inline">|</span>
+          <span className="text-slate-300 hidden sm:inline">|</span>
 
-          <div className="flex items-center gap-1.5 text-teal-300">
+          <div className="flex items-center gap-1.5 text-teal-800">
             <span className="text-sm">🍃</span>
             <span className="font-extrabold tracking-wide">Cleaner Planet</span>
           </div>
 
-          <span className="text-slate-700 hidden sm:inline">|</span>
+          <span className="text-slate-300 hidden sm:inline">|</span>
 
-          <div className="flex items-center gap-1.5 text-amber-300">
+          <div className="flex items-center gap-1.5 text-amber-800">
             <span className="text-sm">📊</span>
             <span className="font-extrabold tracking-wide">Brighter Futures</span>
           </div>
@@ -449,7 +448,7 @@ export const WelcomeGatewayView: React.FC = () => {
           <button 
             type="button"
             onClick={() => handleOpenRoleModal('admin')} 
-            className="opacity-20 hover:opacity-100 text-slate-500 hover:text-amber-400 transition-opacity p-1 cursor-pointer"
+            className="opacity-30 hover:opacity-100 text-slate-400 hover:text-amber-600 transition-opacity p-1 cursor-pointer"
             title=""
             aria-label="Staff Portal"
           >
@@ -459,34 +458,34 @@ export const WelcomeGatewayView: React.FC = () => {
         </div>
       </footer>
 
-      {/* 🔐 AUTHENTICATION MODAL (Opens cleanly when any Role Card is clicked) */}
+      {/* 🔐 AUTHENTICATION MODAL (Clean Light Theme) */}
       {activeModalRole && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
           
           {/* Backdrop Blur */}
           <div 
             onClick={() => setActiveModalRole(null)}
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
           />
 
-          <div className="relative bg-slate-900 text-slate-100 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden z-10 border border-white/15 max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
+          <div className="relative bg-white text-slate-800 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden z-10 border border-slate-200 max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
-            <div className={`p-5 text-white relative shrink-0 border-b border-white/10 ${
-              activeModalRole === 'farmer' ? 'bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900' :
-              activeModalRole === 'buyer' ? 'bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900' :
-              activeModalRole === 'admin' ? 'bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-900' :
-              'bg-gradient-to-r from-amber-950 via-slate-900 to-amber-900'
+            <div className={`p-5 text-white relative shrink-0 border-b border-black/10 ${
+              activeModalRole === 'farmer' ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700' :
+              activeModalRole === 'buyer' ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700' :
+              activeModalRole === 'admin' ? 'bg-gradient-to-r from-purple-700 via-purple-800 to-indigo-800' :
+              'bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800'
             }`}>
               <button
                 onClick={() => setActiveModalRole(null)}
-                className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/15 transition-colors absolute top-3.5 right-3.5 cursor-pointer"
+                className="p-1.5 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-colors absolute top-3.5 right-3.5 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl border border-white/20 shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl border border-white/30 shadow-inner">
                   {activeModalRole === 'farmer' ? '🌾' : activeModalRole === 'buyer' ? '🏢' : activeModalRole === 'admin' ? '🏛️' : '🏬'}
                 </div>
                 <div>
@@ -505,12 +504,12 @@ export const WelcomeGatewayView: React.FC = () => {
                       )}
                     </h3>
                     {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/30 text-amber-200 border border-amber-400/40">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-amber-950 border border-amber-300">
                         🔒 Team Only
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-300 mt-0.5">
+                  <p className="text-xs text-white/90 mt-0.5">
                     {authMode === 'register' 
                       ? (language === 'hi' ? 'नया प्रोफाइल बनाएं और तुरंत डैशबोर्ड में प्रवेश करें' : 'Create a new stakeholder profile & enter dashboard')
                       : (language === 'hi' ? 'पंजीकृत मोबाइल नंबर दर्ज करके लॉगिन करें' : 'Enter your registered mobile phone number to log in')
@@ -522,7 +521,7 @@ export const WelcomeGatewayView: React.FC = () => {
 
             {/* Team Role Switcher inside Modal (Only visible when secret team access is open) */}
             {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-              <div className="flex bg-slate-950 p-1.5 border-b border-amber-500/30 gap-1.5 shrink-0">
+              <div className="flex bg-slate-100 p-1.5 border-b border-slate-200 gap-1.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => {
@@ -532,8 +531,8 @@ export const WelcomeGatewayView: React.FC = () => {
                   }}
                   className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     activeModalRole === 'admin'
-                      ? 'bg-purple-900/90 text-purple-200 border border-purple-400/50 shadow-sm'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-purple-100 text-purple-900 border border-purple-300 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <span>🏛️ Govt Admin Console</span>
@@ -547,8 +546,8 @@ export const WelcomeGatewayView: React.FC = () => {
                   }}
                   className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     activeModalRole === 'collection_centre'
-                      ? 'bg-amber-900/90 text-amber-200 border border-amber-400/50 shadow-sm'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <span>🏬 APMC Collection Hub</span>
@@ -557,7 +556,7 @@ export const WelcomeGatewayView: React.FC = () => {
             )}
 
             {/* Toggle: Register (Default) vs Existing User Login */}
-            <div className="flex border-b border-white/10 bg-slate-950/60 p-1 gap-1 shrink-0">
+            <div className="flex border-b border-slate-200 bg-slate-100/90 p-1 gap-1 shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -567,11 +566,11 @@ export const WelcomeGatewayView: React.FC = () => {
                 }}
                 className={`flex-1 py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   authMode === 'register'
-                    ? 'bg-slate-800 text-white shadow-xs border border-white/15'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
-                <UserIcon className="w-3.5 h-3.5 text-emerald-400" />
+                <UserIcon className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{language === 'hi' ? '📝 नया रजिस्ट्रेशन (Register)' : '📝 New Registration (First)'}</span>
               </button>
 
@@ -584,24 +583,24 @@ export const WelcomeGatewayView: React.FC = () => {
                 }}
                 className={`flex-1 py-2 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   authMode === 'login'
-                    ? 'bg-slate-800 text-white shadow-xs border border-white/15'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
-                <Lock className="w-3.5 h-3.5 text-blue-400" />
+                <Lock className="w-3.5 h-3.5 text-blue-600" />
                 <span>{language === 'hi' ? '🔑 पुराना खाता (Existing User)' : '🔑 Existing User Login'}</span>
               </button>
             </div>
 
             {/* Modal Body / Form */}
-            <div className="p-4 sm:p-5 overflow-y-auto space-y-3.5 flex-1 text-xs">
+            <div className="p-4 sm:p-5 overflow-y-auto space-y-3.5 flex-1 text-xs bg-white text-slate-800">
               
               {/* Notice for Team Roles */}
               {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                <div className="p-2.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex items-start gap-2 text-amber-200">
-                  <Shield className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="p-2.5 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-2 text-amber-900">
+                  <Shield className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                   <div className="text-[11px] leading-relaxed">
-                    <strong className="block text-amber-300 font-bold">
+                    <strong className="block text-amber-900 font-bold">
                       {language === 'hi' ? '🔒 आंतरिक टीम पोर्टल (Team Members Only):' : '🔒 Internal Team & Operator Portal:'}
                     </strong>
                     <span>
@@ -620,8 +619,8 @@ export const WelcomeGatewayView: React.FC = () => {
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center gap-1">
-                          <UserIcon className="w-3.5 h-3.5 text-emerald-400" />
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1">
+                          <UserIcon className="w-3.5 h-3.5 text-emerald-600" />
                           <span>{language === 'hi' ? 'पूरा नाम (Full Legal Name) *' : 'Full Legal Name *'}</span>
                         </label>
                         <input
@@ -633,12 +632,12 @@ export const WelcomeGatewayView: React.FC = () => {
                             setName(e.target.value);
                             setOtpError('');
                           }}
-                          className="w-full px-3.5 py-2 rounded-xl border border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-800/80 text-white placeholder:text-slate-500"
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
                           {activeModalRole === 'farmer' ? (language === 'hi' ? 'कुल कृषि भूमि (एकड़) *' : 'Farm Land (Acres) *') : 
                            activeModalRole === 'buyer' ? (language === 'hi' ? 'कंपनी / व्यवसाय का नाम *' : 'Company / Business *') : 
                            activeModalRole === 'collection_centre' ? (language === 'hi' ? 'APMC हब सेंटर *' : 'APMC Hub Center *') : 
@@ -650,7 +649,7 @@ export const WelcomeGatewayView: React.FC = () => {
                             placeholder="e.g. 5"
                             value={farmSize}
                             onChange={e => setFarmSize(e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-xl border border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-800/80 text-white placeholder:text-slate-500"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white"
                           />
                         ) : activeModalRole === 'buyer' ? (
                           <input
@@ -658,7 +657,7 @@ export const WelcomeGatewayView: React.FC = () => {
                             placeholder="e.g. ITC Agri / Reliance Fresh"
                             value={businessName}
                             onChange={e => setBusinessName(e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-xl border border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-800/80 text-white placeholder:text-slate-500"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white"
                           />
                         ) : (
                           <input
@@ -666,7 +665,7 @@ export const WelcomeGatewayView: React.FC = () => {
                             placeholder="e.g. Nashik North Hub #04"
                             value={hubName}
                             onChange={e => setHubName(e.target.value)}
-                            className="w-full px-3.5 py-2 rounded-xl border border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-800/80 text-white placeholder:text-slate-500"
+                            className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 font-medium bg-slate-800/80 text-white placeholder:text-slate-500"
                           />
                         )}
                       </div>
@@ -674,12 +673,12 @@ export const WelcomeGatewayView: React.FC = () => {
 
                     {/* Mobile Phone */}
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
                         <span className="flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                          <Phone className="w-3.5 h-3.5 text-emerald-600" />
                           <span>{language === 'hi' ? 'मोबाइल नंबर (Aadhaar / Mobile) *' : 'Mobile Phone Number *'}</span>
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">🇮🇳 +91</span>
+                        <span className="text-[10px] text-slate-500 font-mono font-bold">🇮🇳 +91</span>
                       </label>
                       <input
                         type="tel"
@@ -690,43 +689,43 @@ export const WelcomeGatewayView: React.FC = () => {
                           setPhone(e.target.value);
                           setOtpError('');
                         }}
-                        className="w-full px-3.5 py-2 rounded-xl border border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 font-medium font-mono bg-slate-800/80 text-white placeholder:text-slate-500"
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 font-medium font-mono bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white"
                       />
                     </div>
 
                     {/* State & District */}
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1">{language === 'hi' ? 'राज्य (State) *' : 'State *'}</label>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">{language === 'hi' ? 'राज्य (State) *' : 'State *'}</label>
                         <input
                           type="text"
                           placeholder="State"
                           value={state}
                           onChange={e => setState(e.target.value)}
-                          className="w-full px-3 py-1.5 rounded-xl border border-white/10 text-xs bg-slate-800/80 text-white"
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs bg-slate-50 text-slate-900 focus:bg-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1">{language === 'hi' ? 'जिला (District) *' : 'District *'}</label>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">{language === 'hi' ? 'जिला (District) *' : 'District *'}</label>
                         <input
                           type="text"
                           placeholder="District"
                           value={district}
                           onChange={e => setDistrict(e.target.value)}
-                          className="w-full px-3 py-1.5 rounded-xl border border-white/10 text-xs bg-slate-800/80 text-white"
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs bg-slate-50 text-slate-900 focus:bg-white"
                         />
                       </div>
                     </div>
 
                     {/* Team Passkey Field if registering Hub or Admin */}
                     {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                      <div className="p-3 rounded-2xl bg-purple-950/40 border border-purple-500/30 space-y-1.5">
-                        <label className="block text-purple-300 font-bold text-xs flex items-center justify-between">
+                      <div className="p-3 rounded-2xl bg-purple-50 border border-purple-200 space-y-1.5">
+                        <label className="block text-purple-900 font-bold text-xs flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
-                            <KeyRound className="w-3.5 h-3.5 text-purple-400" />
+                            <KeyRound className="w-3.5 h-3.5 text-purple-600" />
                             <span>{activeModalRole === 'admin' ? 'Master Admin Passkey *' : 'Master Team / Hub Passkey *'}</span>
                           </span>
-                          <span className="text-[10px] font-mono text-purple-400 font-bold">Key: Krish0386</span>
+                          <span className="text-[10px] font-mono text-purple-700 font-bold">Key: Krish0386</span>
                         </label>
                         <div className="relative">
                           <input
@@ -738,14 +737,14 @@ export const WelcomeGatewayView: React.FC = () => {
                               setAdminPasskeyInput(e.target.value);
                               setAdminError('');
                             }}
-                            className="w-full pl-3 pr-10 py-2 rounded-xl border border-purple-500/40 text-xs font-mono font-bold focus:ring-2 focus:ring-purple-500 bg-slate-800 text-purple-200"
+                            className="w-full pl-3 pr-10 py-2 rounded-xl border border-purple-300 text-xs font-mono font-bold focus:ring-2 focus:ring-purple-500 bg-white text-purple-950"
                           />
                           <button
                             type="button"
                             onClick={() => setShowAdminPasskey(!showAdminPasskey)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                           >
-                            {showAdminPasskey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-purple-400" />}
+                            {showAdminPasskey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-purple-600" />}
                           </button>
                         </div>
                       </div>
@@ -756,12 +755,12 @@ export const WelcomeGatewayView: React.FC = () => {
                   <div className="space-y-3">
                     {/* Mobile Phone Number */}
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
                         <span className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5 text-blue-400" />
+                          <Phone className="w-3.5 h-3.5 text-blue-600" />
                           <span>{language === 'hi' ? 'पंजीकृत मोबाइल नंबर (Registered Phone) *' : 'Registered Mobile Number *'}</span>
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">🇮🇳 +91</span>
+                        <span className="text-[10px] text-slate-500 font-mono font-bold">🇮🇳 +91</span>
                       </label>
                       <input
                         type="tel"
@@ -772,15 +771,15 @@ export const WelcomeGatewayView: React.FC = () => {
                           setPhone(e.target.value);
                           setOtpError('');
                         }}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-white/15 text-xs font-semibold font-mono focus:ring-2 focus:ring-blue-500 bg-slate-800/90 text-white placeholder:text-slate-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold font-mono focus:ring-2 focus:ring-blue-500 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white"
                       />
                     </div>
 
                     {/* Full Name (Optional) */}
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
                         <span className="flex items-center gap-1.5">
-                          <UserIcon className="w-3.5 h-3.5 text-blue-400" />
+                          <UserIcon className="w-3.5 h-3.5 text-blue-600" />
                           <span>{language === 'hi' ? 'पूरा नाम (वैकल्पिक / Optional)' : 'Registered Name (Optional)'}</span>
                         </span>
                       </label>
@@ -792,19 +791,19 @@ export const WelcomeGatewayView: React.FC = () => {
                           setName(e.target.value);
                           setOtpError('');
                         }}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-white/15 text-xs font-semibold focus:ring-2 focus:ring-blue-500 bg-slate-800/90 text-white placeholder:text-slate-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-500 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white"
                       />
                     </div>
 
                     {/* Team Passkey Field if logging into Hub or Admin */}
                     {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                      <div className="p-3 rounded-2xl bg-purple-950/50 border border-purple-500/40 space-y-1.5 mt-2">
-                        <label className="block text-purple-300 font-bold text-xs flex items-center justify-between">
+                      <div className="p-3 rounded-2xl bg-purple-50 border border-purple-200 space-y-1.5 mt-2">
+                        <label className="block text-purple-900 font-bold text-xs flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
-                            <KeyRound className="w-3.5 h-3.5 text-purple-400" />
+                            <KeyRound className="w-3.5 h-3.5 text-purple-600" />
                             <span>{activeModalRole === 'admin' ? 'Master Admin Passkey *' : 'Master Team / Hub Passkey *'}</span>
                           </span>
-                          <span className="text-[10px] font-mono text-purple-400 font-bold">Key: Krish0386</span>
+                          <span className="text-[10px] font-mono text-purple-700 font-bold">Key: Krish0386</span>
                         </label>
                         <div className="relative">
                           <input
@@ -816,14 +815,14 @@ export const WelcomeGatewayView: React.FC = () => {
                               setAdminPasskeyInput(e.target.value);
                               setAdminError('');
                             }}
-                            className="w-full pl-3 pr-10 py-2 rounded-xl border border-purple-500/40 text-xs font-mono font-bold focus:ring-2 focus:ring-purple-500 bg-slate-800 text-purple-200"
+                            className="w-full pl-3 pr-10 py-2 rounded-xl border border-purple-300 text-xs font-mono font-bold focus:ring-2 focus:ring-purple-500 bg-white text-purple-950"
                           />
                           <button
                             type="button"
                             onClick={() => setShowAdminPasskey(!showAdminPasskey)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                           >
-                            {showAdminPasskey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-purple-400" />}
+                            {showAdminPasskey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-purple-600" />}
                           </button>
                         </div>
                       </div>
@@ -833,15 +832,15 @@ export const WelcomeGatewayView: React.FC = () => {
 
                 {/* Error messages */}
                 {otpError && (
-                  <div className="p-2.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                     <span className="flex-1">{otpError}</span>
                   </div>
                 )}
 
                 {adminError && (activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                  <div className="p-2.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
                     <span>{adminError}</span>
                   </div>
                 )}
@@ -850,11 +849,11 @@ export const WelcomeGatewayView: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full py-3 rounded-2xl text-white font-extrabold text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.01] cursor-pointer mt-3 ${
-                    activeModalRole === 'farmer' ? 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 shadow-emerald-900/40' :
-                    activeModalRole === 'buyer' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-900/40' :
-                    activeModalRole === 'admin' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-900/40' :
-                    'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-amber-900/40'
+                  className={`w-full py-3 rounded-2xl text-white font-extrabold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all hover:scale-[1.01] cursor-pointer mt-3 ${
+                    activeModalRole === 'farmer' ? 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 shadow-emerald-600/30' :
+                    activeModalRole === 'buyer' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/30' :
+                    activeModalRole === 'admin' ? 'bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 shadow-purple-600/30' :
+                    'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-amber-600/30'
                   }`}
                 >
                   <Lock className="w-4 h-4" />
@@ -875,7 +874,7 @@ export const WelcomeGatewayView: React.FC = () => {
                         setOtpError('');
                         setAdminError('');
                       }}
-                      className="text-[11px] text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer font-medium"
+                      className="text-[11px] text-slate-500 hover:text-emerald-700 transition-colors cursor-pointer font-medium"
                     >
                       {language === 'hi' ? 'पहले से खाता है? यहाँ लॉगिन करें →' : 'Already have a registered account? Click here to Login →'}
                     </button>
@@ -887,7 +886,7 @@ export const WelcomeGatewayView: React.FC = () => {
                         setOtpError('');
                         setAdminError('');
                       }}
-                      className="text-[11px] text-slate-400 hover:text-blue-400 transition-colors cursor-pointer font-medium"
+                      className="text-[11px] text-slate-500 hover:text-blue-700 transition-colors cursor-pointer font-medium"
                     >
                       {language === 'hi' ? 'नया खाता बनाना है? नया रजिस्ट्रेशन करें →' : 'Need a new account? Register new profile here →'}
                     </button>
