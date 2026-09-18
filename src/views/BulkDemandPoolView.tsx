@@ -190,116 +190,6 @@ export const BulkDemandPoolView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner Tailored to Role */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-emerald-950 text-white p-6 sm:p-8 shadow-2xl border border-indigo-500/20">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold backdrop-blur-xs">
-              <Boxes className="w-3.5 h-3.5" />
-              <span>
-                {activeRole === 'farmer' 
-                  ? '🌾 4-Month Advance Corporate Bulk Orders (किसान अग्रिम आर्डर केंद्र)' 
-                  : '⚡ 4-Month Advance Institutional Bulk Procurement (50T – 500T+)'}
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              {activeRole === 'farmer' 
-                ? 'Receive 4-Month Advance Corporate Bulk Orders'
-                : '4-Month Advance Bulk Procurement & Demand Pools'}
-            </h1>
-
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              {activeRole === 'farmer' 
-                ? 'ITC, Reliance, BigBasket आदि बड़ी कंपनियां 4 महीने पहले अग्रिम (Advance) 500 टन के आर्डर देती हैं। आप अपनी आगामी फसल की मात्रा (जैसे 10 टन, 25 टन, 50 टन) दर्ज करके गारंटीड भाव और 100% एस्क्रो एडवांस बुक कर सकते हैं।'
-                : 'Buyers can schedule bulk contracts (50T to 500T+) minimum 4 months in advance. Guaranteed 100% Escrow pre-funding with direct multi-farmer cluster aggregation and AI automated multi-axle freight dispatch.'}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap sm:flex-nowrap gap-3 shrink-0">
-            {(activeRole === 'buyer' || activeRole === 'admin') && (
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all hover:scale-105 cursor-pointer"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>+ Create 4-Month Advance Bulk Demand</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => setActiveTab('transport_services')}
-              className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-xs backdrop-blur-xs flex items-center gap-2 transition-all cursor-pointer"
-            >
-              <Truck className="w-4 h-4 text-emerald-400" />
-              <span>State Transport Fleet</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Global Metric Counter Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10 text-xs">
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
-            <span className="text-slate-400 block text-[11px]">Active Advance Pools</span>
-            <span className="text-lg font-extrabold text-white mt-0.5 block">{bulkDemands.length} Corporate Pools</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
-            <span className="text-slate-400 block text-[11px]">Target Quota Volume</span>
-            <span className="text-lg font-extrabold text-amber-400 mt-0.5 block">{totalTargetTons.toLocaleString('en-IN')} Metric Tons</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
-            <span className="text-slate-400 block text-[11px]">Total Committed Supply</span>
-            <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className="text-lg font-extrabold text-emerald-400">{totalCommittedTons.toLocaleString('en-IN')} T</span>
-              <span className="text-[11px] text-emerald-300 font-semibold">({Math.round((totalCommittedTons / (totalTargetTons || 1)) * 100)}%)</span>
-            </div>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
-            <span className="text-slate-400 block text-[11px]">Pre-Funded Escrow</span>
-            <span className="text-lg font-extrabold text-blue-400 mt-0.5 block">₹{(totalEscrowPoolValue / 10000000).toFixed(2)} Cr Locked</span>
-          </div>
-        </div>
-      </div>
-
-      {/* How 4-Month Advance Pooling Works Explainer */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-start gap-3">
-          <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 font-bold flex items-center justify-center shrink-0">
-            1
-          </div>
-          <div>
-            <h4 className="font-bold text-slate-900">Buyer Posts 4-Month Advance Order</h4>
-            <p className="text-slate-500 text-[11px] mt-0.5">ITC, Reliance आदि खरीदार 4 महीने पहले 500 टन की अग्रिम मांग, तय भाव और तारीख दर्ज करते हैं।</p>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-start gap-3">
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 font-bold flex items-center justify-center shrink-0">
-            2
-          </div>
-          <div>
-            <h4 className="font-bold text-slate-900">Farmers Receive & Accept (मात्रा दर्ज करें)</h4>
-            <p className="text-slate-500 text-[11px] mt-0.5">किसान अपनी आगामी फसल (10T, 25T, 50T) दर्ज करके 100% गारंटीड भाव और एस्क्रो लॉक करते हैं।</p>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-start gap-3">
-          <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 font-bold flex items-center justify-center shrink-0">
-            3
-          </div>
-          <div>
-            <h4 className="font-bold text-slate-900">AI Multi-Axle Fleet & Bank Settlement</h4>
-            <p className="text-slate-500 text-[11px] mt-0.5">4 महीने बाद हार्वेस्ट पर AI ट्रक क्लस्टर से माल उठाता है और किसान को सीधा बैंक भुगतान मिलता है।</p>
-          </div>
-        </div>
-      </div>
-
       {/* Search & Filter Controls */}
       <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-soft space-y-4">
         <div className="flex flex-col lg:flex-row gap-3 items-center justify-between">
@@ -314,7 +204,7 @@ export const BulkDemandPoolView: React.FC = () => {
             />
           </div>
 
-          <div className="flex flex-wrap gap-2 w-full lg:w-auto">
+          <div className="flex flex-wrap gap-2 w-full lg:w-auto items-center">
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
@@ -334,6 +224,24 @@ export const BulkDemandPoolView: React.FC = () => {
                 <option key={st} value={st}>Destination: {st}</option>
               ))}
             </select>
+
+            {(activeRole === 'buyer' || activeRole === 'admin') && (
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>+ Create Advance Demand</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => setActiveTab('transport_services')}
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Truck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>State Transport Fleet</span>
+            </button>
           </div>
         </div>
       </div>
