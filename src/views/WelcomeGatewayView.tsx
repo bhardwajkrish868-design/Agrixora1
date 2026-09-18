@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { UserRole } from '../types';
+import { RegistrationModal } from '../components/RegistrationModal';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -25,8 +26,89 @@ import {
   KeyRound,
   CreditCard,
   MapPin,
-  BadgeCheck 
+  BadgeCheck,
+  Mail,
+  ChevronDown,
+  BarChart3,
+  Users,
+  Leaf
 } from 'lucide-react';
+
+// 🇮🇳 Authentic UIDAI Sunburst Aadhaar Logo
+const AadhaarSunburstLogo: React.FC = () => (
+  <div className="w-14 h-12 flex flex-col items-center justify-center shrink-0 bg-white/90 p-1 rounded-xl border border-amber-200/60 shadow-2xs">
+    <svg viewBox="0 0 100 68" className="w-full h-full drop-shadow-2xs">
+      <defs>
+        <linearGradient id="aadhaarSunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#EA580C" />
+          <stop offset="60%" stopColor="#F97316" />
+          <stop offset="100%" stopColor="#FB923C" />
+        </linearGradient>
+      </defs>
+      {/* Sun rays fan */}
+      <g fill="url(#aadhaarSunGrad)">
+        <polygon points="50,26 49,7 51,7" />
+        <polygon points="50,26 40,9 42,8" />
+        <polygon points="50,26 60,9 58,8" />
+        <polygon points="50,26 31,13 33,11" />
+        <polygon points="50,26 69,13 67,11" />
+        <polygon points="50,26 23,19 25,17" />
+        <polygon points="50,26 77,19 75,17" />
+        <polygon points="50,26 19,28 20,26" />
+        <polygon points="50,26 81,28 80,26" />
+        <polygon points="50,26 18,37 19,35" />
+        <polygon points="50,26 82,37 81,35" />
+      </g>
+      {/* Central finger/sun arch */}
+      <path
+        d="M 36 34 A 14 14 0 0 1 64 34"
+        fill="none"
+        stroke="#DC2626"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M 42 34 A 8 8 0 0 1 58 34"
+        fill="none"
+        stroke="#EA580C"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <circle cx="50" cy="33" r="2.5" fill="#DC2626" />
+      {/* UIDAI Wordmark */}
+      <text
+        x="50"
+        y="59"
+        textAnchor="middle"
+        fontSize="10"
+        fontWeight="900"
+        fontFamily="sans-serif"
+        letterSpacing="2"
+        fill="#DC2626"
+      >
+        AADHAAR
+      </text>
+    </svg>
+  </div>
+);
+
+// 🇮🇳 Digital India Official Trust Badge
+const DigitalIndiaLogo: React.FC = () => (
+  <div className="flex items-center gap-1.5 shrink-0 select-none">
+    <div className="w-4 h-4 rounded-full overflow-hidden border border-slate-300 shadow-2xs flex flex-col">
+      <div className="h-1/3 bg-[#FF9933] w-full" />
+      <div className="h-1/3 bg-white w-full flex items-center justify-center">
+        <div className="w-1 h-1 rounded-full bg-[#000080]" />
+      </div>
+      <div className="h-1/3 bg-[#138808] w-full" />
+    </div>
+    <div className="leading-tight flex items-baseline">
+      <span className="text-[11px] font-black text-slate-800 tracking-tight">Digital</span>
+      <span className="text-[11px] font-black text-[#FF9933] tracking-tight ml-0.5">India</span>
+    </div>
+  </div>
+);
+
 
 export const WelcomeGatewayView: React.FC = () => {
   const { loginUser, registerUser, language, setLanguage, verifyAdminPasskey } = useAgri();
@@ -38,7 +120,9 @@ export const WelcomeGatewayView: React.FC = () => {
   // Form states (clean / un-prefilled)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [aadhaarNumber, setAadhaarNumber] = useState('');
+  const [agreedTerms, setAgreedTerms] = useState(true);
   const [otp, setOtp] = useState('882910');
   const [generatedOtp, setGeneratedOtp] = useState('882910');
   const [isOtpSent, setIsOtpSent] = useState(true);
@@ -138,7 +222,9 @@ export const WelcomeGatewayView: React.FC = () => {
     // Start with empty clean inputs so user enters their own details
     setName('');
     setPhone('');
+    setEmail('');
     setAadhaarNumber('');
+    setAgreedTerms(true);
     setOtp('');
     setGeneratedOtp('');
     setOtpVerified(true);
@@ -186,6 +272,15 @@ export const WelcomeGatewayView: React.FC = () => {
         }
       }
 
+      if (!agreedTerms) {
+        setOtpError(
+          language === 'hi'
+            ? '❌ कृपया नियमों और शर्तों से सहमति दें।'
+            : '❌ Please agree to the Terms & Conditions and Privacy Policy.'
+        );
+        return;
+      }
+
       if (activeModalRole === 'admin' || activeModalRole === 'collection_centre') {
         const isKeyValid = verifyAdminPasskey(adminPasskeyInput);
         if (!isKeyValid) {
@@ -208,6 +303,7 @@ export const WelcomeGatewayView: React.FC = () => {
           role: activeModalRole,
           name: cleanName,
           phone: formattedPhone,
+          email: email.trim() || undefined,
           aadhaarNumber: aadhaarNumber.trim(),
           aadhaarVerified: true,
           state: state,
@@ -487,613 +583,14 @@ export const WelcomeGatewayView: React.FC = () => {
         </div>
       </footer>
 
-      {/* 🔐 AUTHENTICATION MODAL (Clean Light Theme) */}
+      {/* 🔐 AUTHENTICATION & REGISTRATION MODAL */}
       {activeModalRole && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-          
-          {/* Backdrop Blur */}
-          <div 
-            onClick={() => setActiveModalRole(null)}
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
-          />
-
-          <div className="relative bg-white text-slate-900 rounded-[28px] sm:rounded-[32px] shadow-[0_25px_70px_rgba(15,23,42,0.35)] max-w-lg w-full overflow-hidden z-10 border border-slate-100 max-h-[92vh] flex flex-col animate-in zoom-in-95 duration-200">
-            
-            {/* 🌟 Modal Header with Glassmorphic Depth */}
-            <div className={`p-5 sm:p-6 text-white relative shrink-0 overflow-hidden border-b border-white/10 ${
-              activeModalRole === 'farmer' ? 'bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-950' :
-              activeModalRole === 'buyer' ? 'bg-gradient-to-br from-blue-600 via-indigo-700 to-slate-950' :
-              activeModalRole === 'admin' ? 'bg-gradient-to-br from-purple-700 via-purple-800 to-slate-950' :
-              'bg-gradient-to-br from-amber-600 via-amber-700 to-slate-950'
-            }`}>
-              {/* Ambient Glow Orb */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-
-              {/* Close Button */}
-              <button
-                onClick={() => setActiveModalRole(null)}
-                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white/90 hover:text-white flex items-center justify-center transition-all absolute top-4 right-4 cursor-pointer backdrop-blur-xs shadow-xs"
-                title="Close dialog"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="flex items-center gap-3.5 relative z-10">
-                <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-2xl border border-white/30 shadow-lg shrink-0">
-                  {activeModalRole === 'farmer' ? '🌾' : activeModalRole === 'buyer' ? '🏢' : activeModalRole === 'admin' ? '🏛️' : '🏬'}
-                </div>
-                <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-white/15 backdrop-blur-md border border-white/20 text-white/90 mb-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>
-                      {activeModalRole === 'farmer' ? 'Kisan Smart Mandi Network' :
-                       activeModalRole === 'buyer' ? 'Institutional Procurement & Escrow' :
-                       activeModalRole === 'admin' ? 'Authorized Govt Console' :
-                       'APMC Collection Hub Operations'}
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl sm:text-2xl font-black font-display tracking-tight text-white leading-tight">
-                    {authMode === 'register' ? (
-                      activeModalRole === 'farmer' ? 'New Farmer Registration' :
-                      activeModalRole === 'buyer' ? 'New Buyer Registration' :
-                      activeModalRole === 'admin' ? 'Govt Admin Enrollment' :
-                      'New APMC Hub Registration'
-                    ) : (
-                      activeModalRole === 'farmer' ? 'Farmer Sign In' :
-                      activeModalRole === 'buyer' ? 'Buyer Sign In' :
-                      activeModalRole === 'admin' ? 'Govt Admin Console' :
-                      'APMC Collection Hub Login'
-                    )}
-                  </h3>
-
-                  <p className="text-xs text-white/80 mt-0.5 font-normal leading-relaxed">
-                    {authMode === 'register' 
-                      ? (language === 'hi' 
-                          ? 'नया सत्यापित प्रोफाइल बनाएं और तुरंत डैशबोर्ड में प्रवेश करें' 
-                          : (activeModalRole === 'buyer' ? 'Direct farmgate contracts, NABL quality grading & trade escrow' : 'Pre-harvest contracts, ₹0 farmgate pickup & guaranteed MSP'))
-                      : (language === 'hi' 
-                          ? 'पंजीकृत मोबाइल या 12-अंक आधार नंबर दर्ज करके लॉगिन करें' 
-                          : 'Sign in with your registered mobile or 12-digit Aadhaar number')
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Team Role Switcher inside Modal (Only visible when secret team access is open) */}
-            {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-              <div className="flex bg-slate-100 p-1.5 border-b border-slate-200 gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveModalRole('admin');
-                    setAdminError('');
-                    setOtpError('');
-                  }}
-                  className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    activeModalRole === 'admin'
-                      ? 'bg-purple-100 text-purple-900 border border-purple-300 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <span>🏛️ Govt Admin Console</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveModalRole('collection_centre');
-                    setAdminError('');
-                    setOtpError('');
-                  }}
-                  className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    activeModalRole === 'collection_centre'
-                      ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <span>🏬 APMC Collection Hub</span>
-                </button>
-              </div>
-            )}
-
-            {/* 🏷️ Sleek Segmented Switcher */}
-            <div className="px-5 pt-3.5 pb-2 bg-white border-b border-slate-100 shrink-0">
-              <div className="flex bg-slate-100/90 p-1 rounded-2xl gap-1 border border-slate-200/70">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthMode('register');
-                    setOtpError('');
-                    setAdminError('');
-                  }}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    authMode === 'register'
-                      ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-extrabold'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <span className={`w-2 h-2 rounded-full ${activeModalRole === 'buyer' ? 'bg-blue-600' : 'bg-emerald-600'}`} />
-                  <span>{language === 'hi' ? '📝 नया रजिस्ट्रेशन (Register)' : '📝 New Registration (First)'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthMode('login');
-                    setOtpError('');
-                    setAdminError('');
-                  }}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    authMode === 'login'
-                      ? 'bg-white text-slate-900 shadow-xs border border-slate-200/80 font-extrabold'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Lock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{language === 'hi' ? '🔑 पुराना खाता (Sign In)' : '🔑 Existing User Sign In'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body / Form */}
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1 text-xs bg-white text-slate-800">
-              
-              {/* Notice for Team Roles */}
-              {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                <div className="p-2.5 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-2 text-amber-900">
-                  <Shield className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                  <div className="text-[11px] leading-relaxed">
-                    <strong className="block text-amber-900 font-bold">
-                      {language === 'hi' ? '🔒 आंतरिक टीम पोर्टल (Team Members Only):' : '🔒 Internal Team & Operator Portal:'}
-                    </strong>
-                    <span>
-                      {language === 'hi' 
-                        ? 'यह पोर्टल केवल अधिकृत टीम सदस्यों के लिए है। आगे बढ़ने के लिए मास्टर टीम पासकी (Krish0386) आवश्यक है।' 
-                        : 'This portal is restricted to Farm2Future team members. Authorized Master Passkey (Krish0386) is required.'}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-3.5">
-                
-                {/* 1. REGISTER MODE (DEFAULT FIRST) */}
-                {authMode === 'register' ? (
-                  <div className="space-y-3.5">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1">
-                          <UserIcon className="w-3.5 h-3.5 text-slate-500" />
-                          <span>{language === 'hi' ? 'पूरा नाम (Full Legal Name) *' : 'Full Legal Name *'}</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder={activeModalRole === 'farmer' ? 'e.g. Ramesh Patil' : activeModalRole === 'buyer' ? 'e.g. Priya Sharma' : activeModalRole === 'admin' ? 'e.g. Dr. Anil Deshmukh' : 'e.g. Rajesh Verma'}
-                          value={name}
-                          onChange={e => {
-                            setName(e.target.value);
-                            setOtpError('');
-                          }}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1">
-                          {activeModalRole === 'farmer' ? (
-                            <>
-                              <Sprout className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>{language === 'hi' ? 'कुल कृषि भूमि (एकड़) *' : 'Farm Land (Acres) *'}</span>
-                            </>
-                          ) : activeModalRole === 'buyer' ? (
-                            <>
-                              <Building2 className="w-3.5 h-3.5 text-blue-600" />
-                              <span>{language === 'hi' ? 'कंपनी / व्यवसाय का नाम *' : 'Company / Business Name *'}</span>
-                            </>
-                          ) : activeModalRole === 'collection_centre' ? (
-                            <>
-                              <Boxes className="w-3.5 h-3.5 text-amber-600" />
-                              <span>{language === 'hi' ? 'APMC हब सेंटर *' : 'APMC Hub Center *'}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Shield className="w-3.5 h-3.5 text-purple-600" />
-                              <span>{language === 'hi' ? 'विभाग *' : 'Department *'}</span>
-                            </>
-                          )}
-                        </label>
-                        {activeModalRole === 'farmer' ? (
-                          <input
-                            type="number"
-                            placeholder="e.g. 5"
-                            value={farmSize}
-                            onChange={e => setFarmSize(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
-                          />
-                        ) : activeModalRole === 'buyer' ? (
-                          <input
-                            type="text"
-                            placeholder="e.g. ITC Agri / Reliance Fresh"
-                            value={businessName}
-                            onChange={e => setBusinessName(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                          />
-                        ) : (
-                          <input
-                            type="text"
-                            placeholder="e.g. Nashik North Hub #04"
-                            value={hubName}
-                            onChange={e => setHubName(e.target.value)}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all"
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Mobile Phone with Prefix Badge */}
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5 text-slate-500" />
-                          <span>{language === 'hi' ? 'मोबाइल नंबर (OTP सत्यापन) *' : 'Mobile Phone Number *'}</span>
-                        </span>
-                        <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                          ✓ OTP Instant Verify
-                        </span>
-                      </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-xs font-mono font-bold text-slate-500 select-none">
-                          🇮🇳 +91
-                        </span>
-                        <input
-                          type="tel"
-                          required
-                          placeholder="98220 11223"
-                          value={phone}
-                          onChange={e => {
-                            setPhone(e.target.value);
-                            setOtpError('');
-                          }}
-                          className="w-full pl-18 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold font-mono bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    {/* 🆔 12-Digit UIDAI Aadhaar Digital Smart Card */}
-                    {(activeModalRole === 'farmer' || activeModalRole === 'buyer') && (
-                      <div className={`p-4 rounded-2xl border transition-all relative overflow-hidden ${
-                        aadhaarNumber.replace(/\D/g, '').length === 12
-                          ? 'bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40 border-emerald-300 shadow-xs'
-                          : 'bg-gradient-to-br from-slate-50 via-white to-slate-50/80 border-slate-200/90 shadow-2xs'
-                      }`}>
-                        {/* Top Tricolor Accent Line */}
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-white to-emerald-600 opacity-80" />
-
-                        {/* Aadhaar Header Row */}
-                        <div className="flex items-center justify-between mb-2 pt-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-base leading-none">🇮🇳</span>
-                            <div>
-                              <p className="text-[10px] font-extrabold tracking-wider uppercase text-slate-700 leading-none">
-                                UIDAI • Government of India
-                              </p>
-                              <p className="text-[9px] text-slate-400 font-medium mt-0.5">National Identity & Direct Benefit Verification</p>
-                            </div>
-                          </div>
-                          {aadhaarNumber.replace(/\D/g, '').length === 12 ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-300 animate-pulse">
-                              <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                              <span>UIDAI Verified</span>
-                            </span>
-                          ) : (
-                            <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                              {12 - aadhaarNumber.replace(/\D/g, '').length > 0
-                                ? `${12 - aadhaarNumber.replace(/\D/g, '').length} digits left`
-                                : '12 digits required'}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Input Row */}
-                        <label className="block text-[11px] font-bold text-slate-800 mb-1.5 flex items-center justify-between">
-                          <span className="flex items-center gap-1.5">
-                            <CreditCard className={`w-3.5 h-3.5 ${activeModalRole === 'buyer' ? 'text-blue-600' : 'text-emerald-600'}`} />
-                            <span>
-                              {language === 'hi' 
-                                ? (activeModalRole === 'farmer' ? 'किसान आधार नंबर (12-अंक UIDAI) *' : 'थोक खरीदार आधार नंबर (12-अंक UIDAI) *') 
-                                : `${activeModalRole === 'farmer' ? 'Farmer' : 'Buyer'} Aadhaar Card Number (12-Digit UIDAI) *`}
-                            </span>
-                          </span>
-                          <span className="text-[10px] font-mono text-slate-400 font-medium">XXXX XXXX XXXX</span>
-                        </label>
-
-                        <div className="relative">
-                          <input
-                            type="text"
-                            required
-                            maxLength={14}
-                            placeholder="5432 8765 1098"
-                            value={aadhaarNumber}
-                            onChange={e => handleAadhaarInput(e.target.value)}
-                            className={`w-full px-3.5 py-2.5 rounded-xl border text-sm font-mono font-bold tracking-widest bg-white text-slate-900 placeholder:text-slate-300 placeholder:tracking-widest focus:bg-white transition-all ${
-                              aadhaarNumber.replace(/\D/g, '').length === 12
-                                ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-500/15 text-emerald-950 shadow-2xs'
-                                : 'border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10'
-                            }`}
-                          />
-                          {aadhaarNumber.replace(/\D/g, '').length === 12 && (
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200 text-[10px] font-bold">
-                              <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[3]" />
-                              <span>Valid</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Security Subtext */}
-                        <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-500 font-medium">
-                          <span className="flex items-center gap-1">
-                            <Lock className="w-3 h-3 text-slate-400" />
-                            <span>
-                              {language === 'hi'
-                                ? '256-बिट सुरक्षित UIDAI सत्यापन: प्रत्यक्ष बैंक ट्रांसफर व सुरक्षित एस्क्रो हेतु अनिवार्य'
-                                : '256-bit encrypted: Mandatory for direct MSP subsidies, mandi access & escrow safety'}
-                            </span>
-                          </span>
-                          <span className="font-bold text-slate-600 shrink-0">Digital India 🇮🇳</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* State & District */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{language === 'hi' ? 'राज्य (State) *' : 'State *'}</span>
-                        </label>
-                        <select
-                          value={state}
-                          onChange={e => setState(e.target.value)}
-                          className="w-full px-3 py-2.5 rounded-xl border border-slate-200/90 text-xs font-semibold bg-slate-50/70 text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer"
-                        >
-                          <option value="Maharashtra">Maharashtra</option>
-                          <option value="Punjab">Punjab</option>
-                          <option value="Haryana">Haryana</option>
-                          <option value="Madhya Pradesh">Madhya Pradesh</option>
-                          <option value="Gujarat">Gujarat</option>
-                          <option value="Uttar Pradesh">Uttar Pradesh</option>
-                          <option value="Rajasthan">Rajasthan</option>
-                          <option value="Karnataka">Karnataka</option>
-                          <option value="Andhra Pradesh">Andhra Pradesh</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1">
-                          <span>{language === 'hi' ? 'जिला (District) *' : 'District *'}</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. Nashik"
-                          value={district}
-                          onChange={e => setDistrict(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200/90 text-xs font-medium bg-slate-50/70 text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Team Passkey Field if registering Hub or Admin */}
-                    {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                      <div className="p-3.5 rounded-2xl bg-purple-50 border border-purple-200 space-y-1.5">
-                        <label className="block text-purple-900 font-bold text-xs flex items-center justify-between">
-                          <span className="flex items-center gap-1.5">
-                            <KeyRound className="w-3.5 h-3.5 text-purple-600" />
-                            <span>{activeModalRole === 'admin' ? 'Master Admin Passkey *' : 'Master Team / Hub Passkey *'}</span>
-                          </span>
-                          <span className="text-[10px] font-mono text-purple-700 font-bold">Key: Krish0386</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showAdminPasskey ? "text" : "password"}
-                            required
-                            placeholder="Enter Team Key: Krish0386"
-                            value={adminPasskeyInput}
-                            onChange={e => {
-                              setAdminPasskeyInput(e.target.value);
-                              setAdminError('');
-                            }}
-                            className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-purple-300 text-xs font-mono font-bold focus:ring-4 focus:ring-purple-500/15 bg-white text-purple-950"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowAdminPasskey(!showAdminPasskey)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                          >
-                            {showAdminPasskey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-purple-600" />}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  /* 2. EXISTING USER LOGIN MODE */
-                  <div className="space-y-3.5">
-                    {/* Mobile Phone or Aadhaar Number */}
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5 text-blue-600" />
-                          <span>
-                            {language === 'hi' 
-                              ? (activeModalRole === 'farmer' || activeModalRole === 'buyer' 
-                                  ? 'पंजीकृत मोबाइल या आधार नंबर (Mobile / Aadhaar) *' 
-                                  : 'पंजीकृत मोबाइल नंबर (Registered Phone) *')
-                              : (activeModalRole === 'farmer' || activeModalRole === 'buyer' 
-                                  ? 'Registered Mobile or Aadhaar Number *' 
-                                  : 'Registered Mobile Number *')}
-                          </span>
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono font-bold">🇮🇳 +91 / UIDAI</span>
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder={
-                          activeModalRole === 'farmer' || activeModalRole === 'buyer'
-                            ? "e.g. 98220 11223 or 5432 8765 1098"
-                            : "e.g. 98220 11223"
-                        }
-                        value={phone}
-                        onChange={e => {
-                          setPhone(e.target.value);
-                          setOtpError('');
-                        }}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold font-mono focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all"
-                      />
-                    </div>
-
-                    {/* Full Name (Optional) */}
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <UserIcon className="w-3.5 h-3.5 text-blue-600" />
-                          <span>{language === 'hi' ? 'पूरा नाम (वैकल्पिक / Optional)' : 'Registered Name (Optional)'}</span>
-                        </span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Ramesh Patil / Priya Sharma"
-                        value={name}
-                        onChange={e => {
-                          setName(e.target.value);
-                          setOtpError('');
-                        }}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-slate-50/70 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all"
-                      />
-                    </div>
-
-                    {/* Team Passkey Field if logging into Hub or Admin */}
-                    {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                      <div className="p-3.5 rounded-2xl bg-purple-50 border border-purple-200 space-y-1.5 mt-2">
-                        <label className="block text-purple-900 font-bold text-xs flex items-center justify-between">
-                          <span className="flex items-center gap-1.5">
-                            <KeyRound className="w-3.5 h-3.5 text-purple-600" />
-                            <span>{activeModalRole === 'admin' ? 'Master Admin Passkey *' : 'Master Team / Hub Passkey *'}</span>
-                          </span>
-                          <span className="text-[10px] font-mono text-purple-700 font-bold">Key: Krish0386</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showAdminPasskey ? "text" : "password"}
-                            required
-                            placeholder="Enter Team Key: Krish0386"
-                            value={adminPasskeyInput}
-                            onChange={e => {
-                              setAdminPasskeyInput(e.target.value);
-                              setAdminError('');
-                            }}
-                            className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-purple-300 text-xs font-mono font-bold focus:ring-4 focus:ring-purple-500/15 bg-white text-purple-950"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowAdminPasskey(!showAdminPasskey)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                          >
-                            {showAdminPasskey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-purple-600" />}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Error messages */}
-                {otpError && (
-                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-shake">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span className="flex-1">{otpError}</span>
-                  </div>
-                )}
-
-                {adminError && (activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
-                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-shake">
-                    <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>{adminError}</span>
-                  </div>
-                )}
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full py-3.5 rounded-2xl text-white font-extrabold text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 transition-all hover:shadow-xl active:scale-[0.99] cursor-pointer mt-2 ${
-                    activeModalRole === 'farmer' 
-                      ? 'bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-700 hover:to-teal-800 shadow-emerald-700/25' 
-                      : activeModalRole === 'buyer' 
-                        ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/25' 
-                        : activeModalRole === 'admin' 
-                          ? 'bg-gradient-to-r from-purple-700 via-purple-800 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 shadow-purple-700/25' 
-                          : 'bg-gradient-to-r from-amber-600 via-amber-700 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-amber-600/25'
-                  }`}
-                >
-                  <Lock className="w-4 h-4" />
-                  <span>
-                    {isSubmitting ? 'Processing & Verifying...' : 
-                     authMode === 'register' 
-                       ? (activeModalRole === 'farmer' ? '🌾 Complete Registration & Launch Farmer Hub →' : '🏢 Complete Registration & Launch Buyer Hub →')
-                       : (activeModalRole === 'farmer' ? '🌾 Sign In to Farmer Dashboard →' : '🏢 Sign In to Buyer Dashboard →')}
-                  </span>
-                </button>
-
-                {/* Trust Badges */}
-                <div className="flex items-center justify-center gap-3 pt-1 text-[10px] text-slate-500 font-medium">
-                  <span className="flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                    <span>100% Free Signup</span>
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <Check className="w-3 h-3 text-blue-600" />
-                    <span>Instant Verification</span>
-                  </span>
-                  <span>•</span>
-                  <span>Bank-Grade Escrow</span>
-                </div>
-
-                {/* Switch helper link */}
-                <div className="text-center pt-1">
-                  {authMode === 'register' ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAuthMode('login');
-                        setOtpError('');
-                        setAdminError('');
-                      }}
-                      className="text-[11px] text-slate-500 hover:text-blue-700 transition-colors cursor-pointer font-medium"
-                    >
-                      {language === 'hi' ? 'पहले से खाता है? यहाँ लॉगिन करें →' : 'Already have a registered account? Click here to Login →'}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAuthMode('register');
-                        setOtpError('');
-                        setAdminError('');
-                      }}
-                      className="text-[11px] text-slate-500 hover:text-emerald-700 transition-colors cursor-pointer font-medium"
-                    >
-                      {language === 'hi' ? 'नया खाता बनाना है? नया रजिस्ट्रेशन करें →' : 'Need a new account? Register new profile here →'}
-                    </button>
-                  )}
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+        <RegistrationModal
+          isOpen={!!activeModalRole}
+          role={activeModalRole}
+          onClose={() => setActiveModalRole(null)}
+          defaultMode={authMode}
+        />
       )}
 
     </div>
