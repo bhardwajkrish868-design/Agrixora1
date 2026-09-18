@@ -22,7 +22,8 @@ import {
   TrendingUp, 
   Boxes, 
   Shield, 
-  KeyRound 
+  KeyRound,
+  CreditCard 
 } from 'lucide-react';
 
 export const WelcomeGatewayView: React.FC = () => {
@@ -35,6 +36,7 @@ export const WelcomeGatewayView: React.FC = () => {
   // Form states (clean / un-prefilled)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [aadhaarNumber, setAadhaarNumber] = useState('');
   const [otp, setOtp] = useState('882910');
   const [generatedOtp, setGeneratedOtp] = useState('882910');
   const [isOtpSent, setIsOtpSent] = useState(true);
@@ -54,6 +56,14 @@ export const WelcomeGatewayView: React.FC = () => {
   const [showAdminPasskey, setShowAdminPasskey] = useState(false);
   const [adminError, setAdminError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Auto-format 12-digit Aadhaar number with standard 4-4-4 spacing
+  const handleAadhaarInput = (val: string) => {
+    const rawDigits = val.replace(/\D/g, '').slice(0, 12);
+    const formatted = rawDigits.match(/.{1,4}/g)?.join(' ') || rawDigits;
+    setAadhaarNumber(formatted);
+    setOtpError('');
+  };
 
   const [logoClicks, setLogoClicks] = useState(0);
   const logoClickTimeoutRef = useRef<any>(null);
@@ -126,6 +136,7 @@ export const WelcomeGatewayView: React.FC = () => {
     // Start with empty clean inputs so user enters their own details
     setName('');
     setPhone('');
+    setAadhaarNumber('');
     setOtp('');
     setGeneratedOtp('');
     setOtpVerified(true);
@@ -160,6 +171,19 @@ export const WelcomeGatewayView: React.FC = () => {
         return;
       }
 
+      // Mandatory 12-Digit UIDAI Aadhaar validation for both Farmer and Buyer
+      if (activeModalRole === 'farmer' || activeModalRole === 'buyer') {
+        const rawAadhaar = aadhaarNumber.replace(/\D/g, '');
+        if (rawAadhaar.length !== 12) {
+          setOtpError(
+            language === 'hi'
+              ? `❌ कृपया ${activeModalRole === 'farmer' ? 'किसान' : 'थोक खरीदार'} का मान्य 12-अंकीय आधार कार्ड नंबर (UIDAI) दर्ज करें।`
+              : `❌ Please enter a valid 12-digit UIDAI Aadhaar Card Number for ${activeModalRole === 'farmer' ? 'Farmer' : 'Buyer'} verification.`
+          );
+          return;
+        }
+      }
+
       if (activeModalRole === 'admin' || activeModalRole === 'collection_centre') {
         const isKeyValid = verifyAdminPasskey(adminPasskeyInput);
         if (!isKeyValid) {
@@ -182,6 +206,8 @@ export const WelcomeGatewayView: React.FC = () => {
           role: activeModalRole,
           name: cleanName,
           phone: formattedPhone,
+          aadhaarNumber: aadhaarNumber.trim(),
+          aadhaarVerified: true,
           state: state,
           district: finalDistrict,
           location: finalLocation,
@@ -200,7 +226,7 @@ export const WelcomeGatewayView: React.FC = () => {
       const rawDigits = cleanPhone.replace(/\D/g, '');
 
       if (!cleanPhone && !cleanName) {
-        setOtpError(language === 'hi' ? '❌ कृपया अपना पंजीकृत मोबाइल नंबर या नाम दर्ज करें।' : '❌ Please enter your registered phone number or name.');
+        setOtpError(language === 'hi' ? '❌ कृपया अपना पंजीकृत मोबाइल नंबर, आधार नंबर या नाम दर्ज करें।' : '❌ Please enter your registered phone number, Aadhaar number, or name.');
         return;
       }
 
@@ -215,17 +241,18 @@ export const WelcomeGatewayView: React.FC = () => {
       }
 
       setIsSubmitting(true);
-      const formattedPhone = cleanPhone.startsWith('+91') ? cleanPhone : cleanPhone ? `+91 ${cleanPhone}` : '';
+      const formattedPhone = cleanPhone.startsWith('+91') ? cleanPhone : (rawDigits.length === 10 ? `+91 ${cleanPhone}` : '');
 
       setTimeout(() => {
         const result = loginUser({
           role: activeModalRole,
           name: cleanName || undefined,
-          phone: formattedPhone || undefined
+          phone: formattedPhone || undefined,
+          aadhaarNumber: rawDigits.length === 12 ? rawDigits : undefined
         });
 
         if (!result.success) {
-          setOtpError(result.message || (language === 'hi' ? '❌ कोई पंजीकृत खाता नहीं मिला। कृपया पहले नया खाता बनाएं (Register)।' : '❌ No registered account found with this phone/name. Please register first.'));
+          setOtpError(result.message || (language === 'hi' ? '❌ कोई पंजीकृत खाता नहीं मिला। कृपया पहले नया खाता बनाएं (Register)।' : '❌ No registered account found with this phone/Aadhaar/name. Please register first.'));
           setIsSubmitting(false);
           return;
         }
@@ -693,6 +720,55 @@ export const WelcomeGatewayView: React.FC = () => {
                       />
                     </div>
 
+                    {/* 12-Digit UIDAI Aadhaar Card (Farmer & Buyer) */}
+                    {(activeModalRole === 'farmer' || activeModalRole === 'buyer') && (
+                      <div className="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-1.5 transition-all">
+                        <label className="block text-[11px] font-bold text-emerald-950 mb-1 flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <CreditCard className="w-3.5 h-3.5 text-emerald-700" />
+                            <span>
+                              {language === 'hi' 
+                                ? (activeModalRole === 'farmer' ? 'किसान आधार नंबर (UIDAI 12-अंक) *' : 'खरीदार आधार नंबर (UIDAI 12-अंक) *') 
+                                : `${activeModalRole === 'farmer' ? 'Farmer' : 'Buyer'} Aadhaar Number (12-Digit UIDAI) *`}
+                            </span>
+                          </span>
+                          {aadhaarNumber.replace(/\D/g, '').length === 12 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold tracking-tight border border-emerald-300 animate-pulse">
+                              <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                              <span>UIDAI Verified</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-mono font-semibold text-emerald-700">
+                              {12 - aadhaarNumber.replace(/\D/g, '').length > 0
+                                ? `${12 - aadhaarNumber.replace(/\D/g, '').length} digits left`
+                                : '12 digits required'}
+                            </span>
+                          )}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            required
+                            maxLength={14}
+                            placeholder="e.g. 5432 8765 1098"
+                            value={aadhaarNumber}
+                            onChange={e => handleAadhaarInput(e.target.value)}
+                            className="w-full px-3.5 py-2 rounded-xl border border-emerald-300 text-xs font-mono font-bold tracking-wider focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal focus:bg-white"
+                          />
+                          {aadhaarNumber.replace(/\D/g, '').length === 12 && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600">
+                              <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-emerald-700 font-medium leading-tight">
+                          {language === 'hi'
+                            ? '🔒 भारत सरकार UIDAI एन्क्रिप्टेड सत्यापन: सीधी एमएसपी सुरक्षा और सुरक्षित ट्रेड एस्क्रो हेतु अनिवार्य।'
+                            : '🔒 Government UIDAI verified: Mandatory for direct MSP subsidies, mandi access & escrow safety.'}
+                        </p>
+                      </div>
+                    )}
+
                     {/* State & District */}
                     <div className="grid grid-cols-2 gap-2">
                       <div>
@@ -753,19 +829,31 @@ export const WelcomeGatewayView: React.FC = () => {
                 ) : (
                   /* 2. EXISTING USER LOGIN MODE */
                   <div className="space-y-3">
-                    {/* Mobile Phone Number */}
+                    {/* Mobile Phone or Aadhaar Number */}
                     <div>
                       <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
                         <span className="flex items-center gap-1.5">
                           <Phone className="w-3.5 h-3.5 text-blue-600" />
-                          <span>{language === 'hi' ? 'पंजीकृत मोबाइल नंबर (Registered Phone) *' : 'Registered Mobile Number *'}</span>
+                          <span>
+                            {language === 'hi' 
+                              ? (activeModalRole === 'farmer' || activeModalRole === 'buyer' 
+                                  ? 'पंजीकृत मोबाइल या आधार नंबर (Mobile / Aadhaar) *' 
+                                  : 'पंजीकृत मोबाइल नंबर (Registered Phone) *')
+                              : (activeModalRole === 'farmer' || activeModalRole === 'buyer' 
+                                  ? 'Registered Mobile or Aadhaar Number *' 
+                                  : 'Registered Mobile Number *')}
+                          </span>
                         </span>
-                        <span className="text-[10px] text-slate-500 font-mono font-bold">🇮🇳 +91</span>
+                        <span className="text-[10px] text-slate-500 font-mono font-bold">🇮🇳 +91 / UIDAI</span>
                       </label>
                       <input
                         type="tel"
                         required
-                        placeholder="e.g. 98220 11223"
+                        placeholder={
+                          activeModalRole === 'farmer' || activeModalRole === 'buyer'
+                            ? "e.g. 98220 11223 or 5432 8765 1098"
+                            : "e.g. 98220 11223"
+                        }
                         value={phone}
                         onChange={e => {
                           setPhone(e.target.value);
