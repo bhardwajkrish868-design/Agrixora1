@@ -25,10 +25,18 @@ import {
   Radio,
   Search,
   Route,
-  MapPin
+  MapPin,
+  Train,
+  RefreshCw,
+  Filter,
+  Layers,
+  ExternalLink,
+  Check,
+  Sparkles,
+  X
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
-import { QualityInspection, DispatchDetails, VehicleDetails } from '../types';
+import { QualityInspection, DispatchDetails, VehicleDetails, CollectionHub } from '../types';
 import { RouteTripTracker } from '../components/RouteTripTracker';
 import { ROUTE_PRESETS } from '../utils/routeUtils';
 
@@ -37,6 +45,10 @@ export const CollectionCentreView: React.FC = () => {
     currentUser, 
     orders, 
     collectionHubs, 
+    selectedHubId,
+    setSelectedHubId,
+    activeHub,
+    addCollectionHub,
     saveQualityInspection, 
     dispatchOrder, 
     updateOrderStage,
@@ -49,18 +61,32 @@ export const CollectionCentreView: React.FC = () => {
     navigateBack
   } = useAgri();
 
-  const [activeSubTab, setActiveSubTab] = useState<'incoming' | 'verification' | 'storage' | 'dispatch' | 'fleet'>(() => {
-    if (['incoming', 'verification', 'storage', 'dispatch', 'fleet'].includes(activeTab)) {
+  const [activeSubTab, setActiveSubTab] = useState<'incoming' | 'verification' | 'storage' | 'dispatch' | 'fleet' | 'fci_network'>(() => {
+    if (['incoming', 'verification', 'storage', 'dispatch', 'fleet', 'fci_network', 'collection_centres'].includes(activeTab)) {
+      if (activeTab === 'collection_centres' || activeTab === 'fci_network') return 'fci_network';
       return activeTab as any;
     }
     return 'incoming';
   });
 
   React.useEffect(() => {
-    if (['incoming', 'verification', 'storage', 'dispatch', 'fleet'].includes(activeTab)) {
-      setActiveSubTab(activeTab as any);
+    if (['incoming', 'verification', 'storage', 'dispatch', 'fleet', 'fci_network', 'collection_centres'].includes(activeTab)) {
+      if (activeTab === 'collection_centres' || activeTab === 'fci_network') {
+        setActiveSubTab('fci_network');
+      } else {
+        setActiveSubTab(activeTab as any);
+      }
     }
   }, [activeTab]);
+
+  // FCI Network Filters & Switcher State
+  const [fciZoneFilter, setFciZoneFilter] = useState<'All' | 'North Zone' | 'West & Central Zone' | 'South Zone' | 'East Zone' | 'North-East Zone'>('All');
+  const [fciStateFilter, setFciStateFilter] = useState('All');
+  const [fciTypeFilter, setFciTypeFilter] = useState('All');
+  const [fciRailFilter, setFciRailFilter] = useState(false);
+  const [fciSearchQuery, setFciSearchQuery] = useState('');
+  const [isHubSwitcherModalOpen, setIsHubSwitcherModalOpen] = useState(false);
+  const [switcherSearch, setSwitcherSearch] = useState('');
 
   const [selectedOrderId, setSelectedOrderId] = useState<string>(orders[1]?.id || orders[0]?.id || '');
 
@@ -113,7 +139,6 @@ export const CollectionCentreView: React.FC = () => {
   const [fleetStateFilter, setFleetStateFilter] = useState('All');
 
   const selectedOrder = orders.find(o => o.id === selectedOrderId) || orders[0];
-  const activeHub = collectionHubs[0];
 
   const incomingOrders = orders.filter(o => o.currentStage === 'order_placed' || o.currentStage === 'collected_at_hub');
   const readyForDispatch = orders.filter(o => o.currentStage === 'quality_verified');
@@ -263,47 +288,90 @@ export const CollectionCentreView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Hub Header */}
-      <div className="bg-gradient-to-r from-amber-700 via-orange-800 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4 max-w-xl">
+      <div className="bg-gradient-to-r from-slate-900 via-amber-950 to-orange-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden border border-amber-500/20">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex items-start gap-4 max-w-2xl">
             <button
               type="button"
               onClick={navigateBack}
-              className="mt-1 p-2 rounded-2xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-xs border border-white/30 transition-all cursor-pointer shrink-0"
+              className="mt-1 p-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-xs border border-white/20 transition-all cursor-pointer shrink-0"
               title="Go Back"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-full bg-white/20 text-amber-200 text-xs font-bold backdrop-blur-xs flex items-center gap-1">
-                  <Building2 className="w-3.5 h-3.5" />
+            <div className="space-y-2.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-extrabold border border-amber-400/30 flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-amber-400" />
                   {activeHub.code}
                 </span>
-                <span className="text-xs text-amber-100">{activeHub.district}, {activeHub.state}</span>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30">
+                  {activeHub.zone || 'North Zone'}
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold border border-blue-400/30">
+                  {activeHub.hubType || 'FCI Modern Steel Silo'}
+                </span>
+                {activeHub.railwaySiding && (
+                  <span className="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-400/30 flex items-center gap-1">
+                    <Train className="w-3 h-3 text-indigo-400" />
+                    Railhead Siding
+                  </span>
+                )}
+                {activeHub.weighbridgeCapacityTons && (
+                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-slate-300 text-[11px] font-mono">
+                    ⚖️ {activeHub.weighbridgeCapacityTons}T Weighbridge
+                  </span>
+                )}
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
+
+              <h1 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-white">
                 {activeHub.name}
               </h1>
-              <p className="text-amber-100 text-xs sm:text-sm">
-                Calibrated weighbridge intake, spectral QC grading, aerated silo storage, and GPS cold fleet dispatch hub.
+
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                📍 {activeHub.address} • <strong className="text-amber-300">{activeHub.district}, {activeHub.state}</strong> (PIN: {activeHub.pincode || '110001'})
               </p>
+
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-1">
+                <span>Incharge: <strong className="text-slate-200">{activeHub.operatorName}</strong></span>
+                <span>•</span>
+                <span>Phone: <strong className="text-slate-200 font-mono">{activeHub.phone}</strong></span>
+                <span>•</span>
+                <span>Hours: <strong className="text-emerald-300">{activeHub.operatingHours}</strong></span>
+              </div>
             </div>
           </div>
 
-          {/* Quick Hub Metrics Pill */}
-          <div className="flex flex-wrap gap-2.5 bg-black/30 p-3 rounded-2xl backdrop-blur-xs border border-white/10 text-xs">
-            <div>
-              <span className="text-[10px] text-slate-300 block">Occupancy</span>
-              <span className="font-extrabold text-amber-300">{activeHub.currentOccupancyTons} / {activeHub.capacityTons} Tons</span>
-            </div>
-            <div className="border-l border-white/20 pl-2.5">
-              <span className="text-[10px] text-slate-300 block">Hub Cold Temp</span>
-              <span className="font-extrabold text-emerald-300">{activeHub.temperatureCelsius}°C</span>
-            </div>
-            <div className="border-l border-white/20 pl-2.5">
-              <span className="text-[10px] text-slate-300 block">Fleet Active</span>
-              <span className="font-extrabold text-white">{vehicles.length} Vehicles</span>
+          {/* Quick Actions & Hub Metrics */}
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0 items-start lg:items-end">
+            <button
+              type="button"
+              onClick={() => setIsHubSwitcherModalOpen(true)}
+              className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition-all hover:scale-105 cursor-pointer"
+            >
+              <RefreshCw className="w-4 h-4 text-slate-950" />
+              <span>Switch FCI Depot (54 All-India Hubs)</span>
+            </button>
+
+            <div className="flex flex-wrap gap-2.5 bg-black/40 p-3 rounded-2xl backdrop-blur-md border border-white/10 text-xs w-full sm:w-auto">
+              <div>
+                <span className="text-[10px] text-slate-400 block">Current Occupancy</span>
+                <span className="font-extrabold text-amber-300">
+                  {activeHub.currentOccupancyTons.toLocaleString('en-IN')} / {activeHub.capacityTons.toLocaleString('en-IN')} MT
+                </span>
+              </div>
+              <div className="border-l border-white/10 pl-2.5">
+                <span className="text-[10px] text-slate-400 block">Silo Chamber Temp</span>
+                <span className="font-extrabold text-emerald-300">{activeHub.temperatureCelsius}°C</span>
+              </div>
+              <div className="border-l border-white/10 pl-2.5">
+                <span className="text-[10px] text-slate-400 block">Humidity</span>
+                <span className="font-extrabold text-blue-300">{activeHub.humidityPercent}% RH</span>
+              </div>
+              <div className="border-l border-white/10 pl-2.5">
+                <span className="text-[10px] text-slate-400 block">Active Batches</span>
+                <span className="font-extrabold text-white">{activeHub.activeBatches} Lots</span>
+              </div>
             </div>
           </div>
         </div>
@@ -353,9 +421,10 @@ export const CollectionCentreView: React.FC = () => {
         {[
           { id: 'incoming', label: 'Incoming Produce Intake', icon: PackageSearch, count: incomingOrders.length },
           { id: 'verification', label: 'QC Lab & Grading', icon: ShieldCheck },
-          { id: 'storage', label: 'Storage & Chamber Status', icon: Warehouse },
+          { id: 'storage', label: 'Storage & Silos Status', icon: Warehouse },
           { id: 'dispatch', label: 'Fleet Dispatch Manager', icon: SendHorizontal, count: readyForDispatch.length },
-          { id: 'fleet', label: 'Fleet & Vehicle Registry', icon: Truck, count: vehicles.length }
+          { id: 'fleet', label: 'Fleet & Vehicle Registry', icon: Truck, count: vehicles.length },
+          { id: 'fci_network', label: 'All-India FCI Centres (अखिल भारतीय FCI केंद्र)', icon: Building2, count: collectionHubs.length }
         ].map(tab => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
@@ -1324,6 +1393,467 @@ export const CollectionCentreView: React.FC = () => {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* Sub-Tab 6: All-India FCI Centres Network (अखिल भारतीय FCI केंद्र) */}
+      {activeSubTab === 'fci_network' && (
+        <div className="space-y-6">
+          {/* Top FCI Command Center Banner */}
+          <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden border border-emerald-500/20">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="space-y-2 max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold backdrop-blur-xs">
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Food Corporation of India (FCI) & State Aggregation Network</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-white">
+                    All-India FCI Centres & Modern Silos Network
+                  </h2>
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    अखिल भारतीय स्तर पर भारतीय खाद्य निगम (FCI) के आधुनिक स्टील साइलो, खाद्यान्न भंडारण डिपो (FSD) और रेलहेड बफ़र केंद्र। देश के किसी भी राज्य के केंद्र का संचालन, इलेक्ट्रॉनिक वे-ब्रिज intake और लाइव स्टोरेज टेलीमेट्री प्रबंधित करें।
+                  </p>
+                </div>
+
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md text-xs space-y-1 shrink-0">
+                  <span className="text-[11px] text-slate-400 block">Current Operating Centre:</span>
+                  <strong className="text-sm font-extrabold text-amber-300 block">{activeHub.name}</strong>
+                  <span className="text-[11px] text-emerald-300">
+                    📍 {activeHub.district}, {activeHub.state} ({activeHub.code})
+                  </span>
+                </div>
+              </div>
+
+              {/* National Overview KPI Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/10 text-xs">
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                  <span className="text-slate-400 block text-[11px]">National Stations</span>
+                  <strong className="text-lg font-extrabold text-white mt-0.5 block">{collectionHubs.length} FCI Depots</strong>
+                </div>
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                  <span className="text-slate-400 block text-[11px]">Total Silo Capacity</span>
+                  <strong className="text-lg font-extrabold text-amber-400 mt-0.5 block">
+                    {(collectionHubs.reduce((sum, h) => sum + h.capacityTons, 0) / 100000).toFixed(2)} Lakh MT
+                  </strong>
+                </div>
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                  <span className="text-slate-400 block text-[11px]">Grain Buffer Occupancy</span>
+                  <strong className="text-lg font-extrabold text-emerald-400 mt-0.5 block">
+                    {(collectionHubs.reduce((sum, h) => sum + h.currentOccupancyTons, 0) / 100000).toFixed(2)} Lakh MT
+                  </strong>
+                </div>
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                  <span className="text-slate-400 block text-[11px]">Railhead Connectivity</span>
+                  <strong className="text-lg font-extrabold text-blue-400 mt-0.5 block">
+                    {collectionHubs.filter(h => h.railwaySiding).length} Siding Connected
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Zone Selector Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {[
+              { id: 'All', label: 'All India', count: collectionHubs.length },
+              { id: 'North Zone', label: 'North Zone (उत्तर)', count: collectionHubs.filter(h => h.zone === 'North Zone').length },
+              { id: 'West & Central Zone', label: 'West & Central (पश्चिम/मध्य)', count: collectionHubs.filter(h => h.zone === 'West & Central Zone').length },
+              { id: 'South Zone', label: 'South Zone (दक्षिण)', count: collectionHubs.filter(h => h.zone === 'South Zone').length },
+              { id: 'East Zone', label: 'East Zone (पूर्व)', count: collectionHubs.filter(h => h.zone === 'East Zone').length },
+              { id: 'North-East Zone', label: 'North-East (पूर्वोत्तर)', count: collectionHubs.filter(h => h.zone === 'North-East Zone').length }
+            ].map(z => (
+              <button
+                key={z.id}
+                onClick={() => setFciZoneFilter(z.id as any)}
+                className={`px-4 py-2 rounded-2xl font-bold text-xs shrink-0 transition-all flex items-center gap-2 cursor-pointer ${
+                  fciZoneFilter === z.id
+                    ? 'bg-slate-900 text-white shadow-md'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <span>{z.label}</span>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${fciZoneFilter === z.id ? 'bg-amber-400 text-slate-900 font-bold' : 'bg-slate-100 text-slate-600'}`}>
+                  {z.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Search & Filter Controls Bar */}
+          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-soft space-y-4">
+            <div className="flex flex-col lg:flex-row gap-3 items-center justify-between">
+              <div className="relative w-full lg:w-96">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by FCI depot, city, district, state, code, or PIN..."
+                  value={fciSearchQuery}
+                  onChange={e => setFciSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 bg-slate-50/50"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2 w-full lg:w-auto items-center">
+                <select
+                  value={fciStateFilter}
+                  onChange={e => setFciStateFilter(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="All">All States (सभी राज्य)</option>
+                  {Array.from(new Set(collectionHubs.map(h => h.state))).sort().map(st => (
+                    <option key={st} value={st}>{st}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={fciTypeFilter}
+                  onChange={e => setFciTypeFilter(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="All">All Facility Types</option>
+                  <option value="FCI Modern Steel Silo">FCI Modern Steel Silo</option>
+                  <option value="FCI Food Storage Depot (FSD)">FCI Food Storage Depot (FSD)</option>
+                  <option value="FCI Railhead Buffer Depot">FCI Railhead Buffer Depot</option>
+                  <option value="State APMC Aggregation Hub">State APMC Aggregation Hub</option>
+                </select>
+
+                <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={fciRailFilter}
+                    onChange={e => setFciRailFilter(e.target.checked)}
+                    className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+                  />
+                  <span>🚆 Rail Siding Only</span>
+                </label>
+
+                {(fciZoneFilter !== 'All' || fciStateFilter !== 'All' || fciTypeFilter !== 'All' || fciRailFilter || fciSearchQuery) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFciZoneFilter('All');
+                      setFciStateFilter('All');
+                      setFciTypeFilter('All');
+                      setFciRailFilter(false);
+                      setFciSearchQuery('');
+                    }}
+                    className="px-3 py-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold hover:bg-rose-100 transition-all cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Grid of FCI Centres */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {collectionHubs
+              .filter(hub => {
+                if (fciZoneFilter !== 'All' && hub.zone !== fciZoneFilter) return false;
+                if (fciStateFilter !== 'All' && hub.state !== fciStateFilter) return false;
+                if (fciTypeFilter !== 'All' && hub.hubType !== fciTypeFilter) return false;
+                if (fciRailFilter && !hub.railwaySiding) return false;
+                if (fciSearchQuery.trim()) {
+                  const q = fciSearchQuery.toLowerCase().trim();
+                  return (
+                    hub.name.toLowerCase().includes(q) ||
+                    hub.code.toLowerCase().includes(q) ||
+                    hub.district.toLowerCase().includes(q) ||
+                    hub.state.toLowerCase().includes(q) ||
+                    (hub.pincode && hub.pincode.includes(q)) ||
+                    (hub.address && hub.address.toLowerCase().includes(q)) ||
+                    (hub.operatorName && hub.operatorName.toLowerCase().includes(q))
+                  );
+                }
+                return true;
+              })
+              .map(hub => {
+                const isCurrentActive = hub.id === selectedHubId;
+                const occPercent = Math.round((hub.currentOccupancyTons / (hub.capacityTons || 1)) * 100);
+
+                return (
+                  <div
+                    key={hub.id}
+                    className={`rounded-3xl p-5 border transition-all space-y-4 flex flex-col justify-between ${
+                      isCurrentActive
+                        ? 'bg-gradient-to-br from-emerald-50/90 to-amber-50/50 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30'
+                        : 'bg-white border-slate-200/80 hover:border-emerald-300 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="space-y-3">
+                      {/* Top Badges */}
+                      <div className="flex flex-wrap items-center justify-between gap-1.5">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="px-2.5 py-0.5 rounded-full bg-slate-900 text-white font-mono text-[10px] font-bold">
+                            {hub.code}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold">
+                            {hub.zone || 'North Zone'}
+                          </span>
+                        </div>
+
+                        {hub.railwaySiding ? (
+                          <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-bold border border-indigo-200 flex items-center gap-1">
+                            <Train className="w-3 h-3 text-indigo-600" />
+                            Railhead Siding
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-medium">
+                            🛣️ Road Highway Link
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Title & Location */}
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="font-extrabold text-slate-900 text-base leading-snug">
+                            {hub.name}
+                          </h3>
+                          {isCurrentActive && (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-extrabold shrink-0 shadow-xs">
+                              OPERATING HUB
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                          📍 {hub.address}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1 text-[11px] font-semibold text-emerald-800">
+                          <span>{hub.district}, {hub.state}</span>
+                          <span>•</span>
+                          <span>PIN: {hub.pincode}</span>
+                        </div>
+                      </div>
+
+                      {/* Type & Weighbridge Pills */}
+                      <div className="flex flex-wrap gap-1.5 pt-1 text-[10px]">
+                        <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-semibold">
+                          {hub.hubType || 'FCI Modern Steel Silo'}
+                        </span>
+                        {hub.weighbridgeCapacityTons && (
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                            ⚖️ {hub.weighbridgeCapacityTons}T Electronic Weighbridge
+                          </span>
+                        )}
+                        {hub.silosCount && (
+                          <span className="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-800 border border-blue-200 font-medium">
+                            🏗️ {hub.silosCount} Steel Silos
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Storage Occupancy Progress Bar */}
+                      <div className="p-3 bg-slate-50/90 rounded-2xl border border-slate-100 space-y-2 text-xs">
+                        <div className="flex justify-between items-center text-[11px]">
+                          <span className="text-slate-500 font-medium">Current Storage Load:</span>
+                          <strong className="text-slate-900">
+                            {hub.currentOccupancyTons.toLocaleString('en-IN')} / {hub.capacityTons.toLocaleString('en-IN')} MT
+                            <span className="text-emerald-700 ml-1">({occPercent}%)</span>
+                          </strong>
+                        </div>
+                        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              occPercent > 80 ? 'bg-amber-500' : 'bg-emerald-600'
+                            }`}
+                            style={{ width: `${Math.min(100, occPercent)}%` }}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-500">
+                          <div>Temp: <strong className="text-emerald-700">{hub.temperatureCelsius}°C</strong></div>
+                          <div>Humidity: <strong className="text-blue-700">{hub.humidityPercent}% RH</strong></div>
+                        </div>
+                      </div>
+
+                      {/* Superintendent & Contact */}
+                      <div className="text-[11px] text-slate-500 space-y-0.5">
+                        <div className="truncate">Incharge: <strong className="text-slate-700">{hub.operatorName}</strong></div>
+                        <div className="flex justify-between items-center">
+                          <span className="font-mono text-slate-700">{hub.phone}</span>
+                          <span className="text-[10px] text-emerald-700 font-semibold">{hub.operatingHours}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                      {isCurrentActive ? (
+                        <div className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                          <Check className="w-4 h-4" />
+                          <span>Currently Operating Here</span>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedHubId(hub.id);
+                          }}
+                          className="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all hover:scale-102 cursor-pointer shadow-sm"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Set as Active FCI Hub</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedHubId(hub.id);
+                          setActiveSubTab('incoming');
+                        }}
+                        className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer"
+                        title="Open Incoming Intake Queue for this Hub"
+                      >
+                        <PackageSearch className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedHubId(hub.id);
+                          setActiveSubTab('storage');
+                        }}
+                        className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer"
+                        title="Inspect Silo Storage Chambers for this Hub"
+                      >
+                        <Warehouse className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Hub Switcher Modal */}
+      {isHubSwitcherModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[85vh]">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 to-emerald-950 text-white flex items-center justify-between">
+              <div>
+                <h3 className="font-extrabold text-lg flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-amber-400" />
+                  <span>Select Active FCI Collection Centre (अखिल भारतीय FCI केंद्र)</span>
+                </h3>
+                <p className="text-xs text-slate-300 mt-1">
+                  Choose from 54 Food Corporation of India Modern Silos & Grain Terminals nationwide
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsHubSwitcherModalOpen(false)}
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Search */}
+            <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Filter by city, state, district, or FCI code..."
+                  value={switcherSearch}
+                  onChange={e => setSwitcherSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 bg-white"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Modal Hubs List */}
+            <div className="p-4 overflow-y-auto space-y-2.5 flex-1">
+              {collectionHubs
+                .filter(hub => {
+                  if (!switcherSearch.trim()) return true;
+                  const q = switcherSearch.toLowerCase().trim();
+                  return (
+                    hub.name.toLowerCase().includes(q) ||
+                    hub.code.toLowerCase().includes(q) ||
+                    hub.district.toLowerCase().includes(q) ||
+                    hub.state.toLowerCase().includes(q) ||
+                    (hub.pincode && hub.pincode.includes(q))
+                  );
+                })
+                .map(hub => {
+                  const isSelected = hub.id === selectedHubId;
+
+                  return (
+                    <div
+                      key={hub.id}
+                      onClick={() => {
+                        setSelectedHubId(hub.id);
+                        setIsHubSwitcherModalOpen(false);
+                      }}
+                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                        isSelected
+                          ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20'
+                          : 'bg-white border-slate-200 hover:border-emerald-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-slate-900 text-white font-mono text-[10px] font-bold">
+                            {hub.code}
+                          </span>
+                          <span className="font-extrabold text-sm text-slate-900">
+                            {hub.name}
+                          </span>
+                          {hub.railwaySiding && (
+                            <span className="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[10px] font-semibold">
+                              🚆 Railhead
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          📍 {hub.district}, {hub.state} • Capacity: <strong className="text-slate-800">{hub.capacityTons.toLocaleString('en-IN')} MT</strong> • Incharge: {hub.operatorName}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0">
+                        {isSelected ? (
+                          <span className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" /> Selected
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs"
+                          >
+                            Switch Hub →
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span>Showing {collectionHubs.length} verified FCI centres and modern silos across India</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsHubSwitcherModalOpen(false);
+                  setActiveSubTab('fci_network');
+                }}
+                className="font-bold text-emerald-700 hover:underline"
+              >
+                View Full Interactive Network Directory →
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

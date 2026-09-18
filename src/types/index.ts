@@ -357,6 +357,12 @@ export interface CollectionHub {
   activeBatches: number;
   operatorName: string;
   operatingHours: string;
+  zone?: 'North Zone' | 'West & Central Zone' | 'South Zone' | 'East Zone' | 'North-East Zone';
+  hubType?: 'FCI Modern Steel Silo' | 'FCI Food Storage Depot (FSD)' | 'FCI Railhead Buffer Depot' | 'State APMC Aggregation Hub';
+  railwaySiding?: boolean;
+  weighbridgeCapacityTons?: number;
+  fciDivision?: string;
+  silosCount?: number;
 }
 
 export interface ActivityLog {

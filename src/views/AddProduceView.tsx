@@ -38,7 +38,8 @@ export const AddProduceView: React.FC = () => {
   });
 
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
-
+  const [customSelectedHubId, setCustomSelectedHubId] = useState<string | null>(null);
+  const [isChangingHub, setIsChangingHub] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const predefinedCrops = [
@@ -374,39 +375,79 @@ export const AddProduceView: React.FC = () => {
             </div>
           </div>
 
-          {/* ⚡ Nearest 10 KM Collection Hub Auto-Matched */}
+          {/* ⚡ Nearest Pan-India FCI Collection Hub Auto-Matched */}
           {(() => {
             const geo = geocodeLocation(form.location, '', form.pincode);
-            let nearestHub = collectionHubs[0];
+            let calculatedNearestHub = collectionHubs[0];
             let minDistance = 9999;
             collectionHubs.forEach(hub => {
               const d = calculateDistanceKm(geo.lat, geo.lng, hub.latitude, hub.longitude);
               if (d < minDistance) {
                 minDistance = d;
-                nearestHub = hub;
+                calculatedNearestHub = hub;
               }
             });
 
+            const currentHub = customSelectedHubId
+              ? (collectionHubs.find(h => h.id === customSelectedHubId) || calculatedNearestHub)
+              : calculatedNearestHub;
+
+            const hubDistance = calculateDistanceKm(geo.lat, geo.lng, currentHub.latitude, currentHub.longitude);
+
             return (
-              <div className="p-3 bg-emerald-50/90 rounded-2xl border border-emerald-200 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <Building2 className="w-4 h-4" />
+              <div className="p-3.5 bg-emerald-50/90 rounded-2xl border border-emerald-200 space-y-2.5 text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Building2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-slate-900">
+                          {currentHub.name}
+                        </span>
+                        <span className="px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-950 font-mono text-[10px] font-bold">
+                          {currentHub.code}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-emerald-800 font-medium mt-0.5">
+                        📍 {currentHub.district}, {currentHub.state} • {hubDistance} km from farm • {currentHub.hubType || 'FCI Modern Silo'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-extrabold text-slate-900">
-                      Auto-Paired Hub: {nearestHub ? nearestHub.name : 'Nashik North Agri Aggregation Hub #04'}
+
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                    <span className="text-[10px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-extrabold shadow-xs">
+                      {customSelectedHubId ? 'Selected FCI Hub' : (hubDistance <= 25 ? '⚡ Nearest FCI Hub' : 'Regional Hub')}
                     </span>
-                    <p className="text-[11px] text-emerald-800 font-medium">
-                      {minDistance <= 10 
-                        ? `⚡ 10 KM Auto-Connected (${minDistance} km away) • Instant QA & Cold Storage`
-                        : `Regional Hub (${minDistance} km away)`}
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsChangingHub(!isChangingHub)}
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 underline cursor-pointer"
+                    >
+                      {isChangingHub ? 'Done' : 'Change FCI Hub ▾'}
+                    </button>
                   </div>
                 </div>
-                <span className="text-[10px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-extrabold shadow-xs shrink-0">
-                  {minDistance <= 10 ? '10 KM Auto-Matched' : 'Nearest Hub'}
-                </span>
+
+                {isChangingHub && (
+                  <div className="p-2.5 bg-white rounded-xl border border-emerald-200 space-y-1.5 animate-in fade-in">
+                    <label className="block text-[11px] font-bold text-slate-700">
+                      Choose from {collectionHubs.length} FCI Centres across India:
+                    </label>
+                    <select
+                      value={currentHub.id}
+                      onChange={e => setCustomSelectedHubId(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 bg-slate-50"
+                    >
+                      {collectionHubs.map(h => (
+                        <option key={h.id} value={h.id}>
+                          {h.state} • {h.name} ({h.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             );
           })()}

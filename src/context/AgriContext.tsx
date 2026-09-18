@@ -107,6 +107,10 @@ interface AgriContextType {
   // Intelligence & Notifications
   mandiPrices: MandiPriceTrend[];
   collectionHubs: CollectionHub[];
+  selectedHubId: string;
+  setSelectedHubId: (id: string) => void;
+  activeHub: CollectionHub;
+  addCollectionHub: (hub: CollectionHub) => void;
   notifications: NotificationItem[];
   markNotificationRead: (id: string) => void;
   clearNotifications: () => void;
@@ -347,7 +351,45 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [mandiPrices] = useState<MandiPriceTrend[]>(initialMandiPrices);
-  const [collectionHubs] = useState<CollectionHub[]>(initialCollectionHubs);
+  const [collectionHubs, setCollectionHubs] = useState<CollectionHub[]>(() => {
+    try {
+      const saved = localStorage.getItem('farm2future_collection_hubs');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= initialCollectionHubs.length) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return initialCollectionHubs;
+  });
+
+  const [selectedHubId, setSelectedHubIdState] = useState<string>(() => {
+    try {
+      return localStorage.getItem('farm2future_selected_hub_id') || initialCollectionHubs[0]?.id || 'fci_pb_moga';
+    } catch {
+      return initialCollectionHubs[0]?.id || 'fci_pb_moga';
+    }
+  });
+
+  const setSelectedHubId = (id: string) => {
+    setSelectedHubIdState(id);
+    try {
+      localStorage.setItem('farm2future_selected_hub_id', id);
+    } catch {}
+  };
+
+  const activeHub = collectionHubs.find(h => h.id === selectedHubId) || collectionHubs[0] || initialCollectionHubs[0];
+
+  const addCollectionHub = (hub: CollectionHub) => {
+    setCollectionHubs(prev => {
+      const updated = [hub, ...prev];
+      try {
+        localStorage.setItem('farm2future_collection_hubs', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
   
   const [selectedListingModal, setSelectedListingModal] = useState<CropListing | null>(null);
   const [activeTrackingOrderId, setActiveTrackingOrderId] = useState<string | null>(null);
@@ -1740,7 +1782,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     totalFarmerEarnings,
     verifiedFarmersCount: 14850,
     verifiedBuyersCount: 2340,
-    activeCollectionHubsCount: 48,
+    activeCollectionHubsCount: collectionHubs.length,
     activeFleetCount: vehicles.length
   };
 
@@ -1794,6 +1836,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       detectLiveLocation,
       mandiPrices,
       collectionHubs,
+      selectedHubId,
+      setSelectedHubId,
+      activeHub,
+      addCollectionHub,
       notifications,
       markNotificationRead,
       clearNotifications,

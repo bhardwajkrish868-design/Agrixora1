@@ -29,7 +29,8 @@ import {
   RefreshCw,
   Filter,
   FileJson,
-  Phone
+  Phone,
+  Train
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { 
@@ -92,6 +93,10 @@ export const AdminDashboard: React.FC = () => {
   // Vehicle filter
   const [vehicleFilterQuery, setVehicleFilterQuery] = useState('');
   const [adminStateFilter, setAdminStateFilter] = useState('all');
+
+  // FCI Hubs filter
+  const [adminHubZoneFilter, setAdminHubZoneFilter] = useState('all');
+  const [adminHubSearchQuery, setAdminHubSearchQuery] = useState('');
 
   const handleChangeKey = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1093,43 +1098,104 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Collection Centres Sub-View */}
       {activeTab === 'collection_centres' && (
-        <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-purple-600" />
-                Regional Aggregation Hubs Network (48 Active Stations)
+                All-India FCI Centres & Aggregation Network ({collectionHubs.length} Active Stations)
               </h2>
-              <p className="text-xs text-slate-500">Cold chain and weighbridge integrity status</p>
+              <p className="text-xs text-slate-500">
+                Nationwide Food Corporation of India Modern Silos, Food Storage Depots (FSD) & Railhead Terminals
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <div className="relative w-48 sm:w-64">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search FCI centre, state..."
+                  value={adminHubSearchQuery}
+                  onChange={e => setAdminHubSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-slate-50"
+                />
+              </div>
+
+              <select
+                value={adminHubZoneFilter}
+                onChange={e => setAdminHubZoneFilter(e.target.value)}
+                className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700"
+              >
+                <option value="all">All Zones ({collectionHubs.length})</option>
+                <option value="North Zone">North Zone ({collectionHubs.filter(h => h.zone === 'North Zone').length})</option>
+                <option value="West & Central Zone">West & Central Zone ({collectionHubs.filter(h => h.zone === 'West & Central Zone').length})</option>
+                <option value="South Zone">South Zone ({collectionHubs.filter(h => h.zone === 'South Zone').length})</option>
+                <option value="East Zone">East Zone ({collectionHubs.filter(h => h.zone === 'East Zone').length})</option>
+                <option value="North-East Zone">North-East Zone ({collectionHubs.filter(h => h.zone === 'North-East Zone').length})</option>
+              </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {collectionHubs.map(hub => (
-              <div key={hub.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2 text-xs">
-                <div className="flex items-center justify-between font-bold text-slate-900">
-                  <span className="text-sm">{hub.name}</span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                    ONLINE
-                  </span>
-                </div>
-                <p className="text-slate-500">{hub.address}</p>
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-xs">
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Occupancy:</span>
-                    <strong className="text-slate-900">{hub.currentOccupancyTons}/{hub.capacityTons} T</strong>
+            {collectionHubs
+              .filter(hub => {
+                if (adminHubZoneFilter !== 'all' && hub.zone !== adminHubZoneFilter) return false;
+                if (adminHubSearchQuery.trim()) {
+                  const q = adminHubSearchQuery.toLowerCase().trim();
+                  return (
+                    hub.name.toLowerCase().includes(q) ||
+                    hub.code.toLowerCase().includes(q) ||
+                    hub.district.toLowerCase().includes(q) ||
+                    hub.state.toLowerCase().includes(q) ||
+                    (hub.address && hub.address.toLowerCase().includes(q))
+                  );
+                }
+                return true;
+              })
+              .map(hub => (
+                <div key={hub.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2.5 text-xs hover:border-purple-200 hover:shadow-xs transition-all">
+                  <div className="flex items-start justify-between gap-2 font-bold text-slate-900">
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="font-mono text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded font-bold">
+                          {hub.code}
+                        </span>
+                        <span className="text-[10px] text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded font-semibold border border-purple-200">
+                          {hub.zone || 'North Zone'}
+                        </span>
+                        {hub.railwaySiding && (
+                          <span className="text-[10px] text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded font-semibold flex items-center gap-0.5">
+                            <Train className="w-2.5 h-2.5" /> Rail
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs font-extrabold line-clamp-1">{hub.name}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded shrink-0">
+                      ONLINE
+                    </span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Chamber Temp:</span>
-                    <strong className="text-emerald-700">{hub.temperatureCelsius}°C</strong>
+
+                  <p className="text-slate-500 text-[11px] line-clamp-2">{hub.address}</p>
+                  
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-xs">
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Occupancy:</span>
+                      <strong className="text-slate-900">{hub.currentOccupancyTons.toLocaleString('en-IN')}/{hub.capacityTons.toLocaleString('en-IN')} T</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Chamber Temp:</span>
+                      <strong className="text-emerald-700">{hub.temperatureCelsius}°C ({hub.humidityPercent}% RH)</strong>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-between items-center text-[11px] text-slate-500 border-t border-slate-100">
+                    <span className="truncate max-w-[150px]">Manager: {hub.operatorName}</span>
+                    <span className="font-mono text-slate-700">{hub.phone}</span>
                   </div>
                 </div>
-                <div className="pt-2 flex justify-between text-[11px] text-slate-500">
-                  <span>Manager: {hub.operatorName}</span>
-                  <span className="font-mono">{hub.phone}</span>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
