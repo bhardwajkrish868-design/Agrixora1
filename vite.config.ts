@@ -159,6 +159,41 @@ function databasePlugin() {
     });
   };
 
+  const sendNtfyPush = (topic: string, title: string, message: string, tags?: string[]): Promise<any> => {
+    const cleanTopic = (topic || 'farm2future_krish').replace(/[^a-zA-Z0-9_-]/g, '');
+    const cleanTitle = (title || 'Farm2Future Notification').replace(/[^\x20-\x7E]/g, '').trim() || 'Farm2Future Notification';
+    return new Promise((resolve) => {
+      try {
+        const tagStr = Array.isArray(tags) ? tags.join(',') : (tags || 'bell');
+        const req = https.request(`https://ntfy.sh/${cleanTopic}`, {
+          method: 'POST',
+          headers: {
+            'Title': cleanTitle,
+            'Priority': 'urgent',
+            'Tags': tagStr
+          }
+        }, (res) => {
+          let data = '';
+          res.on('data', (chunk: any) => { data += chunk; });
+          res.on('end', () => {
+            resolve({ success: res.statusCode && res.statusCode >= 200 && res.statusCode < 300, statusCode: res.statusCode, topic: cleanTopic });
+          });
+        });
+        req.on('error', (err: any) => {
+          resolve({ success: false, error: err.message, topic: cleanTopic });
+        });
+        req.setTimeout(6000, () => {
+          req.destroy();
+          resolve({ success: false, error: 'Timeout', topic: cleanTopic });
+        });
+        req.write(message);
+        req.end();
+      } catch (e: any) {
+        resolve({ success: false, error: e.message, topic: cleanTopic });
+      }
+    });
+  };
+
   return {
     name: 'farm2future-database-api',
     configureServer(server: any) {
@@ -341,6 +376,20 @@ function databasePlugin() {
                   message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key or use 1-Click WhatsApp/SMS link.'
                 };
               }
+
+              // 🚀 Multi-Channel Mobile Push Alerts via NTFY (100% Free, Instant Phone Chime)
+              const ntfyTitle = payload.title || (smsText.includes('OTP') ? '🔑 Farm2Future Verification OTP' : (smsText.includes('Order') ? '✅ Farm2Future Order Confirmed' : '🚚 Farm2Future Transport Booked'));
+              const ntfyTags = smsText.includes('OTP') ? ['key', 'lock'] : (smsText.includes('Transport') ? ['truck', 'white_check_mark'] : ['package', 'white_check_mark']);
+
+              const ntfyPhoneRes = await sendNtfyPush('farm2future_' + cleanPhone, ntfyTitle, smsText, ntfyTags);
+              const ntfyKrishRes = await sendNtfyPush('farm2future_krish', ntfyTitle, smsText, ntfyTags);
+
+              result.ntfy = {
+                success: Boolean(ntfyPhoneRes.success || ntfyKrishRes.success),
+                topic: 'farm2future_' + cleanPhone,
+                globalTopic: 'farm2future_krish',
+                webUrl: `https://ntfy.sh/farm2future_${cleanPhone}`
+              };
 
               if (!db.activityHistory) db.activityHistory = [];
               db.activityHistory.unshift({

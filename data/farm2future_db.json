@@ -1304,6 +1304,15 @@
       "message": "Vehicle MH-15-EG-4401 confirmed for Nashik Red Onion (ताज़ा प्याज़). Confirmation SMS dispatched to +91 9631359486. Driver Prakash Shinde (+91 99223 34455) assigned.",
       "type": "dispatch",
       "recipientRole": "all",
+      "id": "notif_1789937990552",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "title": "✅ Transport Booking Successful Granted!",
+      "message": "Vehicle MH-15-EG-4401 confirmed for Nashik Red Onion (ताज़ा प्याज़). Confirmation SMS dispatched to +91 9631359486. Driver Prakash Shinde (+91 99223 34455) assigned.",
+      "type": "dispatch",
+      "recipientRole": "all",
       "id": "notif_1789936292190",
       "timestamp": "Just now",
       "read": false
@@ -2186,6 +2195,30 @@
     }
   ],
   "activityHistory": [
+    {
+      "id": "act_1789937990552_g2gmo",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "transport_booking",
+      "title": "Transport Booked: MH-15-EG-4401 (undefined)",
+      "description": "Priya Sharma booked Eicher Pro 3015 Reefer Plus from Nashik North Agri Aggregation Hub #04 to AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra for 12T Nashik Red Onion (ताज़ा प्याज़). SMS target: +91 9631359486. Est. Fare: ₹4,620",
+      "timestamp": "2026-09-20T20:59:50.552Z",
+      "metadata": {
+        "vehicleNo": "MH-15-EG-4401",
+        "transporter": "GreenWheels Cold Agri-Logistics",
+        "driver": "Prakash Shinde",
+        "driverPhone": "+91 99223 34455",
+        "customerPhone": "9631359486",
+        "pickupLocation": "Nashik North Agri Aggregation Hub #04",
+        "dropLocation": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+        "cargoWeightTons": 12,
+        "cropName": "Nashik Red Onion (ताज़ा प्याज़)",
+        "estimatedCost": 4620,
+        "bookingDate": "2026-09-20",
+        "isDemoBooking": true
+      }
+    },
     {
       "id": "act_1789937472214_z0ire",
       "userId": "usr_buyer_1789574079511",
@@ -4069,7 +4102,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-20T20:56:32.493Z",
+  "lastUpdated": "2026-09-20T21:23:36.860Z",
   "vehicles": [
     {
       "id": "veh_1",

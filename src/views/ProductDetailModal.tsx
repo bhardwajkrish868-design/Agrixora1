@@ -340,6 +340,17 @@ export const ProductDetailModal: React.FC = () => {
                     <Smartphone className="w-3.5 h-3.5" />
                     <span>Open Phone SMS App</span>
                   </a>
+
+                  {/* 🔔 Free NTFY Push Button */}
+                  <a
+                    href={`https://ntfy.sh/farm2future_${smsNotification.phone.replace(/\D/g, '').slice(-10)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="col-span-2 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  >
+                    <span>🔔</span>
+                    <span>Live NTFY Mobile Push Alert (ntfy.sh/farm2future_{smsNotification.phone.slice(-10)})</span>
+                  </a>
                 </div>
               </div>
 
@@ -450,6 +461,17 @@ export const ProductDetailModal: React.FC = () => {
                   >
                     <Smartphone className="w-3.5 h-3.5 text-sky-200" />
                     <span>Open in Phone SMS App</span>
+                  </a>
+
+                  {/* 🔔 100% Free NTFY Mobile Push Alerts */}
+                  <a
+                    href={`https://ntfy.sh/farm2future_${buyerMobileNumber.replace(/\D/g, '').slice(-10)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="sm:col-span-2 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  >
+                    <span>🔔</span>
+                    <span>Live NTFY Mobile Push Alert (ntfy.sh/farm2future_{buyerMobileNumber.slice(-10)})</span>
                   </a>
                 </div>
               </div>

@@ -532,6 +532,17 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <Smartphone className="w-3.5 h-3.5" />
                 <span>Phone SMS App</span>
               </a>
+
+              {/* 🔔 NTFY Mobile Push Alert */}
+              <a
+                href={`https://ntfy.sh/farm2future_${smsToast.phone.replace(/\D/g, '').slice(-10)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="col-span-2 py-1.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-xs"
+              >
+                <span>🔔</span>
+                <span>Live Phone Push Alert (ntfy.sh/farm2future_{smsToast.phone.slice(-10)})</span>
+              </a>
             </div>
 
             <div className="flex items-center justify-between pt-1 text-[11px] border-t border-slate-800">
@@ -1109,6 +1120,17 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                             <Smartphone className="w-3.5 h-3.5 text-sky-200" />
                             <span>Open in Phone SMS App</span>
                           </a>
+
+                          {/* 🔔 Free NTFY Mobile Push Alert */}
+                          <a
+                            href={`https://ntfy.sh/farm2future_${(phone || '9631359486').replace(/\D/g, '').slice(-10)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="sm:col-span-2 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                          >
+                            <span>🔔</span>
+                            <span>Live NTFY Mobile Push Alert (ntfy.sh/farm2future_{(phone || '9631359486').replace(/\D/g, '').slice(-10)})</span>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -1614,6 +1636,15 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       >
                         <Smartphone className="w-3 h-3" />
                         <span>SMS App</span>
+                      </a>
+                      <span className="text-slate-300">•</span>
+                      <a
+                        href={`https://ntfy.sh/farm2future_${(phone || '9631359486').replace(/\D/g, '').slice(-10)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-purple-700 hover:text-purple-800 font-bold flex items-center gap-1"
+                      >
+                        <span>🔔 NTFY Push</span>
                       </a>
                     </div>
                   </div>
