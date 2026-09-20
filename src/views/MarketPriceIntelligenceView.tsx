@@ -50,40 +50,34 @@ export const MarketPriceIntelligenceView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-emerald-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-start gap-4 max-w-xl">
+      {/* Clean Compact Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={navigateBack}
-            className="mt-1 p-2 rounded-2xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-xs border border-white/30 transition-all cursor-pointer shrink-0"
+            className="p-2 rounded-2xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 border border-slate-200 transition-colors cursor-pointer shrink-0"
             title="Go Back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-xs flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                Farm2Future AI Intelligence Hub
-              </span>
-              <span className="text-xs text-amber-100">Live AGMARKNET & Mandi Sync</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
-              Real-Time Agricultural Market Intelligence
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-emerald-600" />
+              <span>Agricultural Market Price Intelligence</span>
             </h1>
-            <p className="text-amber-100 text-xs sm:text-sm leading-relaxed">
-              Eliminate information asymmetry. Compare spot mandi rates, track 30-day trends, and receive AI-backed selling recommendations before harvesting.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Live AGMARKNET & Mandi modal rates, daily arrival volumes, and Government MSP benchmarks.
             </p>
           </div>
         </div>
 
         <button
           onClick={() => setActiveTab('add_produce')}
-          className="px-5 py-3 rounded-2xl bg-white text-slate-900 font-extrabold text-xs sm:text-sm hover:bg-amber-50 transition-all shadow-lg hover:scale-105 self-start md:self-auto flex items-center gap-2"
+          className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all self-start sm:self-auto cursor-pointer"
         >
           <span>List at Recommended Rate</span>
-          <ArrowUpRight className="w-4 h-4 text-emerald-700" />
+          <ArrowUpRight className="w-4 h-4 text-white" />
         </button>
       </div>
 

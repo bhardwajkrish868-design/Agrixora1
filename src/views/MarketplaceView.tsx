@@ -103,22 +103,21 @@ export const MarketplaceView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="relative z-10 space-y-2 max-w-2xl">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-emerald-500/30 text-emerald-300 text-xs font-bold border border-emerald-400/30 flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              Direct Verified Farmgate Marketplace
-            </span>
-            <span className="text-xs text-slate-300">100% Quality Inspected</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
-            Procure Farm-Fresh Harvest Directly
+      {/* Clean Compact Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
+            <Store className="w-6 h-6 text-emerald-600" />
+            <span>Farmgate Produce Marketplace</span>
           </h1>
-          <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-            Eliminate traditional mandi markups. Buy directly from verified farmers with automated quality grading, cold storage hand-off, and GPS supply chain tracking.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Procure farm-fresh harvest directly from verified farmers with transparent grading and escrow.
           </p>
+        </div>
+
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shrink-0">
+          <Sparkles className="w-4 h-4 text-emerald-600" />
+          <span>{filteredListings.length} Active Lots Available</span>
         </div>
       </div>
 

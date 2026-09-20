@@ -51,54 +51,44 @@ export const BuyerDashboardView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Welcome Banner */}
-      <div className="bg-gradient-to-r from-blue-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold border border-blue-400/30 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                Verified Institutional Bulk Buyer
-              </span>
-              <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-400/30 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-amber-300" />
-                4-Month Advance Procurement Model
-              </span>
-              <span className="text-xs text-slate-300">GSTIN: 27AABCA1234F1Z9</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
-              4-Month Advance Bulk Procurement Hub
+      {/* Clean Compact Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display">
+              Welcome, {currentUser.name} 🏢
             </h1>
-
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              Place corporate bulk demands (50T – 500T+) with 4 months advance notice for pre-harvest farmer aggregation. Buyer pays 100% transport fee in advance into Escrow with zero farmer deduction and automated AI truck dispatch.
-            </p>
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
+              Bulk Buyer
+            </span>
           </div>
+          <p className="text-xs text-slate-500">
+            GSTIN: 27AABCA1234F1Z9 • Direct farmgate procurement with escrow security and automated AI logistics.
+          </p>
+        </div>
 
-          <div className="flex flex-wrap gap-2.5">
-            <button
-              onClick={() => setActiveTab('bulk_pooling')}
-              className="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-indigo-600/30 flex items-center gap-2 transition-all hover:scale-105 cursor-pointer border border-indigo-400/30"
-            >
-              <Boxes className="w-4 h-4 text-amber-300" />
-              <span>+ Create 4-Mo Bulk Demand</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('marketplace')}
-              className="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer"
-            >
-              <Store className="w-4 h-4" />
-              <span>Direct Lots</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('track_delivery')}
-              className="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur-xs border border-white/10 flex items-center gap-2 transition-all cursor-pointer"
-            >
-              <Truck className="w-4 h-4 text-emerald-400" />
-              <span>AI Fleet Telemetry</span>
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setActiveTab('bulk_pooling')}
+            className="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <Boxes className="w-4 h-4 text-amber-300" />
+            <span>+ Create Bulk Demand</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('marketplace')}
+            className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <Store className="w-4 h-4" />
+            <span>Direct Lots</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('track_delivery')}
+            className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <Truck className="w-4 h-4 text-emerald-600" />
+            <span>Fleet Telemetry</span>
+          </button>
         </div>
       </div>
 

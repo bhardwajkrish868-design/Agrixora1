@@ -227,34 +227,27 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                Farm2Future Central Directorate Oversight
-              </span>
-              <span className="text-xs text-slate-400">All-India Network Command</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
-              Smart Agricultural Supply Chain Ecosystem
+      {/* Clean Compact Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
+              <ShieldCheck className="w-6 h-6 text-purple-600" />
+              <span>Platform Administration & Governance</span>
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              Real-time persistent database syncing users, crop lots, vehicles, escrow contracts, and live audit trails.
-            </p>
+            <span className="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 text-xs font-bold">
+              Central Command
+            </span>
           </div>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Real-time database state, user registry, vehicle fleet dispatch, and audit trail records.
+          </p>
+        </div>
 
-          <div className="flex flex-wrap gap-2.5 bg-black/40 p-3 rounded-2xl backdrop-blur-xs border border-white/10 text-xs">
-            <div>
-              <span className="text-[10px] text-slate-400 block uppercase font-semibold">Total GMV Settled</span>
-              <span className="text-base font-extrabold text-emerald-400">₹9.85 Cr</span>
-            </div>
-            <div className="border-l border-white/10 pl-3">
-              <span className="text-[10px] text-slate-400 block uppercase font-semibold">In Escrow Vault</span>
-              <span className="text-base font-extrabold text-amber-300">₹{stats.escrowLockedValue.toLocaleString('en-IN')}</span>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
+            <span className="text-[10px] text-slate-500 block uppercase font-bold">In Escrow Vault</span>
+            <span className="font-extrabold text-amber-600 text-sm">₹{stats.escrowLockedValue.toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>

@@ -17,6 +17,7 @@ import {
   PackageCheck, 
   Layers, 
   ArrowRight,
+  ArrowLeft,
   ExternalLink,
   ChevronRight,
   AlertCircle,
@@ -61,7 +62,7 @@ const ZONES: Record<string, string[]> = {
 };
 
 export const StateTransportDirectoryView: React.FC = () => {
-  const { vehicles, currentUser, activeRole, setActiveTab, setActiveTrackingOrderId, addNotification, logActivity } = useAgri();
+  const { vehicles, currentUser, activeRole, setActiveTab, setActiveTrackingOrderId, addNotification, logActivity, navigateBack } = useAgri();
 
   const [selectedState, setSelectedState] = useState<string>('All States');
   const [selectedZone, setSelectedZone] = useState<string>('All');
@@ -188,41 +189,30 @@ export const StateTransportDirectoryView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-teal-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30 flex items-center gap-1.5">
-                <Truck className="w-3.5 h-3.5 text-emerald-400" />
-                All-India National Fleet Network (अखिल भारतीय राज्य परिवहन सेवा)
-              </span>
-              <span className="text-xs text-emerald-200/80 bg-black/30 px-2.5 py-0.5 rounded-full">
-                24+ States Connected
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-display">
-              State-Wise Agri-Transport & Logistics Fleet
+      {/* Clean Compact Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={navigateBack}
+            className="p-2 rounded-2xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 border border-slate-200 transition-colors cursor-pointer shrink-0"
+            title="Go Back"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
+              <Truck className="w-6 h-6 text-emerald-600" />
+              <span>State Transport & Logistics Directory</span>
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              Find, verify, and book dedicated state-wise cold reefers, multi-axle grain haulers, and express mandi carriers with live GPS tracking, certified drivers, and transparent per-km rates.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Verified cold reefers, multi-axle haulers, and express carriers across 24+ states.
             </p>
           </div>
+        </div>
 
-          <div className="flex flex-wrap gap-2.5 bg-black/40 p-3 rounded-2xl backdrop-blur-xs border border-white/10 text-xs">
-            <div>
-              <span className="text-[10px] text-slate-400 block uppercase font-bold">States Active</span>
-              <span className="text-base font-extrabold text-emerald-400">{statesCoveredCount} States</span>
-            </div>
-            <div className="border-l border-white/10 pl-3">
-              <span className="text-[10px] text-slate-400 block uppercase font-bold">Available Trucks</span>
-              <span className="text-base font-extrabold text-white">{availableCount} Units</span>
-            </div>
-            <div className="border-l border-white/10 pl-3">
-              <span className="text-[10px] text-slate-400 block uppercase font-bold">In-Transit</span>
-              <span className="text-base font-extrabold text-amber-400">{onTripCount} On Road</span>
-            </div>
-          </div>
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shrink-0">
+          <span>{statesCoveredCount} States • {availableCount} Trucks Available</span>
         </div>
       </div>
 

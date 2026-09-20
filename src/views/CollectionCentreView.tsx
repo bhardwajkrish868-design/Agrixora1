@@ -1399,59 +1399,56 @@ export const CollectionCentreView: React.FC = () => {
       {/* Sub-Tab 6: All-India FCI Centres Network (अखिल भारतीय FCI केंद्र) */}
       {activeSubTab === 'fci_network' && (
         <div className="space-y-6">
-          {/* Top FCI Command Center Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden border border-emerald-500/20">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="relative z-10 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="space-y-2 max-w-3xl">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold backdrop-blur-xs">
-                    <Building2 className="w-3.5 h-3.5" />
-                    <span>Food Corporation of India (FCI) & State Aggregation Network</span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-white">
-                    All-India FCI Centres & Modern Silos Network
+          {/* Clean Compact FCI Header & KPIs */}
+          <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
+                    <Building2 className="w-6 h-6 text-emerald-600" />
+                    <span>All-India FCI Centres & Modern Silos Network</span>
                   </h2>
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                    अखिल भारतीय स्तर पर भारतीय खाद्य निगम (FCI) के आधुनिक स्टील साइलो, खाद्यान्न भंडारण डिपो (FSD) और रेलहेड बफ़र केंद्र। देश के किसी भी राज्य के केंद्र का संचालन, इलेक्ट्रॉनिक वे-ब्रिज intake और लाइव स्टोरेज टेलीमेट्री प्रबंधित करें।
-                  </p>
-                </div>
-
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md text-xs space-y-1 shrink-0">
-                  <span className="text-[11px] text-slate-400 block">Current Operating Centre:</span>
-                  <strong className="text-sm font-extrabold text-amber-300 block">{activeHub.name}</strong>
-                  <span className="text-[11px] text-emerald-300">
-                    📍 {activeHub.district}, {activeHub.state} ({activeHub.code})
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                    {collectionHubs.length} Depots
                   </span>
                 </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  FCI modern steel silos, grain buffer depots (FSD), and railhead siding centres across India.
+                </p>
               </div>
 
-              {/* National Overview KPI Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/10 text-xs">
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-slate-400 block text-[11px]">National Stations</span>
-                  <strong className="text-lg font-extrabold text-white mt-0.5 block">{collectionHubs.length} FCI Depots</strong>
-                </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-slate-400 block text-[11px]">Total Silo Capacity</span>
-                  <strong className="text-lg font-extrabold text-amber-400 mt-0.5 block">
-                    {(collectionHubs.reduce((sum, h) => sum + h.capacityTons, 0) / 100000).toFixed(2)} Lakh MT
-                  </strong>
-                </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-slate-400 block text-[11px]">Grain Buffer Occupancy</span>
-                  <strong className="text-lg font-extrabold text-emerald-400 mt-0.5 block">
-                    {(collectionHubs.reduce((sum, h) => sum + h.currentOccupancyTons, 0) / 100000).toFixed(2)} Lakh MT
-                  </strong>
-                </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-slate-400 block text-[11px]">Railhead Connectivity</span>
-                  <strong className="text-lg font-extrabold text-blue-400 mt-0.5 block">
-                    {collectionHubs.filter(h => h.railwaySiding).length} Siding Connected
-                  </strong>
-                </div>
+              <div className="px-3.5 py-2 bg-slate-50 rounded-2xl border border-slate-200 text-xs shrink-0">
+                <span className="text-[10px] text-slate-500 block">Current Operating Centre:</span>
+                <strong className="text-xs font-bold text-slate-900 block">{activeHub.name}</strong>
+                <span className="text-[11px] text-emerald-700">
+                  📍 {activeHub.district}, {activeHub.state} ({activeHub.code})
+                </span>
+              </div>
+            </div>
+
+            {/* National Overview KPI Strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-slate-500 block text-[11px]">National Stations</span>
+                <strong className="text-base font-extrabold text-slate-900 mt-0.5 block">{collectionHubs.length} FCI Depots</strong>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-slate-500 block text-[11px]">Total Silo Capacity</span>
+                <strong className="text-base font-extrabold text-amber-600 mt-0.5 block">
+                  {(collectionHubs.reduce((sum, h) => sum + h.capacityTons, 0) / 100000).toFixed(2)} Lakh MT
+                </strong>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-slate-500 block text-[11px]">Grain Buffer Occupancy</span>
+                <strong className="text-base font-extrabold text-emerald-600 mt-0.5 block">
+                  {(collectionHubs.reduce((sum, h) => sum + h.currentOccupancyTons, 0) / 100000).toFixed(2)} Lakh MT
+                </strong>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-slate-500 block text-[11px]">Railhead Connectivity</span>
+                <strong className="text-base font-extrabold text-blue-600 mt-0.5 block">
+                  {collectionHubs.filter(h => h.railwaySiding).length} Siding Connected
+                </strong>
               </div>
             </div>
           </div>
