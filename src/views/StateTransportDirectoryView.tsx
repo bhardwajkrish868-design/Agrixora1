@@ -371,6 +371,29 @@ export const StateTransportDirectoryView: React.FC = () => {
     // Play chime sound
     playSmsChime();
 
+    // Trigger native OS system notification (Windows / Android push alert)
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        try {
+          new Notification('✅ Successful Granted! (Farm2Future)', {
+            body: `Vehicle ${bookingVehicle.vehicleNo} confirmed. Driver: ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}). Est Fare: ₹${totalCost.toLocaleString('en-IN')}`,
+            icon: '/favicon.ico'
+          });
+        } catch (_) {}
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            try {
+              new Notification('✅ Successful Granted! (Farm2Future)', {
+                body: `Vehicle ${bookingVehicle.vehicleNo} confirmed. Driver: ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}). Est Fare: ₹${totalCost.toLocaleString('en-IN')}`,
+                icon: '/favicon.ico'
+              });
+            } catch (_) {}
+          }
+        }).catch(() => {});
+      }
+    }
+
     // Trigger floating phone SMS notification
     setSmsNotification({
       show: true,
