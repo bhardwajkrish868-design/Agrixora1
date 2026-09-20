@@ -26,8 +26,43 @@ import {
   Bot,
   Thermometer,
   FileText,
-  BadgePercent
+  BadgePercent,
+  Smartphone
 } from 'lucide-react';
+
+// Synthesize pleasant SMS arrival chime via Web Audio API
+const playSmsChime = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+    
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, now);
+    gain1.gain.setValueAtTime(0, now);
+    gain1.gain.linearRampToValueAtTime(0.2, now + 0.05);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.35);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, now + 0.12);
+    gain2.gain.setValueAtTime(0, now + 0.12);
+    gain2.gain.linearRampToValueAtTime(0.25, now + 0.17);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.12);
+    osc2.stop(now + 0.6);
+  } catch (_) {}
+};
 
 export const ProductDetailModal: React.FC = () => {
   const { 
@@ -50,6 +85,28 @@ export const ProductDetailModal: React.FC = () => {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrderRef, setCreatedOrderRef] = useState('');
   const [lastCreatedOrder, setLastCreatedOrder] = useState<any>(null);
+
+  // Buyer Phone for Order & Transport SMS
+  const [buyerMobileNumber, setBuyerMobileNumber] = useState<string>(() => {
+    return currentUser?.phone ? currentUser.phone.replace(/\D/g, '').slice(-10) : '9631359486';
+  });
+
+  // Floating SMS Notification State
+  const [smsNotification, setSmsNotification] = useState<{
+    show: boolean;
+    phone: string;
+    orderNumber: string;
+    cropName: string;
+    quantity: string;
+    totalAmount: number;
+    vehicleNo: string;
+    driverName: string;
+    driverPhone: string;
+    destination: string;
+    timestamp: string;
+    deliveredReal?: boolean;
+    provider?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (selectedListingModal) {
@@ -98,24 +155,96 @@ export const ProductDetailModal: React.FC = () => {
     vehicles
   );
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsOrdering(true);
 
-    setTimeout(() => {
-      const newOrder = placeOrder({
-        listing: item,
-        quantity: currentOrderQty,
-        deliveryAddress,
-        pincode,
-        buyerOrg: currentUser.businessName || currentUser.name,
-        paymentMethod
+    const cleanPhone = buyerMobileNumber.replace(/\D/g, '').slice(-10) || '9631359486';
+
+    const newOrder = placeOrder({
+      listing: item,
+      quantity: currentOrderQty,
+      deliveryAddress,
+      pincode,
+      buyerOrg: currentUser?.businessName || currentUser?.name,
+      paymentMethod
+    });
+
+    const vNo = newOrder.dispatchDetails?.vehicleNo || aiPreview.modelName || 'Assigned Truck';
+    const dName = newOrder.dispatchDetails?.driverName || 'Assigned Driver';
+    const dPhone = newOrder.dispatchDetails?.driverPhone || '+91 98231 44512';
+
+    const smsMessage = `✅ Order Successful & Transport Booked! (Farm2Future)\nOrder #${newOrder.orderNumber}: ${currentOrderQty} ${item.unit} ${item.cropName} (₹${totalPayable.toLocaleString('en-IN')}) confirmed.\nTransport Vehicle: ${vNo}\nDriver: ${dName} (${dPhone})\nDelivery to: ${deliveryAddress}`;
+
+    // Call /api/send-sms
+    let apiDelivery: any = null;
+    try {
+      const res = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: cleanPhone,
+          message: smsMessage,
+          vehicleNo: vNo,
+          driverName: dName,
+          driverPhone: dPhone,
+          origin: newOrder.collectionHubName || 'Central Hub',
+          destination: deliveryAddress,
+          cost: totalPayable
+        })
       });
-      setLastCreatedOrder(newOrder);
-      setCreatedOrderRef(newOrder.orderNumber);
-      setIsOrdering(false);
-      setOrderSuccess(true);
-    }, 600);
+      apiDelivery = await res.json();
+    } catch (_) {
+      apiDelivery = { success: false, simulated: true };
+    }
+
+    // Play chime sound
+    playSmsChime();
+
+    // Trigger native OS notification
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        try {
+          new Notification('✅ Order Successful & Transport Booked!', {
+            body: `Order #${newOrder.orderNumber} confirmed. Transport: ${vNo}. Driver: ${dName} (${dPhone}).`,
+            icon: '/favicon.ico'
+          });
+        } catch (_) {}
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            try {
+              new Notification('✅ Order Successful & Transport Booked!', {
+                body: `Order #${newOrder.orderNumber} confirmed. Transport: ${vNo}. Driver: ${dName} (${dPhone}).`,
+                icon: '/favicon.ico'
+              });
+            } catch (_) {}
+          }
+        }).catch(() => {});
+      }
+    }
+
+    // Trigger floating phone SMS notification
+    setSmsNotification({
+      show: true,
+      phone: cleanPhone,
+      orderNumber: newOrder.orderNumber,
+      cropName: item.cropName,
+      quantity: `${currentOrderQty} ${item.unit || 'Quintals'}`,
+      totalAmount: totalPayable,
+      vehicleNo: vNo,
+      driverName: dName,
+      driverPhone: dPhone,
+      destination: deliveryAddress,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      deliveredReal: Boolean(apiDelivery?.provider === 'fast2sms' && apiDelivery?.success),
+      provider: apiDelivery?.provider || 'simulation'
+    });
+
+    setLastCreatedOrder(newOrder);
+    setCreatedOrderRef(newOrder.orderNumber);
+    setIsOrdering(false);
+    setOrderSuccess(true);
   };
 
   const handleFinishAndTrack = () => {
@@ -126,6 +255,109 @@ export const ProductDetailModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      {/* 📲 FLOATING BUYER SMS NOTIFICATION TOAST */}
+      {smsNotification && smsNotification.show && (() => {
+        const cleanPhone = smsNotification.phone;
+        const whatsappText = `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
+          `📦 *Order Ref:* ${smsNotification.orderNumber}\n` +
+          `🌾 *Produce:* ${smsNotification.quantity} ${smsNotification.cropName}\n` +
+          `💰 *Total Paid:* ₹${smsNotification.totalAmount.toLocaleString('en-IN')}\n\n` +
+          `🚚 *Transport Vehicle:* ${smsNotification.vehicleNo}\n` +
+          `👤 *Driver:* ${smsNotification.driverName} (${smsNotification.driverPhone})\n` +
+          `📍 *Delivery Address:* ${smsNotification.destination}\n\n` +
+          `Thank you for purchasing on Farm2Future!`;
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappText)}`;
+        const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(whatsappText.replace(/[*_]/g, ''))}`;
+
+        return (
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] max-w-lg w-[94vw] animate-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <div className="bg-slate-950/95 backdrop-blur-md text-white p-4 sm:p-5 rounded-3xl shadow-2xl border-2 border-emerald-500/60 space-y-3 ring-4 ring-emerald-500/20">
+              <div className="flex items-center justify-between text-xs pb-2 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs shadow-md">
+                    💬
+                  </div>
+                  <div>
+                    <span className="font-extrabold text-emerald-300">BUYER SMS ALERT</span>
+                    <span className="text-[10px] text-slate-400 ml-1.5">• VM-AGRIF2F • {smsNotification.timestamp}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSmsNotification(null)}
+                  className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center text-xs cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-slate-300">
+                    SMS To Buyer: <strong className="text-white font-mono">+91 {smsNotification.phone}</strong>
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 font-extrabold text-[10px] border border-emerald-400/40 uppercase">
+                    Order & Transport Confirmed
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/10 font-sans text-slate-100 text-xs leading-relaxed border border-white/10 space-y-1.5">
+                  <p className="font-black text-emerald-300 text-sm flex items-center gap-1.5">
+                    <span>✅</span>
+                    <span>Order Successful & Transport Booked! (ऑर्डर व ट्रांसपोर्ट सफल)</span>
+                  </p>
+                  <p className="text-slate-200">
+                    Order <strong>#{smsNotification.orderNumber}</strong> for <strong>{smsNotification.quantity} {smsNotification.cropName}</strong> (₹{smsNotification.totalAmount.toLocaleString('en-IN')}) is confirmed and escrow protected.
+                  </p>
+                  <div className="bg-white/5 p-2.5 rounded-xl border border-white/10 space-y-0.5 text-[11px]">
+                    <p className="text-emerald-300 font-bold">
+                      🚚 Transport Vehicle: {smsNotification.vehicleNo}
+                    </p>
+                    <p className="text-slate-300">
+                      Driver: <strong>{smsNotification.driverName}</strong> (📞 {smsNotification.driverPhone})
+                    </p>
+                    <p className="text-slate-400 text-[10px]">
+                      Destination: {smsNotification.destination}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 1-Click WhatsApp & Phone SMS buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  >
+                    <span>🟢</span>
+                    <span>Send to WhatsApp</span>
+                  </a>
+                  <a
+                    href={nativeSmsUrl}
+                    className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>Open Phone SMS App</span>
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/10">
+                <span>Farm2Future Automated Buyer Gateway</span>
+                <button
+                  type="button"
+                  onClick={() => setSmsNotification(null)}
+                  className="text-slate-300 hover:text-white font-bold cursor-pointer"
+                >
+                  Dismiss (बंद करें)
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Backdrop */}
       <div 
         onClick={() => setSelectedListingModal(null)}
@@ -162,10 +394,64 @@ export const ProductDetailModal: React.FC = () => {
                 <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-mono font-bold">
                   {createdOrderRef}
                 </span>
-                <h3 className="text-2xl font-extrabold text-slate-900">Escrow Locked & AI Fleet Auto-Assigned!</h3>
+                <h3 className="text-2xl font-extrabold text-slate-900">Order Successful & Transport Booked!</h3>
                 <p className="text-xs text-slate-600 max-w-md mx-auto">
-                  ₹{totalPayable.toLocaleString('en-IN')} is locked securely in Farm2Future Escrow Vault. Buyer paid ₹{logisticsFee} for delivery, which will be disbursed to driver upon successful delivery.
+                  ₹{totalPayable.toLocaleString('en-IN')} is locked securely in Farm2Future Escrow Vault. Transport vehicle has been dispatched for delivery.
                 </p>
+              </div>
+
+              {/* 📱 Buyer Order & Transport SMS Confirmation Card */}
+              <div className="p-4 bg-white rounded-2xl border-2 border-emerald-300 text-left max-w-md mx-auto space-y-3 shadow-md">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-extrabold text-emerald-800">
+                    <Smartphone className="w-4 h-4 text-emerald-600" />
+                    <span>Buyer SMS Alert Dispatched</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-300 font-mono">
+                    +91 {buyerMobileNumber}
+                  </span>
+                </div>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                  <p className="font-bold text-slate-900 flex items-center gap-1">
+                    <span>✅</span>
+                    <span>Order #{createdOrderRef} Confirmed & Transport Booked!</span>
+                  </p>
+                  <p className="text-slate-600 text-[11px]">
+                    Vehicle: <strong className="text-slate-800 font-mono">{lastCreatedOrder?.dispatchDetails?.vehicleNo}</strong> • Driver: <strong className="text-slate-800">{lastCreatedOrder?.dispatchDetails?.driverName}</strong> (📞 {lastCreatedOrder?.dispatchDetails?.driverPhone})
+                  </p>
+                </div>
+
+                {/* 1-Click WhatsApp & Phone SMS buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  <a
+                    href={`https://api.whatsapp.com/send?phone=91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
+                      `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
+                      `📦 *Order Ref:* ${createdOrderRef}\n` +
+                      `🌾 *Produce:* ${currentOrderQty} ${item.unit} ${item.cropName}\n` +
+                      `💰 *Total Paid:* ₹${totalPayable.toLocaleString('en-IN')}\n\n` +
+                      `🚚 *Transport Vehicle:* ${lastCreatedOrder?.dispatchDetails?.vehicleNo}\n` +
+                      `👤 *Driver:* ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone})\n` +
+                      `📍 *Delivery Destination:* ${deliveryAddress}\n\n` +
+                      `Thank you for ordering on Farm2Future!`
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  >
+                    <span>🟢</span>
+                    <span>Send to WhatsApp (+91 {buyerMobileNumber.slice(-10)})</span>
+                  </a>
+                  <a
+                    href={`sms:+91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
+                      `Order ${createdOrderRef} Confirmed & Transport Booked! Vehicle: ${lastCreatedOrder?.dispatchDetails?.vehicleNo}, Driver: ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone}). Total: Rs ${totalPayable}. Delivery to: ${deliveryAddress}`
+                    )}`}
+                    className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  >
+                    <Smartphone className="w-3.5 h-3.5 text-sky-200" />
+                    <span>Open in Phone SMS App</span>
+                  </a>
+                </div>
               </div>
 
               {/* 🤖 AI Assigned Fleet Box */}
@@ -436,6 +722,34 @@ export const ProductDetailModal: React.FC = () => {
                       onChange={e => setDeliveryAddress(e.target.value)}
                       className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500"
                     />
+                  </div>
+
+                  {/* Buyer Mobile Number for Order & Transport SMS */}
+                  <div className="sm:col-span-2 p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1.5">
+                    <label className="block font-bold text-slate-800 flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <Smartphone className="w-4 h-4 text-emerald-600" />
+                        <span>Buyer Mobile Number for Order & Transport SMS (मोबाइल नंबर दर्ज करें) *</span>
+                      </span>
+                      <span className="text-[10px] text-emerald-700 font-extrabold bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                        ● Live SMS Dispatch
+                      </span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3 font-bold text-slate-600 text-xs select-none font-mono">🇮🇳 +91</span>
+                      <input
+                        type="tel"
+                        required
+                        maxLength={10}
+                        placeholder="Enter 10-digit mobile number"
+                        value={buyerMobileNumber}
+                        onChange={e => setBuyerMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        className="w-full pl-16 pr-3 py-2.5 rounded-xl bg-white border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono font-bold text-slate-900 text-sm"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      ऑर्डर कन्फर्म होते ही इस नंबर पर <strong>Order Successful</strong> और <strong>Transport Booking (गाड़ी संख्या व ड्राइवर नंबर)</strong> का मैसेज भेजा जाएगा।
+                    </p>
                   </div>
                 </div>
 

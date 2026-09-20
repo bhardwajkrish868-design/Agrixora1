@@ -1300,6 +1300,15 @@
   ],
   "notifications": [
     {
+      "title": "✅ Transport Booking Successful Granted!",
+      "message": "Vehicle MH-15-EG-4401 confirmed for Nashik Red Onion (ताज़ा प्याज़). Confirmation SMS dispatched to +91 9631359486. Driver Prakash Shinde (+91 99223 34455) assigned.",
+      "type": "dispatch",
+      "recipientRole": "all",
+      "id": "notif_1789936292190",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
       "recipientRole": "farmer",
       "title": "Produce Quality Verified at Hub",
       "message": "Your crop batch successfully cleared QC with grade: Grade A+.",
@@ -2177,44 +2186,6 @@
     }
   ],
   "activityHistory": [
-    {
-      "id": "act_1789934744554_udlsk",
-      "userId": "usr_farmer_1789735666459",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "transport_booking",
-      "title": "Transport Booked: MH-15-EG-4401 (undefined)",
-      "description": "Krish Bhardwaj booked Eicher Pro 3015 Reefer Plus from Nashik North Agri Aggregation Hub #04 to AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra for 12T Nashik Red Onion (ताज़ा प्याज़). SMS sent to +91 9631359486. Est. Fare: ₹4,620",
-      "timestamp": "2026-09-20T20:05:44.554Z",
-      "metadata": {
-        "vehicleNo": "MH-15-EG-4401",
-        "transporter": "GreenWheels Cold Agri-Logistics",
-        "driver": "Prakash Shinde",
-        "driverPhone": "+91 99223 34455",
-        "customerPhone": "9631359486",
-        "pickupLocation": "Nashik North Agri Aggregation Hub #04",
-        "dropLocation": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
-        "cargoWeightTons": 12,
-        "cropName": "Nashik Red Onion (ताज़ा प्याज़)",
-        "estimatedCost": 4620,
-        "bookingDate": "2026-09-20",
-        "isDemoBooking": true
-      }
-    },
-    {
-      "id": "act_1789934723928_jht1m",
-      "userId": "usr_farmer_1789735666459",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-20T20:05:23.928Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
     {
       "id": "act_1789934060469_b5j2f",
       "userId": "usr_buyer_1789574079511",
@@ -4012,7 +3983,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-20T20:28:17.604Z",
+  "lastUpdated": "2026-09-20T20:48:13.719Z",
   "vehicles": [
     {
       "id": "veh_1",
