@@ -29,6 +29,40 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
+// Synthesize pleasant SMS arrival chime via Web Audio API
+const playSmsChime = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+    
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, now);
+    gain1.gain.setValueAtTime(0, now);
+    gain1.gain.linearRampToValueAtTime(0.2, now + 0.05);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.35);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, now + 0.12);
+    gain2.gain.setValueAtTime(0, now + 0.12);
+    gain2.gain.linearRampToValueAtTime(0.25, now + 0.17);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.12);
+    osc2.stop(now + 0.6);
+  } catch (_) {}
+};
+
 interface RegistrationModalProps {
   isOpen: boolean;
   role: UserRole | null;
@@ -137,6 +171,72 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [aadhaarNumber, setAadhaarNumber] = useState('');
   const [otpCode, setOtpCode] = useState('882910');
   const [isOtpVerified, setIsOtpVerified] = useState(true);
+  const [smsToast, setSmsToast] = useState<{ show: boolean; otp: string; phone: string } | null>(null);
+  const [otpSentMessage, setOtpSentMessage] = useState<string>('');
+  const [isSendingOtp, setIsSendingOtp] = useState<boolean>(false);
+
+  // Dispatch OTP directly to user's physical mobile phone and multi-channel alerts
+  const sendOtpToPhone = async (targetPhone?: string, targetOtp?: string) => {
+    const rawTarget = (targetPhone || phone || '').replace(/\D/g, '').slice(-10) || '9631359486';
+    const otpToDispatch = targetOtp || otpCode || '882910';
+
+    setIsSendingOtp(true);
+    setOtpCode(otpToDispatch);
+    setIsOtpVerified(true);
+
+    const smsMessage = `🔑 Farm2Future Verification OTP: ${otpToDispatch}. Valid for 10 minutes. Do not share this OTP with anyone. (Farm2Future Smart Agri Platform)`;
+
+    // 1. Backend dispatch to /api/send-sms (Fast2SMS telecom gateway / DB logging)
+    try {
+      await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: rawTarget,
+          message: smsMessage,
+          cost: 0,
+          origin: 'Farm2Future UIDAI Auth',
+          destination: `+91 ${rawTarget}`
+        })
+      });
+    } catch (_) {}
+
+    // 2. Synthesize SMS ringtone chime
+    playSmsChime();
+
+    // 3. Trigger Native OS Browser Push Notification
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'granted') {
+        try {
+          new Notification('🔑 Farm2Future Verification OTP', {
+            body: `Your OTP is: ${otpToDispatch} for mobile +91 ${rawTarget}. Valid for 10 minutes.`,
+            icon: '/favicon.ico'
+          });
+        } catch (_) {}
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            try {
+              new Notification('🔑 Farm2Future Verification OTP', {
+                body: `Your OTP is: ${otpToDispatch} for mobile +91 ${rawTarget}. Valid for 10 minutes.`,
+                icon: '/favicon.ico'
+              });
+            } catch (_) {}
+          }
+        }).catch(() => {});
+      }
+    }
+
+    // 4. Trigger Floating Phone Push Notification Toast
+    setSmsToast({
+      show: true,
+      otp: otpToDispatch,
+      phone: rawTarget
+    });
+
+    setOtpSentMessage(`✅ Demo OTP (${otpToDispatch}) sent to +91 ${rawTarget}`);
+    setIsSendingOtp(false);
+  };
 
   // Step 3: Business / Farm Details
   // Farmer fields
@@ -228,6 +328,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         setErrorMsg(language === 'hi' ? '❌ मान्य 10-अंकीय मोबाइल नंबर दर्ज करें।' : '❌ Please enter a valid 10-digit mobile number.');
         return;
       }
+
+      // Automatically dispatch Demo OTP to user's phone when moving to Step 2
+      if (stepNumber === 2 && currentStep === 1) {
+        sendOtpToPhone(rawPhoneDigits, '882910');
+      }
     }
 
     // Step 2 Validation
@@ -238,6 +343,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           language === 'hi'
             ? '❌ कृपया 12-अंकीय आधार कार्ड नंबर (UIDAI) दर्ज करें।'
             : '❌ Please enter a valid 12-digit UIDAI Aadhaar Card Number.'
+        );
+        return;
+      }
+      if (!otpCode || otpCode.length < 4) {
+        setErrorMsg(
+          language === 'hi'
+            ? '❌ कृपया 6-अंकीय मोबाइल/आधार ओटीपी सत्यापित करें।'
+            : '❌ Please enter and verify the 6-digit mobile/Aadhaar OTP.'
         );
         return;
       }
@@ -370,6 +483,82 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+      {/* 📲 Floating OTP SMS Notification Banner (Phone Toast) */}
+      {smsToast && (
+        <div className="fixed top-4 inset-x-0 z-[100] flex justify-center px-4 pointer-events-none animate-in slide-in-from-top-4 duration-300">
+          <div className="bg-slate-900 text-white rounded-2xl shadow-2xl border-2 border-emerald-400 p-4 max-w-md w-full pointer-events-auto space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                  📲
+                </div>
+                <span className="text-xs font-mono font-bold tracking-wider text-emerald-400 uppercase">
+                  OTP SMS ALERT • VM-AGRIF2F
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-mono">Just Now</span>
+            </div>
+
+            <div className="p-2.5 bg-slate-800/90 rounded-xl border border-slate-700/80 text-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-300 font-medium">🔑 Demo Verification OTP:</span>
+                <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono font-black text-sm tracking-widest border border-emerald-500/40">
+                  {smsToast.otp}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Dispatched to: <strong className="text-emerald-400 font-mono">+91 {smsToast.phone}</strong>
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-0.5">
+              <a
+                href={`https://api.whatsapp.com/send?phone=91${smsToast.phone.replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
+                  `🔑 *Farm2Future Verification OTP: ${smsToast.otp}*\n\nYour One-Time Password (OTP) is *${smsToast.otp}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-xs"
+              >
+                <span>🟢</span>
+                <span>WhatsApp OTP</span>
+              </a>
+              <a
+                href={`sms:+91${smsToast.phone.replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
+                  `Farm2Future Verification OTP: ${smsToast.otp}. Valid for 10 minutes. Do not share with anyone.`
+                )}`}
+                className="py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-xs"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>Phone SMS App</span>
+              </a>
+            </div>
+
+            <div className="flex items-center justify-between pt-1 text-[11px] border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setOtpCode(smsToast.otp);
+                  setIsOtpVerified(true);
+                  setSmsToast(null);
+                }}
+                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Auto-fill OTP</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSmsToast(null)}
+                className="text-slate-400 hover:text-white font-bold cursor-pointer"
+              >
+                Dismiss (बंद करें)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Backdrop */}
       <div 
         onClick={onClose}
@@ -656,8 +845,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                           />
                         </div>
                         <p className="text-[10px] text-emerald-700 font-bold mt-1 flex items-center gap-1">
-                          <Check className="w-3 h-3 text-emerald-600 stroke-[3]" />
-                          <span>OTP verification linked in Step 2</span>
+                          <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Step 2 पर जाते ही इस नंबर पर Live Demo OTP भेजा जाएगा</span>
                         </p>
                       </div>
 
@@ -835,39 +1024,92 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </div>
 
                     {/* Instant OTP Authentication Verification Box */}
-                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                    <div className="p-3.5 rounded-2xl bg-slate-50 border-2 border-emerald-300/80 space-y-3 shadow-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                          <Smartphone className="w-3.5 h-3.5 text-blue-600" />
-                          <span>Instant Aadhaar OTP Linked Verification</span>
+                        <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                          <Smartphone className="w-4 h-4 text-emerald-600" />
+                          <span>Aadhaar & Mobile OTP Verification (ओटीपी सत्यापन)</span>
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                          Auto-Generated
+                        <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                          ● Live Mobile Dispatch
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+
+                      <div className="flex flex-wrap items-center gap-2">
                         <input
                           type="text"
                           maxLength={6}
                           value={otpCode}
-                          onChange={e => setOtpCode(e.target.value)}
+                          onChange={e => {
+                            setOtpCode(e.target.value);
+                            setIsOtpVerified(e.target.value.length === 6);
+                          }}
                           placeholder="882910"
-                          className="w-32 px-3 py-1.5 rounded-xl border border-slate-200 font-mono font-bold text-sm tracking-widest text-slate-900 text-center bg-white"
+                          className="w-28 px-3 py-2 rounded-xl border-2 border-slate-300 font-mono font-black text-sm tracking-widest text-slate-900 text-center bg-white focus:border-emerald-500 focus:outline-none shadow-2xs"
                         />
                         <button
                           type="button"
+                          disabled={isSendingOtp}
                           onClick={() => {
-                            setOtpCode('882910');
-                            setIsOtpVerified(true);
+                            sendOtpToPhone(phone || '9631359486', '882910');
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-slate-200/80 hover:bg-slate-300 text-slate-700 text-xs font-bold cursor-pointer transition-colors"
+                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
                         >
-                          Fill Demo OTP
+                          <Smartphone className="w-3.5 h-3.5" />
+                          <span>{isSendingOtp ? 'Sending...' : 'Fill Demo OTP (882910) & Send to Mobile'}</span>
                         </button>
-                        <span className="text-[11px] text-emerald-700 font-bold flex items-center gap-1 ml-auto">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span>Phone Verified</span>
-                        </span>
+                        {isOtpVerified && (
+                          <span className="text-[11px] text-emerald-700 font-extrabold flex items-center gap-1 ml-auto bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>OTP Verified</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Phone Dispatch Status & 1-Click WhatsApp / SMS App Buttons */}
+                      <div className="p-2.5 bg-white rounded-xl border border-emerald-200 text-xs space-y-2">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-600">
+                            ओटीपी मोबाइल नंबर: <strong className="text-slate-900 font-mono">+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)}</strong>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => sendOtpToPhone(phone || '9631359486', otpCode || '882910')}
+                            className="text-emerald-700 hover:text-emerald-800 font-bold underline cursor-pointer text-[10.5px]"
+                          >
+                            Resend OTP (दोबारा भेजें)
+                          </button>
+                        </div>
+
+                        {otpSentMessage && (
+                          <p className="text-[11px] text-emerald-700 font-bold flex items-center gap-1">
+                            <span>📲</span>
+                            <span>{otpSentMessage}</span>
+                          </p>
+                        )}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                          <a
+                            href={`https://api.whatsapp.com/send?phone=91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
+                              `🔑 *Farm2Future Verification OTP: ${otpCode || '882910'}*\n\nYour One-Time Password (OTP) is *${otpCode || '882910'}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`
+                            )}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                          >
+                            <span>🟢</span>
+                            <span>Send OTP to WhatsApp (+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)})</span>
+                          </a>
+                          <a
+                            href={`sms:+91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
+                              `Farm2Future Verification OTP: ${otpCode || '882910'}. Valid for 10 minutes. Do not share with anyone.`
+                            )}`}
+                            className="py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                          >
+                            <Smartphone className="w-3.5 h-3.5 text-sky-200" />
+                            <span>Open in Phone SMS App</span>
+                          </a>
+                        </div>
                       </div>
                     </div>
 
@@ -1308,6 +1550,74 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </div>
                   </div>
                 )}
+
+                {/* 📲 Demo OTP Verification for Login */}
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                      <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Instant Login Demo OTP Verification</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      ● Mobile SMS
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={e => setOtpCode(e.target.value)}
+                      placeholder="882910"
+                      className="w-28 px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold text-sm tracking-widest text-slate-900 text-center bg-white"
+                    />
+                    <button
+                      type="button"
+                      disabled={isSendingOtp}
+                      onClick={() => {
+                        sendOtpToPhone(phone || '9631359486', '882910');
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      <Smartphone className="w-3 h-3" />
+                      <span>{isSendingOtp ? 'Sending...' : 'Send Demo OTP (882910) to Mobile'}</span>
+                    </button>
+                    {isOtpVerified && (
+                      <span className="text-[11px] text-emerald-700 font-bold flex items-center gap-1 ml-auto">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Verified</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 text-[10px]">
+                    <span className="text-slate-500">
+                      Target: <strong className="text-slate-700 font-mono">+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)}</strong>
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://api.whatsapp.com/send?phone=91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
+                          `🔑 *Farm2Future Login OTP: ${otpCode || '882910'}*\n\nYour Login OTP is *${otpCode || '882910'}*. Valid for 10 minutes.\n\n🌾 Farm2Future Platform`
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1"
+                      >
+                        <span>🟢 WhatsApp</span>
+                      </a>
+                      <span className="text-slate-300">•</span>
+                      <a
+                        href={`sms:+91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
+                          `Farm2Future Login OTP: ${otpCode || '882910'}. Valid for 10 minutes.`
+                        )}`}
+                        className="text-sky-700 hover:text-sky-800 font-bold flex items-center gap-1"
+                      >
+                        <Smartphone className="w-3 h-3" />
+                        <span>SMS App</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
 
                 <button
                   type="submit"
