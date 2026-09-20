@@ -22,9 +22,50 @@ import {
   ChevronRight,
   AlertCircle,
   Bot,
-  Sparkles
+  Sparkles,
+  MessageSquare,
+  Send,
+  Smartphone,
+  X,
+  Bell
 } from 'lucide-react';
 import { RouteTripTracker } from '../components/RouteTripTracker';
+
+// Synthesize pleasant SMS arrival chime via Web Audio API
+const playSmsChime = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+    
+    // First high chime tone
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, now); // D5
+    gain1.gain.setValueAtTime(0.15, now);
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.15);
+
+    // Second bell tone
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, now + 0.1); // A5
+    gain2.gain.setValueAtTime(0.2, now + 0.1);
+    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.1);
+    osc2.stop(now + 0.4);
+  } catch {
+    // AudioContext blocked or not supported
+  }
+};
 
 const ALL_INDIAN_STATES = [
   'All States',
@@ -79,6 +120,26 @@ export const StateTransportDirectoryView: React.FC = () => {
   const [estimatedDistanceKm, setEstimatedDistanceKm] = useState(150);
   const [bookingDate, setBookingDate] = useState(new Date().toISOString().split('T')[0]);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+
+  // Mobile phone state for SMS dispatch
+  const [userMobileNumber, setUserMobileNumber] = useState<string>(() => {
+    return currentUser?.phone ? currentUser.phone.replace(/\D/g, '').slice(-10) : '9876543210';
+  });
+
+  // Live SMS Simulation Toast state
+  const [smsNotification, setSmsNotification] = useState<{
+    show: boolean;
+    phone: string;
+    vehicleNo: string;
+    driverName: string;
+    driverPhone: string;
+    origin: string;
+    destination: string;
+    cost: number;
+    cropName: string;
+    timestamp: string;
+  } | null>(null);
 
   // Filtered vehicles logic
   const filteredVehicles = useMemo(() => {
@@ -114,15 +175,14 @@ export const StateTransportDirectoryView: React.FC = () => {
 
       // Search query
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchesPlate = v.vehicleNo.toLowerCase().includes(q);
-        const matchesTransporter = v.transporterName.toLowerCase().includes(q);
-        const matchesDriver = v.driverName.toLowerCase().includes(q);
-        const matchesState = v.state.toLowerCase().includes(q);
-        const matchesCity = (v.cityHub || '').toLowerCase().includes(q);
-        const matchesModel = (v.modelName || '').toLowerCase().includes(q);
+        const q = searchQuery.toLowerCase();
+        const matchesPlate = v.vehicleNo?.toLowerCase().includes(q);
+        const matchesTransporter = v.transporterName?.toLowerCase().includes(q);
+        const matchesDriver = v.driverName?.toLowerCase().includes(q);
+        const matchesState = v.state?.toLowerCase().includes(q);
+        const matchesCity = v.cityHub?.toLowerCase().includes(q);
+        const matchesModel = v.modelName?.toLowerCase().includes(q);
         const matchesRoute = (v.operatingRoutes || []).some(r => r.toLowerCase().includes(q));
-
         return matchesPlate || matchesTransporter || matchesDriver || matchesState || matchesCity || matchesModel || matchesRoute;
       }
 
@@ -139,11 +199,37 @@ export const StateTransportDirectoryView: React.FC = () => {
     return s.size;
   }, [vehicles]);
 
-  const handleOpenBooking = (vehicle: VehicleDetails) => {
+  const handleOpenBooking = (vehicle: VehicleDetails, demo: boolean = false) => {
     setBookingVehicle(vehicle);
     setPickupLocation(vehicle.originHub || `${vehicle.cityHub || vehicle.state} Aggregation Hub`);
     setDropLocation(vehicle.destinationWarehouse || 'Destination APMC Mandi / Food Depot');
     setBookingSuccess(false);
+    setIsDemoMode(demo);
+  };
+
+  const handleOpenDemoBooking = () => {
+    const defaultVehicle = vehicles?.[0] || {
+      id: 'veh_demo_1',
+      vehicleNo: 'MH-15-EG-4412',
+      vehicleType: 'Multi-Axle Heavy Hauler',
+      modelName: 'Tata Signa 4825.TK (28-Ton)',
+      capacityTons: 28,
+      ratePerKm: 26,
+      currentStatus: 'Available',
+      originHub: 'Nashik Pimpalgaon Hub',
+      destinationWarehouse: 'Mumbai Vashi APMC Mandi',
+      driverName: 'Rameshwar Shinde',
+      driverPhone: '+91 98231 44512',
+      transporterName: 'Maharashtra State Agro Logistics',
+      state: 'Maharashtra',
+      cityHub: 'Nashik',
+      isRefrigerated: true
+    } as VehicleDetails;
+
+    handleOpenBooking(defaultVehicle, true);
+    setCargoWeightTons(12);
+    setCropName('Nashik Red Onion (ताज़ा प्याज़)');
+    setEstimatedDistanceKm(165);
   };
 
   const handleConfirmBooking = (e: React.FormEvent) => {
@@ -152,43 +238,123 @@ export const StateTransportDirectoryView: React.FC = () => {
 
     const rate = bookingVehicle.ratePerKm || 28;
     const totalCost = Math.round(estimatedDistanceKm * rate);
+    const cleanPhone = userMobileNumber.replace(/\D/g, '').slice(-10) || '9876543210';
 
     // Add activity log
     logActivity({
       actionType: 'transport_booking',
       title: `Transport Booked: ${bookingVehicle.vehicleNo} (${bookingVehicle.state})`,
-      description: `${currentUser.name} (${currentUser.role}) booked ${bookingVehicle.modelName || bookingVehicle.vehicleType} from ${pickupLocation} to ${dropLocation} for ${cargoWeightTons}T ${cropName}. Estimated Cost: ₹${totalCost.toLocaleString('en-IN')}`,
+      description: `${currentUser.name} booked ${bookingVehicle.modelName || bookingVehicle.vehicleType} from ${pickupLocation} to ${dropLocation} for ${cargoWeightTons}T ${cropName}. SMS sent to +91 ${cleanPhone}. Est. Fare: ₹${totalCost.toLocaleString('en-IN')}`,
       metadata: {
         vehicleNo: bookingVehicle.vehicleNo,
         transporter: bookingVehicle.transporterName,
         driver: bookingVehicle.driverName,
         driverPhone: bookingVehicle.driverPhone,
+        customerPhone: cleanPhone,
         pickupLocation,
         dropLocation,
         cargoWeightTons,
         cropName,
         estimatedCost: totalCost,
-        bookingDate
+        bookingDate,
+        isDemoBooking: isDemoMode
       }
     });
 
     // Notify
     addNotification({
-      title: '🚚 State Transport Booking Confirmed!',
-      message: `Vehicle ${bookingVehicle.vehicleNo} (${bookingVehicle.transporterName}) booked for ${cropName} from ${pickupLocation} to ${dropLocation}. Driver ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}) will contact you shortly.`,
+      title: '✅ Transport Booking Successful Granted!',
+      message: `Vehicle ${bookingVehicle.vehicleNo} confirmed for ${cropName}. Confirmation SMS dispatched to +91 ${cleanPhone}. Driver ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}) assigned.`,
       type: 'dispatch',
       recipientRole: 'all'
     });
 
+    // Play chime sound
+    playSmsChime();
+
+    // Trigger floating phone SMS notification
+    setSmsNotification({
+      show: true,
+      phone: cleanPhone,
+      vehicleNo: bookingVehicle.vehicleNo,
+      driverName: bookingVehicle.driverName,
+      driverPhone: bookingVehicle.driverPhone,
+      origin: pickupLocation,
+      destination: dropLocation,
+      cost: totalCost,
+      cropName,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+
     setBookingSuccess(true);
-    setTimeout(() => {
-      setBookingVehicle(null);
-      setBookingSuccess(false);
-    }, 2500);
   };
 
   return (
     <div className="space-y-6">
+      {/* 📲 LIVE SIMULATED SMS PUSH NOTIFICATION TOAST */}
+      {smsNotification && smsNotification.show && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92vw] animate-in slide-in-from-top-4 duration-300 pointer-events-auto">
+          <div className="bg-slate-950/95 backdrop-blur-md text-white p-4 rounded-3xl shadow-2xl border-2 border-emerald-500/60 space-y-2.5 ring-4 ring-emerald-500/20">
+            <div className="flex items-center justify-between text-xs pb-1.5 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">
+                  💬
+                </div>
+                <div>
+                  <span className="font-extrabold text-emerald-300">MESSAGES</span>
+                  <span className="text-[10px] text-slate-400 ml-1.5">• VM-AGRIF2F • {smsNotification.timestamp}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSmsNotification(null)}
+                className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-1.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-slate-300">SMS To: <strong className="text-white font-mono">+91 {smsNotification.phone}</strong></span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-[10px] border border-emerald-400/30 uppercase">
+                  Delivered
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/10 font-sans text-slate-100 text-xs leading-relaxed border border-white/10 space-y-1">
+                <p className="font-black text-emerald-300 text-sm flex items-center gap-1.5">
+                  <span>✅</span>
+                  <span>Successful Granted! (बुकिंग स्वीकृत हुई)</span>
+                </p>
+                <p className="text-slate-200">
+                  Your agri-transport booking for vehicle <strong>{smsNotification.vehicleNo}</strong> is confirmed.
+                </p>
+                <p className="text-slate-300 text-[11px]">
+                  Driver: <strong>{smsNotification.driverName}</strong> (📞 {smsNotification.driverPhone}).
+                </p>
+                <p className="text-slate-300 text-[11px]">
+                  Trip: <em>{smsNotification.origin}</em> ➔ <em>{smsNotification.destination}</em>.
+                </p>
+                <p className="text-amber-300 font-bold text-[11px] pt-0.5">
+                  Est. Fare: ₹{smsNotification.cost.toLocaleString('en-IN')}.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+              <span>Farm2Future Automated SMS Gateway</span>
+              <button
+                type="button"
+                onClick={() => setSmsNotification(null)}
+                className="text-emerald-400 font-bold hover:underline cursor-pointer"
+              >
+                Dismiss (बंद करें)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Clean Compact Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
         <div className="flex items-center gap-3">
@@ -211,8 +377,19 @@ export const StateTransportDirectoryView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shrink-0">
-          <span>{statesCoveredCount} States • {availableCount} Trucks Available</span>
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={handleOpenDemoBooking}
+            className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs shadow-md shadow-emerald-700/20 flex items-center gap-2 transition-all hover:scale-105 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <span>⚡ Demo Booking (SMS टेस्ट)</span>
+          </button>
+
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+            <span>{statesCoveredCount} States • {availableCount} Trucks Available</span>
+          </div>
         </div>
       </div>
 
@@ -587,12 +764,67 @@ export const StateTransportDirectoryView: React.FC = () => {
             </div>
 
             {bookingSuccess ? (
-              <div className="p-6 text-center space-y-3 bg-emerald-50 rounded-2xl border border-emerald-200">
-                <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto animate-bounce" />
-                <h4 className="font-extrabold text-emerald-900 text-base">Booking Confirmed Successfully!</h4>
-                <p className="text-xs text-emerald-700">
-                  Vehicle {bookingVehicle.vehicleNo} has been assigned. Transporter {bookingVehicle.transporterName} and Driver {bookingVehicle.driverName} have been notified.
-                </p>
+              <div className="p-6 text-center space-y-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 shadow-sm animate-in fade-in">
+                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-emerald-600 shadow-sm">
+                  <CheckCircle2 className="w-10 h-10 animate-bounce" />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <span className="px-3.5 py-1 rounded-full bg-emerald-600 text-white font-black text-xs uppercase tracking-wider shadow-sm">
+                    ✅ Successful Granted! (बुकिंग स्वीकृत हुई)
+                  </span>
+                  <h4 className="font-extrabold text-slate-900 text-base mt-2">
+                    {isDemoMode ? 'Demo Transport Booking Granted' : 'Agri-Transport Booked & Dispatched'}
+                  </h4>
+                  <p className="text-xs text-slate-600">
+                    A confirmation SMS message has been sent to <strong className="text-emerald-800 font-mono">+91 {userMobileNumber}</strong>
+                  </p>
+                </div>
+
+                {/* Dispatch Details Card */}
+                <div className="p-3.5 bg-white rounded-xl border border-emerald-200 text-left text-xs space-y-2">
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span className="text-slate-500">Vehicle No:</span>
+                    <strong className="font-mono text-slate-900 bg-slate-100 px-2 py-0.5 rounded">{bookingVehicle.vehicleNo}</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span className="text-slate-500">Driver Contact:</span>
+                    <strong className="text-slate-900">{bookingVehicle.driverName} (<a href={`tel:${bookingVehicle.driverPhone}`} className="text-emerald-700 underline font-mono">{bookingVehicle.driverPhone}</a>)</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span className="text-slate-500">Transporter:</span>
+                    <strong className="text-slate-900">{bookingVehicle.transporterName}</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-700">
+                    <span className="text-slate-500">Trip Route:</span>
+                    <strong className="text-slate-900 truncate max-w-[220px]">{pickupLocation} ➔ {dropLocation}</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-700 border-t border-slate-100 pt-1.5">
+                    <span className="text-slate-500">Estimated Fare:</span>
+                    <strong className="text-emerald-700 font-bold text-sm">₹{Math.round(estimatedDistanceKm * (bookingVehicle.ratePerKm || 28)).toLocaleString('en-IN')}</strong>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <a
+                    href={`tel:${bookingVehicle.driverPhone}`}
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Call Driver Now</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBookingVehicle(null);
+                      setBookingSuccess(false);
+                      setIsDemoMode(false);
+                    }}
+                    className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md"
+                  >
+                    Done (समाप्त)
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleConfirmBooking} className="space-y-4 text-xs">
@@ -704,6 +936,34 @@ export const StateTransportDirectoryView: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Mobile Number for SMS Notification */}
+                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1.5">
+                    <label className="block font-bold text-slate-800 flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <Smartphone className="w-4 h-4 text-emerald-600" />
+                        <span>Mobile Number for SMS (मोबाइल नंबर दर्ज करें) *</span>
+                      </span>
+                      <span className="text-[10px] text-emerald-700 font-extrabold bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                        ● Instant SMS "Successful Granted"
+                      </span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3 font-bold text-slate-600 text-xs select-none font-mono">🇮🇳 +91</span>
+                      <input
+                        type="tel"
+                        required
+                        maxLength={10}
+                        placeholder="Enter 10-digit mobile number"
+                        value={userMobileNumber}
+                        onChange={e => setUserMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        className="w-full pl-16 pr-3 py-2.5 rounded-xl bg-white border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono font-bold text-slate-900 text-sm"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      इस नंबर पर बुकिंग होते ही <strong>"Successful Granted!"</strong> और ड्राइवर के फोन नंबर का लाइव SMS भेजा जाएगा।
+                    </p>
+                  </div>
+
                   {/* Cost Calculation Bar */}
                   <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between">
                     <div>
@@ -719,16 +979,20 @@ export const StateTransportDirectoryView: React.FC = () => {
                 <div className="pt-2 flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => setBookingVehicle(null)}
+                    onClick={() => {
+                      setBookingVehicle(null);
+                      setIsDemoMode(false);
+                    }}
                     className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors cursor-pointer shadow-md"
+                    className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
                   >
-                    Confirm Booking
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{isDemoMode ? 'Send Demo Booking & SMS' : 'Confirm Booking'}</span>
                   </button>
                 </div>
               </form>
