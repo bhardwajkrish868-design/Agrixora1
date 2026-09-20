@@ -1,35 +1,54 @@
 {
   "users": [
     {
-      "id": "usr_admin_1789638252507",
+      "id": "usr_collection_centre_1789738899022",
       "name": "Krish Bhardwaj",
       "phone": "+91 9631359486",
-      "email": "krishbhardwaj@farm2future.in",
+      "email": "bhardwajkrish868@gmail.com",
+      "role": "collection_centre",
+      "location": "Nashik, Maharashtra",
+      "district": "Nashik",
+      "state": "Maharashtra",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1234 5678 9012",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&auto=format&fit=crop&q=80",
+      "hubName": "Nashik Hub"
+    },
+    {
+      "id": "usr_admin_1789738786832",
+      "name": "Krish Bhardwaj",
+      "phone": "+91 9631359486",
+      "email": "bhardwajkrish868@gmail.com",
       "role": "admin",
       "location": "Nashik, Maharashtra",
       "district": "Nashik",
       "state": "Maharashtra",
       "verified": true,
       "aadhaarVerified": true,
+      "aadhaarNumber": "1234 5678 9012",
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80"
     },
     {
-      "id": "usr_collection_centre_1789630827321",
+      "id": "usr_farmer_1789735666459",
       "name": "Krish Bhardwaj",
       "phone": "+91 9631359486",
-      "email": "krishbhardwaj@farm2future.in",
-      "role": "collection_centre",
+      "email": "bhardwajkrish868@gmail.com",
+      "role": "farmer",
       "location": "Nashik, Maharashtra",
-      "district": "Vaishali",
-      "state": "Bihar",
+      "district": "Nashik",
+      "state": "Maharashtra",
       "verified": true,
       "aadhaarVerified": true,
+      "aadhaarNumber": "1234 5678 9012",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&auto=format&fit=crop&q=80",
-      "hubName": "Hajipur"
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 5
     },
     {
       "id": "usr_collection_centre_1789576256285",
@@ -46,22 +65,6 @@
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&auto=format&fit=crop&q=80",
       "hubName": "Nashik North Agri Aggregation Hub #04"
-    },
-    {
-      "id": "usr_farmer_1789575055783",
-      "name": "Ramesh Patil",
-      "phone": "+91 9631359486",
-      "email": "rameshpatil@farm2future.in",
-      "role": "farmer",
-      "location": "Pimpalgaon Baswant, Nashik",
-      "district": "Nashik",
-      "state": "Maharashtra",
-      "verified": true,
-      "aadhaarVerified": true,
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 16
     },
     {
       "id": "usr_farmer_1789574829216",
@@ -98,6 +101,41 @@
     }
   ],
   "listings": [
+    {
+      "id": "LST-104",
+      "farmerId": "usr_farmer_1789735666459",
+      "farmerName": "Krish Bhardwaj",
+      "farmerPhone": "+91 9631359486",
+      "farmerLocation": "Nashik, Maharashtra, Maharashtra",
+      "cropName": "Tomato",
+      "category": "Vegetables",
+      "variety": "Hybrid High-Lycopene Grade A",
+      "quantity": 70,
+      "unit": "Kg",
+      "qualityGrade": "Grade A+",
+      "pricePerUnit": 21,
+      "expectedPriceTotal": 2100,
+      "harvestDate": "2026-09-18",
+      "availableDate": "Immediate Dispatch",
+      "location": "Nashik, Maharashtra",
+      "district": "Nashik",
+      "state": "Maharashtra",
+      "pincode": "422202",
+      "latitude": 20.2,
+      "longitude": 73.83,
+      "images": [
+        "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80"
+      ],
+      "description": "Freshly harvested, uniformly graded, harvested under optimal weather. Stored in shaded farm warehouse.",
+      "moisturePercent": 12,
+      "organicCertified": true,
+      "status": "Active",
+      "createdAt": "2026-09-18T12:48:42.229Z",
+      "viewsCount": 1,
+      "bidsCount": 0,
+      "recommendedPrice": 71,
+      "mandiBenchmarkPrice": -19
+    },
     {
       "id": "LST-103",
       "farmerId": "usr_farmer_1789482597768",
@@ -199,6 +237,219 @@
     }
   ],
   "orders": [
+    {
+      "id": "ORD-2026-7850",
+      "orderNumber": "F2F-ORD-1748",
+      "listingId": "LST-104",
+      "cropName": "Tomato",
+      "variety": "Hybrid High-Lycopene Grade A",
+      "category": "Vegetables",
+      "quantity": 30,
+      "unit": "Kg",
+      "pricePerUnit": 21,
+      "produceAmount": 630,
+      "platformFee": 9,
+      "collectionFee": 6,
+      "logisticsFee": 98,
+      "totalAmount": 743,
+      "farmerPayout": 621,
+      "deliveryPaidBy": "buyer",
+      "deliveryPaymentStatus": "paid_by_buyer",
+      "deliveryFeePaid": 98,
+      "transporterPayout": 98,
+      "assignedVehicleId": "veh_mh_1",
+      "farmerId": "usr_farmer_1789735666459",
+      "farmerName": "Krish Bhardwaj",
+      "farmerPhone": "+91 9631359486",
+      "farmerLocation": "Nashik, Maharashtra, Maharashtra",
+      "farmerState": "Maharashtra",
+      "buyerId": "usr_buyer_1789574079511",
+      "buyerName": "Priya Sharma",
+      "buyerOrg": "ITC Agri-Business Division",
+      "buyerPhone": "+91 98112 23344",
+      "deliveryAddress": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+      "deliveryCity": "Mumbai",
+      "deliveryState": "Maharashtra",
+      "pincode": "400705",
+      "collectionHubId": "hub_nashik_1",
+      "collectionHubName": "Nashik North Agri Aggregation Hub #04",
+      "collectionHubAddress": "Pimpalgaon Baswant, Nashik, Maharashtra",
+      "orderDate": "2026-09-18T13:43:37.550Z",
+      "expectedDelivery": "2026-09-21T13:43:37.550Z",
+      "currentStage": "quality_verified",
+      "paymentStatus": "escrow_locked",
+      "transactionId": "TXN-F2F-39017550-ESCROW",
+      "paymentMethod": "Escrow Bank Transfer / UPI",
+      "aiAllocation": {
+        "aiMatchScore": 99.4,
+        "aiModelUsed": "AgriLogistics DeepRoute AI v4.2",
+        "aiConfidence": "Ultra High",
+        "aiRationale": [
+          "🛵 Micro Express Fit: High-efficiency EV transport selected for 30 Kg payload.",
+          "⚡ Zero Cold-Drop Farmgate Transit: ~40 mins direct buyer delivery.",
+          "📍 Deadhead Proximity: Assigned carrier is within 3.5 km of Nashik North Agri Aggregation Hub #04.",
+          "🌱 Carbon & Route Optimization: Estimated 18.5 kg CO₂ saved via consolidated corridor mapping."
+        ],
+        "carbonSavedKg": 10.6,
+        "costOptimizedPercent": 18,
+        "allocatedVehicleId": "veh_mh_1",
+        "allocatedVehicleNo": "MH-15-EG-4401",
+        "allocatedDriverName": "Prakash Shinde",
+        "allocatedDriverPhone": "+91 99223 34455",
+        "allocatedAt": "2026-09-18T13:43:37.550Z",
+        "autoAssigned": true,
+        "transitType": "Hyperlocal EV Express"
+      },
+      "dispatchDetails": {
+        "transporterName": "GreenWheels Cold Agri-Logistics",
+        "driverName": "Prakash Shinde",
+        "driverPhone": "+91 99223 34455",
+        "driverLicenseNo": "MH-1520190045123",
+        "vehicleNo": "MH-15-EG-4401",
+        "vehicleType": "12-Ton Insulated Cold Reefer",
+        "modelName": "Eicher Pro 3015 Reefer Plus",
+        "capacityTons": 12,
+        "rcNumber": "RC-MH-15-2022-004401",
+        "gpsDeviceId": "GPS-GW-8821",
+        "eWayBillNo": "EWB-2026-6924238068",
+        "dispatchedAt": "2026-09-18T13:43:37.550Z",
+        "estimatedArrival": "10:13 PM, 9/18/2026",
+        "temperatureCelsius": 14,
+        "gpsLiveLat": 20.026,
+        "gpsLiveLng": 73.8023,
+        "originHub": "Nashik North Agri Aggregation Hub #04",
+        "destinationWarehouse": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
+        "totalDistanceKm": 133,
+        "coveredDistanceKm": 20,
+        "currentSpeedKmph": 48,
+        "estimatedMinutesRemaining": 173,
+        "checkpoints": [
+          {
+            "id": "cp_1",
+            "name": "Pimpalgaon Baswant Hub Loading Gate",
+            "distanceKm": 0,
+            "status": "passed",
+            "type": "origin",
+            "description": "Consignment Sealed & GPS Telemetry Online",
+            "passedAt": "Recorded"
+          },
+          {
+            "id": "cp_2",
+            "name": "Kasara Ghat Summit Fastag Toll Plaza",
+            "distanceKm": 43,
+            "status": "passed",
+            "type": "toll",
+            "description": "Toll Clearance & Sensor Check 14.2°C",
+            "passedAt": "Recorded"
+          },
+          {
+            "id": "cp_3",
+            "name": "Shahapur Agri-Transit Inspection Post",
+            "distanceKm": 89,
+            "status": "passed",
+            "type": "checkpoint",
+            "description": "Weight & Seal Integrity Verified",
+            "passedAt": "Recorded"
+          },
+          {
+            "id": "cp_4",
+            "name": "Bhiwandi-Kalyan Logistics Bypass Ring",
+            "distanceKm": 135,
+            "status": "current",
+            "type": "junction",
+            "description": "Approaching Mumbai Metropolitan Boundary"
+          },
+          {
+            "id": "cp_5",
+            "name": "Vashi APMC Mega Mandi Terminal",
+            "distanceKm": 165,
+            "status": "upcoming",
+            "type": "destination",
+            "description": "Inbound Receiving Dock & Unloading Gate"
+          }
+        ]
+      },
+      "trackingSteps": [
+        {
+          "id": "step-1",
+          "stage": "order_placed",
+          "title": "Order Placed & Escrow Locked",
+          "subtitle": "₹743 locked (Includes ₹98 Buyer Delivery Fee)",
+          "timestamp": "Just now",
+          "completed": true,
+          "current": true,
+          "location": "Farm2Future Smart Escrow Contract",
+          "details": {
+            "verifiedWeight": "30 Kg (Booked)",
+            "digitalSignature": "SHA256:cfn6bwbnn1",
+            "vehicleNumber": "MH-15-EG-4401",
+            "driverName": "Prakash Shinde",
+            "driverPhone": "+91 99223 34455"
+          }
+        },
+        {
+          "id": "step-2",
+          "stage": "collected_at_hub",
+          "title": "AI Fleet Route Dispatched to Hub",
+          "subtitle": "🤖 Eicher Pro 3015 Reefer Plus (MH-15-EG-4401) auto-assigned (99.4% match)",
+          "timestamp": "Updated 07:19 PM",
+          "completed": true,
+          "current": false,
+          "location": "Nashik North Aggregation Hub #04"
+        },
+        {
+          "id": "step-3",
+          "stage": "quality_verified",
+          "title": "Quality & Weighbridge Check",
+          "subtitle": "Digital moisture & spectral grading inspection",
+          "timestamp": "Verified 07:19 PM",
+          "completed": true,
+          "current": true,
+          "location": "Quality Lab",
+          "details": {
+            "agentName": "Krish Bhardwaj",
+            "gradeAssigned": "Grade A+",
+            "moistureScore": "11.8%",
+            "digitalSignature": "QC-CERT-MH-7734"
+          }
+        },
+        {
+          "id": "step-4",
+          "stage": "in_transit",
+          "title": "Cold & GPS-Tracked Transit",
+          "subtitle": "MH-15-EG-4401 with live telematics (14°C)",
+          "timestamp": "Pending Dispatch",
+          "completed": false,
+          "current": false,
+          "location": "Highway Corridor"
+        },
+        {
+          "id": "step-5",
+          "stage": "delivered",
+          "title": "Delivery & Escrow Settlement",
+          "subtitle": "Instant settlement: ₹621 to Farmer + ₹98 to Transporter",
+          "timestamp": "Pending Delivery",
+          "completed": false,
+          "current": false,
+          "location": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra"
+        }
+      ],
+      "qualityInspection": {
+        "inspectorName": "Krish Bhardwaj",
+        "hubId": "fci_br_patna",
+        "hubName": "FCI Digha Ghat Food Storage Depot - Patna",
+        "inspectedAt": "2026-09-18T13:49:59.181Z",
+        "moisturePercent": 11.8,
+        "foreignMatterPercent": 0.2,
+        "pestInfestationPercent": 0,
+        "assignedGrade": "Grade A+",
+        "visualQualityScore": 96,
+        "notes": "Clean lot, uniform size, zero pest infestation. Certified for immediate distribution.",
+        "certificateId": "QC-CERT-MH-7734",
+        "passed": true
+      }
+    },
     {
       "id": "ORD-2026-6336",
       "orderNumber": "F2F-ORD-3381",
@@ -451,7 +702,7 @@
       "collectionHubAddress": "Pimpalgaon Baswant, Nashik, Maharashtra",
       "orderDate": "2026-09-16T13:32:27.748Z",
       "expectedDelivery": "2026-09-19T13:32:27.748Z",
-      "currentStage": "in_transit",
+      "currentStage": "quality_verified",
       "paymentStatus": "escrow_locked",
       "transactionId": "TXN-F2F-65547748-ESCROW",
       "paymentMethod": "Escrow Bank Transfer / UPI",
@@ -575,15 +826,15 @@
           "stage": "quality_verified",
           "title": "Quality & Weighbridge Check",
           "subtitle": "Digital moisture & spectral grading inspection",
-          "timestamp": "Verified 07:20 PM",
+          "timestamp": "Verified 07:12 PM",
           "completed": true,
-          "current": false,
+          "current": true,
           "location": "Quality Lab",
           "details": {
             "agentName": "Krish Bhardwaj",
             "gradeAssigned": "Grade A+",
             "moistureScore": "11.8%",
-            "digitalSignature": "QC-CERT-MH-7054"
+            "digitalSignature": "QC-CERT-MH-1430"
           }
         },
         {
@@ -617,16 +868,16 @@
       ],
       "qualityInspection": {
         "inspectorName": "Krish Bhardwaj",
-        "hubId": "hub_nashik_1",
-        "hubName": "Nashik North Agri Aggregation Hub #04",
-        "inspectedAt": "2026-09-16T13:50:49.503Z",
+        "hubId": "fci_br_patna",
+        "hubName": "FCI Digha Ghat Food Storage Depot - Patna",
+        "inspectedAt": "2026-09-18T13:42:08.056Z",
         "moisturePercent": 11.8,
         "foreignMatterPercent": 0.2,
         "pestInfestationPercent": 0,
         "assignedGrade": "Grade A+",
         "visualQualityScore": 96,
         "notes": "Clean lot, uniform size, zero pest infestation. Certified for immediate distribution.",
-        "certificateId": "QC-CERT-MH-7054",
+        "certificateId": "QC-CERT-MH-1430",
         "passed": true
       }
     },
@@ -1048,6 +1299,120 @@
     }
   ],
   "notifications": [
+    {
+      "recipientRole": "farmer",
+      "title": "Produce Quality Verified at Hub",
+      "message": "Your crop batch successfully cleared QC with grade: Grade A+.",
+      "type": "quality",
+      "orderId": "ORD-2026-7850",
+      "id": "notif_1789739399182",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-2026-7850",
+      "id": "notif_1789739399182",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1789574079511",
+      "title": "Order Confirmed & AI Truck Assigned (F2F-ORD-1748)",
+      "message": "AI auto-assigned MH-15-EG-4401 (Prakash Shinde) with 99.4% match score. Delivery fee of ₹98 secured in escrow.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7850",
+      "linkTab": "track_delivery",
+      "id": "notif_1789739017552",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "collection_centre",
+      "title": "AI Fleet Dispatched: MH-15-EG-4401",
+      "message": "AI auto-assigned Eicher Pro 3015 Reefer Plus (Driver: Prakash Shinde) for order F2F-ORD-1748.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7850",
+      "linkTab": "incoming",
+      "id": "notif_1789739017552",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1789735666459",
+      "title": "New Order Received for Tomato!",
+      "message": "Priya Sharma ordered 30 Kg. Net farmer payout ₹621 secured. Buyer paid ₹98 for transport.",
+      "type": "order",
+      "orderId": "ORD-2026-7850",
+      "linkTab": "orders",
+      "id": "notif_1789739017552",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Produce Quality Verified at Hub",
+      "message": "Your crop batch successfully cleared QC with grade: Grade A+.",
+      "type": "quality",
+      "orderId": "ORD-2026-3564",
+      "id": "notif_1789738928056",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-2026-3564",
+      "id": "notif_1789738928056",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Produce Quality Verified at Hub",
+      "message": "Your crop batch successfully cleared QC with grade: Grade A+.",
+      "type": "quality",
+      "orderId": "ORD-2026-3564",
+      "id": "notif_1789738926641",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-2026-3564",
+      "id": "notif_1789738926641",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "New Crop Available on Marketplace",
+      "message": "Krish Bhardwaj listed 100 Kg of Tomato (Hybrid High-Lycopene Grade A).",
+      "type": "market",
+      "id": "notif_1789735722229",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1789735666459",
+      "title": "Produce Listed Successfully!",
+      "message": "Your listing for 100 Kg of Tomato is now saved in database and live on marketplace.",
+      "type": "market",
+      "id": "notif_1789735722229",
+      "timestamp": "Just now",
+      "read": false
+    },
     {
       "recipientRole": "buyer",
       "title": "Consignment Dispatched & Live Tracking Active!",
@@ -1812,6 +2177,105 @@
     }
   ],
   "activityHistory": [
+    {
+      "id": "act_1789934744554_udlsk",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "transport_booking",
+      "title": "Transport Booked: MH-15-EG-4401 (undefined)",
+      "description": "Krish Bhardwaj booked Eicher Pro 3015 Reefer Plus from Nashik North Agri Aggregation Hub #04 to AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra for 12T Nashik Red Onion (ताज़ा प्याज़). SMS sent to +91 9631359486. Est. Fare: ₹4,620",
+      "timestamp": "2026-09-20T20:05:44.554Z",
+      "metadata": {
+        "vehicleNo": "MH-15-EG-4401",
+        "transporter": "GreenWheels Cold Agri-Logistics",
+        "driver": "Prakash Shinde",
+        "driverPhone": "+91 99223 34455",
+        "customerPhone": "9631359486",
+        "pickupLocation": "Nashik North Agri Aggregation Hub #04",
+        "dropLocation": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+        "cargoWeightTons": 12,
+        "cropName": "Nashik Red Onion (ताज़ा प्याज़)",
+        "estimatedCost": 4620,
+        "bookingDate": "2026-09-20",
+        "isDemoBooking": true
+      }
+    },
+    {
+      "id": "act_1789934723928_jht1m",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-20T20:05:23.928Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1789934060469_b5j2f",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Priya Sharma logged into buyer portal.",
+      "timestamp": "2026-09-20T19:54:20.469Z",
+      "metadata": {
+        "phone": "+91 98112 23344",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1789933979382_ghx6k",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-20T19:52:59.382Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789933877960_lzp86",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-20T19:51:17.960Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1789747323990_d5ntk",
+      "userId": "usr_collection_centre_1789483198740",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-18T16:02:03.990Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789740798181_88qky",
+      "userId": "usr_collection_centre_1789483198740",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-18T14:13:18.181Z",
+      "metadata": {}
+    },
     {
       "id": "act_1789640395272_9203z",
       "userId": "usr_farmer_1789575055783",
@@ -3548,7 +4012,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-18T11:54:20.040Z",
+  "lastUpdated": "2026-09-20T20:28:17.604Z",
   "vehicles": [
     {
       "id": "veh_1",
@@ -3711,14 +4175,14 @@
       ],
       "verifiedTransporter": true,
       "activeTrip": {
-        "orderId": "ORD-2026-3564",
+        "orderId": "ORD-2026-7850",
         "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
         "origin": "Nashik North Agri Aggregation Hub #04",
         "destination": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
-        "totalDistanceKm": 165,
-        "coveredDistanceKm": 0,
+        "totalDistanceKm": 133,
+        "coveredDistanceKm": 20,
         "currentSpeedKmph": 48,
-        "estimatedMinutesRemaining": 206
+        "estimatedMinutesRemaining": 173
       }
     },
     {
@@ -5256,5 +5720,8 @@
         }
       ]
     }
-  ]
+  ],
+  "smsGateway": {
+    "fast2smsApiKey": ""
+  }
 }

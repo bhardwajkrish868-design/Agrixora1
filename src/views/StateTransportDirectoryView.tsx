@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { VehicleDetails } from '../types';
 import { 
@@ -27,7 +27,10 @@ import {
   Send,
   Smartphone,
   X,
-  Bell
+  Bell,
+  Key,
+  Share2,
+  Loader2
 } from 'lucide-react';
 import { RouteTripTracker } from '../components/RouteTripTracker';
 
@@ -127,7 +130,71 @@ export const StateTransportDirectoryView: React.FC = () => {
     return currentUser?.phone ? currentUser.phone.replace(/\D/g, '').slice(-10) : '9876543210';
   });
 
-  // Live SMS Simulation Toast state
+  // SMS Gateway config & status state
+  const [gatewayConfig, setGatewayConfig] = useState<{
+    configured: boolean;
+    provider: string;
+    maskedKey?: string;
+  }>({ configured: false, provider: 'none' });
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [fast2smsApiKeyInput, setFast2smsApiKeyInput] = useState('');
+  const [isSavingKey, setIsSavingKey] = useState(false);
+  const [saveKeyMessage, setSaveKeyMessage] = useState('');
+  const [isSendingSms, setIsSendingSms] = useState(false);
+  const [smsDeliveryStatus, setSmsDeliveryStatus] = useState<{
+    success: boolean;
+    delivered?: boolean;
+    simulated?: boolean;
+    provider?: string;
+    error?: string;
+    message?: string;
+  } | null>(null);
+
+  // Fetch gateway configuration status on mount
+  useEffect(() => {
+    fetch('/api/sms/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setGatewayConfig(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSaveApiKey = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingKey(true);
+    setSaveKeyMessage('');
+    try {
+      const res = await fetch('/api/sms/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fast2smsApiKey: fast2smsApiKeyInput })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setGatewayConfig({
+          configured: data.configured,
+          provider: data.provider,
+          maskedKey: fast2smsApiKeyInput ? (fast2smsApiKeyInput.slice(0, 4) + '••••' + fast2smsApiKeyInput.slice(-4)) : ''
+        });
+        setSaveKeyMessage('✅ Fast2SMS API Key सफलतापूर्वक सेव हो गई! अब असली SMS जाएंगे।');
+        setTimeout(() => {
+          setShowConfigModal(false);
+          setSaveKeyMessage('');
+        }, 1800);
+      } else {
+        setSaveKeyMessage('❌ सेव नहीं हो सका: ' + (data.error || 'अज्ञात त्रुटि'));
+      }
+    } catch (err: any) {
+      setSaveKeyMessage('❌ कनेक्शन त्रुटि: ' + err.message);
+    } finally {
+      setIsSavingKey(false);
+    }
+  };
+
+  // Live SMS Simulation & Delivery Toast state
   const [smsNotification, setSmsNotification] = useState<{
     show: boolean;
     phone: string;
@@ -139,6 +206,9 @@ export const StateTransportDirectoryView: React.FC = () => {
     cost: number;
     cropName: string;
     timestamp: string;
+    deliveredReal?: boolean;
+    provider?: string;
+    error?: string;
   } | null>(null);
 
   // Filtered vehicles logic
@@ -232,19 +302,22 @@ export const StateTransportDirectoryView: React.FC = () => {
     setEstimatedDistanceKm(165);
   };
 
-  const handleConfirmBooking = (e: React.FormEvent) => {
+  const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bookingVehicle) return;
 
+    setIsSendingSms(true);
     const rate = bookingVehicle.ratePerKm || 28;
     const totalCost = Math.round(estimatedDistanceKm * rate);
     const cleanPhone = userMobileNumber.replace(/\D/g, '').slice(-10) || '9876543210';
+
+    const smsMessage = `Successful Granted! Farm2Future Agri-Transport confirmed for vehicle ${bookingVehicle.vehicleNo}. Driver: ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}). Route: ${pickupLocation} to ${dropLocation}. Fare: Rs ${totalCost.toLocaleString('en-IN')}.`;
 
     // Add activity log
     logActivity({
       actionType: 'transport_booking',
       title: `Transport Booked: ${bookingVehicle.vehicleNo} (${bookingVehicle.state})`,
-      description: `${currentUser.name} booked ${bookingVehicle.modelName || bookingVehicle.vehicleType} from ${pickupLocation} to ${dropLocation} for ${cargoWeightTons}T ${cropName}. SMS sent to +91 ${cleanPhone}. Est. Fare: ₹${totalCost.toLocaleString('en-IN')}`,
+      description: `${currentUser.name} booked ${bookingVehicle.modelName || bookingVehicle.vehicleType} from ${pickupLocation} to ${dropLocation} for ${cargoWeightTons}T ${cropName}. SMS target: +91 ${cleanPhone}. Est. Fare: ₹${totalCost.toLocaleString('en-IN')}`,
       metadata: {
         vehicleNo: bookingVehicle.vehicleNo,
         transporter: bookingVehicle.transporterName,
@@ -261,13 +334,39 @@ export const StateTransportDirectoryView: React.FC = () => {
       }
     });
 
-    // Notify
+    // Notify inside app
     addNotification({
       title: '✅ Transport Booking Successful Granted!',
       message: `Vehicle ${bookingVehicle.vehicleNo} confirmed for ${cropName}. Confirmation SMS dispatched to +91 ${cleanPhone}. Driver ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}) assigned.`,
       type: 'dispatch',
       recipientRole: 'all'
     });
+
+    // Call real SMS Gateway API endpoint
+    let apiDelivery: any = null;
+    try {
+      const res = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: cleanPhone,
+          message: smsMessage,
+          vehicleNo: bookingVehicle.vehicleNo,
+          driverName: bookingVehicle.driverName,
+          driverPhone: bookingVehicle.driverPhone,
+          origin: pickupLocation,
+          destination: dropLocation,
+          cost: totalCost
+        })
+      });
+      apiDelivery = await res.json();
+      setSmsDeliveryStatus(apiDelivery);
+    } catch (err: any) {
+      apiDelivery = { success: false, simulated: true, error: err.message };
+      setSmsDeliveryStatus(apiDelivery);
+    } finally {
+      setIsSendingSms(false);
+    }
 
     // Play chime sound
     playSmsChime();
@@ -283,7 +382,10 @@ export const StateTransportDirectoryView: React.FC = () => {
       destination: dropLocation,
       cost: totalCost,
       cropName,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      deliveredReal: Boolean(apiDelivery?.provider === 'fast2sms' && apiDelivery?.success),
+      provider: apiDelivery?.provider || 'simulation',
+      error: apiDelivery?.error
     });
 
     setBookingSuccess(true);
@@ -291,69 +393,118 @@ export const StateTransportDirectoryView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 📲 LIVE SIMULATED SMS PUSH NOTIFICATION TOAST */}
-      {smsNotification && smsNotification.show && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92vw] animate-in slide-in-from-top-4 duration-300 pointer-events-auto">
-          <div className="bg-slate-950/95 backdrop-blur-md text-white p-4 rounded-3xl shadow-2xl border-2 border-emerald-500/60 space-y-2.5 ring-4 ring-emerald-500/20">
-            <div className="flex items-center justify-between text-xs pb-1.5 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs">
-                  💬
-                </div>
-                <div>
-                  <span className="font-extrabold text-emerald-300">MESSAGES</span>
-                  <span className="text-[10px] text-slate-400 ml-1.5">• VM-AGRIF2F • {smsNotification.timestamp}</span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSmsNotification(null)}
-                className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center text-xs cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
+      {/* 📲 LIVE REAL & SIMULATED SMS PUSH NOTIFICATION TOAST */}
+      {smsNotification && smsNotification.show && (() => {
+        const whatsappText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
+          `🚚 *Vehicle:* ${smsNotification.vehicleNo}\n` +
+          `👤 *Driver:* ${smsNotification.driverName} (${smsNotification.driverPhone})\n` +
+          `📍 *Trip:* ${smsNotification.origin} ➔ ${smsNotification.destination}\n` +
+          `🌾 *Produce:* ${smsNotification.cropName}\n` +
+          `💰 *Est Fare:* ₹${smsNotification.cost.toLocaleString('en-IN')}\n\n` +
+          `Thank you for booking through Farm2Future Agri-Transport.`;
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=91${smsNotification.phone}&text=${encodeURIComponent(whatsappText)}`;
+        const nativeSmsUrl = `sms:+91${smsNotification.phone}?body=${encodeURIComponent(whatsappText.replace(/[*_]/g, ''))}`;
 
-            <div className="space-y-1.5 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-slate-300">SMS To: <strong className="text-white font-mono">+91 {smsNotification.phone}</strong></span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-[10px] border border-emerald-400/30 uppercase">
-                  Delivered
-                </span>
+        return (
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-lg w-[94vw] animate-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <div className="bg-slate-950/95 backdrop-blur-md text-white p-4 sm:p-5 rounded-3xl shadow-2xl border-2 border-emerald-500/60 space-y-3 ring-4 ring-emerald-500/20">
+              <div className="flex items-center justify-between text-xs pb-2 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs shadow-md">
+                    💬
+                  </div>
+                  <div>
+                    <span className="font-extrabold text-emerald-300">MESSAGES</span>
+                    <span className="text-[10px] text-slate-400 ml-1.5">• VM-AGRIF2F • {smsNotification.timestamp}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSmsNotification(null)}
+                  className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center text-xs cursor-pointer"
+                >
+                  ✕
+                </button>
               </div>
-              <div className="p-3 rounded-2xl bg-white/10 font-sans text-slate-100 text-xs leading-relaxed border border-white/10 space-y-1">
-                <p className="font-black text-emerald-300 text-sm flex items-center gap-1.5">
-                  <span>✅</span>
-                  <span>Successful Granted! (बुकिंग स्वीकृत हुई)</span>
-                </p>
-                <p className="text-slate-200">
-                  Your agri-transport booking for vehicle <strong>{smsNotification.vehicleNo}</strong> is confirmed.
-                </p>
-                <p className="text-slate-300 text-[11px]">
-                  Driver: <strong>{smsNotification.driverName}</strong> (📞 {smsNotification.driverPhone}).
-                </p>
-                <p className="text-slate-300 text-[11px]">
-                  Trip: <em>{smsNotification.origin}</em> ➔ <em>{smsNotification.destination}</em>.
-                </p>
-                <p className="text-amber-300 font-bold text-[11px] pt-0.5">
-                  Est. Fare: ₹{smsNotification.cost.toLocaleString('en-IN')}.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
-              <span>Farm2Future Automated SMS Gateway</span>
-              <button
-                type="button"
-                onClick={() => setSmsNotification(null)}
-                className="text-emerald-400 font-bold hover:underline cursor-pointer"
-              >
-                Dismiss (बंद करें)
-              </button>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-slate-300">
+                    SMS To: <strong className="text-white font-mono">+91 {smsNotification.phone}</strong>
+                  </span>
+                  {smsNotification.deliveredReal ? (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 font-extrabold text-[10px] border border-emerald-400/40 uppercase flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Real Cellular SMS Sent
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-[10px] border border-amber-400/30 uppercase">
+                      Simulated Preview
+                    </span>
+                  )}
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/10 font-sans text-slate-100 text-xs leading-relaxed border border-white/10 space-y-1">
+                  <p className="font-black text-emerald-300 text-sm flex items-center gap-1.5">
+                    <span>✅</span>
+                    <span>Successful Granted! (बुकिंग स्वीकृत हुई)</span>
+                  </p>
+                  <p className="text-slate-200">
+                    Your agri-transport booking for vehicle <strong>{smsNotification.vehicleNo}</strong> is confirmed.
+                  </p>
+                  <p className="text-slate-300 text-[11px]">
+                    Driver: <strong>{smsNotification.driverName}</strong> (📞 {smsNotification.driverPhone}).
+                  </p>
+                  <p className="text-slate-300 text-[11px]">
+                    Trip: <em>{smsNotification.origin}</em> ➔ <em>{smsNotification.destination}</em>.
+                  </p>
+                  <p className="text-amber-300 font-bold text-[11px] pt-0.5">
+                    Est. Fare: ₹{smsNotification.cost.toLocaleString('en-IN')}.
+                  </p>
+                </div>
+
+                {/* 1-Click WhatsApp & Phone SMS buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  >
+                    <span>🟢</span>
+                    <span>Send to WhatsApp</span>
+                  </a>
+                  <a
+                    href={nativeSmsUrl}
+                    className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>Open Phone SMS App</span>
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowConfigModal(true)}
+                  className="text-amber-300 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Key className="w-3 h-3" />
+                  <span>{gatewayConfig.configured ? 'Gateway: Active' : 'Connect Fast2SMS for Cellular SMS'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSmsNotification(null)}
+                  className="text-slate-300 hover:text-white font-bold cursor-pointer"
+                >
+                  Dismiss (बंद करें)
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Clean Compact Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
@@ -385,6 +536,20 @@ export const StateTransportDirectoryView: React.FC = () => {
           >
             <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
             <span>⚡ Demo Booking (SMS टेस्ट)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowConfigModal(true)}
+            className={`px-3 py-2.5 rounded-2xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              gatewayConfig.configured 
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100'
+                : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
+            }`}
+            title="Real SMS Gateway Settings"
+          >
+            <Key className="w-3.5 h-3.5" />
+            <span>{gatewayConfig.configured ? '📡 Real SMS Active' : '⚙️ SMS Gateway'}</span>
           </button>
 
           <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
@@ -763,70 +928,133 @@ export const StateTransportDirectoryView: React.FC = () => {
               </button>
             </div>
 
-            {bookingSuccess ? (
-              <div className="p-6 text-center space-y-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 shadow-sm animate-in fade-in">
-                <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-emerald-600 shadow-sm">
-                  <CheckCircle2 className="w-10 h-10 animate-bounce" />
-                </div>
-                
-                <div className="space-y-1.5">
-                  <span className="px-3.5 py-1 rounded-full bg-emerald-600 text-white font-black text-xs uppercase tracking-wider shadow-sm">
-                    ✅ Successful Granted! (बुकिंग स्वीकृत हुई)
-                  </span>
-                  <h4 className="font-extrabold text-slate-900 text-base mt-2">
-                    {isDemoMode ? 'Demo Transport Booking Granted' : 'Agri-Transport Booked & Dispatched'}
-                  </h4>
-                  <p className="text-xs text-slate-600">
-                    A confirmation SMS message has been sent to <strong className="text-emerald-800 font-mono">+91 {userMobileNumber}</strong>
-                  </p>
-                </div>
+            {bookingSuccess ? (() => {
+              const cleanPhone = userMobileNumber.replace(/\D/g, '').slice(-10);
+              const estFare = Math.round(estimatedDistanceKm * (bookingVehicle.ratePerKm || 28));
+              const whatsappText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
+                `🚚 *Vehicle:* ${bookingVehicle.vehicleNo}\n` +
+                `👤 *Driver:* ${bookingVehicle.driverName} (${bookingVehicle.driverPhone})\n` +
+                `📍 *Trip:* ${pickupLocation} ➔ ${dropLocation}\n` +
+                `🌾 *Produce:* ${cargoWeightTons}T ${cropName}\n` +
+                `💰 *Est Fare:* ₹${estFare.toLocaleString('en-IN')}\n\n` +
+                `Thank you for using Farm2Future Agri-Logistics.`;
+              const whatsappUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappText)}`;
+              const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(whatsappText.replace(/[*_]/g, ''))}`;
 
-                {/* Dispatch Details Card */}
-                <div className="p-3.5 bg-white rounded-xl border border-emerald-200 text-left text-xs space-y-2">
-                  <div className="flex justify-between items-center text-slate-700">
-                    <span className="text-slate-500">Vehicle No:</span>
-                    <strong className="font-mono text-slate-900 bg-slate-100 px-2 py-0.5 rounded">{bookingVehicle.vehicleNo}</strong>
+              return (
+                <div className="p-6 text-center space-y-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 shadow-sm animate-in fade-in">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-emerald-600 shadow-sm">
+                    <CheckCircle2 className="w-10 h-10 animate-bounce" />
                   </div>
-                  <div className="flex justify-between items-center text-slate-700">
-                    <span className="text-slate-500">Driver Contact:</span>
-                    <strong className="text-slate-900">{bookingVehicle.driverName} (<a href={`tel:${bookingVehicle.driverPhone}`} className="text-emerald-700 underline font-mono">{bookingVehicle.driverPhone}</a>)</strong>
+                  
+                  <div className="space-y-1.5">
+                    <span className="px-3.5 py-1 rounded-full bg-emerald-600 text-white font-black text-xs uppercase tracking-wider shadow-sm inline-block">
+                      ✅ Successful Granted! (बुकिंग स्वीकृत हुई)
+                    </span>
+                    <h4 className="font-extrabold text-slate-900 text-base mt-2">
+                      {isDemoMode ? 'Demo Transport Booking Granted' : 'Agri-Transport Booked & Dispatched'}
+                    </h4>
+                    <p className="text-xs text-slate-600">
+                      Confirmation message target: <strong className="text-emerald-800 font-mono">+91 {userMobileNumber}</strong>
+                    </p>
                   </div>
-                  <div className="flex justify-between items-center text-slate-700">
-                    <span className="text-slate-500">Transporter:</span>
-                    <strong className="text-slate-900">{bookingVehicle.transporterName}</strong>
-                  </div>
-                  <div className="flex justify-between items-center text-slate-700">
-                    <span className="text-slate-500">Trip Route:</span>
-                    <strong className="text-slate-900 truncate max-w-[220px]">{pickupLocation} ➔ {dropLocation}</strong>
-                  </div>
-                  <div className="flex justify-between items-center text-slate-700 border-t border-slate-100 pt-1.5">
-                    <span className="text-slate-500">Estimated Fare:</span>
-                    <strong className="text-emerald-700 font-bold text-sm">₹{Math.round(estimatedDistanceKm * (bookingVehicle.ratePerKm || 28)).toLocaleString('en-IN')}</strong>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-2 pt-2">
-                  <a
-                    href={`tel:${bookingVehicle.driverPhone}`}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Call Driver Now</span>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setBookingVehicle(null);
-                      setBookingSuccess(false);
-                      setIsDemoMode(false);
-                    }}
-                    className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md"
-                  >
-                    Done (समाप्त)
-                  </button>
+                  {/* Real Gateway vs Simulation Delivery Badge */}
+                  <div className="p-2.5 rounded-xl border text-xs text-left">
+                    {smsDeliveryStatus?.delivered ? (
+                      <div className="flex items-center gap-2 text-emerald-800 bg-emerald-100/70 p-2 rounded-lg font-bold">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>📡 Real SMS Delivered to your phone via Fast2SMS Gateway!</span>
+                      </div>
+                    ) : (
+                      <div className="space-y-1 text-slate-700 bg-white/70 p-2.5 rounded-lg border border-slate-200">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold flex items-center gap-1.5 text-slate-900">
+                            <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span>SMS Mode: On-Screen Simulation</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setShowConfigModal(true)}
+                            className="text-emerald-700 font-extrabold hover:underline text-[11px] cursor-pointer"
+                          >
+                            + Connect Real Fast2SMS
+                          </button>
+                        </div>
+                        <p className="text-[11px] text-slate-500">
+                          अगर आप फोन पर तुरंत मैसेज चाहते हैं, तो नीचे <strong>WhatsApp</strong> या <strong>SMS App</strong> बटन दबाएं!
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 1-Click WhatsApp & Native Mobile SMS Direct Action Buttons */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer hover:scale-[1.02]"
+                    >
+                      <span className="text-sm">🟢</span>
+                      <span>Send via WhatsApp (+91 {cleanPhone})</span>
+                    </a>
+                    <a
+                      href={nativeSmsUrl}
+                      className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer hover:scale-[1.02]"
+                    >
+                      <Smartphone className="w-4 h-4 text-sky-200" />
+                      <span>Open Phone SMS App</span>
+                    </a>
+                  </div>
+
+                  {/* Dispatch Details Card */}
+                  <div className="p-3.5 bg-white rounded-xl border border-emerald-200 text-left text-xs space-y-2">
+                    <div className="flex justify-between items-center text-slate-700">
+                      <span className="text-slate-500">Vehicle No:</span>
+                      <strong className="font-mono text-slate-900 bg-slate-100 px-2 py-0.5 rounded">{bookingVehicle.vehicleNo}</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-700">
+                      <span className="text-slate-500">Driver Contact:</span>
+                      <strong className="text-slate-900">{bookingVehicle.driverName} (<a href={`tel:${bookingVehicle.driverPhone}`} className="text-emerald-700 underline font-mono">{bookingVehicle.driverPhone}</a>)</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-700">
+                      <span className="text-slate-500">Transporter:</span>
+                      <strong className="text-slate-900">{bookingVehicle.transporterName}</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-700">
+                      <span className="text-slate-500">Trip Route:</span>
+                      <strong className="text-slate-900 truncate max-w-[220px]">{pickupLocation} ➔ {dropLocation}</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-700 border-t border-slate-100 pt-1.5">
+                      <span className="text-slate-500">Estimated Fare:</span>
+                      <strong className="text-emerald-700 font-bold text-sm">₹{estFare.toLocaleString('en-IN')}</strong>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <a
+                      href={`tel:${bookingVehicle.driverPhone}`}
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Call Driver Now</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBookingVehicle(null);
+                        setBookingSuccess(false);
+                        setIsDemoMode(false);
+                      }}
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md"
+                    >
+                      Done (समाप्त)
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
+              );
+            })() : (
               <form onSubmit={handleConfirmBooking} className="space-y-4 text-xs">
                 {/* Vehicle Details Card */}
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 grid grid-cols-2 gap-2">
@@ -989,14 +1217,128 @@ export const StateTransportDirectoryView: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
+                    disabled={isSendingSms}
+                    className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2 disabled:opacity-60"
                   >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>{isDemoMode ? 'Send Demo Booking & SMS' : 'Confirm Booking'}</span>
+                    {isSendingSms ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending SMS & Booking...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>{isDemoMode ? 'Send Demo Booking & SMS' : 'Confirm Booking'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ⚙️ REAL SMS GATEWAY (FAST2SMS) CONFIGURATION MODAL */}
+      {showConfigModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full border border-slate-100 p-6 sm:p-7 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                  <Key className="w-5 h-5 text-amber-700" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base">Real Cellular SMS Gateway</h3>
+                  <p className="text-[11px] text-slate-500">Fast2SMS (India Telecom Quick SMS API)</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowConfigModal(false);
+                  setSaveKeyMessage('');
+                }}
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs text-slate-600">
+              <div className={`p-3 rounded-2xl border ${gatewayConfig.configured ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
+                <div className="flex items-center gap-2 font-bold mb-1">
+                  <span className={`w-2 h-2 rounded-full ${gatewayConfig.configured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                  <span>Gateway Status: {gatewayConfig.configured ? `Active (${gatewayConfig.provider.toUpperCase()})` : 'Not Configured (Demo Mode)'}</span>
+                </div>
+                {gatewayConfig.maskedKey && (
+                  <p className="font-mono text-[11px] text-slate-600">Active API Key: {gatewayConfig.maskedKey}</p>
+                )}
+                <p className="text-[11px] mt-1 leading-relaxed">
+                  {gatewayConfig.configured
+                    ? 'जब भी आप या कोई किसान/खरीदार बुकिंग करेगा, Fast2SMS गेटवे सीधे उनके फोन के इनबॉक्स में असली SMS पहुंचाएगा।'
+                    : 'बिना API Key के केवल ऑन-स्क्रीन सिमुलेशन और 1-Click WhatsApp काम करता है। असली टेलीकॉम SMS पाने के लिए नीचे Fast2SMS API Key डालें।'}
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveApiKey} className="space-y-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Fast2SMS Authorization API Key
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Paste Fast2SMS API Key (e.g. 5x8YkZ...)"
+                    value={fast2smsApiKeyInput}
+                    onChange={e => setFast2smsApiKeyInput(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono text-xs"
+                  />
+                </div>
+
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1 text-[11px] text-slate-600">
+                  <strong className="text-slate-800 block">Fast2SMS की फ्री API Key कैसे लें?</strong>
+                  <ol className="list-decimal pl-4 space-y-0.5">
+                    <li>
+                      <a href="https://www.fast2sms.com" target="_blank" rel="noreferrer" className="text-emerald-700 underline font-bold">
+                        fast2sms.com
+                      </a> पर फ्री अकाउंट बनाएं।
+                    </li>
+                    <li>Dashboard ➔ <strong>Dev API</strong> टैब पर जाएं।</li>
+                    <li>अपनी <strong>Authorization Key</strong> कॉपी करके यहाँ पेस्ट करें।</li>
+                  </ol>
+                  <p className="text-[10px] text-slate-400 pt-1">
+                    नोट: नए अकाउंट पर Fast2SMS की तरफ से मुफ्त में 50 SMS क्रेडिट मिलते हैं।
+                  </p>
+                </div>
+
+                {saveKeyMessage && (
+                  <div className={`p-2.5 rounded-xl text-xs font-bold ${saveKeyMessage.startsWith('✅') ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                    {saveKeyMessage}
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowConfigModal(false);
+                      setSaveKeyMessage('');
+                    }}
+                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingKey || !fast2smsApiKeyInput.trim()}
+                    className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-md"
+                  >
+                    {isSavingKey ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
+                    <span>Save & Activate</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
