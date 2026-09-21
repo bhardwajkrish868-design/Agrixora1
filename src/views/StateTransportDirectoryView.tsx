@@ -342,7 +342,22 @@ export const StateTransportDirectoryView: React.FC = () => {
       recipientRole: 'all'
     });
 
-    // Call real SMS Gateway API endpoint
+    const callmebotKey = typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || undefined) : undefined;
+
+    // Direct WhatsApp message & Auto-launch
+    const whatsappText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
+      `🚚 *Vehicle:* ${bookingVehicle.vehicleNo}\n` +
+      `👤 *Driver:* ${bookingVehicle.driverName} (${bookingVehicle.driverPhone})\n` +
+      `📍 *Trip:* ${pickupLocation} ➔ ${dropLocation}\n` +
+      `🌾 *Produce:* ${cropName}\n` +
+      `💰 *Est Fare:* ₹${totalCost.toLocaleString('en-IN')}\n\n` +
+      `Thank you for booking through Farm2Future Agri-Transport.`;
+    const waUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappText)}`;
+    try {
+      window.open(waUrl, '_blank');
+    } catch (_) {}
+
+    // Call real SMS Gateway API endpoint with CallMeBot support
     let apiDelivery: any = null;
     try {
       const res = await fetch('/api/send-sms', {
@@ -356,7 +371,8 @@ export const StateTransportDirectoryView: React.FC = () => {
           driverPhone: bookingVehicle.driverPhone,
           origin: pickupLocation,
           destination: dropLocation,
-          cost: totalCost
+          cost: totalCost,
+          callmebotApiKey: callmebotKey
         })
       });
       apiDelivery = await res.json();
@@ -488,15 +504,16 @@ export const StateTransportDirectoryView: React.FC = () => {
 
                 {/* 1-Click WhatsApp & Phone SMS buttons */}
                 <div className="grid grid-cols-2 gap-2 pt-1">
-                  <a
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.open(whatsappUrl, '_blank');
+                    }}
+                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer ring-2 ring-emerald-400/40"
                   >
                     <span>🟢</span>
-                    <span>Send to WhatsApp</span>
-                  </a>
+                    <span>Direct WhatsApp में खोलें</span>
+                  </button>
                   <a
                     href={nativeSmsUrl}
                     className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"

@@ -198,7 +198,25 @@ export const ProductDetailModal: React.FC = () => {
 
     const smsMessage = `✅ Order Successful & Transport Booked! (Farm2Future)\nOrder #${newOrder.orderNumber}: ${currentOrderQty} ${item.unit} ${item.cropName} (₹${totalPayable.toLocaleString('en-IN')}) confirmed.\nTransport Vehicle: ${vNo}\nDriver: ${dName} (${dPhone})\nDelivery to: ${deliveryAddress}`;
 
-    // Call /api/send-sms
+    const callmebotKey = typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || undefined) : undefined;
+
+    // Direct WhatsApp Message & URL
+    const whatsappOrderText = `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
+      `📦 *Order Ref:* ${newOrder.orderNumber}\n` +
+      `🌾 *Produce:* ${currentOrderQty} ${item.unit} ${item.cropName}\n` +
+      `💰 *Total Paid:* ₹${totalPayable.toLocaleString('en-IN')}\n\n` +
+      `🚚 *Transport Vehicle:* ${vNo}\n` +
+      `👤 *Driver:* ${dName} (${dPhone})\n` +
+      `📍 *Delivery Address:* ${deliveryAddress}\n\n` +
+      `Thank you for purchasing on Farm2Future!`;
+    const whatsappOrderUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappOrderText)}`;
+
+    // Auto-launch WhatsApp directly
+    try {
+      window.open(whatsappOrderUrl, '_blank');
+    } catch (_) {}
+
+    // Call /api/send-sms with CallMeBot support
     let apiDelivery: any = null;
     try {
       const res = await fetch('/api/send-sms', {
@@ -212,7 +230,8 @@ export const ProductDetailModal: React.FC = () => {
           driverPhone: dPhone,
           origin: newOrder.collectionHubName || 'Central Hub',
           destination: deliveryAddress,
-          cost: totalPayable
+          cost: totalPayable,
+          callmebotApiKey: callmebotKey
         })
       });
       apiDelivery = await res.json();
@@ -346,15 +365,16 @@ export const ProductDetailModal: React.FC = () => {
 
                 {/* 1-Click WhatsApp & Phone SMS buttons */}
                 <div className="grid grid-cols-2 gap-2 pt-1">
-                  <a
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.open(whatsappUrl, '_blank');
+                    }}
+                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer ring-2 ring-emerald-400/40"
                   >
                     <span>🟢</span>
-                    <span>Send to WhatsApp</span>
-                  </a>
+                    <span>Direct WhatsApp में खोलें</span>
+                  </button>
                   <a
                     href={nativeSmsUrl}
                     className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
@@ -463,24 +483,26 @@ export const ProductDetailModal: React.FC = () => {
 
                 {/* 1-Click WhatsApp & Phone SMS buttons */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                  <a
-                    href={`https://api.whatsapp.com/send?phone=91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
-                      `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
-                      `📦 *Order Ref:* ${createdOrderRef}\n` +
-                      `🌾 *Produce:* ${currentOrderQty} ${item.unit} ${item.cropName}\n` +
-                      `💰 *Total Paid:* ₹${totalPayable.toLocaleString('en-IN')}\n\n` +
-                      `🚚 *Transport Vehicle:* ${lastCreatedOrder?.dispatchDetails?.vehicleNo}\n` +
-                      `👤 *Driver:* ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone})\n` +
-                      `📍 *Delivery Destination:* ${deliveryAddress}\n\n` +
-                      `Thank you for ordering on Farm2Future!`
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const waLink = `https://api.whatsapp.com/send?phone=91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
+                        `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
+                        `📦 *Order Ref:* ${createdOrderRef}\n` +
+                        `🌾 *Produce:* ${currentOrderQty} ${item.unit} ${item.cropName}\n` +
+                        `💰 *Total Paid:* ₹${totalPayable.toLocaleString('en-IN')}\n\n` +
+                        `🚚 *Transport Vehicle:* ${lastCreatedOrder?.dispatchDetails?.vehicleNo}\n` +
+                        `👤 *Driver:* ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone})\n` +
+                        `📍 *Delivery Destination:* ${deliveryAddress}\n\n` +
+                        `Thank you for ordering on Farm2Future!`
+                      )}`;
+                      window.open(waLink, '_blank');
+                    }}
+                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer ring-2 ring-emerald-400/30"
                   >
                     <span>🟢</span>
-                    <span>Send to WhatsApp (+91 {buyerMobileNumber.slice(-10)})</span>
-                  </a>
+                    <span>Direct WhatsApp में खोलें (+91 {buyerMobileNumber.slice(-10)})</span>
+                  </button>
                   <a
                     href={`sms:+91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
                       `Order ${createdOrderRef} Confirmed & Transport Booked! Vehicle: ${lastCreatedOrder?.dispatchDetails?.vehicleNo}, Driver: ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone}). Total: Rs ${totalPayable}. Delivery to: ${deliveryAddress}`

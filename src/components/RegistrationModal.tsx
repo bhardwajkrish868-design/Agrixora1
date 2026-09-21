@@ -178,8 +178,70 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [otpSentMessage, setOtpSentMessage] = useState<string>('');
   const [isSendingOtp, setIsSendingOtp] = useState<boolean>(false);
 
-  // Dispatch OTP directly to user's physical mobile phone and multi-channel alerts
-  const sendOtpToPhone = async (targetPhone?: string, targetOtp?: string) => {
+  // 🟢 Direct WhatsApp States
+  const [callmebotApiKey, setCallmebotApiKey] = useState<string>(() => {
+    return typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || '') : '';
+  });
+  const [isCallmebotConfigured, setIsCallmebotConfigured] = useState<boolean>(false);
+  const [callmebotKeyInput, setCallmebotKeyInput] = useState<string>('');
+  const [showCallmebotSetup, setShowCallmebotSetup] = useState<boolean>(false);
+  const [isTestingCallmebot, setIsTestingCallmebot] = useState<boolean>(false);
+  const [callmebotStatusMsg, setCallmebotStatusMsg] = useState<string>('');
+  const [autoOpenWhatsApp, setAutoOpenWhatsApp] = useState<boolean>(() => {
+    return typeof window !== 'undefined' ? (localStorage.getItem('f2f_auto_open_wa') !== 'false') : true;
+  });
+
+  useEffect(() => {
+    fetch('/api/sms/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.callmebotConfigured) {
+          setIsCallmebotConfigured(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSaveAndTestCallmebot = async () => {
+    const key = callmebotKeyInput.trim();
+    if (!key) {
+      setCallmebotStatusMsg('❌ कृपया मान्य CallMeBot API Key दर्ज करें।');
+      return;
+    }
+    setIsTestingCallmebot(true);
+    setCallmebotStatusMsg('⏳ WhatsApp पर परीक्षण संदेश भेजा जा रहा है...');
+    try {
+      const rawTarget = (phone || '9631359486').replace(/\D/g, '').slice(-10);
+      const res = await fetch('/api/whatsapp/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: rawTarget,
+          apiKey: key,
+          saveKey: true
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCallmebotApiKey(key);
+        setIsCallmebotConfigured(true);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('f2f_callmebot_api_key', key);
+        }
+        setCallmebotStatusMsg(`✅ सफल! WhatsApp पर संदेश पहुंच गया (+91 ${rawTarget}).`);
+      } else {
+        const errorText = data.details?.rawResponse || data.error || 'अमान्य API Key या WhatsApp बॉट को अनुमति नहीं दी गई।';
+        setCallmebotStatusMsg(`❌ विफल: ${errorText}`);
+      }
+    } catch (e: any) {
+      setCallmebotStatusMsg(`❌ त्रुटि: ${e.message}`);
+    } finally {
+      setIsTestingCallmebot(false);
+    }
+  };
+
+  // Dispatch OTP directly to user's physical mobile phone, WhatsApp, and multi-channel alerts
+  const sendOtpToPhone = async (targetPhone?: string, targetOtp?: string, forceOpenWhatsApp?: boolean) => {
     const rawTarget = (targetPhone || phone || '').replace(/\D/g, '').slice(-10) || '9631359486';
     const otpToDispatch = targetOtp || generateRandomOtp();
 
@@ -188,20 +250,34 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setIsOtpVerified(true);
 
     const smsMessage = `🔑 Farm2Future Verification OTP: ${otpToDispatch}. Valid for 10 minutes. Do not share this OTP with anyone. (Farm2Future Smart Agri Platform)`;
+    const waText = `🔑 *Farm2Future Verification OTP: ${otpToDispatch}*\n\nYour One-Time Password (OTP) is *${otpToDispatch}*.\nValid for 10 minutes.\nDo not share this OTP with anyone.\n\n🌾 Farm2Future Smart Agriculture Platform`;
+    const waUrl = `https://api.whatsapp.com/send?phone=91${rawTarget}&text=${encodeURIComponent(waText)}`;
 
-    // 1. Backend dispatch to /api/send-sms (Fast2SMS telecom gateway / DB logging)
+    // Auto launch WhatsApp directly if enabled or forced
+    if (forceOpenWhatsApp || autoOpenWhatsApp) {
+      try {
+        window.open(waUrl, '_blank');
+      } catch (_) {}
+    }
+
+    const currentCallmebotKey = callmebotApiKey || (typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || '') : '');
+
+    // 1. Backend dispatch to /api/send-sms (CallMeBot WhatsApp gateway / Fast2SMS / DB logging)
+    let apiRes: any = null;
     try {
-      await fetch('/api/send-sms', {
+      const res = await fetch('/api/send-sms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           phone: rawTarget,
           message: smsMessage,
+          callmebotApiKey: currentCallmebotKey || undefined,
           cost: 0,
           origin: 'Farm2Future UIDAI Auth',
           destination: `+91 ${rawTarget}`
         })
       });
+      apiRes = await res.json();
     } catch (_) {}
 
     // 2. Synthesize SMS ringtone chime
@@ -237,7 +313,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       phone: rawTarget
     });
 
-    setOtpSentMessage(`✅ Demo OTP (${otpToDispatch}) sent to +91 ${rawTarget}`);
+    if (apiRes?.whatsapp?.delivered) {
+      setOtpSentMessage(`🟢 Live OTP delivered directly to your WhatsApp (+91 ${rawTarget})! Code: ${otpToDispatch}`);
+    } else {
+      setOtpSentMessage(`✅ OTP (${otpToDispatch}) generated & dispatched to +91 ${rawTarget}`);
+    }
     setIsSendingOtp(false);
   };
 
@@ -1102,18 +1182,141 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                           </p>
                         )}
 
+                        {/* 🟢 DIRECT WHATSAPP DELIVERY & BOT ACTIVATION */}
+                        <div className="p-3 bg-gradient-to-br from-emerald-500/10 via-green-500/5 to-teal-500/10 rounded-2xl border-2 border-emerald-500/40 space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">🟢</span>
+                              <div>
+                                <h5 className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
+                                  <span>WhatsApp Direct Delivery</span>
+                                  {isCallmebotConfigured && (
+                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9.5px] font-extrabold border border-emerald-300">
+                                      ● Server Bot Active
+                                    </span>
+                                  )}
+                                </h5>
+                                <p className="text-[10px] text-emerald-800/80 font-medium">
+                                  सीधे व्हाट्सएप इनबॉक्स में ओटीपी व रसीद प्राप्त करें
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* 1-Click Instant Open WhatsApp Button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const clean = (phone || '9631359486').replace(/\D/g, '').slice(-10);
+                                const msg = `🔑 *Farm2Future Verification OTP: ${otpCode}*\n\nYour One-Time Password (OTP) is *${otpCode}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`;
+                                window.open(`https://api.whatsapp.com/send?phone=91${clean}&text=${encodeURIComponent(msg)}`, '_blank');
+                              }}
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] flex items-center gap-1 shadow-sm transition-all cursor-pointer hover:scale-102 shrink-0"
+                            >
+                              <span>🟢 WhatsApp में खोलें</span>
+                            </button>
+                          </div>
+
+                          {/* Toggle: Auto-open WhatsApp on OTP generation */}
+                          <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60 text-[10.5px]">
+                            <label className="flex items-center gap-1.5 text-slate-700 cursor-pointer select-none font-semibold">
+                              <input
+                                type="checkbox"
+                                checked={autoOpenWhatsApp}
+                                onChange={e => {
+                                  setAutoOpenWhatsApp(e.target.checked);
+                                  if (typeof window !== 'undefined') {
+                                    localStorage.setItem('f2f_auto_open_wa', e.target.checked ? 'true' : 'false');
+                                  }
+                                }}
+                                className="rounded-sm text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5 cursor-pointer"
+                              />
+                              <span>हर बार नया OTP जनरेट होने पर WhatsApp तुरंत खोलें</span>
+                            </label>
+
+                            <button
+                              type="button"
+                              onClick={() => setShowCallmebotSetup(!showCallmebotSetup)}
+                              className="text-emerald-800 font-bold underline hover:text-emerald-950 text-[10.5px] cursor-pointer"
+                            >
+                              {showCallmebotSetup ? 'Hide Cloud Bot Setup ▲' : '🤖 Free WhatsApp Bot Setup (Direct Inbox) ▼'}
+                            </button>
+                          </div>
+
+                          {/* Expandable Free CallMeBot 15-second setup */}
+                          {showCallmebotSetup && (
+                            <div className="p-2.5 bg-white rounded-xl border border-emerald-200 space-y-2 text-xs animate-in fade-in duration-200">
+                              <div className="flex items-center justify-between">
+                                <span className="font-extrabold text-slate-800 text-[11px]">
+                                  🤖 15-सेकंड फ्री WhatsApp बॉट सेटअप (बिना किसी ऐप खोले सीधा इनबॉक्स में मैसेज पाएँ)
+                                </span>
+                                <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-md">
+                                  100% Free • No Sign-up
+                                </span>
+                              </div>
+
+                              <ol className="list-decimal list-inside text-[10.5px] text-slate-600 space-y-1 font-medium">
+                                <li>
+                                  नीचे दिए गए बटन को दबाकर WhatsApp में बॉट (<strong>+34 698 28 89 73</strong>) को यह मैसेज भेजें:
+                                  <div className="mt-1">
+                                    <a
+                                      href="https://wa.me/34698288973?text=I%20allow%20callmebot%20to%20send%20me%20messages"
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10.5px] shadow-xs"
+                                    >
+                                      <span>🟢</span>
+                                      <span>Send "I allow callmebot to send me messages" to WhatsApp Bot</span>
+                                    </a>
+                                  </div>
+                                </li>
+                                <li>
+                                  बॉट तुरंत आपको रिप्लाई में <strong>API Key</strong> (जैसे: <code>123456</code>) भेजेगा।
+                                </li>
+                                <li>
+                                  वह API Key यहाँ डालकर Save & Test दबाएं:
+                                </li>
+                              </ol>
+
+                              <div className="flex items-center gap-2 pt-1">
+                                <input
+                                  type="text"
+                                  value={callmebotKeyInput}
+                                  onChange={e => setCallmebotKeyInput(e.target.value)}
+                                  placeholder="Enter CallMeBot API Key (e.g. 123456)"
+                                  className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  disabled={isTestingCallmebot}
+                                  onClick={handleSaveAndTestCallmebot}
+                                  className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs cursor-pointer shadow-xs disabled:opacity-50"
+                                >
+                                  {isTestingCallmebot ? 'Testing...' : 'Save & Test Direct WhatsApp'}
+                                </button>
+                              </div>
+
+                              {callmebotStatusMsg && (
+                                <p className={`text-[10.5px] font-bold ${callmebotStatusMsg.startsWith('✅') ? 'text-emerald-700' : 'text-rose-600'}`}>
+                                  {callmebotStatusMsg}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                          <a
-                            href={`https://api.whatsapp.com/send?phone=91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
-                              `🔑 *Farm2Future Verification OTP: ${otpCode}*\n\nYour One-Time Password (OTP) is *${otpCode}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`
-                            )}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const clean = (phone || '9631359486').replace(/\D/g, '').slice(-10);
+                              const msg = `🔑 *Farm2Future Verification OTP: ${otpCode}*\n\nYour One-Time Password (OTP) is *${otpCode}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`;
+                              window.open(`https://api.whatsapp.com/send?phone=91${clean}&text=${encodeURIComponent(msg)}`, '_blank');
+                            }}
+                            className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer hover:scale-101"
                           >
                             <span>🟢</span>
-                            <span>Send OTP to WhatsApp (+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)})</span>
-                          </a>
+                            <span>Direct WhatsApp me bhejo (+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)})</span>
+                          </button>
                           <a
                             href={`sms:+91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
                               `Farm2Future Verification OTP: ${otpCode}. Valid for 10 minutes. Do not share with anyone.`

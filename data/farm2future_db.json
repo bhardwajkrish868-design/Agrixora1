@@ -276,8 +276,8 @@
       "collectionHubAddress": "Pimpalgaon Baswant, Nashik, Maharashtra",
       "orderDate": "2026-09-18T13:43:37.550Z",
       "expectedDelivery": "2026-09-21T13:43:37.550Z",
-      "currentStage": "quality_verified",
-      "paymentStatus": "escrow_locked",
+      "currentStage": "delivered",
+      "paymentStatus": "disbursed_to_farmer",
       "transactionId": "TXN-F2F-39017550-ESCROW",
       "paymentMethod": "Escrow Bank Transfer / UPI",
       "aiAllocation": {
@@ -321,9 +321,9 @@
         "destinationWarehouse": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
         "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
         "totalDistanceKm": 133,
-        "coveredDistanceKm": 20,
-        "currentSpeedKmph": 48,
-        "estimatedMinutesRemaining": 173,
+        "coveredDistanceKm": 133,
+        "currentSpeedKmph": 0,
+        "estimatedMinutesRemaining": 0,
         "checkpoints": [
           {
             "id": "cp_1",
@@ -337,7 +337,7 @@
           {
             "id": "cp_2",
             "name": "Kasara Ghat Summit Fastag Toll Plaza",
-            "distanceKm": 43,
+            "distanceKm": 35,
             "status": "passed",
             "type": "toll",
             "description": "Toll Clearance & Sensor Check 14.2°C",
@@ -346,24 +346,23 @@
           {
             "id": "cp_3",
             "name": "Shahapur Agri-Transit Inspection Post",
-            "distanceKm": 89,
-            "status": "passed",
+            "distanceKm": 72,
+            "status": "current",
             "type": "checkpoint",
-            "description": "Weight & Seal Integrity Verified",
-            "passedAt": "Recorded"
+            "description": "Weight & Seal Integrity Verified"
           },
           {
             "id": "cp_4",
             "name": "Bhiwandi-Kalyan Logistics Bypass Ring",
-            "distanceKm": 135,
-            "status": "current",
+            "distanceKm": 109,
+            "status": "upcoming",
             "type": "junction",
             "description": "Approaching Mumbai Metropolitan Boundary"
           },
           {
             "id": "cp_5",
             "name": "Vashi APMC Mega Mandi Terminal",
-            "distanceKm": 165,
+            "distanceKm": 133,
             "status": "upcoming",
             "type": "destination",
             "description": "Inbound Receiving Dock & Unloading Gate"
@@ -378,7 +377,7 @@
           "subtitle": "₹743 locked (Includes ₹98 Buyer Delivery Fee)",
           "timestamp": "Just now",
           "completed": true,
-          "current": true,
+          "current": false,
           "location": "Farm2Future Smart Escrow Contract",
           "details": {
             "verifiedWeight": "30 Kg (Booked)",
@@ -405,7 +404,7 @@
           "subtitle": "Digital moisture & spectral grading inspection",
           "timestamp": "Verified 07:19 PM",
           "completed": true,
-          "current": true,
+          "current": false,
           "location": "Quality Lab",
           "details": {
             "agentName": "Krish Bhardwaj",
@@ -419,8 +418,8 @@
           "stage": "in_transit",
           "title": "Cold & GPS-Tracked Transit",
           "subtitle": "MH-15-EG-4401 with live telematics (14°C)",
-          "timestamp": "Pending Dispatch",
-          "completed": false,
+          "timestamp": "Updated 10:15 AM",
+          "completed": true,
           "current": false,
           "location": "Highway Corridor"
         },
@@ -430,7 +429,7 @@
           "title": "Delivery & Escrow Settlement",
           "subtitle": "Instant settlement: ₹621 to Farmer + ₹98 to Transporter",
           "timestamp": "Pending Delivery",
-          "completed": false,
+          "completed": true,
           "current": false,
           "location": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra"
         }
@@ -448,7 +447,8 @@
         "notes": "Clean lot, uniform size, zero pest infestation. Certified for immediate distribution.",
         "certificateId": "QC-CERT-MH-7734",
         "passed": true
-      }
+      },
+      "actualDeliveryDate": "2026-09-21T04:45:53.052Z"
     },
     {
       "id": "ORD-2026-6336",
@@ -1299,6 +1299,28 @@
     }
   ],
   "notifications": [
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1789574079511",
+      "title": "Delivery Completed: F2F-ORD-1748",
+      "message": "Order marked as received. Thank you for using Farm2Future Direct Supply Chain!",
+      "type": "delivery",
+      "orderId": "ORD-2026-7850",
+      "id": "notif_1789965953051",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1789735666459",
+      "title": "Payment Disbursed: ₹621",
+      "message": "Order F2F-ORD-1748 delivered successfully. Escrow funds transferred to your bank account.",
+      "type": "payment",
+      "orderId": "ORD-2026-7850",
+      "id": "notif_1789965953051",
+      "timestamp": "Just now",
+      "read": false
+    },
     {
       "title": "✅ Transport Booking Successful Granted!",
       "message": "Vehicle MH-15-EG-4401 confirmed for Nashik Red Onion (ताज़ा प्याज़). Confirmation SMS dispatched to +91 9631359486. Driver Prakash Shinde (+91 99223 34455) assigned.",
@@ -2195,6 +2217,148 @@
     }
   ],
   "activityHistory": [
+    {
+      "id": "act_1789966044511_775w3",
+      "userId": "usr_admin_1789738786832",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-21T04:47:24.511Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1789966044309_xdo2m",
+      "userId": "admin_usr",
+      "userName": "Govt Administrator",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "Admin Master Console Unlocked",
+      "description": "Administrator verified passkey and gained high-privilege oversight access.",
+      "timestamp": "2026-09-21T04:47:24.309Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789966017054_8uzlb",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Priya Sharma signed out.",
+      "timestamp": "2026-09-21T04:46:57.054Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789965990058_nucly",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Priya Sharma logged into buyer portal.",
+      "timestamp": "2026-09-21T04:46:30.058Z",
+      "metadata": {
+        "phone": "+91 98112 23344",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1789965968066_gfyr1",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-21T04:46:08.066Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789965953051_v0n17",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-1748",
+      "description": "Order F2F-ORD-1748 confirmed delivered. Escrow payout of ₹621 instantly disbursed to Krish Bhardwaj.",
+      "timestamp": "2026-09-21T04:45:53.051Z",
+      "metadata": {
+        "orderId": "ORD-2026-7850",
+        "farmerPayout": 621
+      }
+    },
+    {
+      "id": "act_1789965941240_fvpwf",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "stage_update",
+      "title": "Order Stage Updated: IN TRANSIT",
+      "description": "Order F2F-ORD-1748 advanced to stage in transit.",
+      "timestamp": "2026-09-21T04:45:41.240Z",
+      "metadata": {
+        "orderId": "ORD-2026-7850",
+        "newStage": "in_transit"
+      }
+    },
+    {
+      "id": "act_1789965925477_95mzl",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-21T04:45:25.477Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1789964686920_k3tqg",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-1748",
+      "description": "Order F2F-ORD-1748 confirmed delivered. Escrow payout of ₹621 instantly disbursed to Krish Bhardwaj.",
+      "timestamp": "2026-09-21T04:24:46.920Z",
+      "metadata": {
+        "orderId": "ORD-2026-7850",
+        "farmerPayout": 621
+      }
+    },
+    {
+      "id": "act_1789964671108_svocg",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Priya Sharma logged into buyer portal.",
+      "timestamp": "2026-09-21T04:24:31.108Z",
+      "metadata": {
+        "phone": "+91 98112 23344",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1789964624526_ewger",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-21T04:23:44.526Z",
+      "metadata": {}
+    },
     {
       "id": "act_1789937990552_g2gmo",
       "userId": "usr_buyer_1789574079511",
@@ -4102,7 +4266,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-21T04:20:13.351Z",
+  "lastUpdated": "2026-09-21T05:20:13.364Z",
   "vehicles": [
     {
       "id": "veh_1",
@@ -5810,8 +5974,5 @@
         }
       ]
     }
-  ],
-  "smsGateway": {
-    "fast2smsApiKey": ""
-  }
+  ]
 }
