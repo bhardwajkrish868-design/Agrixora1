@@ -87,7 +87,7 @@ export const ProductDetailModal: React.FC = () => {
   const [deliveryAddress, setDeliveryAddress] = useState('AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra');
   const [pincode, setPincode] = useState('400705');
   const [paymentTab, setPaymentTab] = useState<'upi_qr' | 'neft_rtgs' | 'card' | 'credit'>('upi_qr');
-  const [paymentMethod, setPaymentMethod] = useState('Instant UPI QR (PhonePe / GPay / Paytm)');
+  const [paymentMethod, setPaymentMethod] = useState('Instant UPI QR (krishbhardwaj326@naviaxis)');
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [copiedAccount, setCopiedAccount] = useState(false);
   const [upiVerified, setUpiVerified] = useState(false);
@@ -129,7 +129,7 @@ export const ProductDetailModal: React.FC = () => {
 
   useEffect(() => {
     if (paymentTab === 'upi_qr') {
-      setPaymentMethod('Instant UPI QR (PhonePe / GPay / Paytm)');
+      setPaymentMethod('Instant UPI QR (krishbhardwaj326@naviaxis)');
     } else if (paymentTab === 'neft_rtgs') {
       setPaymentMethod('NEFT / RTGS Corporate Escrow');
     } else if (paymentTab === 'card') {
@@ -866,11 +866,11 @@ export const ProductDetailModal: React.FC = () => {
                           {/* Real Dynamic QR Code Box */}
                           <div className="flex flex-col items-center p-2.5 bg-slate-50 rounded-2xl border-2 border-emerald-500/50 shadow-xs shrink-0">
                             <img
-                              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=${encodeURIComponent(
-                                `upi://pay?pa=farm2future.escrow@icici&pn=Farm2Future%20Escrow&am=${totalPayable}&cu=INR&tn=Order%20Payment`
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=4&data=${encodeURIComponent(
+                                `upi://pay?pa=krishbhardwaj326@naviaxis&pn=Krish%20Bhardwaj&am=${totalPayable}&cu=INR&tn=Farm2Future%20Order`
                               )}`}
                               alt="Farm2Future UPI Escrow QR"
-                              className="w-32 h-32 rounded-xl bg-white p-1 shadow-xs"
+                              className="w-36 h-36 rounded-xl bg-white p-1.5 shadow-xs"
                             />
                             <span className="text-[10px] font-extrabold text-emerald-800 mt-1.5 flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
@@ -882,22 +882,22 @@ export const ProductDetailModal: React.FC = () => {
                           <div className="space-y-2 text-xs flex-1 w-full">
                             <div>
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-                                Official Escrow VPA (UPI ID)
+                                Official UPI ID (VPA)
                               </span>
                               <div className="flex items-center gap-2 mt-0.5">
-                                <span className="font-mono font-black text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs sm:text-sm">
-                                  farm2future.escrow@icici
+                                <span className="font-mono font-black text-emerald-950 bg-emerald-50 px-2.5 py-1.5 rounded-xl border border-emerald-200 text-xs sm:text-sm select-all">
+                                  krishbhardwaj326@naviaxis
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    navigator.clipboard.writeText('farm2future.escrow@icici');
+                                    navigator.clipboard.writeText('krishbhardwaj326@naviaxis');
                                     setCopiedUpi(true);
                                     setTimeout(() => setCopiedUpi(false), 2500);
                                   }}
-                                  className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center gap-1 border border-emerald-200 cursor-pointer"
+                                  className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold flex items-center gap-1 border border-emerald-600 shadow-xs cursor-pointer"
                                 >
-                                  {copiedUpi ? <CheckCheck className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                  {copiedUpi ? <CheckCheck className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-white" />}
                                   <span>{copiedUpi ? 'Copied!' : 'Copy'}</span>
                                 </button>
                               </div>
@@ -930,7 +930,7 @@ export const ProductDetailModal: React.FC = () => {
                             {/* Mobile Tap to Pay & Simulated Demo button */}
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                               <a
-                                href={`upi://pay?pa=farm2future.escrow@icici&pn=Farm2Future%20Escrow&am=${totalPayable}&cu=INR&tn=Order%20Payment`}
+                                href={`upi://pay?pa=krishbhardwaj326@naviaxis&pn=Krish%20Bhardwaj&am=${totalPayable}&cu=INR&tn=Farm2Future%20Order`}
                                 className="py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs cursor-pointer"
                               >
                                 <Smartphone className="w-3.5 h-3.5" />
