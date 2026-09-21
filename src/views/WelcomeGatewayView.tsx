@@ -123,8 +123,8 @@ export const WelcomeGatewayView: React.FC = () => {
   const [email, setEmail] = useState('');
   const [aadhaarNumber, setAadhaarNumber] = useState('');
   const [agreedTerms, setAgreedTerms] = useState(true);
-  const [otp, setOtp] = useState('882910');
-  const [generatedOtp, setGeneratedOtp] = useState('882910');
+  const [otp, setOtp] = useState(() => Math.floor(100000 + Math.random() * 900000).toString());
+  const [generatedOtp, setGeneratedOtp] = useState(() => Math.floor(100000 + Math.random() * 900000).toString());
   const [isOtpSent, setIsOtpSent] = useState(true);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [otpVerified, setOtpVerified] = useState(true);

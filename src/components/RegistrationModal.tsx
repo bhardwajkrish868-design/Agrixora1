@@ -167,9 +167,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [state, setState] = useState('Maharashtra');
   const [district, setDistrict] = useState('Nashik');
 
+  // Generate fresh unique 6-digit OTP on every request
+  const generateRandomOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
   // Step 2: Identity Verification (UIDAI Aadhaar + OTP)
   const [aadhaarNumber, setAadhaarNumber] = useState('');
-  const [otpCode, setOtpCode] = useState('882910');
+  const [otpCode, setOtpCode] = useState(() => Math.floor(100000 + Math.random() * 900000).toString());
   const [isOtpVerified, setIsOtpVerified] = useState(true);
   const [smsToast, setSmsToast] = useState<{ show: boolean; otp: string; phone: string } | null>(null);
   const [otpSentMessage, setOtpSentMessage] = useState<string>('');
@@ -178,7 +181,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   // Dispatch OTP directly to user's physical mobile phone and multi-channel alerts
   const sendOtpToPhone = async (targetPhone?: string, targetOtp?: string) => {
     const rawTarget = (targetPhone || phone || '').replace(/\D/g, '').slice(-10) || '9631359486';
-    const otpToDispatch = targetOtp || otpCode || '882910';
+    const otpToDispatch = targetOtp || generateRandomOtp();
 
     setIsSendingOtp(true);
     setOtpCode(otpToDispatch);
@@ -279,7 +282,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       setPhone('');
       setEmail('');
       setAadhaarNumber('');
-      setOtpCode('882910');
+      setOtpCode(generateRandomOtp());
       setIsOtpVerified(true);
       setFarmSize('5');
       setPrimaryCrop('Onions & Wheat');
@@ -331,7 +334,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
       // Automatically dispatch Demo OTP to user's phone when moving to Step 2
       if (stepNumber === 2 && currentStep === 1) {
-        sendOtpToPhone(rawPhoneDigits, '882910');
+        sendOtpToPhone(rawPhoneDigits, generateRandomOtp());
       }
     }
 
@@ -1055,19 +1058,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                             setOtpCode(e.target.value);
                             setIsOtpVerified(e.target.value.length === 6);
                           }}
-                          placeholder="882910"
+                          placeholder="6-Digit OTP"
                           className="w-28 px-3 py-2 rounded-xl border-2 border-slate-300 font-mono font-black text-sm tracking-widest text-slate-900 text-center bg-white focus:border-emerald-500 focus:outline-none shadow-2xs"
                         />
                         <button
                           type="button"
                           disabled={isSendingOtp}
                           onClick={() => {
-                            sendOtpToPhone(phone || '9631359486', '882910');
+                            sendOtpToPhone(phone || '9631359486', generateRandomOtp());
                           }}
                           className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
                         >
                           <Smartphone className="w-3.5 h-3.5" />
-                          <span>{isSendingOtp ? 'Sending...' : 'Fill Demo OTP (882910) & Send to Mobile'}</span>
+                          <span>{isSendingOtp ? 'Sending...' : 'Generate New OTP & Send to Mobile'}</span>
                         </button>
                         {isOtpVerified && (
                           <span className="text-[11px] text-emerald-700 font-extrabold flex items-center gap-1 ml-auto bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
@@ -1085,10 +1088,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                           </span>
                           <button
                             type="button"
-                            onClick={() => sendOtpToPhone(phone || '9631359486', otpCode || '882910')}
+                            onClick={() => sendOtpToPhone(phone || '9631359486', generateRandomOtp())}
                             className="text-emerald-700 hover:text-emerald-800 font-bold underline cursor-pointer text-[10.5px]"
                           >
-                            Resend OTP (दोबारा भेजें)
+                            Resend New OTP (नया OTP भेजें)
                           </button>
                         </div>
 
@@ -1102,7 +1105,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                           <a
                             href={`https://api.whatsapp.com/send?phone=91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
-                              `🔑 *Farm2Future Verification OTP: ${otpCode || '882910'}*\n\nYour One-Time Password (OTP) is *${otpCode || '882910'}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`
+                              `🔑 *Farm2Future Verification OTP: ${otpCode}*\n\nYour One-Time Password (OTP) is *${otpCode}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`
                             )}`}
                             target="_blank"
                             rel="noreferrer"
@@ -1113,7 +1116,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                           </a>
                           <a
                             href={`sms:+91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
-                              `Farm2Future Verification OTP: ${otpCode || '882910'}. Valid for 10 minutes. Do not share with anyone.`
+                              `Farm2Future Verification OTP: ${otpCode}. Valid for 10 minutes. Do not share with anyone.`
                             )}`}
                             className="py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
                           >
@@ -1590,19 +1593,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       maxLength={6}
                       value={otpCode}
                       onChange={e => setOtpCode(e.target.value)}
-                      placeholder="882910"
+                      placeholder="6-Digit OTP"
                       className="w-28 px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold text-sm tracking-widest text-slate-900 text-center bg-white"
                     />
                     <button
                       type="button"
                       disabled={isSendingOtp}
                       onClick={() => {
-                        sendOtpToPhone(phone || '9631359486', '882910');
+                        sendOtpToPhone(phone || '9631359486', generateRandomOtp());
                       }}
                       className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
                     >
                       <Smartphone className="w-3 h-3" />
-                      <span>{isSendingOtp ? 'Sending...' : 'Send Demo OTP (882910) to Mobile'}</span>
+                      <span>{isSendingOtp ? 'Sending...' : 'Generate New OTP & Send'}</span>
                     </button>
                     {isOtpVerified && (
                       <span className="text-[11px] text-emerald-700 font-bold flex items-center gap-1 ml-auto">
@@ -1619,7 +1622,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <div className="flex items-center gap-2">
                       <a
                         href={`https://api.whatsapp.com/send?phone=91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
-                          `🔑 *Farm2Future Login OTP: ${otpCode || '882910'}*\n\nYour Login OTP is *${otpCode || '882910'}*. Valid for 10 minutes.\n\n🌾 Farm2Future Platform`
+                          `🔑 *Farm2Future Login OTP: ${otpCode}*\n\nYour Login OTP is *${otpCode}*. Valid for 10 minutes.\n\n🌾 Farm2Future Platform`
                         )}`}
                         target="_blank"
                         rel="noreferrer"
@@ -1630,7 +1633,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       <span className="text-slate-300">•</span>
                       <a
                         href={`sms:+91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
-                          `Farm2Future Login OTP: ${otpCode || '882910'}. Valid for 10 minutes.`
+                          `Farm2Future Login OTP: ${otpCode}. Valid for 10 minutes.`
                         )}`}
                         className="text-sky-700 hover:text-sky-800 font-bold flex items-center gap-1"
                       >
