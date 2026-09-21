@@ -2218,107 +2218,40 @@
   ],
   "activityHistory": [
     {
-      "id": "act_1789966044511_775w3",
-      "userId": "usr_admin_1789738786832",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-21T04:47:24.511Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1789966044309_xdo2m",
-      "userId": "admin_usr",
-      "userName": "Govt Administrator",
-      "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "Admin Master Console Unlocked",
-      "description": "Administrator verified passkey and gained high-privilege oversight access.",
-      "timestamp": "2026-09-21T04:47:24.309Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1789966017054_8uzlb",
-      "userId": "usr_buyer_1789574079511",
-      "userName": "Priya Sharma",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Priya Sharma signed out.",
-      "timestamp": "2026-09-21T04:46:57.054Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1789965990058_nucly",
-      "userId": "usr_buyer_1789574079511",
-      "userName": "Priya Sharma",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Priya Sharma logged into buyer portal.",
-      "timestamp": "2026-09-21T04:46:30.058Z",
-      "metadata": {
-        "phone": "+91 98112 23344",
-        "role": "buyer"
-      }
-    },
-    {
-      "id": "act_1789965968066_gfyr1",
-      "userId": "usr_farmer_1789735666459",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-21T04:46:08.066Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1789965953051_v0n17",
-      "userId": "usr_farmer_1789735666459",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "delivered",
-      "title": "Order Delivered & Escrow Released: F2F-ORD-1748",
-      "description": "Order F2F-ORD-1748 confirmed delivered. Escrow payout of ₹621 instantly disbursed to Krish Bhardwaj.",
-      "timestamp": "2026-09-21T04:45:53.051Z",
-      "metadata": {
-        "orderId": "ORD-2026-7850",
-        "farmerPayout": 621
-      }
-    },
-    {
-      "id": "act_1789965941240_fvpwf",
-      "userId": "usr_farmer_1789735666459",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "stage_update",
-      "title": "Order Stage Updated: IN TRANSIT",
-      "description": "Order F2F-ORD-1748 advanced to stage in transit.",
-      "timestamp": "2026-09-21T04:45:41.240Z",
-      "metadata": {
-        "orderId": "ORD-2026-7850",
-        "newStage": "in_transit"
-      }
-    },
-    {
-      "id": "act_1789965925477_95mzl",
+      "id": "act_1789968267393_5lc1d",
       "userId": "usr_farmer_1789735666459",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-21T04:45:25.477Z",
+      "timestamp": "2026-09-21T05:24:27.393Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "farmer"
       }
+    },
+    {
+      "id": "act_1789968218659_htgha",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Priya Sharma signed out.",
+      "timestamp": "2026-09-21T05:23:38.659Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789965313806_jt50q",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Priya Sharma signed out.",
+      "timestamp": "2026-09-21T04:35:13.806Z",
+      "metadata": {}
     },
     {
       "id": "act_1789964686920_k3tqg",
@@ -4266,7 +4199,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-21T05:20:13.364Z",
+  "lastUpdated": "2026-09-21T05:31:40.222Z",
   "vehicles": [
     {
       "id": "veh_1",

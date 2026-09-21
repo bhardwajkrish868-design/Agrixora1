@@ -29,6 +29,49 @@ export const BuyerPaymentsView: React.FC = () => {
   const inEscrow = myOrders.filter(o => o.paymentStatus === 'escrow_locked').reduce((sum, o) => sum + o.totalAmount, 0);
   const settled = myOrders.filter(o => o.paymentStatus === 'disbursed_to_farmer').reduce((sum, o) => sum + o.totalAmount, 0);
 
+  const downloadInvoicesCsv = () => {
+    const headers = [
+      "Transaction ID",
+      "Order Ref",
+      "Farmer Base Amount (INR)",
+      "QC & Hub Fee (INR)",
+      "Logistics Fee (INR)",
+      "Total Paid / Escrow (INR)",
+      "Payment Method",
+      "Status"
+    ];
+
+    const rows = orders.map(order => [
+      order.transactionId || `TXN-F2F-${order.id}`,
+      order.orderNumber,
+      order.farmerPayout,
+      (order as any).hubFee || Math.round(order.farmerPayout * 0.01),
+      order.logisticsFee,
+      order.totalAmount,
+      `"${order.paymentMethod || 'UPI QR (krishbhardwaj326@naviaxis)'}"`,
+      order.paymentStatus === 'disbursed_to_farmer' ? 'SETTLED' : 'LOCKED IN ESCROW'
+    ]);
+
+    const csv = [
+      `FARM2FUTURE PROCUREMENT INVOICES & GST AUDIT REPORT`,
+      `Generated Date: ${new Date().toLocaleDateString('en-IN')}`,
+      `Buyer: ${currentUser.name || 'Krish Bhardwaj'}`,
+      ``,
+      headers.join(','),
+      ...rows.map(r => r.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Buyer_Procurement_Invoices_FY26.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
@@ -92,11 +135,12 @@ export const BuyerPaymentsView: React.FC = () => {
           </h2>
 
           <button
-            onClick={() => alert('All procurement GST invoices downloaded in ZIP format.')}
-            className="px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5"
+            type="button"
+            onClick={downloadInvoicesCsv}
+            className="px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-emerald-50 hover:text-emerald-800 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download All Invoices</span>
+            <Download className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Download All Invoices (CSV)</span>
           </button>
         </div>
 

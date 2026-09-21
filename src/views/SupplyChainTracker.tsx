@@ -487,8 +487,56 @@ export const SupplyChainTracker: React.FC = () => {
             </p>
 
             <button
-              onClick={() => alert('Digital QR Gate Pass downloaded.')}
-              className="w-full py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+              type="button"
+              onClick={() => {
+                const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Farm2Future Digital QR Gate Pass</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 30px; background: #f8fafc; color: #0f172a; }
+  .pass { max-width: 600px; margin: 0 auto; background: white; border-radius: 24px; border: 2px solid #10b981; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+  .header { text-align: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 20px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 13px; margin-bottom: 20px; }
+  .badge { display: inline-block; background: #ecfdf5; color: #065f46; font-weight: bold; padding: 4px 12px; border-radius: 999px; font-size: 11px; border: 1px solid #a7f3d0; }
+  @media print { body { padding: 0; background: white; } .pass { border: none; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="pass">
+  <div class="header">
+    <span class="badge">NATIONAL DIGITAL TRANSIT PERMIT</span>
+    <h2 style="margin: 10px 0 4px; color: #065f46;">🌱 Farm2Future Digital Gate Pass</h2>
+    <p style="font-size: 12px; color: #64748b; margin: 0;">UIDAI Aadhaar Verified & Mandi QC Authorized Transit Permit</p>
+  </div>
+  <div class="grid">
+    <div><span style="color:#64748b;font-size:11px;display:block;">VEHICLE NO</span><strong>MH-15-EG-4412</strong></div>
+    <div><span style="color:#64748b;font-size:11px;display:block;">DRIVER</span><strong>Rameshwar (+91 98231 44512)</strong></div>
+    <div><span style="color:#64748b;font-size:11px;display:block;">COMMODITY</span><strong>Nashik Red Onions (Grade A)</strong></div>
+    <div><span style="color:#64748b;font-size:11px;display:block;">CONSIGNMENT WEIGHT</span><strong>120 Quintals</strong></div>
+    <div><span style="color:#64748b;font-size:11px;display:block;">DISPATCH ORIGIN</span><strong>Nashik APMC Aggregation Hub</strong></div>
+    <div><span style="color:#64748b;font-size:11px;display:block;">DELIVERY DESTINATION</span><strong>Mumbai Central Hub</strong></div>
+    <div><span style="color:#64748b;font-size:11px;display:block;">ESCROW STATUS</span><strong style="color:#059669;">PROTECTED & VERIFIED</strong></div>
+    <div><span style="color:#64748b;font-size:11px;display:block;">PERMIT ID</span><strong>GP-F2F-${Date.now().toString().slice(-6)}</strong></div>
+  </div>
+  <div style="text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #64748b;">
+    Valid for green-channel interstate transport under National Digital Agriculture Mission.
+  </div>
+</div>
+</body>
+</html>`;
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Farm2Future_Digital_Gate_Pass_${Date.now().toString().slice(-6)}.html`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+              }}
+              className="w-full py-2 rounded-xl border border-slate-200 hover:bg-emerald-50 hover:text-emerald-800 text-slate-700 font-bold text-xs transition-colors cursor-pointer shadow-2xs"
             >
               Download Gate Pass
             </button>
