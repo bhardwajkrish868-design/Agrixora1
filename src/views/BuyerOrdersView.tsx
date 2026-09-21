@@ -221,9 +221,14 @@ export const BuyerOrdersView: React.FC = () => {
                     </div>
                   </div>
                   
-                  <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Escrow Safe Payout
-                  </span>
+                  <div className="flex items-center justify-between text-[10px] text-emerald-700 font-semibold pt-1 border-t border-slate-200">
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Escrow Safe Payout
+                    </span>
+                    <span className="text-slate-500 font-bold truncate max-w-[120px]" title={order.paymentMethod}>
+                      {order.paymentMethod || 'UPI QR'}
+                    </span>
+                  </div>
                 </div>
               </div>
 

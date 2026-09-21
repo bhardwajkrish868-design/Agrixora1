@@ -27,7 +27,13 @@ import {
   Thermometer,
   FileText,
   BadgePercent,
-  Smartphone
+  Smartphone,
+  QrCode,
+  Copy,
+  CheckCheck,
+  Landmark,
+  Wallet,
+  ExternalLink
 } from 'lucide-react';
 
 // Synthesize pleasant SMS arrival chime via Web Audio API
@@ -80,7 +86,11 @@ export const ProductDetailModal: React.FC = () => {
   const [orderQty, setOrderQty] = useState<number>(50);
   const [deliveryAddress, setDeliveryAddress] = useState('AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra');
   const [pincode, setPincode] = useState('400705');
-  const [paymentMethod, setPaymentMethod] = useState('Escrow Bank Transfer / UPI');
+  const [paymentTab, setPaymentTab] = useState<'upi_qr' | 'neft_rtgs' | 'card' | 'credit'>('upi_qr');
+  const [paymentMethod, setPaymentMethod] = useState('Instant UPI QR (PhonePe / GPay / Paytm)');
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
+  const [upiVerified, setUpiVerified] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrderRef, setCreatedOrderRef] = useState('');
@@ -116,6 +126,18 @@ export const ProductDetailModal: React.FC = () => {
       setOrderQty(initialQty > 0 ? initialQty : 1);
     }
   }, [selectedListingModal]);
+
+  useEffect(() => {
+    if (paymentTab === 'upi_qr') {
+      setPaymentMethod('Instant UPI QR (PhonePe / GPay / Paytm)');
+    } else if (paymentTab === 'neft_rtgs') {
+      setPaymentMethod('NEFT / RTGS Corporate Escrow');
+    } else if (paymentTab === 'card') {
+      setPaymentMethod('Debit / Credit Card (RuPay / Visa)');
+    } else if (paymentTab === 'credit') {
+      setPaymentMethod('Agri-Credit 30-Day Line');
+    }
+  }, [paymentTab]);
 
   if (!selectedListingModal) return null;
 
@@ -402,9 +424,15 @@ export const ProductDetailModal: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-mono font-bold">
-                  {createdOrderRef}
-                </span>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-mono font-bold">
+                    {createdOrderRef}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200">
+                    <QrCode className="w-3 h-3 text-emerald-600" />
+                    <span>{paymentMethod}</span>
+                  </span>
+                </div>
                 <h3 className="text-2xl font-extrabold text-slate-900">Order Successful & Transport Booked!</h3>
                 <p className="text-xs text-slate-600 max-w-md mx-auto">
                   ₹{totalPayable.toLocaleString('en-IN')} is locked securely in Farm2Future Escrow Vault. Transport vehicle has been dispatched for delivery.
@@ -713,36 +741,17 @@ export const ProductDetailModal: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Payment Gateway */}
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Payment Escrow Gateway *
-                    </label>
-                    <select
-                      value={paymentMethod}
-                      onChange={e => setPaymentMethod(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500"
-                    >
-                      <option value="Escrow Bank Transfer / UPI">Farm2Future Instant UPI / Escrow</option>
-                      <option value="NEFT / RTGS Corporate Escrow">NEFT / RTGS Corporate Escrow</option>
-                      <option value="Agri-Credit 30-Day Line">Agri-Credit Line (Pre-approved)</option>
-                    </select>
-                    <span className="text-[10px] text-emerald-700 font-semibold block mt-1">
-                      Funds safely held in Escrow until quality intake.
-                    </span>
-                  </div>
-
                   {/* Delivery Location */}
-                  <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-slate-700">
                       Buyer Warehouse Destination Address *
                     </label>
-                    <input
-                      type="text"
+                    <textarea
+                      rows={2}
                       required
                       value={deliveryAddress}
                       onChange={e => setDeliveryAddress(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 font-medium text-slate-800"
                     />
                   </div>
 
@@ -772,6 +781,286 @@ export const ProductDetailModal: React.FC = () => {
                     <p className="text-[10px] text-slate-500 leading-tight">
                       ऑर्डर कन्फर्म होते ही इस नंबर पर <strong>Order Successful</strong> और <strong>Transport Booking (गाड़ी संख्या व ड्राइवर नंबर)</strong> का मैसेज भेजा जाएगा।
                     </p>
+                  </div>
+
+                  {/* 💳 Interactive Payment Gateway & Dynamic Escrow UPI QR */}
+                  <div className="sm:col-span-2 p-4 bg-gradient-to-br from-slate-50 via-emerald-50/25 to-slate-50 rounded-2xl border-2 border-emerald-500/40 shadow-xs space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pb-2 border-b border-slate-200/80">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                          <QrCode className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                            <span>Payment & Smart Escrow Gateway (पेमेंट विकल्प व UPI QR)</span>
+                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full border border-emerald-300">
+                              🔒 100% Escrow Protected
+                            </span>
+                          </h4>
+                          <p className="text-[10px] text-slate-500">
+                            Funds are safely held in ICICI Smart Escrow Vault until delivery intake & quality verification.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Mode Tabs */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentTab('upi_qr')}
+                        className={`py-2 px-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          paymentTab === 'upi_qr'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        <QrCode className="w-3.5 h-3.5" />
+                        <span>UPI / QR Code</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentTab('neft_rtgs')}
+                        className={`py-2 px-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          paymentTab === 'neft_rtgs'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        <Landmark className="w-3.5 h-3.5" />
+                        <span>NEFT / RTGS</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentTab('card')}
+                        className={`py-2 px-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          paymentTab === 'card'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        <span>Card / NetBanking</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPaymentTab('credit')}
+                        className={`py-2 px-2 rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          paymentTab === 'credit'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        <Wallet className="w-3.5 h-3.5" />
+                        <span>Agri-Credit (30D)</span>
+                      </button>
+                    </div>
+
+                    {/* TAB 1: UPI / QR CODE CONTENT */}
+                    {paymentTab === 'upi_qr' && (
+                      <div className="p-3.5 bg-white rounded-2xl border border-emerald-200 shadow-xs space-y-3">
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                          {/* Real Dynamic QR Code Box */}
+                          <div className="flex flex-col items-center p-2.5 bg-slate-50 rounded-2xl border-2 border-emerald-500/50 shadow-xs shrink-0">
+                            <img
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=4&data=${encodeURIComponent(
+                                `upi://pay?pa=farm2future.escrow@icici&pn=Farm2Future%20Escrow&am=${totalPayable}&cu=INR&tn=Order%20Payment`
+                              )}`}
+                              alt="Farm2Future UPI Escrow QR"
+                              className="w-32 h-32 rounded-xl bg-white p-1 shadow-xs"
+                            />
+                            <span className="text-[10px] font-extrabold text-emerald-800 mt-1.5 flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                              Scan: ₹{totalPayable.toLocaleString('en-IN')}
+                            </span>
+                          </div>
+
+                          {/* UPI Details & Supported Apps */}
+                          <div className="space-y-2 text-xs flex-1 w-full">
+                            <div>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                                Official Escrow VPA (UPI ID)
+                              </span>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="font-mono font-black text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs sm:text-sm">
+                                  farm2future.escrow@icici
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText('farm2future.escrow@icici');
+                                    setCopiedUpi(true);
+                                    setTimeout(() => setCopiedUpi(false), 2500);
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center gap-1 border border-emerald-200 cursor-pointer"
+                                >
+                                  {copiedUpi ? <CheckCheck className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                  <span>{copiedUpi ? 'Copied!' : 'Copy'}</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Supported UPI Apps Pills */}
+                            <div>
+                              <span className="text-[10px] text-slate-500 font-semibold block mb-1">
+                                Scan with any UPI app on your phone:
+                              </span>
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">
+                                  🔵 Google Pay
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold">
+                                  🟣 PhonePe
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold">
+                                  🟦 Paytm
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold">
+                                  🟧 BHIM UPI
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md bg-slate-900 text-white text-[10px] font-bold">
+                                  CRED
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Mobile Tap to Pay & Simulated Demo button */}
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                              <a
+                                href={`upi://pay?pa=farm2future.escrow@icici&pn=Farm2Future%20Escrow&am=${totalPayable}&cu=INR&tn=Order%20Payment`}
+                                className="py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs cursor-pointer"
+                              >
+                                <Smartphone className="w-3.5 h-3.5" />
+                                <span>Open UPI App (Mobile)</span>
+                              </a>
+
+                              <button
+                                type="button"
+                                onClick={() => setUpiVerified(!upiVerified)}
+                                className={`py-1.5 px-3 rounded-xl text-[11px] font-bold flex items-center gap-1 border cursor-pointer transition-colors ${
+                                  upiVerified
+                                    ? 'bg-emerald-100 text-emerald-800 border-emerald-400'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                                }`}
+                              >
+                                <CheckCircle2 className={`w-3.5 h-3.5 ${upiVerified ? 'text-emerald-600' : 'text-slate-400'}`} />
+                                <span>{upiVerified ? '✓ UPI Paid & Verified' : 'Simulate Paid (Demo)'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TAB 2: NEFT / RTGS CONTENT */}
+                    {paymentTab === 'neft_rtgs' && (
+                      <div className="p-3.5 bg-white rounded-2xl border border-slate-200 space-y-2 text-xs">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                          <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                            <Landmark className="w-4 h-4 text-emerald-600" />
+                            Virtual Escrow Nodal Account
+                          </span>
+                          <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full font-bold">
+                            RTGS / NEFT / IMPS
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <div className="p-2 bg-slate-50 rounded-xl">
+                            <span className="text-slate-400 block text-[10px]">Beneficiary Name</span>
+                            <span className="font-bold text-slate-800">Farm2Future Agriculture Escrow Trust</span>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded-xl flex items-center justify-between">
+                            <div>
+                              <span className="text-slate-400 block text-[10px]">Virtual Escrow A/C</span>
+                              <span className="font-mono font-bold text-slate-900">F2FESCROW{buyerMobileNumber.slice(-10) || '9631359486'}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(`F2FESCROW${buyerMobileNumber.slice(-10) || '9631359486'}`);
+                                setCopiedAccount(true);
+                                setTimeout(() => setCopiedAccount(false), 2000);
+                              }}
+                              className="p-1 text-slate-500 hover:text-emerald-600"
+                            >
+                              {copiedAccount ? <CheckCheck className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded-xl">
+                            <span className="text-slate-400 block text-[10px]">IFSC Code</span>
+                            <span className="font-mono font-bold text-slate-900">ICIC0000002</span>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded-xl">
+                            <span className="text-slate-400 block text-[10px]">Nodal Bank</span>
+                            <span className="font-bold text-slate-800">ICICI Bank Escrow Corporate Hub, Mumbai</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TAB 3: CARDS CONTENT */}
+                    {paymentTab === 'card' && (
+                      <div className="p-3.5 bg-white rounded-2xl border border-slate-200 space-y-2.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                            <CreditCard className="w-4 h-4 text-emerald-600" />
+                            Debit / Credit / RuPay Corporate Card
+                          </span>
+                          <div className="flex items-center gap-1 text-[10px] font-extrabold text-slate-600">
+                            <span className="px-1.5 py-0.5 bg-slate-100 rounded border">RuPay</span>
+                            <span className="px-1.5 py-0.5 bg-slate-100 rounded border">VISA</span>
+                            <span className="px-1.5 py-0.5 bg-slate-100 rounded border">MasterCard</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="col-span-3">
+                            <input
+                              type="text"
+                              readOnly
+                              value="4532 •••• •••• 8821"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono font-bold text-slate-800 text-xs"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <input
+                              type="text"
+                              readOnly
+                              value="Expiry: 12 / 28"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono text-slate-600 text-xs"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              readOnly
+                              value="CVV: •••"
+                              className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 font-mono text-slate-600 text-xs text-center"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TAB 4: AGRI-CREDIT CONTENT */}
+                    {paymentTab === 'credit' && (
+                      <div className="p-3.5 bg-white rounded-2xl border border-emerald-200 space-y-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                            <Wallet className="w-4 h-4 text-emerald-600" />
+                            e-Kisan Trade Credit Facility (0% Interest 30 Days)
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
+                            Pre-Approved
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600">
+                          You have an active credit line of <strong>₹5,00,000</strong> provided by NABARD partner NBFCs. Payment will be automatically settled after 30 days of produce acceptance.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -871,7 +1160,13 @@ export const ProductDetailModal: React.FC = () => {
                   className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] cursor-pointer"
                 >
                   <Lock className="w-4 h-4" />
-                  <span>{isOrdering ? '🤖 AI Assigning Truck & Securing Escrow...' : 'Confirm Order & Lock Escrow (₹' + totalPayable.toLocaleString('en-IN') + ')'}</span>
+                  <span>
+                    {isOrdering
+                      ? '⚡ Verifying Payment & Securing Escrow...'
+                      : paymentTab === 'upi_qr'
+                      ? `Pay via UPI QR & Lock Escrow (₹${totalPayable.toLocaleString('en-IN')})`
+                      : `Confirm Order & Lock Escrow (₹${totalPayable.toLocaleString('en-IN')})`}
+                  </span>
                 </button>
               </form>
             </>
