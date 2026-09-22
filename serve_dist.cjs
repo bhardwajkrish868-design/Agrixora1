@@ -287,6 +287,73 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // GET /api/orders
+  if (reqPath === '/api/orders' && req.method === 'GET') {
+    const db = readDb();
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.end(JSON.stringify(db.orders || []));
+    return;
+  }
+
+  // POST /api/orders/create
+  if (reqPath === '/api/orders/create' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const order = JSON.parse(body || '{}');
+        if (!order.id) throw new Error('Order ID required');
+        const currentDb = readDb();
+        if (!currentDb.orders) currentDb.orders = [];
+        currentDb.orders = [order, ...currentDb.orders.filter(o => o.id !== order.id)];
+        writeDb(currentDb);
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true, order }));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // POST /api/orders/update
+  if (reqPath === '/api/orders/update' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const { orderId, updates } = JSON.parse(body || '{}');
+        if (!orderId) throw new Error('orderId required');
+        const currentDb = readDb();
+        if (!currentDb.orders) currentDb.orders = [];
+        currentDb.orders = currentDb.orders.map(o => o.id === orderId ? { ...o, ...updates } : o);
+        writeDb(currentDb);
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true }));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   if (reqPath === '/api/db/sync' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });

@@ -39,6 +39,34 @@ export const dbService = {
     }
   },
 
+  async createOrder(order: Order): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/orders/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend direct order creation failed', err);
+      return false;
+    }
+  },
+
+  async updateOrder(orderId: string, updates: Partial<Order>): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/orders/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, updates })
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend order update failed', err);
+      return false;
+    }
+  },
+
   async logActivity(log: {
     userId?: string;
     userName?: string;

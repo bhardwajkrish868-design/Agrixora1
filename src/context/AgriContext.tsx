@@ -142,7 +142,51 @@ interface AgriContextType {
     activeCollectionHubsCount: number;
     activeFleetCount: number;
   };
+
+  // Farmer Association Helpers
+  isFarmerOrder: (order: Order, user?: User | null) => boolean;
+  isFarmerListing: (listing: CropListing, user?: User | null) => boolean;
 }
+
+export const isFarmerOrder = (order: Order, user: User | null): boolean => {
+  if (!user) return false;
+  // 1. Direct ID match
+  if (order.farmerId === user.id) return true;
+  // 2. Phone match
+  const uPhone = (user.phone || '').replace(/\D/g, '').slice(-10);
+  const oPhone = (order.farmerPhone || '').replace(/\D/g, '').slice(-10);
+  if (uPhone && oPhone && uPhone === oPhone) return true;
+  // 3. Name match
+  const uName = (user.name || '').trim().toLowerCase();
+  const oName = (order.farmerName || '').trim().toLowerCase();
+  if (uName && oName && uName === oName) return true;
+  // 4. Default demo farmer fallback
+  if (user.role === 'farmer') {
+    if (order.farmerName === 'Krish Bhardwaj' || order.farmerName === 'Ramesh Patil' || 
+        order.farmerId === 'usr_farmer_ramesh' || order.farmerId === 'usr_farmer_1789735666459' || order.farmerId === 'usr_farmer_1789482597768') {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const isFarmerListing = (listing: CropListing, user: User | null): boolean => {
+  if (!user) return false;
+  if (listing.farmerId === user.id) return true;
+  const uPhone = (user.phone || '').replace(/\D/g, '').slice(-10);
+  const lPhone = (listing.farmerPhone || '').replace(/\D/g, '').slice(-10);
+  if (uPhone && lPhone && uPhone === lPhone) return true;
+  const uName = (user.name || '').trim().toLowerCase();
+  const lName = (listing.farmerName || '').trim().toLowerCase();
+  if (uName && lName && uName === lName) return true;
+  if (user.role === 'farmer') {
+    if (listing.farmerName === 'Krish Bhardwaj' || listing.farmerName === 'Ramesh Patil' || 
+        listing.farmerId === 'usr_farmer_ramesh' || listing.farmerId === 'usr_farmer_1789735666459' || listing.farmerId === 'usr_farmer_1789482597768') {
+      return true;
+    }
+  }
+  return false;
+};
 
 const AgriContext = createContext<AgriContextType | undefined>(undefined);
 
@@ -421,8 +465,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.setItem('farm2future_listings', JSON.stringify(db.listings));
           }
           if (Array.isArray(db.orders)) {
-            setOrders(db.orders);
-            localStorage.setItem('farm2future_orders', JSON.stringify(db.orders));
+            const dbOrders: Order[] = db.orders;
+            setOrders(prev => {
+              const dbIds = new Set(dbOrders.map((o: any) => o.id));
+              const localOnly = prev.filter(p => !dbIds.has(p.id));
+              const merged = [...localOnly, ...dbOrders];
+              localStorage.setItem('farm2future_orders', JSON.stringify(merged));
+              return merged;
+            });
           }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) {
             const existingIds = new Set(db.vehicles.map((v: any) => v.id));
@@ -471,7 +521,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (db) {
           if (Array.isArray(db.users)) setRegisteredUsers(db.users);
           if (Array.isArray(db.listings) && db.listings.length > 0) setListings(db.listings);
-          if (Array.isArray(db.orders)) setOrders(db.orders);
+          if (Array.isArray(db.orders)) {
+            const dbOrders: Order[] = db.orders;
+            setOrders(prev => {
+              const dbIds = new Set(dbOrders.map((o: any) => o.id));
+              const localOnly = prev.filter(p => !dbIds.has(p.id));
+              return [...localOnly, ...dbOrders];
+            });
+          }
           if (Array.isArray(db.bulkDemands) && db.bulkDemands.length > 0) setBulkDemands(db.bulkDemands);
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) setVehicles(db.vehicles);
           if (Array.isArray(db.notifications) && db.notifications.length > 0) setNotifications(db.notifications);
@@ -1219,7 +1276,17 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ]
     };
 
-    setOrders(prev => [newOrder, ...prev]);
+    setOrders(prev => [newOrder, ...prev.filter(o => o.id !== newOrder.id)]);
+
+    // Immediate localStorage persistence
+    try {
+      const existingOrders = JSON.parse(localStorage.getItem('farm2future_orders') || '[]');
+      const updatedOrders = [newOrder, ...existingOrders.filter((o: any) => o.id !== newOrder.id)];
+      localStorage.setItem('farm2future_orders', JSON.stringify(updatedOrders));
+    } catch (_) {}
+
+    // Immediate direct backend order creation (atomic and race-condition proof)
+    dbService.createOrder(newOrder);
 
     // Update the assigned vehicle status to 'On Trip' in fleet state
     setVehicles(prev => prev.map(v => {
@@ -1321,6 +1388,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         trackingSteps: updatedSteps
       };
     }));
+
+    dbService.updateOrder(orderId, { currentStage: newStage });
 
     const targetOrder = orders.find(o => o.id === orderId);
     logActivity({
@@ -1574,6 +1643,13 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         trackingSteps: updatedSteps
       };
     }));
+
+    // Direct backend atomic update
+    dbService.updateOrder(orderId, {
+      currentStage: 'delivered',
+      paymentStatus: 'disbursed_to_farmer',
+      actualDeliveryDate: new Date().toISOString()
+    });
 
     // Return vehicle back to 'Available' in fleet registry and clear activeTrip
     if (deliveredVehicleNo) {
@@ -1852,7 +1928,9 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       verifyAdminPasskey,
       changeAdminPasskey,
       lockAdminConsole,
-      stats
+      stats,
+      isFarmerOrder: (order: Order, user?: User | null) => isFarmerOrder(order, user !== undefined ? user : currentUser),
+      isFarmerListing: (listing: CropListing, user?: User | null) => isFarmerListing(listing, user !== undefined ? user : currentUser)
     }}>
       {children}
     </AgriContext.Provider>

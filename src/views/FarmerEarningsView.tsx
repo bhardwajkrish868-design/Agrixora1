@@ -27,11 +27,11 @@ import {
 } from 'recharts';
 
 export const FarmerEarningsView: React.FC = () => {
-  const { currentUser, orders, navigateBack } = useAgri();
+  const { currentUser, orders, isFarmerOrder, navigateBack } = useAgri();
   const [showStatementModal, setShowStatementModal] = useState<boolean>(false);
   const [downloadSuccessToast, setDownloadSuccessToast] = useState<string | null>(null);
 
-  const myOrders = orders.filter(o => o.farmerId === currentUser.id);
+  const myOrders = orders.filter(o => isFarmerOrder(o, currentUser));
 
   const defaultSampleOrders = [
     {

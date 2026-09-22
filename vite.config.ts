@@ -262,6 +262,60 @@ function databasePlugin() {
           return;
         }
 
+        if (url === '/api/orders' && req.method === 'GET') {
+          const db = readDb();
+          res.setHeader('Content-Type', 'application/json');
+          res.statusCode = 200;
+          res.end(JSON.stringify(db.orders || []));
+          return;
+        }
+
+        if (url === '/api/orders/create' && req.method === 'POST') {
+          let body = '';
+          req.on('data', (chunk: any) => { body += chunk; });
+          req.on('end', () => {
+            try {
+              const order = JSON.parse(body || '{}');
+              if (!order.id) throw new Error('Order ID required');
+              const currentDb = readDb();
+              if (!currentDb.orders) currentDb.orders = [];
+              currentDb.orders = [order, ...currentDb.orders.filter((o: any) => o.id !== order.id)];
+              writeDb(currentDb);
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 200;
+              res.end(JSON.stringify({ success: true, order }));
+            } catch (err: any) {
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 400;
+              res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+
+        if (url === '/api/orders/update' && req.method === 'POST') {
+          let body = '';
+          req.on('data', (chunk: any) => { body += chunk; });
+          req.on('end', () => {
+            try {
+              const { orderId, updates } = JSON.parse(body || '{}');
+              if (!orderId) throw new Error('orderId required');
+              const currentDb = readDb();
+              if (!currentDb.orders) currentDb.orders = [];
+              currentDb.orders = currentDb.orders.map((o: any) => o.id === orderId ? { ...o, ...updates } : o);
+              writeDb(currentDb);
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 200;
+              res.end(JSON.stringify({ success: true }));
+            } catch (err: any) {
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 400;
+              res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+
         if (url === '/api/db/sync' && req.method === 'POST') {
           let body = '';
           req.on('data', (chunk: any) => { body += chunk; });

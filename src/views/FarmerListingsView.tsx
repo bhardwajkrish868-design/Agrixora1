@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 
 export const FarmerListingsView: React.FC = () => {
-  const { currentUser, listings, deleteListing, setActiveTab, setSelectedListingModal, navigateBack } = useAgri();
+  const { currentUser, listings, isFarmerListing, deleteListing, setActiveTab, setSelectedListingModal, navigateBack } = useAgri();
 
-  const myListings = listings.filter(l => l.farmerId === currentUser.id);
+  const myListings = listings.filter(l => isFarmerListing(l, currentUser));
 
   return (
     <div className="space-y-6">

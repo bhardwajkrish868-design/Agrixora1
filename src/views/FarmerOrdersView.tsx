@@ -22,15 +22,19 @@ export const FarmerOrdersView: React.FC = () => {
   const { 
     currentUser,
     orders, 
+    isFarmerOrder,
+    updateOrderStage,
     setActiveTab, 
     setActiveTrackingOrderId, 
     navigateBack 
   } = useAgri();
 
-  const [filterStage, setFilterStage] = useState<'all' | 'in_transit' | 'collected_at_hub' | 'delivered'>('all');
+  const [filterStage, setFilterStage] = useState<'all' | 'order_placed' | 'in_transit' | 'collected_at_hub' | 'delivered'>('all');
   const [search, setSearch] = useState('');
 
-  const myOrders = orders.filter(o => o.farmerId === currentUser.id);
+  const myOrders = orders.filter(o => isFarmerOrder(o, currentUser));
+
+  const newOrdersCount = myOrders.filter(o => o.currentStage === 'order_placed').length;
 
   const filteredOrders = myOrders.filter(order => {
     if (filterStage !== 'all' && order.currentStage !== filterStage) return false;
@@ -64,6 +68,11 @@ export const FarmerOrdersView: React.FC = () => {
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
               <ShoppingBag className="w-6 h-6 text-emerald-600" />
               <span>Received Buyer Orders</span>
+              {newOrdersCount > 0 && (
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-white text-xs font-black animate-pulse">
+                  {newOrdersCount} NEW
+                </span>
+              )}
             </h1>
             <p className="text-xs text-slate-500">
               Direct procurement orders placed on your verified produce listings • Transport paid 100% by buyer
@@ -84,6 +93,27 @@ export const FarmerOrdersView: React.FC = () => {
             All ({myOrders.length})
           </button>
           <button
+            onClick={() => setFilterStage('order_placed')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              filterStage === 'order_placed' 
+                ? 'bg-amber-600 text-white shadow-sm' 
+                : newOrdersCount > 0 
+                  ? 'bg-amber-100 text-amber-900 border border-amber-300 font-extrabold' 
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            {newOrdersCount > 0 && <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>}
+            <span>New Orders ({newOrdersCount})</span>
+          </button>
+          <button
+            onClick={() => setFilterStage('collected_at_hub')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              filterStage === 'collected_at_hub' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100'
+            }`}
+          >
+            At Hub ({myOrders.filter(o => o.currentStage === 'collected_at_hub' || o.currentStage === 'quality_verified').length})
+          </button>
+          <button
             onClick={() => setFilterStage('in_transit')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterStage === 'in_transit' ? 'bg-blue-600 text-white shadow-sm' : 'bg-blue-50 text-blue-800 hover:bg-blue-100'
@@ -92,20 +122,12 @@ export const FarmerOrdersView: React.FC = () => {
             In Transit ({myOrders.filter(o => o.currentStage === 'in_transit').length})
           </button>
           <button
-            onClick={() => setFilterStage('collected_at_hub')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filterStage === 'collected_at_hub' ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
-            }`}
-          >
-            At Hub ({myOrders.filter(o => o.currentStage === 'collected_at_hub' || o.currentStage === 'quality_verified').length})
-          </button>
-          <button
             onClick={() => setFilterStage('delivered')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               filterStage === 'delivered' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
             }`}
           >
-            Delivered ({myOrders.filter(o => o.currentStage === 'delivered').length})
+            Delivered & Paid ({myOrders.filter(o => o.currentStage === 'delivered').length})
           </button>
         </div>
 
@@ -164,6 +186,34 @@ export const FarmerOrdersView: React.FC = () => {
                   </span>
                 </div>
               </div>
+
+              {order.currentStage === 'order_placed' && (
+                <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <span className="relative flex h-3 w-3 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                    </span>
+                    <div>
+                      <span className="font-extrabold text-amber-950 text-xs sm:text-sm flex items-center gap-1.5">
+                        <span>🎉 New Order Received!</span>
+                        <span className="text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-300 text-xs font-mono">₹{order.farmerPayout.toLocaleString('en-IN')} Escrow-Secured</span>
+                      </span>
+                      <p className="text-[11px] text-amber-800 mt-0.5">
+                        Assigned Driver: <strong>{order.dispatchDetails?.driverName || 'Prakash Shinde'}</strong> ({order.dispatchDetails?.vehicleNo || 'MH-15-EG-4401'}) is allocated for pickup.
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => updateOrderStage(order.id, 'collected_at_hub')}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Confirm Handover / Dispatch to Hub</span>
+                  </button>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-1">

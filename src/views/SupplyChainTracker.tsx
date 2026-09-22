@@ -37,11 +37,12 @@ export const SupplyChainTracker: React.FC = () => {
     markOrderDelivered,
     currentUser,
     activeRole,
+    isFarmerOrder,
     navigateBack
   } = useAgri();
 
   const userTrackableOrders = orders.filter(o => {
-    if (activeRole === 'farmer') return o.farmerId === currentUser.id;
+    if (activeRole === 'farmer') return isFarmerOrder(o, currentUser);
     if (activeRole === 'buyer') return o.buyerId === currentUser.id;
     return true; // Hub operator and Govt Admin view all/assigned
   });

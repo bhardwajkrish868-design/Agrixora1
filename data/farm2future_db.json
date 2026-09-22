@@ -238,6 +238,175 @@
   ],
   "orders": [
     {
+      "id": "ORD-2026-8479",
+      "orderNumber": "F2F-ORD-4532",
+      "listingId": "LST-104",
+      "cropName": "Tomato",
+      "variety": "Hybrid High-Lycopene Grade A",
+      "category": "Vegetables",
+      "quantity": 1,
+      "unit": "Kg",
+      "pricePerUnit": 21,
+      "produceAmount": 21,
+      "platformFee": 1,
+      "collectionFee": 1,
+      "logisticsFee": 35,
+      "totalAmount": 58,
+      "farmerPayout": 20,
+      "deliveryPaidBy": "buyer",
+      "deliveryPaymentStatus": "paid_by_buyer",
+      "deliveryFeePaid": 35,
+      "transporterPayout": 35,
+      "assignedVehicleId": "veh_mh_1",
+      "farmerId": "usr_farmer_1789735666459",
+      "farmerName": "Krish Bhardwaj",
+      "farmerPhone": "+91 9631359486",
+      "farmerLocation": "Nashik, Maharashtra, Maharashtra",
+      "farmerState": "Maharashtra",
+      "buyerId": "usr_buyer_1789574079511",
+      "buyerName": "Priya Sharma",
+      "buyerOrg": "ITC Agri-Business Division",
+      "buyerPhone": "+91 98112 23344",
+      "deliveryAddress": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+      "deliveryCity": "Mumbai",
+      "deliveryState": "Maharashtra",
+      "pincode": "400705",
+      "collectionHubId": "hub_nashik_1",
+      "collectionHubName": "Nashik North Agri Aggregation Hub #04",
+      "collectionHubAddress": "Pimpalgaon Baswant, Nashik, Maharashtra",
+      "orderDate": "2026-09-21T09:30:44.616Z",
+      "expectedDelivery": "2026-09-24T09:30:44.616Z",
+      "currentStage": "order_placed",
+      "paymentStatus": "escrow_locked",
+      "transactionId": "TXN-F2F-98304461-ESCROW",
+      "paymentMethod": "Escrow Bank Transfer / UPI",
+      "aiAllocation": {
+        "aiMatchScore": 99.4,
+        "aiModelUsed": "AgriLogistics DeepRoute AI v4.2",
+        "aiConfidence": "Ultra High",
+        "aiRationale": [
+          "Cold Reefer Compatibility",
+          "Express Highway Corridor NH-160",
+          "Low Emissions EV/BS-VI"
+        ],
+        "carbonSavedKg": 8.4,
+        "costOptimizedPercent": 22,
+        "allocatedVehicleId": "veh_mh_1",
+        "allocatedVehicleNo": "MH-15-EG-4401",
+        "allocatedDriverName": "Prakash Shinde",
+        "allocatedDriverPhone": "+91 99223 34455",
+        "allocatedAt": "2026-09-21T09:30:44.616Z",
+        "autoAssigned": true,
+        "transitType": "Direct Farmgate Pickup"
+      },
+      "dispatchDetails": {
+        "transporterName": "GreenWheels Cold Agri-Logistics",
+        "driverName": "Prakash Shinde",
+        "driverPhone": "+91 99223 34455",
+        "driverLicenseNo": "MH-1520190045123",
+        "vehicleNo": "MH-15-EG-4401",
+        "vehicleType": "12-Ton Insulated Cold Reefer",
+        "modelName": "Eicher Pro 3015 Reefer Plus",
+        "capacityTons": 12,
+        "rcNumber": "RC-MH-15-2022-004401",
+        "gpsDeviceId": "GPS-GW-8821",
+        "eWayBillNo": "EWB-2026-45329811",
+        "dispatchedAt": "2026-09-21T09:30:44.616Z",
+        "estimatedArrival": "6:30 PM, 9/24/2026",
+        "temperatureCelsius": 14,
+        "gpsLiveLat": 20.026,
+        "gpsLiveLng": 73.8023,
+        "originHub": "Nashik North Agri Aggregation Hub #04",
+        "destinationWarehouse": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
+        "totalDistanceKm": 165,
+        "coveredDistanceKm": 0,
+        "currentSpeedKmph": 0,
+        "estimatedMinutesRemaining": 210,
+        "checkpoints": [
+          {
+            "name": "Pimpalgaon Baswant Farm Hub",
+            "status": "pending",
+            "reachedAt": null
+          },
+          {
+            "name": "Nashik NH-160 Toll Plaza",
+            "status": "pending",
+            "reachedAt": null
+          },
+          {
+            "name": "Igatpuri Ghat Cold Transit Point",
+            "status": "pending",
+            "reachedAt": null
+          },
+          {
+            "name": "Navi Mumbai Hub Intake",
+            "status": "pending",
+            "reachedAt": null
+          }
+        ]
+      },
+      "trackingSteps": [
+        {
+          "id": "step-1",
+          "stage": "order_placed",
+          "title": "Order Placed & Escrow Locked",
+          "subtitle": "₹58 locked (Includes ₹35 Buyer Delivery Fee)",
+          "timestamp": "Today, 3:00 PM",
+          "completed": true,
+          "current": true,
+          "location": "Farm2Future Smart Escrow Contract",
+          "details": {
+            "verifiedWeight": "1 Kg (Booked)",
+            "digitalSignature": "SHA256:f453298a1b",
+            "vehicleNumber": "MH-15-EG-4401",
+            "driverName": "Prakash Shinde",
+            "driverPhone": "+91 99223 34455"
+          }
+        },
+        {
+          "id": "step-2",
+          "stage": "collected_at_hub",
+          "title": "Farmgate / Hub Dispatch Intake",
+          "subtitle": "Nashik North Agri Aggregation Hub #04",
+          "timestamp": "Pending Dispatch",
+          "completed": false,
+          "current": false,
+          "location": "Nashik Hub"
+        },
+        {
+          "id": "step-3",
+          "stage": "quality_verified",
+          "title": "Assay Lab Quality & Moisture Test",
+          "subtitle": "ISO 17025 Moisture & Residue Analysis",
+          "timestamp": "Pending QC",
+          "completed": false,
+          "current": false,
+          "location": "Quality Lab"
+        },
+        {
+          "id": "step-4",
+          "stage": "in_transit",
+          "title": "Cold & GPS-Tracked Transit",
+          "subtitle": "MH-15-EG-4401 with live telematics (14°C)",
+          "timestamp": "Pending Dispatch",
+          "completed": false,
+          "current": false,
+          "location": "Highway Corridor"
+        },
+        {
+          "id": "step-5",
+          "stage": "delivered",
+          "title": "Delivery & Escrow Settlement",
+          "subtitle": "Instant settlement: ₹20 to Farmer + ₹35 to Transporter",
+          "timestamp": "Pending Delivery",
+          "completed": false,
+          "current": false,
+          "location": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra"
+        }
+      ]
+    },
+    {
       "id": "ORD-2026-7850",
       "orderNumber": "F2F-ORD-1748",
       "listingId": "LST-104",
@@ -471,7 +640,7 @@
       "deliveryFeePaid": 1230,
       "transporterPayout": 1230,
       "assignedVehicleId": "veh_3",
-      "farmerId": "usr_farmer_1789482597768",
+      "farmerId": "usr_farmer_1789735666459",
       "farmerName": "Krish Bhardwaj",
       "farmerPhone": "9631359486",
       "farmerLocation": "Hajipur 844101, Bihar",
@@ -1087,7 +1256,7 @@
       "logisticsFee": 3500,
       "totalAmount": 111125,
       "farmerPayout": 103425,
-      "farmerId": "usr_farmer_1789482597768",
+      "farmerId": "usr_farmer_1789735666459",
       "farmerName": "Krish Bhardwaj",
       "farmerPhone": "9631359486",
       "farmerLocation": "Hajipur 844101, Bihar",
@@ -1200,7 +1369,7 @@
       "logisticsFee": 3500,
       "totalAmount": 5653,
       "farmerPayout": 2068,
-      "farmerId": "usr_farmer_1789482597768",
+      "farmerId": "usr_farmer_1789735666459",
       "farmerName": "Krish Bhardwaj",
       "farmerPhone": "9631359486",
       "farmerLocation": "Hajipur 844101, Bihar",
@@ -1308,7 +1477,7 @@
       "orderId": "ORD-2026-7850",
       "id": "notif_1789965953051",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1319,7 +1488,7 @@
       "orderId": "ORD-2026-7850",
       "id": "notif_1789965953051",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "title": "✅ Transport Booking Successful Granted!",
@@ -1328,7 +1497,7 @@
       "recipientRole": "all",
       "id": "notif_1789937990552",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "title": "✅ Transport Booking Successful Granted!",
@@ -1337,7 +1506,7 @@
       "recipientRole": "all",
       "id": "notif_1789936292190",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1347,7 +1516,7 @@
       "orderId": "ORD-2026-7850",
       "id": "notif_1789739399182",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1357,7 +1526,7 @@
       "orderId": "ORD-2026-7850",
       "id": "notif_1789739399182",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1369,7 +1538,7 @@
       "linkTab": "track_delivery",
       "id": "notif_1789739017552",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "collection_centre",
@@ -1380,7 +1549,7 @@
       "linkTab": "incoming",
       "id": "notif_1789739017552",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1392,7 +1561,7 @@
       "linkTab": "orders",
       "id": "notif_1789739017552",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1402,7 +1571,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789738928056",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1412,7 +1581,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789738928056",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1422,7 +1591,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789738926641",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1432,7 +1601,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789738926641",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1441,7 +1610,7 @@
       "type": "market",
       "id": "notif_1789735722229",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1451,7 +1620,7 @@
       "type": "market",
       "id": "notif_1789735722229",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1461,7 +1630,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789576276740",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1471,7 +1640,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789576276556",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1481,7 +1650,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789576276338",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1491,7 +1660,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789576276110",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1501,7 +1670,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789576275902",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1511,7 +1680,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789576275551",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1521,7 +1690,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789566658256",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1531,7 +1700,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789566658055",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1541,7 +1710,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789566657840",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1551,7 +1720,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789566657208",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1561,7 +1730,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789566649503",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1571,7 +1740,7 @@
       "orderId": "ORD-2026-3564",
       "id": "notif_1789566649503",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1581,7 +1750,7 @@
       "orderId": "ORD-2026-6336",
       "id": "notif_1789566638880",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1591,7 +1760,7 @@
       "orderId": "ORD-2026-6336",
       "id": "notif_1789566638880",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1603,7 +1772,7 @@
       "linkTab": "track_delivery",
       "id": "notif_1789566538254",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "collection_centre",
@@ -1614,7 +1783,7 @@
       "linkTab": "incoming",
       "id": "notif_1789566538254",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1626,7 +1795,7 @@
       "linkTab": "orders",
       "id": "notif_1789566538254",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1636,7 +1805,7 @@
       "type": "order",
       "id": "notif_1789566469247",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1646,7 +1815,7 @@
       "type": "order",
       "id": "notif_1789566469247",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1655,7 +1824,7 @@
       "type": "market",
       "id": "notif_1789566434425",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1665,7 +1834,7 @@
       "type": "market",
       "id": "notif_1789566434425",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1677,7 +1846,7 @@
       "linkTab": "track_delivery",
       "id": "notif_1789565547750",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "collection_centre",
@@ -1688,7 +1857,7 @@
       "linkTab": "incoming",
       "id": "notif_1789565547750",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1700,7 +1869,7 @@
       "linkTab": "orders",
       "id": "notif_1789565547750",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1710,7 +1879,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565461560",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1720,7 +1889,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565461337",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1730,7 +1899,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565461121",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1740,7 +1909,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565460873",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1750,7 +1919,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565460560",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1760,7 +1929,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565454848",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1770,7 +1939,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565454592",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1780,7 +1949,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565454024",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1790,7 +1959,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565448640",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1800,7 +1969,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565443896",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1810,7 +1979,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565437016",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1820,7 +1989,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565436808",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1830,7 +1999,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565436513",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1840,7 +2009,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565434369",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1850,7 +2019,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565406296",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1860,7 +2029,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565406296",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1870,7 +2039,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565401609",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1880,7 +2049,7 @@
       "orderId": "ORD-2026-7532",
       "id": "notif_1789565401609",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1892,7 +2061,7 @@
       "linkTab": "track_delivery",
       "id": "notif_1789564501843",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "collection_centre",
@@ -1903,7 +2072,7 @@
       "linkTab": "incoming",
       "id": "notif_1789564501843",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1915,7 +2084,7 @@
       "linkTab": "orders",
       "id": "notif_1789564501843",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "buyer",
@@ -1924,7 +2093,7 @@
       "type": "market",
       "id": "notif_1789562157569",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -1934,7 +2103,7 @@
       "type": "market",
       "id": "notif_1789562157569",
       "timestamp": "Just now",
-      "read": false
+      "read": true
     },
     {
       "recipientRole": "farmer",
@@ -2218,78 +2387,112 @@
   ],
   "activityHistory": [
     {
-      "id": "act_1789968267393_5lc1d",
+      "id": "act_1789983192318_s0dzo",
       "userId": "usr_farmer_1789735666459",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-21T05:24:27.393Z",
+      "timestamp": "2026-09-21T09:33:12.318Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "farmer"
       }
     },
     {
-      "id": "act_1789968218659_htgha",
+      "id": "act_1789983177807_qb8lb",
       "userId": "usr_buyer_1789574079511",
       "userName": "Priya Sharma",
       "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged Out",
       "description": "Priya Sharma signed out.",
-      "timestamp": "2026-09-21T05:23:38.659Z",
+      "timestamp": "2026-09-21T09:32:57.807Z",
       "metadata": {}
     },
     {
-      "id": "act_1789965313806_jt50q",
+      "id": "act_1789983044616_l829d",
       "userId": "usr_buyer_1789574079511",
       "userName": "Priya Sharma",
       "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Priya Sharma signed out.",
-      "timestamp": "2026-09-21T04:35:13.806Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1789964686920_k3tqg",
-      "userId": "usr_buyer_1789574079511",
-      "userName": "Priya Sharma",
-      "userRole": "buyer",
-      "actionType": "delivered",
-      "title": "Order Delivered & Escrow Released: F2F-ORD-1748",
-      "description": "Order F2F-ORD-1748 confirmed delivered. Escrow payout of ₹621 instantly disbursed to Krish Bhardwaj.",
-      "timestamp": "2026-09-21T04:24:46.920Z",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-4532)",
+      "description": "Priya Sharma ordered 1 Kg of Tomato. AI auto-assigned MH-15-EG-4401 (Prakash Shinde, 99.4% match). Buyer paid ₹35 delivery fee.",
+      "timestamp": "2026-09-21T09:30:44.616Z",
       "metadata": {
-        "orderId": "ORD-2026-7850",
-        "farmerPayout": 621
+        "orderId": "ORD-2026-8479",
+        "orderNumber": "F2F-ORD-4532",
+        "totalAmount": 58,
+        "logisticsFee": 35,
+        "vehicleNo": "MH-15-EG-4401",
+        "aiMatchScore": 99.4
       }
     },
     {
-      "id": "act_1789964671108_svocg",
+      "id": "act_1789983044616_pmoai",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "add_produce",
+      "title": "Crop Listing Updated (#LST-104)",
+      "description": "Listing LST-104 was updated.",
+      "timestamp": "2026-09-21T09:30:44.616Z",
+      "metadata": {
+        "listingId": "LST-104",
+        "updates": {
+          "quantity": 69
+        }
+      }
+    },
+    {
+      "id": "act_1789982953243_n6s1t",
       "userId": "usr_buyer_1789574079511",
       "userName": "Priya Sharma",
       "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Priya Sharma logged into buyer portal.",
-      "timestamp": "2026-09-21T04:24:31.108Z",
+      "timestamp": "2026-09-21T09:29:13.243Z",
       "metadata": {
         "phone": "+91 98112 23344",
         "role": "buyer"
       }
     },
     {
-      "id": "act_1789964624526_ewger",
+      "id": "act_1789982943369_q8a5g",
       "userId": "usr_farmer_1789735666459",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged Out",
       "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-21T04:23:44.526Z",
+      "timestamp": "2026-09-21T09:29:03.369Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789982851183_02fwm",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-21T09:27:31.183Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1789981663845_govd5",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Priya Sharma signed out.",
+      "timestamp": "2026-09-21T09:07:43.845Z",
       "metadata": {}
     },
     {
@@ -4199,7 +4402,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-21T05:31:40.222Z",
+  "lastUpdated": "2026-09-21T09:52:45.788Z",
   "vehicles": [
     {
       "id": "veh_1",

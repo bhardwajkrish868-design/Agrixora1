@@ -37,13 +37,15 @@ export const FarmerDashboard: React.FC = () => {
     orders, 
     bulkDemands,
     mandiPrices, 
+    isFarmerOrder,
+    isFarmerListing,
     setActiveTab, 
     setSelectedListingModal,
     setActiveTrackingOrderId 
   } = useAgri();
 
-  const myListings = listings.filter(l => l.farmerId === currentUser.id);
-  const myOrders = orders.filter(o => o.farmerId === currentUser.id);
+  const myListings = listings.filter(l => isFarmerListing(l, currentUser));
+  const myOrders = orders.filter(o => isFarmerOrder(o, currentUser));
   
   const totalProduceListed = myListings.reduce((sum, l) => sum + l.quantity, 0);
   const activeOrdersCount = myOrders.filter(o => o.currentStage !== 'delivered').length;
@@ -276,7 +278,14 @@ export const FarmerDashboard: React.FC = () => {
 
           <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-slate-900">Recent Dispatches</h2>
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span>Orders Received & Dispatches</span>
+                {myOrders.filter(o => o.currentStage === 'order_placed').length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black animate-pulse">
+                    {myOrders.filter(o => o.currentStage === 'order_placed').length} NEW
+                  </span>
+                )}
+              </h2>
               <button
                 onClick={() => setActiveTab('orders')}
                 className="text-xs font-semibold text-emerald-700 hover:text-emerald-800"
@@ -300,7 +309,11 @@ export const FarmerDashboard: React.FC = () => {
                       setActiveTrackingOrderId(order.id);
                       setActiveTab('track_delivery');
                     }}
-                    className="p-3.5 rounded-2xl border border-slate-100 hover:border-emerald-300 hover:bg-slate-50 transition-all cursor-pointer"
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                      order.currentStage === 'order_placed'
+                        ? 'border-amber-300 bg-amber-50/40 hover:bg-amber-50 shadow-xs'
+                        : 'border-slate-100 hover:border-emerald-300 hover:bg-slate-50'
+                    }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[11px] font-bold text-slate-800">{order.orderNumber}</span>
@@ -309,9 +322,11 @@ export const FarmerDashboard: React.FC = () => {
                           ? 'bg-emerald-100 text-emerald-800'
                           : order.currentStage === 'in_transit'
                             ? 'bg-blue-100 text-blue-800'
-                            : 'bg-amber-100 text-amber-800'
+                            : order.currentStage === 'order_placed'
+                              ? 'bg-amber-500 text-white font-extrabold animate-pulse'
+                              : 'bg-amber-100 text-amber-800'
                       }`}>
-                        {order.currentStage.replace(/_/g, ' ').toUpperCase()}
+                        {order.currentStage === 'order_placed' ? 'NEW ORDER RECEIVED' : order.currentStage.replace(/_/g, ' ').toUpperCase()}
                       </span>
                     </div>
 

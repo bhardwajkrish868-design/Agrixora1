@@ -34,7 +34,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { activeRole, activeTab, setActiveTab, listings, orders, notifications, currentUser, activityHistory, vehicles, bulkDemands } = useAgri();
+  const { activeRole, activeTab, setActiveTab, listings, orders, notifications, currentUser, isFarmerOrder, isFarmerListing, activityHistory, vehicles, bulkDemands } = useAgri();
 
   // Role based navigation configuration
   const getNavItems = (role: UserRole) => {
@@ -44,8 +44,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           { id: 'overview', label: 'Overview', icon: LayoutDashboard },
           { id: 'bulk_pooling', label: '📥 Receive Bulk Orders', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
           { id: 'add_produce', label: 'Add Produce', icon: PlusCircle },
-          { id: 'my_listings', label: 'My Listings', icon: Layers, badge: listings.filter(l => l.farmerId === currentUser.id).length },
-          { id: 'orders', label: 'Orders Received', icon: ShoppingBag, badge: orders.filter(o => o.farmerId === currentUser.id).length },
+          { id: 'my_listings', label: 'My Listings', icon: Layers, badge: listings.filter(l => isFarmerListing(l, currentUser)).length },
+          { id: 'orders', label: 'Orders Received', icon: ShoppingBag, badge: orders.filter(o => isFarmerOrder(o, currentUser)).length, highlight: orders.some(o => isFarmerOrder(o, currentUser) && o.currentStage === 'order_placed') },
           { id: 'transport_services', label: 'State Transport', icon: Truck, badge: vehicles?.length || 0 },
           { id: 'market_prices', label: 'Market Prices', icon: TrendingUp },
           { id: 'earnings', label: 'Earnings', icon: Wallet },
