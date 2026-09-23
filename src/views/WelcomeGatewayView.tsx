@@ -424,19 +424,6 @@ export const WelcomeGatewayView: React.FC = () => {
 
         {/* Top Right Actions */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Cloud DB Status Pill */}
-          <button
-            onClick={() => setIsCloudDbOpen(true)}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer hover:scale-105 ${
-              cloudStatus.connected
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs'
-                : 'bg-white/90 hover:bg-white text-slate-700 border-slate-200/80 shadow-xs'
-            }`}
-            title="Online Cloud Database (Turso 9 GB)"
-          >
-            <Cloud className={`w-3.5 h-3.5 ${cloudStatus.connected ? 'text-emerald-600' : 'text-slate-500'}`} />
-            <span>{cloudStatus.tursoConnected ? '🟢 Turso Cloud (9 GB)' : (cloudStatus.connected ? '🟢 Cloud Active' : '☁️ Turso Cloud (9 GB)')}</span>
-          </button>
 
           <button
             onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}

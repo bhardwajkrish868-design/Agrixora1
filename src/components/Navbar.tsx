@@ -187,22 +187,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
 
               {/* User Profile Pill & Actions */}
               <div className="flex items-center gap-2">
-                {/* ☁️ Cloud Database (Turso 9 GB) Status Pill */}
-                <button
-                  type="button"
-                  onClick={() => setIsCloudDbOpen(true)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                    cloudStatus.connected
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 shadow-2xs'
-                      : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200/80'
-                  }`}
-                  title="Turso Cloud Database Status (9 GB LibSQL Cloud)"
-                >
-                  <Cloud className={`w-3.5 h-3.5 ${cloudStatus.connected ? 'text-emerald-600' : 'text-slate-500'}`} />
-                  <span className="hidden sm:inline">
-                    {cloudStatus.tursoConnected ? '🟢 Turso Cloud (9 GB)' : (cloudStatus.mongoConnected ? '🟢 MongoDB Cloud' : '☁️ Turso Cloud (9 GB)')}
-                  </span>
-                </button>
 
                 {/* 1-Click Quick Login / Persona Switcher Trigger */}
                 <button
