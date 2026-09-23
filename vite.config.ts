@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const mongo = require('./server/mongodb.cjs');
+mongo.connectMongoDB().catch(() => {});
 
 function databasePlugin() {
   const DB_FILE = path.resolve(__dirname, 'data', 'farm2future_db.json');
@@ -254,36 +259,104 @@ function databasePlugin() {
           return;
         }
 
-        if (url === '/api/db' && req.method === 'GET') {
-          const db = readDb();
+        // GET /api/db/status - Report current Database Provider & Connection
+        if (url === '/api/db/status' && req.method === 'GET') {
           res.setHeader('Content-Type', 'application/json');
           res.statusCode = 200;
-          res.end(JSON.stringify(db));
+          res.end(JSON.stringify({
+            connected: mongo.getIsConnected(),
+            provider: mongo.getIsConnected() ? 'mongodb_cloud' : 'local_json',
+            database: mongo.getIsConnected() ? 'MongoDB Atlas (Online Cloud)' : 'Local farm2future_db.json',
+            maskedUri: mongo.getMongoUri()
+          }));
+          return;
+        }
+
+        // POST /api/db/config - Connect or update MongoDB Cloud URI
+        if (url === '/api/db/config' && req.method === 'POST') {
+          let body = '';
+          req.on('data', (chunk: any) => { body += chunk; });
+          req.on('end', async () => {
+            try {
+              const payload = JSON.parse(body || '{}');
+              const uri = (payload.uri || '').trim();
+              if (!uri) throw new Error('MongoDB URI required');
+              const result = await mongo.connectMongoDB(uri);
+              if (result.success) {
+                try {
+                  fs.writeFileSync(path.resolve(__dirname, '.env'), `MONGODB_URI=${uri}\n`, 'utf-8');
+                } catch (_) {}
+              }
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 200;
+              res.end(JSON.stringify(result));
+            } catch (err: any) {
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 400;
+              res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+
+        if (url === '/api/db' && req.method === 'GET') {
+          (async () => {
+            let db = null;
+            if (mongo.getIsConnected()) {
+              try {
+                db = await mongo.getAllMongoData();
+              } catch (_) {}
+            }
+            if (!db) {
+              db = readDb();
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.statusCode = 200;
+            res.end(JSON.stringify(db));
+          })();
           return;
         }
 
         if (url === '/api/orders' && req.method === 'GET') {
-          const db = readDb();
-          res.setHeader('Content-Type', 'application/json');
-          res.statusCode = 200;
-          res.end(JSON.stringify(db.orders || []));
+          (async () => {
+            let orders = null;
+            if (mongo.getIsConnected()) {
+              try {
+                orders = await mongo.OrderModel.find({}).lean();
+              } catch (_) {}
+            }
+            if (!orders) {
+              const db = readDb();
+              orders = db.orders || [];
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.statusCode = 200;
+            res.end(JSON.stringify(orders));
+          })();
           return;
         }
 
         if (url === '/api/orders/create' && req.method === 'POST') {
           let body = '';
           req.on('data', (chunk: any) => { body += chunk; });
-          req.on('end', () => {
+          req.on('end', async () => {
             try {
               const order = JSON.parse(body || '{}');
               if (!order.id) throw new Error('Order ID required');
+
+              // Persist to MongoDB Cloud if connected
+              if (mongo.getIsConnected()) {
+                try { await mongo.saveMongoOrder(order); } catch (_) {}
+              }
+
+              // Local persistent backup
               const currentDb = readDb();
               if (!currentDb.orders) currentDb.orders = [];
               currentDb.orders = [order, ...currentDb.orders.filter((o: any) => o.id !== order.id)];
               writeDb(currentDb);
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 200;
-              res.end(JSON.stringify({ success: true, order }));
+              res.end(JSON.stringify({ success: true, order, cloudSaved: mongo.getIsConnected() }));
             } catch (err: any) {
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 400;
@@ -296,17 +369,23 @@ function databasePlugin() {
         if (url === '/api/orders/update' && req.method === 'POST') {
           let body = '';
           req.on('data', (chunk: any) => { body += chunk; });
-          req.on('end', () => {
+          req.on('end', async () => {
             try {
               const { orderId, updates } = JSON.parse(body || '{}');
               if (!orderId) throw new Error('orderId required');
+
+              // Persist to MongoDB Cloud if connected
+              if (mongo.getIsConnected()) {
+                try { await mongo.updateMongoOrder(orderId, updates); } catch (_) {}
+              }
+
               const currentDb = readDb();
               if (!currentDb.orders) currentDb.orders = [];
-              currentDb.orders = currentDb.orders.map((o: any) => o.id === orderId ? { ...o, ...updates } : o);
+              currentDb.orders = currentDb.orders.map((o: any) => (o.id === orderId || o.orderNumber === orderId) ? { ...o, ...updates } : o);
               writeDb(currentDb);
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 200;
-              res.end(JSON.stringify({ success: true }));
+              res.end(JSON.stringify({ success: true, cloudSaved: mongo.getIsConnected() }));
             } catch (err: any) {
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 400;
@@ -319,9 +398,25 @@ function databasePlugin() {
         if (url === '/api/db/sync' && req.method === 'POST') {
           let body = '';
           req.on('data', (chunk: any) => { body += chunk; });
-          req.on('end', () => {
+          req.on('end', async () => {
             try {
               const payload = JSON.parse(body || '{}');
+
+              // Sync to MongoDB Cloud if connected
+              if (mongo.getIsConnected()) {
+                try {
+                  if (Array.isArray(payload.users)) {
+                    for (const u of payload.users) await mongo.saveMongoUser(u);
+                  }
+                  if (Array.isArray(payload.listings)) {
+                    for (const l of payload.listings) await mongo.saveMongoListing(l);
+                  }
+                  if (Array.isArray(payload.orders)) {
+                    for (const o of payload.orders) await mongo.saveMongoOrder(o);
+                  }
+                } catch (_) {}
+              }
+
               const currentDb = readDb();
               const updatedDb = {
                 ...currentDb,
@@ -331,7 +426,7 @@ function databasePlugin() {
               writeDb(updatedDb);
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 200;
-              res.end(JSON.stringify({ success: true, db: updatedDb }));
+              res.end(JSON.stringify({ success: true, db: updatedDb, cloudSynced: mongo.getIsConnected() }));
             } catch (err: any) {
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 400;

@@ -2387,6 +2387,31 @@
   ],
   "activityHistory": [
     {
+      "id": "act_1790188347212_f760w",
+      "userId": "usr_farmer_1789735666459",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-23T18:32:27.212Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790182495433_csr9x",
+      "userId": "usr_buyer_1789574079511",
+      "userName": "Priya Sharma",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Priya Sharma signed out.",
+      "timestamp": "2026-09-23T16:54:55.433Z",
+      "metadata": {}
+    },
+    {
       "id": "act_1789983192318_s0dzo",
       "userId": "usr_farmer_1789735666459",
       "userName": "Krish Bhardwaj",
@@ -4402,7 +4427,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-21T09:52:45.788Z",
+  "lastUpdated": "2026-09-23T18:43:31.820Z",
   "vehicles": [
     {
       "id": "veh_1",

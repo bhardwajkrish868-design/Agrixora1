@@ -12,9 +12,11 @@ import {
   LogOut,
   Sparkles,
   TrendingUp,
-  ArrowLeft
+  ArrowLeft,
+  Cloud
 } from 'lucide-react';
 import { NotificationDrawer } from './NotificationDrawer';
+import { CloudDatabaseModal } from './CloudDatabaseModal';
 
 interface NavbarProps {
   onMenuToggle?: () => void;
@@ -37,6 +39,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isCloudDbOpen, setIsCloudDbOpen] = useState(false);
+  const [isMongoCloud, setIsMongoCloud] = useState(false);
+
+  React.useEffect(() => {
+    const checkDb = async () => {
+      try {
+        const res = await fetch('/api/db/status');
+        if (res.ok) {
+          const data = await res.json();
+          setIsMongoCloud(Boolean(data.connected));
+        }
+      } catch (_) {}
+    };
+    checkDb();
+    const interval = setInterval(checkDb, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -144,6 +163,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
 
               {/* User Profile Pill & Actions */}
               <div className="flex items-center gap-2">
+                {/* ☁️ MongoDB Cloud Database Status Pill */}
+                <button
+                  type="button"
+                  onClick={() => setIsCloudDbOpen(true)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                    isMongoCloud
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 shadow-2xs'
+                      : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200/80'
+                  }`}
+                  title="MongoDB Cloud Database Status & Configuration (ऑनलाइन क्लाउड डेटाबेस)"
+                >
+                  <Cloud className={`w-3.5 h-3.5 ${isMongoCloud ? 'text-emerald-600' : 'text-slate-500'}`} />
+                  <span className="hidden sm:inline">
+                    {isMongoCloud ? '🟢 MongoDB Cloud' : '☁️ Cloud DB'}
+                  </span>
+                </button>
+
                 {/* 1-Click Quick Login / Persona Switcher Trigger */}
                 <button
                   type="button"
@@ -270,6 +306,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
 
       {/* Slide-over Notifications */}
       <NotificationDrawer isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+
+      {/* ☁️ MongoDB Cloud Database Configuration & Connection Modal */}
+      <CloudDatabaseModal isOpen={isCloudDbOpen} onClose={() => setIsCloudDbOpen(false)} />
     </>
   );
 };
