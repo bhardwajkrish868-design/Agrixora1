@@ -3,6 +3,12 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const mongo = require('./server/mongodb.cjs');
+const turso = require('./server/turso.cjs');
+
+// Auto-connect to Turso Cloud (9 GB) if TURSO_DATABASE_URL is provided
+turso.connectTurso().catch(err => {
+  console.warn('Turso startup connection notice:', err.message);
+});
 
 // Auto-connect to MongoDB Cloud if MONGODB_URI is provided
 mongo.connectMongoDB().catch(err => {
@@ -285,27 +291,75 @@ const server = http.createServer((req, res) => {
   // API Endpoints
   // GET /api/db/status - Report current Database Provider & Connection
   if (reqPath === '/api/db/status' && req.method === 'GET') {
+    const isTurso = turso.getIsConnected();
+    const isMongo = mongo.getIsConnected();
+
+    let provider = 'local_json';
+    let database = 'Local farm2future_db.json';
+    let maskedUrl = '';
+
+    if (isTurso) {
+      provider = 'turso_cloud';
+      database = 'Turso Cloud (9 GB LibSQL Cloud)';
+      maskedUrl = turso.getTursoUrl();
+    } else if (isMongo) {
+      provider = 'mongodb_cloud';
+      database = 'MongoDB Atlas (Online Cloud)';
+      maskedUrl = mongo.getMongoUri();
+    }
+
     res.writeHead(200, {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*'
     });
     res.end(JSON.stringify({
-      connected: mongo.getIsConnected(),
-      provider: mongo.getIsConnected() ? 'mongodb_cloud' : 'local_json',
-      database: mongo.getIsConnected() ? 'MongoDB Atlas (Online Cloud)' : 'Local farm2future_db.json',
-      maskedUri: mongo.getMongoUri()
+      connected: isTurso || isMongo,
+      provider,
+      database,
+      maskedUri: maskedUrl,
+      tursoConnected: isTurso,
+      mongoConnected: isMongo,
+      storageTier: isTurso ? '9 GB Cloud SQL' : (isMongo ? '512 MB Cloud NoSQL' : 'Local Disk')
     }));
     return;
   }
 
-  // POST /api/db/config - Connect or update MongoDB Cloud URI
+  // POST /api/db/config - Connect or update Turso or MongoDB Cloud URI
   if (reqPath === '/api/db/config' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body || '{}');
-        const uri = (payload.uri || '').trim();
+        const provider = payload.provider || (payload.url?.startsWith('libsql:') ? 'turso' : 'mongo');
+
+        if (provider === 'turso') {
+          const url = (payload.url || payload.uri || '').trim();
+          const authToken = (payload.authToken || payload.token || '').trim();
+          if (!url) throw new Error('Turso Database URL required');
+          const result = await turso.connectTurso(url, authToken);
+          if (result.success) {
+            try {
+              let envContent = '';
+              if (fs.existsSync(path.join(__dirname, '.env'))) {
+                envContent = fs.readFileSync(path.join(__dirname, '.env'), 'utf-8');
+              }
+              envContent = envContent.replace(/^TURSO_DATABASE_URL=.*$/m, '');
+              envContent = envContent.replace(/^TURSO_AUTH_TOKEN=.*$/m, '');
+              envContent += `\nTURSO_DATABASE_URL=${url}\nTURSO_AUTH_TOKEN=${authToken}\n`;
+              fs.writeFileSync(path.join(__dirname, '.env'), envContent.trim() + '\n', 'utf-8');
+            } catch (_) {}
+          }
+          res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          });
+          res.end(JSON.stringify(result));
+          return;
+        }
+
+        // MongoDB option
+        const uri = (payload.uri || payload.url || '').trim();
         if (!uri) throw new Error('MongoDB URI required');
         const result = await mongo.connectMongoDB(uri);
         if (result.success) {
@@ -333,10 +387,11 @@ const server = http.createServer((req, res) => {
   if (reqPath === '/api/db' && req.method === 'GET') {
     (async () => {
       let db = null;
-      if (mongo.getIsConnected()) {
-        try {
-          db = await mongo.getAllMongoData();
-        } catch (_) {}
+      if (turso.getIsConnected()) {
+        try { db = await turso.getAllTursoData(); } catch (_) {}
+      }
+      if (!db && mongo.getIsConnected()) {
+        try { db = await mongo.getAllMongoData(); } catch (_) {}
       }
       if (!db) {
         db = readDb();
@@ -354,7 +409,13 @@ const server = http.createServer((req, res) => {
   if (reqPath === '/api/orders' && req.method === 'GET') {
     (async () => {
       let orders = null;
-      if (mongo.getIsConnected()) {
+      if (turso.getIsConnected()) {
+        try {
+          const db = await turso.getAllTursoData();
+          orders = db?.orders || null;
+        } catch (_) {}
+      }
+      if (!orders && mongo.getIsConnected()) {
         try {
           orders = await mongo.OrderModel.find({}).lean();
         } catch (_) {}
@@ -381,6 +442,10 @@ const server = http.createServer((req, res) => {
         const order = JSON.parse(body || '{}');
         if (!order.id) throw new Error('Order ID required');
 
+        // Persist to Turso Cloud (9 GB) if connected
+        if (turso.getIsConnected()) {
+          try { await turso.saveTursoOrder(order); } catch (_) {}
+        }
         // Persist to MongoDB Cloud if connected
         if (mongo.getIsConnected()) {
           try { await mongo.saveMongoOrder(order); } catch (_) {}
@@ -396,7 +461,7 @@ const server = http.createServer((req, res) => {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         });
-        res.end(JSON.stringify({ success: true, order, cloudSaved: mongo.getIsConnected() }));
+        res.end(JSON.stringify({ success: true, order, cloudSaved: turso.getIsConnected() || mongo.getIsConnected() }));
       } catch (err) {
         res.writeHead(400, {
           'Content-Type': 'application/json',
@@ -417,7 +482,9 @@ const server = http.createServer((req, res) => {
         const { orderId, updates } = JSON.parse(body || '{}');
         if (!orderId) throw new Error('orderId required');
 
-        // Persist to MongoDB Cloud if connected
+        if (turso.getIsConnected()) {
+          try { await turso.updateTursoOrder(orderId, updates); } catch (_) {}
+        }
         if (mongo.getIsConnected()) {
           try { await mongo.updateMongoOrder(orderId, updates); } catch (_) {}
         }
@@ -431,7 +498,7 @@ const server = http.createServer((req, res) => {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         });
-        res.end(JSON.stringify({ success: true, cloudSaved: mongo.getIsConnected() }));
+        res.end(JSON.stringify({ success: true, cloudSaved: turso.getIsConnected() || mongo.getIsConnected() }));
       } catch (err) {
         res.writeHead(400, {
           'Content-Type': 'application/json',
@@ -449,6 +516,21 @@ const server = http.createServer((req, res) => {
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body || '{}');
+
+        // Sync to Turso Cloud (9 GB) if connected
+        if (turso.getIsConnected()) {
+          try {
+            if (Array.isArray(payload.users)) {
+              for (const u of payload.users) await turso.saveTursoUser(u);
+            }
+            if (Array.isArray(payload.listings)) {
+              for (const l of payload.listings) await turso.saveTursoListing(l);
+            }
+            if (Array.isArray(payload.orders)) {
+              for (const o of payload.orders) await turso.saveTursoOrder(o);
+            }
+          } catch (_) {}
+        }
 
         // Sync to MongoDB Cloud if connected
         if (mongo.getIsConnected()) {
@@ -476,7 +558,7 @@ const server = http.createServer((req, res) => {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         });
-        res.end(JSON.stringify({ success: true, db: updatedDb, cloudSynced: mongo.getIsConnected() }));
+        res.end(JSON.stringify({ success: true, db: updatedDb, cloudSynced: turso.getIsConnected() || mongo.getIsConnected() }));
       } catch (err) {
         res.writeHead(400, {
           'Content-Type': 'application/json',

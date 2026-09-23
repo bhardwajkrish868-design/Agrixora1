@@ -34,13 +34,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
     navigateBack,
     canGoBack,
     mandiPrices,
-    logoutUser
+    logoutUser,
+    openGateway
   } = useAgri();
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isCloudDbOpen, setIsCloudDbOpen] = useState(false);
-  const [isMongoCloud, setIsMongoCloud] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<{
+    connected: boolean;
+    tursoConnected: boolean;
+    mongoConnected: boolean;
+  }>({
+    connected: false,
+    tursoConnected: false,
+    mongoConnected: false
+  });
 
   React.useEffect(() => {
     const checkDb = async () => {
@@ -48,12 +57,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
         const res = await fetch('/api/db/status');
         if (res.ok) {
           const data = await res.json();
-          setIsMongoCloud(Boolean(data.connected));
+          setCloudStatus({
+            connected: Boolean(data.connected),
+            tursoConnected: Boolean(data.tursoConnected),
+            mongoConnected: Boolean(data.mongoConnected)
+          });
         }
       } catch (_) {}
     };
     checkDb();
-    const interval = setInterval(checkDb, 10000);
+    const interval = setInterval(checkDb, 8000);
     return () => clearInterval(interval);
   }, []);
 
@@ -85,6 +98,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
                   <span className="inline font-bold">{language === 'hi' ? 'वापस' : 'Back'}</span>
                 </button>
               )}
+
+              {/* Return to Main Welcome Gateway */}
+              <button
+                type="button"
+                onClick={openGateway}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 border border-emerald-200/90 text-emerald-800 text-xs font-bold transition-all shadow-xs group cursor-pointer"
+                title="Return to Main Welcome Gateway / मुख्य गेटवे पर जाएं"
+              >
+                <span className="text-sm">🏠</span>
+                <span className="hidden sm:inline font-bold">{language === 'hi' ? 'गेटवे' : 'Gateway'}</span>
+              </button>
 
               <button
                 type="button"
@@ -163,20 +187,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
 
               {/* User Profile Pill & Actions */}
               <div className="flex items-center gap-2">
-                {/* ☁️ MongoDB Cloud Database Status Pill */}
+                {/* ☁️ Cloud Database (Turso 9 GB) Status Pill */}
                 <button
                   type="button"
                   onClick={() => setIsCloudDbOpen(true)}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                    isMongoCloud
+                    cloudStatus.connected
                       ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 shadow-2xs'
                       : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200/80'
                   }`}
-                  title="MongoDB Cloud Database Status & Configuration (ऑनलाइन क्लाउड डेटाबेस)"
+                  title="Turso Cloud Database Status (9 GB LibSQL Cloud)"
                 >
-                  <Cloud className={`w-3.5 h-3.5 ${isMongoCloud ? 'text-emerald-600' : 'text-slate-500'}`} />
+                  <Cloud className={`w-3.5 h-3.5 ${cloudStatus.connected ? 'text-emerald-600' : 'text-slate-500'}`} />
                   <span className="hidden sm:inline">
-                    {isMongoCloud ? '🟢 MongoDB Cloud' : '☁️ Cloud DB'}
+                    {cloudStatus.tursoConnected ? '🟢 Turso Cloud (9 GB)' : (cloudStatus.mongoConnected ? '🟢 MongoDB Cloud' : '☁️ Turso Cloud (9 GB)')}
                   </span>
                 </button>
 

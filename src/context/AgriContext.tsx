@@ -99,6 +99,12 @@ interface AgriContextType {
   language: 'en' | 'hi';
   setLanguage: (lang: 'en' | 'hi') => void;
 
+  // Welcome Gateway
+  showWelcomeGateway: boolean;
+  setShowWelcomeGateway: (show: boolean) => void;
+  enterPortal: (role: UserRole) => void;
+  openGateway: () => void;
+
   // 📍 Geo-Location & 10 KM Hyperlocal Auto-Connect
   userLocation: GeoCoordinate;
   setUserLocation: (loc: GeoCoordinate) => void;
@@ -728,6 +734,59 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const activeRole: UserRole = currentUser?.role || 'farmer';
 
+  const [showWelcomeGateway, setShowWelcomeGatewayState] = useState<boolean>(() => {
+    try {
+      const inPortal = sessionStorage.getItem('farm2future_in_portal');
+      return inPortal !== 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const setShowWelcomeGateway = (show: boolean) => {
+    setShowWelcomeGatewayState(show);
+    try {
+      if (show) {
+        sessionStorage.removeItem('farm2future_in_portal');
+      } else {
+        sessionStorage.setItem('farm2future_in_portal', 'true');
+      }
+    } catch {}
+  };
+
+  const openGateway = () => {
+    setShowWelcomeGateway(true);
+  };
+
+  const enterPortal = (role: UserRole) => {
+    // 1. If currently logged-in user matches role, keep them
+    if (currentUser && currentUser.role === role) {
+      setShowWelcomeGateway(false);
+      return;
+    }
+
+    // 2. Check if a registered user of this role exists
+    const matching = registeredUsers.find(u => u.role === role);
+    const targetUser = matching || (role === 'buyer' ? defaultBuyerUser : defaultFarmerUser);
+
+    setCurrentUser(targetUser);
+    setIsAuthenticated(true);
+    try {
+      localStorage.setItem('farm2future_user', JSON.stringify(targetUser));
+      localStorage.setItem('farm2future_auth', 'true');
+    } catch {}
+
+    if (role === 'buyer') {
+      setActiveTab('marketplace');
+    } else if (role === 'farmer') {
+      setActiveTab('overview');
+    } else {
+      setActiveTab('overview');
+    }
+
+    setShowWelcomeGateway(false);
+  };
+
   const registerUser = (userData: Partial<User> & { role: UserRole }) => {
     const newUser: User = {
       id: userData.id || `usr_${userData.role}_${Date.now()}`,
@@ -776,6 +835,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     else setActiveTab('overview');
     localStorage.setItem('farm2future_user', JSON.stringify(newUser));
     localStorage.setItem('farm2future_auth', 'true');
+    setShowWelcomeGatewayState(false);
+    try { sessionStorage.setItem('farm2future_in_portal', 'true'); } catch {}
 
     // Audit Log & Database Sync
     logActivity({
@@ -865,6 +926,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else setActiveTab('overview');
       localStorage.setItem('farm2future_user', JSON.stringify(existing));
       localStorage.setItem('farm2future_auth', 'true');
+      setShowWelcomeGatewayState(false);
+      try { sessionStorage.setItem('farm2future_in_portal', 'true'); } catch {}
 
       // Audit Log & Database Sync
       logActivity({
@@ -964,10 +1027,12 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('farm2future_auth');
     localStorage.removeItem('farm2future_admin_auth');
     localStorage.removeItem('farm2future_active_tab');
+    try { sessionStorage.removeItem('farm2future_in_portal'); } catch {}
     setCurrentUser(null);
     setIsAuthenticated(false);
     setIsAdminAuthenticated(false);
     setActiveTabState('overview');
+    setShowWelcomeGatewayState(true);
   };
 
   const switchRole = (role: UserRole) => {
@@ -1907,6 +1972,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthModalOpen,
       language,
       setLanguage,
+      showWelcomeGateway,
+      setShowWelcomeGateway,
+      enterPortal,
+      openGateway,
       userLocation,
       setUserLocation,
       detectLiveLocation,

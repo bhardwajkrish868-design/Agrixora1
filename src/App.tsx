@@ -31,11 +31,11 @@ import { BulkDemandPoolView } from './views/BulkDemandPoolView';
 import { WelcomeGatewayView } from './views/WelcomeGatewayView';
 
 const MainLayout: React.FC = () => {
-  const { activeRole, activeTab, isAuthenticated, currentUser } = useAgri();
+  const { activeRole, activeTab, isAuthenticated, currentUser, showWelcomeGateway } = useAgri();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // If user is not authenticated / freshly loaded / logged out, show Welcome Gateway
-  if (!isAuthenticated || !currentUser) {
+  // If on initial open / session start / logged out, show Welcome Gateway landing screen
+  if (showWelcomeGateway || !isAuthenticated || !currentUser) {
     return <WelcomeGatewayView />;
   }
 

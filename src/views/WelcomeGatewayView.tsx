@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { UserRole } from '../types';
 import { RegistrationModal } from '../components/RegistrationModal';
+import { CloudDatabaseModal } from '../components/CloudDatabaseModal';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -13,6 +14,7 @@ import {
   Clock, 
   Check, 
   AlertCircle, 
+  Cloud, 
   Eye, 
   EyeOff, 
   ShieldAlert, 
@@ -111,7 +113,32 @@ const DigitalIndiaLogo: React.FC = () => (
 
 
 export const WelcomeGatewayView: React.FC = () => {
-  const { loginUser, registerUser, language, setLanguage, verifyAdminPasskey } = useAgri();
+  const { loginUser, registerUser, language, setLanguage, verifyAdminPasskey, enterPortal } = useAgri();
+
+  // Cloud Database Modal & Status
+  const [isCloudDbOpen, setIsCloudDbOpen] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<{ connected: boolean; tursoConnected: boolean }>({
+    connected: false,
+    tursoConnected: false
+  });
+
+  useEffect(() => {
+    const checkDb = async () => {
+      try {
+        const res = await fetch('/api/db/status');
+        if (res.ok) {
+          const data = await res.json();
+          setCloudStatus({
+            connected: Boolean(data.connected),
+            tursoConnected: Boolean(data.tursoConnected)
+          });
+        }
+      } catch (_) {}
+    };
+    checkDb();
+    const interval = setInterval(checkDb, 8000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Selected role & modal state
   const [activeModalRole, setActiveModalRole] = useState<UserRole | null>(null);
@@ -397,6 +424,20 @@ export const WelcomeGatewayView: React.FC = () => {
 
         {/* Top Right Actions */}
         <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Cloud DB Status Pill */}
+          <button
+            onClick={() => setIsCloudDbOpen(true)}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer hover:scale-105 ${
+              cloudStatus.connected
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs'
+                : 'bg-white/90 hover:bg-white text-slate-700 border-slate-200/80 shadow-xs'
+            }`}
+            title="Online Cloud Database (Turso 9 GB)"
+          >
+            <Cloud className={`w-3.5 h-3.5 ${cloudStatus.connected ? 'text-emerald-600' : 'text-slate-500'}`} />
+            <span>{cloudStatus.tursoConnected ? '🟢 Turso Cloud (9 GB)' : (cloudStatus.connected ? '🟢 Cloud Active' : '☁️ Turso Cloud (9 GB)')}</span>
+          </button>
+
           <button
             onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
             className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 text-xs font-bold shadow-xs border border-slate-200/80 transition-all cursor-pointer hover:scale-105"
@@ -444,7 +485,7 @@ export const WelcomeGatewayView: React.FC = () => {
           
           {/* Primary Public Card 1: Farmer */}
           <div 
-            onClick={() => handleOpenRoleModal('farmer')}
+            onClick={() => enterPortal('farmer')}
             className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-emerald-500/40 hover:border-emerald-600 shadow-[0_10px_30px_rgba(16,185,129,0.14)] hover:shadow-[0_16px_36px_rgba(16,185,129,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
@@ -481,17 +522,39 @@ export const WelcomeGatewayView: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 flex items-center justify-between border-t border-slate-100 mt-3">
-              <div className="w-full py-2 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-emerald-700/20 group-hover:scale-[1.01] transition-transform">
-                <span>{language === 'hi' ? 'किसान पोर्टल में प्रवेश करें →' : 'Enter Farmer Portal →'}</span>
+            <div className="pt-3 flex flex-col gap-2 border-t border-slate-100 mt-3">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  enterPortal('farmer');
+                }}
+                className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-emerald-700/20 group-hover:scale-[1.01] transition-transform cursor-pointer"
+              >
+                <span>{language === 'hi' ? 'किसान पोर्टल में सीधे प्रवेश करें →' : 'Enter Farmer Portal →'}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <div className="flex items-center justify-between px-1 text-[11px]">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenRoleModal('farmer');
+                  }}
+                  className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <UserIcon className="w-3 h-3" />
+                  <span>{language === 'hi' ? 'नया किसान खाता / लॉगिन' : 'New Account / Login'}</span>
+                </button>
+                <span className="text-slate-400 font-medium">1-Click Fast Entry</span>
               </div>
             </div>
           </div>
 
           {/* Primary Public Card 2: Buyer */}
           <div 
-            onClick={() => handleOpenRoleModal('buyer')}
+            onClick={() => enterPortal('buyer')}
             className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-blue-500/40 hover:border-blue-600 shadow-[0_10px_30px_rgba(37,99,235,0.14)] hover:shadow-[0_16px_36px_rgba(37,99,235,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
@@ -528,10 +591,32 @@ export const WelcomeGatewayView: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-3 flex items-center justify-between border-t border-slate-100 mt-3">
-              <div className="w-full py-2 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-blue-700/20 group-hover:scale-[1.01] transition-transform">
-                <span>{language === 'hi' ? 'खरीदार पोर्टल में प्रवेश करें →' : 'Enter Buyer Portal →'}</span>
+            <div className="pt-3 flex flex-col gap-2 border-t border-slate-100 mt-3">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  enterPortal('buyer');
+                }}
+                className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-blue-700/20 group-hover:scale-[1.01] transition-transform cursor-pointer"
+              >
+                <span>{language === 'hi' ? 'खरीदार पोर्टल में सीधे प्रवेश करें →' : 'Enter Buyer Portal →'}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <div className="flex items-center justify-between px-1 text-[11px]">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenRoleModal('buyer');
+                  }}
+                  className="text-blue-700 hover:text-blue-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <UserIcon className="w-3 h-3" />
+                  <span>{language === 'hi' ? 'नया खरीदार खाता / लॉगिन' : 'New Account / Login'}</span>
+                </button>
+                <span className="text-slate-400 font-medium">1-Click Fast Entry</span>
               </div>
             </div>
           </div>
@@ -592,6 +677,12 @@ export const WelcomeGatewayView: React.FC = () => {
           defaultMode={authMode}
         />
       )}
+
+      {/* ☁️ CLOUD DATABASE MODAL (TURSO 9 GB) */}
+      <CloudDatabaseModal
+        isOpen={isCloudDbOpen}
+        onClose={() => setIsCloudDbOpen(false)}
+      />
 
     </div>
   );
