@@ -1,7 +1,7 @@
 const { createClient } = require('@libsql/client');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
 let client = null;
 let isConnected = false;
@@ -219,6 +219,9 @@ async function autoMigrateFromJsonIfEmpty(c) {
 }
 
 async function connectTurso(customUrl, customToken) {
+  try {
+    require('dotenv').config({ path: path.resolve(__dirname, '..', '.env'), override: true });
+  } catch (_) {}
   const url = customUrl || process.env.TURSO_DATABASE_URL || currentUrl;
   const authToken = customToken || process.env.TURSO_AUTH_TOKEN || currentToken;
 

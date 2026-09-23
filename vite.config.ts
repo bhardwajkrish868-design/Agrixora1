@@ -6,6 +6,8 @@ import https from 'https';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 const mongo = require('./server/mongodb.cjs');
 const turso = require('./server/turso.cjs');
 turso.connectTurso().catch(() => {});
