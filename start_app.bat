@@ -17,6 +17,13 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
+:: 1.5 Check for online updates automatically if git remote is configured
+where git >nul 2>nul
+if %errorlevel% equ 0 (
+    echo [SYNC] Checking for online updates from cloud...
+    git pull --quiet 2>nul
+)
+
 :: 2. Check if dependencies are installed
 if not exist "node_modules\" (
     echo [SETUP] Installing project dependencies (first time setup)...
