@@ -17,8 +17,11 @@ import {
   Package,
   Truck,
   Boxes,
-  ArrowRight
+  ArrowRight,
+  Store,
+  SendHorizontal
 } from 'lucide-react';
+import { getNearestTargetMandi } from '../data/indiaLocations';
 import { StatCard } from '../components/StatCard';
 import { 
   ResponsiveContainer, 
@@ -133,7 +136,130 @@ export const FarmerDashboard: React.FC = () => {
         />
       </div>
 
+      {/* 📥 Live Institutional Bulk Procurement Demands (500T+ Mega Pools) */}
+      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+                <Boxes className="w-5 h-5" />
+              </div>
+              <h2 className="text-base font-extrabold text-slate-900 font-display flex items-center gap-2">
+                <span>Direct Bulk Demands & Pooled Orders (थोक मांग पूल)</span>
+                {bulkDemands.length > 0 && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black animate-pulse">
+                    {bulkDemands.length} LIVE
+                  </span>
+                )}
+              </h2>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Institutional buyers placing 500T+ advance orders with 100% pre-funded Escrow. Supply produce directly to earn guaranteed payouts.
+            </p>
+          </div>
 
+          <button
+            onClick={() => setActiveTab('bulk_pooling')}
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm self-start sm:self-auto cursor-pointer"
+          >
+            <span>View All Bulk Orders ({bulkDemands.length})</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {bulkDemands.length === 0 ? (
+          <div className="p-8 text-center bg-slate-50/60 rounded-2xl border border-dashed border-slate-200 space-y-2">
+            <Boxes className="w-10 h-10 text-slate-300 mx-auto" />
+            <h4 className="font-bold text-slate-700 text-xs">No Bulk Demand Pools at this moment</h4>
+            <p className="text-[11px] text-slate-400 max-w-md mx-auto">
+              When institutional buyers (millers, exporters, processors) place large pooled demand contracts, they will appear here live for direct farmer acceptance and supply allocation.
+            </p>
+            <button
+              onClick={() => setActiveTab('bulk_pooling')}
+              className="mt-2 px-4 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-xs inline-flex items-center gap-1 cursor-pointer"
+            >
+              <span>Explore Bulk Pooling Bay</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {bulkDemands.slice(0, 3).map((demand) => {
+              const committedPct = Math.min(100, Math.round((demand.committedQuantityTons / demand.targetQuantityTons) * 100));
+              const isFull = demand.committedQuantityTons >= demand.targetQuantityTons;
+              return (
+                <div
+                  key={demand.id}
+                  className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-white border border-slate-200/80 hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                        {demand.demandNumber}
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        isFull 
+                          ? 'bg-slate-100 text-slate-600' 
+                          : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {isFull ? 'Quota Full' : 'Open for Farmers'}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h4 className="font-black text-slate-900 text-sm">{demand.cropName}</h4>
+                      <p className="text-[11px] text-slate-500">{demand.variety} • {demand.category}</p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] text-emerald-800 font-medium block">Price Guaranteed</span>
+                        <span className="text-xs font-black text-emerald-700">₹{demand.pricePerTon.toLocaleString('en-IN')}/Ton</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-emerald-800 font-medium block">Target Volume</span>
+                        <span className="text-xs font-black text-slate-900">{demand.targetQuantityTons} Tons</span>
+                      </div>
+                    </div>
+
+                    {/* Progress */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] font-semibold text-slate-500">
+                        <span>Committed: {demand.committedQuantityTons}T</span>
+                        <span>{committedPct}%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-emerald-600 h-full rounded-full transition-all"
+                          style={{ width: `${committedPct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="text-[10px] text-slate-500 flex items-center justify-between pt-1">
+                      <span className="truncate">🏢 {demand.buyerOrg || demand.buyerName}</span>
+                      <span className="shrink-0 font-medium">📍 {demand.deliveryCity}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setActiveTab('bulk_pooling')}
+                    disabled={isFull}
+                    className={`w-full py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      isFull
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                    }`}
+                  >
+                    <SendHorizontal className="w-3.5 h-3.5" />
+                    <span>{isFull ? 'Quota Filled' : '📥 Accept & Supply Produce'}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
@@ -152,6 +278,24 @@ export const FarmerDashboard: React.FC = () => {
               >
                 View all mandis <ArrowUpRight className="w-3.5 h-3.5" />
               </button>
+            </div>
+
+            {/* 🎯 Nearest Target APMC Mandi according to location */}
+            <div className="mb-4 p-3.5 bg-emerald-50/90 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Store className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider block">Nearest Target APMC Mandi</span>
+                  <span className="font-extrabold text-slate-900 text-xs sm:text-sm">
+                    {currentUser.preferredMandi || getNearestTargetMandi(currentUser.state || 'Maharashtra', currentUser.district || 'Nashik')}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-800 bg-white px-2.5 py-1 rounded-full border border-emerald-300 self-start sm:self-center shadow-xs">
+                📍 Matched to {currentUser.district || 'Nashik'}, {currentUser.state || 'Maharashtra'}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">

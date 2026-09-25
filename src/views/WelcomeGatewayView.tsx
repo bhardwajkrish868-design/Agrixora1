@@ -113,7 +113,7 @@ const DigitalIndiaLogo: React.FC = () => (
 
 
 export const WelcomeGatewayView: React.FC = () => {
-  const { loginUser, registerUser, language, setLanguage, verifyAdminPasskey, enterPortal } = useAgri();
+  const { language, setLanguage, bulkDemands } = useAgri();
 
   // Cloud Database Modal & Status
   const [isCloudDbOpen, setIsCloudDbOpen] = useState(false);
@@ -144,40 +144,6 @@ export const WelcomeGatewayView: React.FC = () => {
   const [activeModalRole, setActiveModalRole] = useState<UserRole | null>(null);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('register');
 
-  // Form states (clean / un-prefilled)
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [aadhaarNumber, setAadhaarNumber] = useState('');
-  const [agreedTerms, setAgreedTerms] = useState(true);
-  const [otp, setOtp] = useState(() => Math.floor(100000 + Math.random() * 900000).toString());
-  const [generatedOtp, setGeneratedOtp] = useState(() => Math.floor(100000 + Math.random() * 900000).toString());
-  const [isOtpSent, setIsOtpSent] = useState(true);
-  const [otpCountdown, setOtpCountdown] = useState(0);
-  const [otpVerified, setOtpVerified] = useState(true);
-  const [otpError, setOtpError] = useState('');
-  const [smsToast, setSmsToast] = useState<{ show: boolean; otp: string; phone: string } | null>(null);
-
-  const [state, setState] = useState('Maharashtra');
-  const [district, setDistrict] = useState('Nashik');
-  const [location, setLocation] = useState('Nashik, Maharashtra');
-  const [farmSize, setFarmSize] = useState('');
-  const [businessName, setBusinessName] = useState('');
-  const [gstin, setGstin] = useState('');
-  const [hubName, setHubName] = useState('');
-  const [adminPasskeyInput, setAdminPasskeyInput] = useState('');
-  const [showAdminPasskey, setShowAdminPasskey] = useState(false);
-  const [adminError, setAdminError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Auto-format 12-digit Aadhaar number with standard 4-4-4 spacing
-  const handleAadhaarInput = (val: string) => {
-    const rawDigits = val.replace(/\D/g, '').slice(0, 12);
-    const formatted = rawDigits.match(/.{1,4}/g)?.join(' ') || rawDigits;
-    setAadhaarNumber(formatted);
-    setOtpError('');
-  };
-
   const [logoClicks, setLogoClicks] = useState(0);
   const logoClickTimeoutRef = useRef<any>(null);
 
@@ -195,6 +161,12 @@ export const WelcomeGatewayView: React.FC = () => {
       }, 1500);
       return next;
     });
+  };
+
+  // Open role modal
+  const handleOpenRoleModal = (role: UserRole, mode: 'login' | 'register' = 'register') => {
+    setActiveModalRole(role);
+    setAuthMode(mode);
   };
 
   // Check URL query parameters for team access (e.g. ?team=admin or ?role=hub)
@@ -224,169 +196,6 @@ export const WelcomeGatewayView: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
-
-  // OTP Countdown Timer
-  useEffect(() => {
-    let timer: any;
-    if (otpCountdown > 0) {
-      timer = setInterval(() => {
-        setOtpCountdown(prev => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [otpCountdown]);
-
-  // Open role modal with defaults (empty fields for clean new registration)
-  const handleOpenRoleModal = (role: UserRole) => {
-    setActiveModalRole(role);
-    setAuthMode('register');
-    setAdminError('');
-    setOtpError('');
-    setSmsToast(null);
-
-    // Start with empty clean inputs so user enters their own details
-    setName('');
-    setPhone('');
-    setEmail('');
-    setAadhaarNumber('');
-    setAgreedTerms(true);
-    setOtp('');
-    setGeneratedOtp('');
-    setOtpVerified(true);
-    setState('Maharashtra');
-    setDistrict('Nashik');
-    setLocation('Nashik, Maharashtra');
-    setFarmSize('');
-    setBusinessName('');
-    setGstin('');
-    setHubName('');
-    setAdminPasskeyInput('');
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setAdminError('');
-    setOtpError('');
-
-    if (!activeModalRole) return;
-
-    if (authMode === 'register') {
-      const cleanName = name.trim();
-      if (!cleanName) {
-        setOtpError(language === 'hi' ? '❌ कृपया अपना पूरा नाम दर्ज करें।' : '❌ Please enter your full legal name.');
-        return;
-      }
-
-      const cleanPhone = phone.trim();
-      const rawDigits = cleanPhone.replace(/\D/g, '');
-      if (rawDigits.length < 10) {
-        setOtpError(language === 'hi' ? '❌ मान्य 10-अंकीय मोबाइल नंबर दर्ज करें।' : '❌ Please enter a valid 10-digit mobile number.');
-        return;
-      }
-
-      // Mandatory 12-Digit UIDAI Aadhaar validation for both Farmer and Buyer
-      if (activeModalRole === 'farmer' || activeModalRole === 'buyer') {
-        const rawAadhaar = aadhaarNumber.replace(/\D/g, '');
-        if (rawAadhaar.length !== 12) {
-          setOtpError(
-            language === 'hi'
-              ? `❌ कृपया ${activeModalRole === 'farmer' ? 'किसान' : 'थोक खरीदार'} का मान्य 12-अंकीय आधार कार्ड नंबर (UIDAI) दर्ज करें।`
-              : `❌ Please enter a valid 12-digit UIDAI Aadhaar Card Number for ${activeModalRole === 'farmer' ? 'Farmer' : 'Buyer'} verification.`
-          );
-          return;
-        }
-      }
-
-      if (!agreedTerms) {
-        setOtpError(
-          language === 'hi'
-            ? '❌ कृपया नियमों और शर्तों से सहमति दें।'
-            : '❌ Please agree to the Terms & Conditions and Privacy Policy.'
-        );
-        return;
-      }
-
-      if (activeModalRole === 'admin' || activeModalRole === 'collection_centre') {
-        const isKeyValid = verifyAdminPasskey(adminPasskeyInput);
-        if (!isKeyValid) {
-          setAdminError(language === 'hi' 
-            ? '❌ टीम पासकी अमान्य है: अधिकृत टीम मास्टर पासकी (Krish0386) दर्ज करें।' 
-            : '❌ Access Denied: Invalid Team Security Passkey. Use authorized key: Krish0386');
-          return;
-        }
-      }
-
-      setIsSubmitting(true);
-
-      const formattedPhone = cleanPhone.startsWith('+91') ? cleanPhone : `+91 ${cleanPhone}`;
-      const finalDistrict = district.trim() || 'Nashik';
-      const finalLocation = location.trim() || `${finalDistrict}, ${state}`;
-
-      setTimeout(() => {
-        registerUser({
-          id: `usr_${activeModalRole}_${Date.now()}`,
-          role: activeModalRole,
-          name: cleanName,
-          phone: formattedPhone,
-          email: email.trim() || undefined,
-          aadhaarNumber: aadhaarNumber.trim(),
-          aadhaarVerified: true,
-          state: state,
-          district: finalDistrict,
-          location: finalLocation,
-          farmSizeAcres: activeModalRole === 'farmer' ? (Number(farmSize) || 5) : undefined,
-          businessName: activeModalRole === 'buyer' ? (businessName.trim() || cleanName) : undefined,
-          gstin: activeModalRole === 'buyer' ? gstin.trim() : undefined,
-          hubName: activeModalRole === 'collection_centre' ? (hubName.trim() || `${finalDistrict} Hub`) : undefined
-        });
-        setIsSubmitting(false);
-        setActiveModalRole(null);
-      }, 200);
-    } else {
-      // Existing User Login Mode
-      const cleanPhone = phone.trim();
-      const cleanName = name.trim();
-      const rawDigits = cleanPhone.replace(/\D/g, '');
-
-      if (!cleanPhone && !cleanName) {
-        setOtpError(language === 'hi' ? '❌ कृपया अपना पंजीकृत मोबाइल नंबर, आधार नंबर या नाम दर्ज करें।' : '❌ Please enter your registered phone number, Aadhaar number, or name.');
-        return;
-      }
-
-      if (activeModalRole === 'admin' || activeModalRole === 'collection_centre') {
-        const isKeyValid = verifyAdminPasskey(adminPasskeyInput);
-        if (!isKeyValid) {
-          setAdminError(language === 'hi' 
-            ? '❌ टीम पासकी अमान्य है: अधिकृत टीम मास्टर पासकी (Krish0386) दर्ज करें।' 
-            : '❌ Access Denied: Invalid Team Security Passkey. Use authorized key: Krish0386');
-          return;
-        }
-      }
-
-      setIsSubmitting(true);
-      const formattedPhone = cleanPhone.startsWith('+91') ? cleanPhone : (rawDigits.length === 10 ? `+91 ${cleanPhone}` : '');
-
-      setTimeout(() => {
-        const result = loginUser({
-          role: activeModalRole,
-          name: cleanName || undefined,
-          phone: formattedPhone || undefined,
-          aadhaarNumber: rawDigits.length === 12 ? rawDigits : undefined
-        });
-
-        if (!result.success) {
-          setOtpError(result.message || (language === 'hi' ? '❌ कोई पंजीकृत खाता नहीं मिला। कृपया पहले नया खाता बनाएं (Register)।' : '❌ No registered account found with this phone/Aadhaar/name. Please register first.'));
-          setIsSubmitting(false);
-          return;
-        }
-
-        setIsSubmitting(false);
-        setActiveModalRole(null);
-      }, 200);
-    }
-  };
 
   return (
     <div className="relative h-screen w-full flex flex-col justify-between overflow-y-auto md:overflow-hidden font-sans select-none bg-slate-50 text-slate-900">
@@ -467,12 +276,47 @@ export const WelcomeGatewayView: React.FC = () => {
           </div>
         </div>
 
+        {/* ⚡ Live Bulk Demands Alert Banner (Visible to any visitor on any device immediately) */}
+        {bulkDemands && bulkDemands.length > 0 && (
+          <div 
+            onClick={() => handleOpenRoleModal('farmer', 'login')}
+            className="max-w-4xl mx-auto w-full bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-2xl p-3 sm:p-4 border border-emerald-500/40 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-left cursor-pointer hover:border-emerald-400 transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0 text-lg">
+                📦
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                    Live Bulk Demands ({bulkDemands.length})
+                  </span>
+                  <span className="text-xs font-bold text-emerald-300">
+                    100% Escrow Funded
+                  </span>
+                </div>
+                <p className="text-xs text-slate-200 mt-0.5 font-medium line-clamp-1">
+                  {bulkDemands.map(b => `${b.demandNumber}: ${b.cropName} (${b.targetQuantityTons}T @ ₹${b.pricePerTon.toLocaleString('en-IN')}/T by ${b.buyerName})`).join(' • ')}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-500 group-hover:bg-emerald-400 text-slate-950 font-black text-xs shrink-0 flex items-center gap-1 shadow-sm cursor-pointer"
+            >
+              <span>{language === 'hi' ? 'किसान लॉगिन करके सप्लाई करें' : 'Login as Farmer to Supply'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* 🌟 2 PRIMARY PUBLIC CARDS (FOR ALL VISITORS COMING ON THE WEBSITE) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 text-left max-w-4xl mx-auto w-full">
           
           {/* Primary Public Card 1: Farmer */}
           <div 
-            onClick={() => enterPortal('farmer')}
+            onClick={() => handleOpenRoleModal('farmer', 'register')}
             className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-emerald-500/40 hover:border-emerald-600 shadow-[0_10px_30px_rgba(16,185,129,0.14)] hover:shadow-[0_16px_36px_rgba(16,185,129,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
@@ -510,38 +354,40 @@ export const WelcomeGatewayView: React.FC = () => {
             </div>
 
             <div className="pt-3 flex flex-col gap-2 border-t border-slate-100 mt-3">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  enterPortal('farmer');
-                }}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-emerald-700/20 group-hover:scale-[1.01] transition-transform cursor-pointer"
-              >
-                <span>{language === 'hi' ? 'किसान पोर्टल में सीधे प्रवेश करें →' : 'Enter Farmer Portal →'}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              <div className="flex items-center justify-between px-1 text-[11px]">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleOpenRoleModal('farmer');
+                    handleOpenRoleModal('farmer', 'register');
                   }}
-                  className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                  className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
-                  <UserIcon className="w-3 h-3" />
-                  <span>{language === 'hi' ? 'नया किसान खाता / लॉगिन' : 'New Account / Login'}</span>
+                  <UserIcon className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'नया खाता बनाएं' : 'Register'}</span>
                 </button>
-                <span className="text-slate-400 font-medium">1-Click Fast Entry</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenRoleModal('farmer', 'login');
+                  }}
+                  className="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'लॉगिन करें' : 'Sign In'}</span>
+                </button>
+              </div>
+              <div className="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-semibold pt-0.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Authentication'}</span>
               </div>
             </div>
           </div>
 
           {/* Primary Public Card 2: Buyer */}
           <div 
-            onClick={() => enterPortal('buyer')}
+            onClick={() => handleOpenRoleModal('buyer', 'register')}
             className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-blue-500/40 hover:border-blue-600 shadow-[0_10px_30px_rgba(37,99,235,0.14)] hover:shadow-[0_16px_36px_rgba(37,99,235,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
@@ -579,31 +425,33 @@ export const WelcomeGatewayView: React.FC = () => {
             </div>
 
             <div className="pt-3 flex flex-col gap-2 border-t border-slate-100 mt-3">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  enterPortal('buyer');
-                }}
-                className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-between shadow-md shadow-blue-700/20 group-hover:scale-[1.01] transition-transform cursor-pointer"
-              >
-                <span>{language === 'hi' ? 'खरीदार पोर्टल में सीधे प्रवेश करें →' : 'Enter Buyer Portal →'}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-
-              <div className="flex items-center justify-between px-1 text-[11px]">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleOpenRoleModal('buyer');
+                    handleOpenRoleModal('buyer', 'register');
                   }}
-                  className="text-blue-700 hover:text-blue-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                  className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-blue-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
-                  <UserIcon className="w-3 h-3" />
-                  <span>{language === 'hi' ? 'नया खरीदार खाता / लॉगिन' : 'New Account / Login'}</span>
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'नया खाता बनाएं' : 'Register'}</span>
                 </button>
-                <span className="text-slate-400 font-medium">1-Click Fast Entry</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenRoleModal('buyer', 'login');
+                  }}
+                  className="py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'लॉगिन करें' : 'Sign In'}</span>
+                </button>
+              </div>
+              <div className="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-semibold pt-0.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Authentication'}</span>
               </div>
             </div>
           </div>

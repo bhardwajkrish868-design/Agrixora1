@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node serve_dist.cjs 3000"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",

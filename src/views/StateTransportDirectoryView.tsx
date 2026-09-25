@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { VehicleDetails } from '../types';
+import { ALL_INDIAN_STATES as MASTER_STATES, getDistrictsForState } from '../data/indiaLocations';
 import { 
   Truck, 
   MapPin, 
@@ -72,33 +73,11 @@ const playSmsChime = () => {
 
 const ALL_INDIAN_STATES = [
   'All States',
-  'Maharashtra',
-  'Punjab',
-  'Haryana',
-  'Uttar Pradesh',
-  'Madhya Pradesh',
-  'Gujarat',
-  'Rajasthan',
-  'Karnataka',
-  'Tamil Nadu',
-  'Andhra Pradesh',
-  'Telangana',
-  'West Bengal',
-  'Bihar',
-  'Kerala',
-  'Odisha',
-  'Assam',
-  'Himachal Pradesh',
-  'Uttarakhand',
-  'Jammu & Kashmir',
-  'Jharkhand',
-  'Chhattisgarh',
-  'Goa',
-  'Delhi-NCR'
+  ...MASTER_STATES
 ];
 
 const ZONES: Record<string, string[]> = {
-  'North Zone': ['Punjab', 'Haryana', 'Uttar Pradesh', 'Himachal Pradesh', 'Uttarakhand', 'Jammu & Kashmir', 'Delhi-NCR'],
+  'North Zone': ['Punjab', 'Haryana', 'Uttar Pradesh', 'Himachal Pradesh', 'Uttarakhand', 'Jammu and Kashmir', 'Delhi'],
   'West Zone': ['Maharashtra', 'Gujarat', 'Rajasthan', 'Goa'],
   'South Zone': ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Telangana', 'Kerala'],
   'Central Zone': ['Madhya Pradesh', 'Chhattisgarh'],
@@ -109,10 +88,22 @@ export const StateTransportDirectoryView: React.FC = () => {
   const { vehicles, currentUser, activeRole, setActiveTab, setActiveTrackingOrderId, addNotification, logActivity, navigateBack } = useAgri();
 
   const [selectedState, setSelectedState] = useState<string>('All States');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('All');
   const [selectedZone, setSelectedZone] = useState<string>('All');
   const [selectedServiceType, setSelectedServiceType] = useState<string>('All');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Dependent districts for selected state
+  const availableDistricts = useMemo(() => {
+    if (selectedState === 'All States') return [];
+    return getDistrictsForState(selectedState);
+  }, [selectedState]);
+
+  const handleStateChange = (newState: string) => {
+    setSelectedState(newState);
+    setSelectedDistrict('All');
+  };
 
   // Booking Modal State
   const [bookingVehicle, setBookingVehicle] = useState<VehicleDetails | null>(null);
@@ -225,6 +216,15 @@ export const StateTransportDirectoryView: React.FC = () => {
         return false;
       }
 
+      // District filter
+      if (selectedDistrict !== 'All') {
+        const dLower = selectedDistrict.toLowerCase();
+        const matchesDistrict = (v.district && v.district.toLowerCase() === dLower) ||
+          (v.hubLocation && v.hubLocation.toLowerCase().includes(dLower)) ||
+          (v.cityHub && v.cityHub.toLowerCase().includes(dLower));
+        if (!matchesDistrict) return false;
+      }
+
       // Service type filter
       if (selectedServiceType !== 'All') {
         if (selectedServiceType === 'Reefer' && !v.serviceType?.toLowerCase().includes('reefer') && !v.vehicleType?.toLowerCase().includes('reefer')) {
@@ -258,7 +258,7 @@ export const StateTransportDirectoryView: React.FC = () => {
 
       return true;
     });
-  }, [vehicles, selectedZone, selectedState, selectedServiceType, selectedStatus, searchQuery]);
+  }, [vehicles, selectedZone, selectedState, selectedDistrict, selectedServiceType, selectedStatus, searchQuery]);
 
   // Quick stats
   const totalVehicles = vehicles?.length || 0;
@@ -691,7 +691,7 @@ export const StateTransportDirectoryView: React.FC = () => {
           <div>
             <select
               value={selectedState}
-              onChange={e => setSelectedState(e.target.value)}
+              onChange={e => handleStateChange(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium"
             >
               {ALL_INDIAN_STATES.map(st => (
@@ -701,6 +701,22 @@ export const StateTransportDirectoryView: React.FC = () => {
               ))}
             </select>
           </div>
+
+          {/* Dependent District Dropdown (when specific state is chosen) */}
+          {selectedState !== 'All States' && (
+            <div>
+              <select
+                value={selectedDistrict}
+                onChange={e => setSelectedDistrict(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-emerald-400 text-xs text-emerald-800 bg-emerald-50/70 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold animate-in fade-in"
+              >
+                <option value="All">All Districts in {selectedState}</option>
+                {availableDistricts.map(d => (
+                  <option key={d} value={d}>🏙️ {d}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Service Type */}
           <div>

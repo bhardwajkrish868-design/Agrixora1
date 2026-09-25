@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { CropCategory, QualityGrade } from '../types';
+import { ALL_INDIAN_STATES, getDistrictsForState, getDefaultDistrictForState, getNearestTargetMandi } from '../data/indiaLocations';
 import { 
   Sprout, 
   Upload, 
@@ -8,12 +9,13 @@ import {
   ShieldCheck, 
   Sparkles, 
   CheckCircle2, 
-  ArrowRight,
-  Scale,
-  ArrowLeft,
-  Navigation,
-  Zap,
-  Building2
+  ArrowRight, 
+  Scale, 
+  ArrowLeft, 
+  Navigation, 
+  Zap, 
+  Building2,
+  Store
 } from 'lucide-react';
 import { geocodeLocation, calculateDistanceKm } from '../utils/geoUtils';
 
@@ -30,12 +32,25 @@ export const AddProduceView: React.FC = () => {
     pricePerUnit: 2100,
     harvestDate: new Date().toISOString().split('T')[0],
     location: currentUser.location || 'Dindori Farmgate, Nashik',
+    state: currentUser.state || 'Maharashtra',
+    district: currentUser.district || 'Nashik',
     pincode: currentUser.pincode || '422202',
     moisturePercent: 12.0,
     organicCertified: false,
     description: 'Freshly harvested, uniformly graded, harvested under optimal weather. Stored in shaded farm warehouse.',
     imagePreview: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'
   });
+
+  const availableDistricts = useMemo(() => getDistrictsForState(form.state), [form.state]);
+
+  const handleStateChange = (newState: string) => {
+    const def = getDefaultDistrictForState(newState);
+    setForm(prev => ({
+      ...prev,
+      state: newState,
+      district: def
+    }));
+  };
 
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [customSelectedHubId, setCustomSelectedHubId] = useState<string | null>(null);
@@ -75,6 +90,8 @@ export const AddProduceView: React.FC = () => {
       pricePerUnit: Number(form.pricePerUnit),
       harvestDate: form.harvestDate,
       location: form.location,
+      state: form.state,
+      district: form.district,
       pincode: form.pincode,
       moisturePercent: Number(form.moisturePercent),
       organicCertified: form.organicCertified,
@@ -308,19 +325,6 @@ export const AddProduceView: React.FC = () => {
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Tested Moisture Content (%)
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              value={form.moisturePercent}
-              onChange={e => setForm({ ...form, moisturePercent: Number(e.target.value) })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-            />
-          </div>
         </div>
 
         <div className="space-y-3">
@@ -337,7 +341,9 @@ export const AddProduceView: React.FC = () => {
                   setForm(prev => ({
                     ...prev,
                     location: `${loc.name}, ${loc.district}`,
-                    pincode: loc.pincode
+                    pincode: loc.pincode,
+                    state: loc.state || prev.state,
+                    district: loc.district || prev.district
                   }));
                 } finally {
                   setIsDetectingLocation(false);
@@ -372,6 +378,43 @@ export const AddProduceView: React.FC = () => {
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 placeholder="PIN (e.g. 422209)"
               />
+            </div>
+          </div>
+
+          {/* Dependent Cascading State & District Selectors */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                State (राज्य) *
+              </label>
+              <select
+                value={form.state}
+                onChange={e => handleStateChange(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+              >
+                {ALL_INDIAN_STATES.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                District (ज़िला) *
+              </label>
+              <select
+                value={form.district}
+                onChange={e => setForm(prev => ({ ...prev, district: e.target.value }))}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+              >
+                {availableDistricts.length > 0 ? (
+                  availableDistricts.map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))
+                ) : (
+                  <option value="">Select State first</option>
+                )}
+              </select>
             </div>
           </div>
 
@@ -448,6 +491,18 @@ export const AddProduceView: React.FC = () => {
                     </select>
                   </div>
                 )}
+
+                {/* 🎯 Nearest Target APMC Mandi according to location */}
+                <div className="pt-2 border-t border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+                  <div className="flex items-center gap-1.5 text-slate-800">
+                    <Store className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                    <span className="font-semibold text-slate-600">Nearest Target APMC Mandi:</span>
+                    <strong className="font-extrabold text-slate-900">{getNearestTargetMandi(form.state, form.district)}</strong>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-300 self-start sm:self-auto">
+                    📍 Target Mandi for {form.district}, {form.state}
+                  </span>
+                </div>
               </div>
             );
           })()}

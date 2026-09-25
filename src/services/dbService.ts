@@ -8,6 +8,17 @@ export const dbService = {
       const res = await fetch(`${API_BASE}/api/db`);
       if (res.ok) {
         const data = await res.json();
+        if (!Array.isArray(data.bulkDemands) || data.bulkDemands.length === 0) {
+          try {
+            const bRes = await fetch(`${API_BASE}/api/bulk-demands`);
+            if (bRes.ok) {
+              const bData = await bRes.json();
+              if (Array.isArray(bData) && bData.length > 0) {
+                data.bulkDemands = bData;
+              }
+            }
+          } catch (_) {}
+        }
         return data;
       }
     } catch (err) {
@@ -63,6 +74,60 @@ export const dbService = {
       return res.ok;
     } catch (err) {
       console.warn('Backend order update failed', err);
+      return false;
+    }
+  },
+
+  async clearAllOrders(): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/orders/clear`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend clear all orders failed', err);
+      return false;
+    }
+  },
+
+  async clearAllListings(): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/listings/clear`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend clear all listings failed', err);
+      return false;
+    }
+  },
+
+  async createBulkDemand(demand: BulkDemandPool): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/bulk-demands/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(demand)
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend createBulkDemand failed', err);
+      return false;
+    }
+  },
+
+  async contributeBulkDemand(poolId: string, updatedPool: BulkDemandPool): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/bulk-demands/contribute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ poolId, updatedPool })
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend contributeBulkDemand failed', err);
       return false;
     }
   },

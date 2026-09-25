@@ -30,7 +30,8 @@ import {
   Filter,
   FileJson,
   Phone,
-  Train
+  Train,
+  Clock
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { 
@@ -1371,6 +1372,70 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Activity & History Audit Trail */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
+                  <History className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-bold text-slate-900">Activity & History Audit Trail</h2>
+                    <span className="text-[11px] font-bold text-purple-800 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
+                      {activityHistory?.length || 0} Recorded Events
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Chronological audit trail tracking all stakeholder events, logins, crop postings, orders, and system state changes.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setActiveTab('database')}
+                  className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold border border-purple-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Database className="w-3.5 h-3.5" />
+                  <span>Full Database View</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2.5 pt-2 max-h-[480px] overflow-y-auto pr-1">
+              {(!activityHistory || activityHistory.length === 0) ? (
+                <div className="text-center py-8 text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl">
+                  <Clock className="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                  <span>No recorded activities yet. System events will appear here in real-time.</span>
+                </div>
+              ) : (
+                activityHistory.map(item => (
+                  <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition-colors">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getActionBadgeColor(item.actionType)}`}>
+                          {item.actionType.replace('_', ' ').toUpperCase()}
+                        </span>
+                        <strong className="text-slate-900 font-bold">{item.title}</strong>
+                        {item.userName && (
+                          <span className="text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                            {item.userName} ({item.userRole})
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-slate-600 text-[11px]">{item.description}</p>
+                    </div>
+
+                    <div className="text-[10px] font-mono text-slate-400 whitespace-nowrap self-start sm:self-center">
+                      {new Date(item.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </>

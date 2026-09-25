@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { UserRole } from '../types';
+import { 
+  ALL_INDIAN_STATES, 
+  getDistrictsForState, 
+  getDefaultDistrictForState,
+  getNearestTargetMandi,
+  getNearbyMandisForLocation
+} from '../data/indiaLocations';
 import { 
   ArrowRight, 
   ArrowLeft,
@@ -28,40 +35,6 @@ import {
   Smartphone,
   CheckCircle2
 } from 'lucide-react';
-
-// Synthesize pleasant SMS arrival chime via Web Audio API
-const playSmsChime = () => {
-  try {
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-    const now = ctx.currentTime;
-    
-    const osc1 = ctx.createOscillator();
-    const gain1 = ctx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(587.33, now);
-    gain1.gain.setValueAtTime(0, now);
-    gain1.gain.linearRampToValueAtTime(0.2, now + 0.05);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-    osc1.connect(gain1);
-    gain1.connect(ctx.destination);
-    osc1.start(now);
-    osc1.stop(now + 0.35);
-
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(880, now + 0.12);
-    gain2.gain.setValueAtTime(0, now + 0.12);
-    gain2.gain.linearRampToValueAtTime(0.25, now + 0.17);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-    osc2.connect(gain2);
-    gain2.connect(ctx.destination);
-    osc2.start(now + 0.12);
-    osc2.stop(now + 0.6);
-  } catch (_) {}
-};
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -167,166 +140,42 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [state, setState] = useState('Maharashtra');
   const [district, setDistrict] = useState('Nashik');
 
-  // Generate fresh unique 6-digit OTP on every request
-  const generateRandomOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+  // Dependent cascading districts list for selected state
+  const availableDistricts = useMemo(() => getDistrictsForState(state), [state]);
 
-  // Step 2: Identity Verification (UIDAI Aadhaar + OTP)
+  const [preferredMandi, setPreferredMandi] = useState(() => getNearestTargetMandi('Maharashtra', 'Nashik'));
+
+  // Suggested nearby mandis for current location
+  const nearbyMandis = useMemo(() => getNearbyMandisForLocation(state, district), [state, district]);
+
+  const handleStateChange = (newState: string) => {
+    setState(newState);
+    const def = getDefaultDistrictForState(newState);
+    setDistrict(def);
+    setPreferredMandi(getNearestTargetMandi(newState, def));
+  };
+
+  const handleDistrictChange = (newDistrict: string) => {
+    setDistrict(newDistrict);
+    setPreferredMandi(getNearestTargetMandi(state, newDistrict));
+  };
+
+  // Step 2: Identity & Security (UIDAI Aadhaar + Password)
   const [aadhaarNumber, setAadhaarNumber] = useState('');
-  const [otpCode, setOtpCode] = useState(() => Math.floor(100000 + Math.random() * 900000).toString());
-  const [isOtpVerified, setIsOtpVerified] = useState(true);
-  const [smsToast, setSmsToast] = useState<{ show: boolean; otp: string; phone: string } | null>(null);
-  const [otpSentMessage, setOtpSentMessage] = useState<string>('');
-  const [isSendingOtp, setIsSendingOtp] = useState<boolean>(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // 🟢 Direct WhatsApp States
-  const [callmebotApiKey, setCallmebotApiKey] = useState<string>(() => {
-    return typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || '') : '';
-  });
-  const [isCallmebotConfigured, setIsCallmebotConfigured] = useState<boolean>(false);
-  const [callmebotKeyInput, setCallmebotKeyInput] = useState<string>('');
-  const [showCallmebotSetup, setShowCallmebotSetup] = useState<boolean>(false);
-  const [isTestingCallmebot, setIsTestingCallmebot] = useState<boolean>(false);
-  const [callmebotStatusMsg, setCallmebotStatusMsg] = useState<string>('');
-  const [autoOpenWhatsApp, setAutoOpenWhatsApp] = useState<boolean>(() => {
-    return typeof window !== 'undefined' ? (localStorage.getItem('f2f_auto_open_wa') !== 'false') : true;
-  });
-
-  useEffect(() => {
-    fetch('/api/sms/config')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.callmebotConfigured) {
-          setIsCallmebotConfigured(true);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const handleSaveAndTestCallmebot = async () => {
-    const key = callmebotKeyInput.trim();
-    if (!key) {
-      setCallmebotStatusMsg('❌ कृपया मान्य CallMeBot API Key दर्ज करें।');
-      return;
-    }
-    setIsTestingCallmebot(true);
-    setCallmebotStatusMsg('⏳ WhatsApp पर परीक्षण संदेश भेजा जा रहा है...');
-    try {
-      const rawTarget = (phone || '9631359486').replace(/\D/g, '').slice(-10);
-      const res = await fetch('/api/whatsapp/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phone: rawTarget,
-          apiKey: key,
-          saveKey: true
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setCallmebotApiKey(key);
-        setIsCallmebotConfigured(true);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('f2f_callmebot_api_key', key);
-        }
-        setCallmebotStatusMsg(`✅ सफल! WhatsApp पर संदेश पहुंच गया (+91 ${rawTarget}).`);
-      } else {
-        const errorText = data.details?.rawResponse || data.error || 'अमान्य API Key या WhatsApp बॉट को अनुमति नहीं दी गई।';
-        setCallmebotStatusMsg(`❌ विफल: ${errorText}`);
-      }
-    } catch (e: any) {
-      setCallmebotStatusMsg(`❌ त्रुटि: ${e.message}`);
-    } finally {
-      setIsTestingCallmebot(false);
-    }
-  };
-
-  // Dispatch OTP directly to user's physical mobile phone, WhatsApp, and multi-channel alerts
-  const sendOtpToPhone = async (targetPhone?: string, targetOtp?: string, forceOpenWhatsApp?: boolean) => {
-    const rawTarget = (targetPhone || phone || '').replace(/\D/g, '').slice(-10) || '9631359486';
-    const otpToDispatch = targetOtp || generateRandomOtp();
-
-    setIsSendingOtp(true);
-    setOtpCode(otpToDispatch);
-    setIsOtpVerified(true);
-
-    const smsMessage = `🔑 Farm2Future Verification OTP: ${otpToDispatch}. Valid for 10 minutes. Do not share this OTP with anyone. (Farm2Future Smart Agri Platform)`;
-    const waText = `🔑 *Farm2Future Verification OTP: ${otpToDispatch}*\n\nYour One-Time Password (OTP) is *${otpToDispatch}*.\nValid for 10 minutes.\nDo not share this OTP with anyone.\n\n🌾 Farm2Future Smart Agriculture Platform`;
-    const waUrl = `https://api.whatsapp.com/send?phone=91${rawTarget}&text=${encodeURIComponent(waText)}`;
-
-    // Auto launch WhatsApp directly if enabled or forced
-    if (forceOpenWhatsApp || autoOpenWhatsApp) {
-      try {
-        window.open(waUrl, '_blank');
-      } catch (_) {}
-    }
-
-    const currentCallmebotKey = callmebotApiKey || (typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || '') : '');
-
-    // 1. Backend dispatch to /api/send-sms (CallMeBot WhatsApp gateway / Fast2SMS / DB logging)
-    let apiRes: any = null;
-    try {
-      const res = await fetch('/api/send-sms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          phone: rawTarget,
-          message: smsMessage,
-          callmebotApiKey: currentCallmebotKey || undefined,
-          cost: 0,
-          origin: 'Farm2Future UIDAI Auth',
-          destination: `+91 ${rawTarget}`
-        })
-      });
-      apiRes = await res.json();
-    } catch (_) {}
-
-    // 2. Synthesize SMS ringtone chime
-    playSmsChime();
-
-    // 3. Trigger Native OS Browser Push Notification
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'granted') {
-        try {
-          new Notification('🔑 Farm2Future Verification OTP', {
-            body: `Your OTP is: ${otpToDispatch} for mobile +91 ${rawTarget}. Valid for 10 minutes.`,
-            icon: '/favicon.ico'
-          });
-        } catch (_) {}
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(perm => {
-          if (perm === 'granted') {
-            try {
-              new Notification('🔑 Farm2Future Verification OTP', {
-                body: `Your OTP is: ${otpToDispatch} for mobile +91 ${rawTarget}. Valid for 10 minutes.`,
-                icon: '/favicon.ico'
-              });
-            } catch (_) {}
-          }
-        }).catch(() => {});
-      }
-    }
-
-    // 4. Trigger Floating Phone Push Notification Toast
-    setSmsToast({
-      show: true,
-      otp: otpToDispatch,
-      phone: rawTarget
-    });
-
-    if (apiRes?.whatsapp?.delivered) {
-      setOtpSentMessage(`🟢 Live OTP delivered directly to your WhatsApp (+91 ${rawTarget})! Code: ${otpToDispatch}`);
-    } else {
-      setOtpSentMessage(`✅ OTP (${otpToDispatch}) generated & dispatched to +91 ${rawTarget}`);
-    }
-    setIsSendingOtp(false);
-  };
+  // Login Mode Password
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Step 3: Business / Farm Details
   // Farmer fields
   const [farmSize, setFarmSize] = useState('5');
   const [primaryCrop, setPrimaryCrop] = useState('Onions & Wheat');
   const [irrigationSource, setIrrigationSource] = useState('Drip Irrigation');
-  const [preferredMandi, setPreferredMandi] = useState('Nashik North APMC Hub');
 
   // Buyer fields
   const [businessName, setBusinessName] = useState('');
@@ -362,12 +211,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       setPhone('');
       setEmail('');
       setAadhaarNumber('');
-      setOtpCode(generateRandomOtp());
-      setIsOtpVerified(true);
+      setPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+      setLoginPassword('');
+      setShowLoginPassword(false);
       setFarmSize('5');
       setPrimaryCrop('Onions & Wheat');
       setIrrigationSource('Drip Irrigation');
-      setPreferredMandi('Nashik North APMC Hub');
+      setPreferredMandi(getNearestTargetMandi('Maharashtra', 'Nashik'));
       setBusinessName('');
       setGstin('');
       setProcurementCategory('Vegetables & Fruits');
@@ -411,29 +264,37 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         setErrorMsg(language === 'hi' ? '❌ मान्य 10-अंकीय मोबाइल नंबर दर्ज करें।' : '❌ Please enter a valid 10-digit mobile number.');
         return;
       }
-
-      // Automatically dispatch Demo OTP to user's phone when moving to Step 2
-      if (stepNumber === 2 && currentStep === 1) {
-        sendOtpToPhone(rawPhoneDigits, generateRandomOtp());
-      }
     }
 
-    // Step 2 Validation
-    if (stepNumber > 2 && (activeModalRole === 'farmer' || activeModalRole === 'buyer')) {
-      const rawAadhaar = aadhaarNumber.replace(/\D/g, '');
-      if (rawAadhaar.length !== 12) {
+    // Step 2 Validation (Aadhaar + Password)
+    if (stepNumber > 2) {
+      if (activeModalRole === 'farmer' || activeModalRole === 'buyer') {
+        const rawAadhaar = aadhaarNumber.replace(/\D/g, '');
+        if (rawAadhaar.length !== 12) {
+          setErrorMsg(
+            language === 'hi'
+              ? '❌ कृपया 12-अंकीय आधार कार्ड नंबर (UIDAI) दर्ज करें।'
+              : '❌ Please enter a valid 12-digit UIDAI Aadhaar Card Number.'
+          );
+          return;
+        }
+      }
+
+      const cleanPass = password.trim();
+      if (!cleanPass || cleanPass.length < 4) {
         setErrorMsg(
           language === 'hi'
-            ? '❌ कृपया 12-अंकीय आधार कार्ड नंबर (UIDAI) दर्ज करें।'
-            : '❌ Please enter a valid 12-digit UIDAI Aadhaar Card Number.'
+            ? '❌ कृपया कम से कम 4 अक्षरों का सुरक्षित पासवर्ड दर्ज करें।'
+            : '❌ Please enter a password with at least 4 characters.'
         );
         return;
       }
-      if (!otpCode || otpCode.length < 4) {
+
+      if (cleanPass !== confirmPassword.trim()) {
         setErrorMsg(
           language === 'hi'
-            ? '❌ कृपया 6-अंकीय मोबाइल/आधार ओटीपी सत्यापित करें।'
-            : '❌ Please enter and verify the 6-digit mobile/Aadhaar OTP.'
+            ? '❌ पासवर्ड और कन्फर्म पासवर्ड मेल नहीं खा रहे हैं।'
+            : '❌ Password and Confirm Password do not match.'
         );
         return;
       }
@@ -496,6 +357,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           name: cleanName,
           phone: formattedPhone,
           email: email.trim() || (cleanName.toLowerCase().replace(/\s+/g, '') + '@farm2future.in'),
+          password: password.trim(),
           aadhaarNumber: aadhaarNumber.trim(),
           aadhaarVerified: true,
           state: state,
@@ -504,7 +366,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           farmSizeAcres: activeModalRole === 'farmer' ? (Number(farmSize) || 5) : undefined,
           businessName: activeModalRole === 'buyer' ? (businessName.trim() || cleanName) : undefined,
           gstin: activeModalRole === 'buyer' ? gstin.trim() : undefined,
-          hubName: activeModalRole === 'collection_centre' ? (hubName.trim() || `${finalDistrict} Hub`) : undefined
+          hubName: activeModalRole === 'collection_centre' ? (hubName.trim() || `${finalDistrict} Hub`) : undefined,
+          preferredMandi: activeModalRole === 'farmer' ? (preferredMandi || getNearestTargetMandi(state, finalDistrict)) : undefined
         });
         setIsSubmitting(false);
         onClose();
@@ -514,6 +377,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       const cleanPhone = phone.trim();
       const cleanName = name.trim();
       const rawDigits = cleanPhone.replace(/\D/g, '');
+      const cleanLoginPass = loginPassword.trim();
 
       if (!cleanPhone && !cleanName) {
         setErrorMsg(
@@ -524,7 +388,17 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         return;
       }
 
-      if (activeModalRole === 'admin' || activeModalRole === 'collection_centre') {
+      const isAdminRole = activeModalRole === 'admin' || activeModalRole === 'collection_centre';
+      if (!cleanLoginPass && !isAdminRole) {
+        setErrorMsg(
+          language === 'hi'
+            ? '❌ कृपया अपना खाता पासवर्ड दर्ज करें।'
+            : '❌ Please enter your account password.'
+        );
+        return;
+      }
+
+      if (isAdminRole) {
         const isKeyValid = verifyAdminPasskey(adminPasskeyInput);
         if (!isKeyValid) {
           setAdminError(
@@ -544,7 +418,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           role: activeModalRole,
           name: cleanName || undefined,
           phone: formattedPhone || undefined,
-          aadhaarNumber: rawDigits.length === 12 ? rawDigits : undefined
+          aadhaarNumber: rawDigits.length === 12 ? rawDigits : undefined,
+          password: cleanLoginPass || adminPasskeyInput.trim() || undefined
         });
 
         if (!result.success) {
@@ -566,93 +441,6 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      {/* 📲 Floating OTP SMS Notification Banner (Phone Toast) */}
-      {smsToast && (
-        <div className="fixed top-4 inset-x-0 z-[100] flex justify-center px-4 pointer-events-none animate-in slide-in-from-top-4 duration-300">
-          <div className="bg-slate-900 text-white rounded-2xl shadow-2xl border-2 border-emerald-400 p-4 max-w-md w-full pointer-events-auto space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                  📲
-                </div>
-                <span className="text-xs font-mono font-bold tracking-wider text-emerald-400 uppercase">
-                  OTP SMS ALERT • VM-AGRIF2F
-                </span>
-              </div>
-              <span className="text-[10px] text-slate-400 font-mono">Just Now</span>
-            </div>
-
-            <div className="p-2.5 bg-slate-800/90 rounded-xl border border-slate-700/80 text-xs space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-300 font-medium">🔑 Demo Verification OTP:</span>
-                <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono font-black text-sm tracking-widest border border-emerald-500/40">
-                  {smsToast.otp}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Dispatched to: <strong className="text-emerald-400 font-mono">+91 {smsToast.phone}</strong>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 pt-0.5">
-              <a
-                href={`https://api.whatsapp.com/send?phone=91${smsToast.phone.replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
-                  `🔑 *Farm2Future Verification OTP: ${smsToast.otp}*\n\nYour One-Time Password (OTP) is *${smsToast.otp}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`
-                )}`}
-                target="_blank"
-                rel="noreferrer"
-                className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-xs"
-              >
-                <span>🟢</span>
-                <span>WhatsApp OTP</span>
-              </a>
-              <a
-                href={`sms:+91${smsToast.phone.replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
-                  `Farm2Future Verification OTP: ${smsToast.otp}. Valid for 10 minutes. Do not share with anyone.`
-                )}`}
-                className="py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-xs"
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                <span>Phone SMS App</span>
-              </a>
-
-              {/* 🔔 NTFY Mobile Push Alert */}
-              <a
-                href={`https://ntfy.sh/farm2future_${smsToast.phone.replace(/\D/g, '').slice(-10)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="col-span-2 py-1.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-xs"
-              >
-                <span>🔔</span>
-                <span>Live Phone Push Alert (ntfy.sh/farm2future_{smsToast.phone.slice(-10)})</span>
-              </a>
-            </div>
-
-            <div className="flex items-center justify-between pt-1 text-[11px] border-t border-slate-800">
-              <button
-                type="button"
-                onClick={() => {
-                  setOtpCode(smsToast.otp);
-                  setIsOtpVerified(true);
-                  setSmsToast(null);
-                }}
-                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 cursor-pointer"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Auto-fill OTP</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSmsToast(null)}
-                className="text-slate-400 hover:text-white font-bold cursor-pointer"
-              >
-                Dismiss (बंद करें)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Backdrop */}
       <div 
         onClick={onClose}
@@ -804,7 +592,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         ? 'font-bold text-emerald-700' 
                         : 'font-medium text-slate-400'
                   }`}>
-                    Identity Verification
+                    Identity & Password
                   </span>
                 </button>
 
@@ -907,7 +695,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       <input
                         type="text"
                         required
-                        placeholder={activeModalRole === 'farmer' ? 'e.g. Ramesh Patil' : 'e.g. Priya Sharma'}
+                        placeholder={activeModalRole === 'farmer' ? (language === 'hi' ? 'उदा. राजेश कुमार' : 'e.g. Rajesh Kumar') : (language === 'hi' ? 'उदा. सनराइज फूड्स' : 'e.g. Sunrise Foods Pvt Ltd')}
                         value={name}
                         onChange={e => { setName(e.target.value); setErrorMsg(''); }}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium bg-slate-50/60 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
@@ -938,9 +726,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                             className="w-full px-3 py-2.5 text-xs sm:text-sm font-mono font-semibold bg-transparent text-slate-900 placeholder:text-slate-400 focus:outline-hidden"
                           />
                         </div>
-                        <p className="text-[10px] text-emerald-700 font-bold mt-1 flex items-center gap-1">
-                          <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Step 2 पर जाते ही इस नंबर पर Live Demo OTP भेजा जाएगा</span>
+                        <p className="text-[10px] text-slate-500 font-medium mt-1 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>खाता पहचान और पासवर्ड आधारित सुरक्षित लॉगिन के लिए</span>
                         </p>
                       </div>
 
@@ -974,18 +762,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         <div className="relative">
                           <select
                             value={state}
-                            onChange={e => setState(e.target.value)}
+                            onChange={e => handleStateChange(e.target.value)}
                             className="w-full pl-3 pr-8 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold bg-slate-50/60 text-slate-900 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all cursor-pointer appearance-none"
                           >
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Punjab">Punjab</option>
-                            <option value="Haryana">Haryana</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Uttar Pradesh">Uttar Pradesh</option>
-                            <option value="Rajasthan">Rajasthan</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            {ALL_INDIAN_STATES.map(st => (
+                              <option key={st} value={st}>{st}</option>
+                            ))}
                           </select>
                           <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
@@ -999,18 +781,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         <div className="relative">
                           <select
                             value={district}
-                            onChange={e => setDistrict(e.target.value)}
+                            onChange={e => handleDistrictChange(e.target.value)}
                             className="w-full pl-3 pr-8 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold bg-slate-50/60 text-slate-900 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all cursor-pointer appearance-none"
                           >
-                            <option value="Nashik">Nashik</option>
-                            <option value="Pune">Pune</option>
-                            <option value="Nagpur">Nagpur</option>
-                            <option value="Amravati">Amravati</option>
-                            <option value="Chhatrapati Sambhajinagar">Chhatrapati Sambhajinagar</option>
-                            <option value="Kolhapur">Kolhapur</option>
-                            <option value="Ludhiana">Ludhiana</option>
-                            <option value="Karnal">Karnal</option>
-                            <option value="Indore">Indore</option>
+                            {availableDistricts.length > 0 ? (
+                              availableDistricts.map(d => (
+                                <option key={d} value={d}>{d}</option>
+                              ))
+                            ) : (
+                              <option value="">Select State first</option>
+                            )}
                           </select>
                           <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
@@ -1117,227 +897,106 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Instant OTP Authentication Verification Box */}
-                    <div className="p-3.5 rounded-2xl bg-slate-50 border-2 border-emerald-300/80 space-y-3 shadow-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
-                          <Smartphone className="w-4 h-4 text-emerald-600" />
-                          <span>Aadhaar & Mobile OTP Verification (ओटीपी सत्यापन)</span>
-                        </span>
-                        <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
-                          ● Live Mobile Dispatch
-                        </span>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        <input
-                          type="text"
-                          maxLength={6}
-                          value={otpCode}
-                          onChange={e => {
-                            setOtpCode(e.target.value);
-                            setIsOtpVerified(e.target.value.length === 6);
-                          }}
-                          placeholder="6-Digit OTP"
-                          className="w-28 px-3 py-2 rounded-xl border-2 border-slate-300 font-mono font-black text-sm tracking-widest text-slate-900 text-center bg-white focus:border-emerald-500 focus:outline-none shadow-2xs"
-                        />
-                        <button
-                          type="button"
-                          disabled={isSendingOtp}
-                          onClick={() => {
-                            sendOtpToPhone(phone || '9631359486', generateRandomOtp());
-                          }}
-                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
-                        >
-                          <Smartphone className="w-3.5 h-3.5" />
-                          <span>{isSendingOtp ? 'Sending...' : 'Generate New OTP & Send to Mobile'}</span>
-                        </button>
-                        {isOtpVerified && (
-                          <span className="text-[11px] text-emerald-700 font-extrabold flex items-center gap-1 ml-auto bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>OTP Verified</span>
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Phone Dispatch Status & 1-Click WhatsApp / SMS App Buttons */}
-                      <div className="p-2.5 bg-white rounded-xl border border-emerald-200 text-xs space-y-2">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-600">
-                            ओटीपी मोबाइल नंबर: <strong className="text-slate-900 font-mono">+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)}</strong>
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => sendOtpToPhone(phone || '9631359486', generateRandomOtp())}
-                            className="text-emerald-700 hover:text-emerald-800 font-bold underline cursor-pointer text-[10.5px]"
-                          >
-                            Resend New OTP (नया OTP भेजें)
-                          </button>
+                    {/* 🔒 Account Password Setup Card (No OTP Required) */}
+                    <div className="p-4 rounded-2xl bg-white border-2 border-emerald-400/80 space-y-3.5 shadow-sm">
+                      <div className="flex items-center justify-between pb-2 border-b border-emerald-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                            <Lock className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <span className="text-xs sm:text-sm font-extrabold text-slate-800 flex items-center gap-1.5 leading-tight">
+                              <span>खाता पासवर्ड बनाएं (Set Account Password)</span>
+                              <span className="text-rose-500">*</span>
+                            </span>
+                            <p className="text-[10.5px] text-slate-500 font-medium">
+                              {language === 'hi' ? 'भविष्य में बिना OTP तुरंत लॉगिन करने के लिए पासवर्ड सेट करें' : 'Create a secure password for instant login without OTP'}
+                            </p>
+                          </div>
                         </div>
+                        <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                          🛡️ No OTP Needed
+                        </span>
+                      </div>
 
-                        {otpSentMessage && (
-                          <p className="text-[11px] text-emerald-700 font-bold flex items-center gap-1">
-                            <span>📲</span>
-                            <span>{otpSentMessage}</span>
-                          </p>
-                        )}
-
-                        {/* 🟢 DIRECT WHATSAPP DELIVERY & BOT ACTIVATION */}
-                        <div className="p-3 bg-gradient-to-br from-emerald-500/10 via-green-500/5 to-teal-500/10 rounded-2xl border-2 border-emerald-500/40 space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">🟢</span>
-                              <div>
-                                <h5 className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
-                                  <span>WhatsApp Direct Delivery</span>
-                                  {isCallmebotConfigured && (
-                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9.5px] font-extrabold border border-emerald-300">
-                                      ● Server Bot Active
-                                    </span>
-                                  )}
-                                </h5>
-                                <p className="text-[10px] text-emerald-800/80 font-medium">
-                                  सीधे व्हाट्सएप इनबॉक्स में ओटीपी व रसीद प्राप्त करें
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* 1-Click Instant Open WhatsApp Button */}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const clean = (phone || '9631359486').replace(/\D/g, '').slice(-10);
-                                const msg = `🔑 *Farm2Future Verification OTP: ${otpCode}*\n\nYour One-Time Password (OTP) is *${otpCode}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`;
-                                window.open(`https://api.whatsapp.com/send?phone=91${clean}&text=${encodeURIComponent(msg)}`, '_blank');
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        {/* New Password */}
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+                            <span>पासवर्ड (New Password) <span className="text-rose-500">*</span></span>
+                            <span className="text-[10px] text-slate-400 font-normal">Min. 4 characters</span>
+                          </label>
+                          <div className="relative">
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              required
+                              value={password}
+                              onChange={e => {
+                                setPassword(e.target.value);
+                                setErrorMsg('');
                               }}
-                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] flex items-center gap-1 shadow-sm transition-all cursor-pointer hover:scale-102 shrink-0"
-                            >
-                              <span>🟢 WhatsApp में खोलें</span>
-                            </button>
-                          </div>
-
-                          {/* Toggle: Auto-open WhatsApp on OTP generation */}
-                          <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60 text-[10.5px]">
-                            <label className="flex items-center gap-1.5 text-slate-700 cursor-pointer select-none font-semibold">
-                              <input
-                                type="checkbox"
-                                checked={autoOpenWhatsApp}
-                                onChange={e => {
-                                  setAutoOpenWhatsApp(e.target.checked);
-                                  if (typeof window !== 'undefined') {
-                                    localStorage.setItem('f2f_auto_open_wa', e.target.checked ? 'true' : 'false');
-                                  }
-                                }}
-                                className="rounded-sm text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5 cursor-pointer"
-                              />
-                              <span>हर बार नया OTP जनरेट होने पर WhatsApp तुरंत खोलें</span>
-                            </label>
-
+                              placeholder={language === 'hi' ? 'सुरक्षित पासवर्ड बनाएं (कम से कम 4 अक्षर)' : 'Create a secure password (min 4 chars)'}
+                              className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 bg-slate-50/50 focus:bg-white text-slate-900 transition-all"
+                            />
                             <button
                               type="button"
-                              onClick={() => setShowCallmebotSetup(!showCallmebotSetup)}
-                              className="text-emerald-800 font-bold underline hover:text-emerald-950 text-[10.5px] cursor-pointer"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                              tabIndex={-1}
                             >
-                              {showCallmebotSetup ? 'Hide Cloud Bot Setup ▲' : '🤖 Free WhatsApp Bot Setup (Direct Inbox) ▼'}
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-emerald-600" />}
                             </button>
                           </div>
-
-                          {/* Expandable Free CallMeBot 15-second setup */}
-                          {showCallmebotSetup && (
-                            <div className="p-2.5 bg-white rounded-xl border border-emerald-200 space-y-2 text-xs animate-in fade-in duration-200">
-                              <div className="flex items-center justify-between">
-                                <span className="font-extrabold text-slate-800 text-[11px]">
-                                  🤖 15-सेकंड फ्री WhatsApp बॉट सेटअप (बिना किसी ऐप खोले सीधा इनबॉक्स में मैसेज पाएँ)
-                                </span>
-                                <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-md">
-                                  100% Free • No Sign-up
-                                </span>
-                              </div>
-
-                              <ol className="list-decimal list-inside text-[10.5px] text-slate-600 space-y-1 font-medium">
-                                <li>
-                                  नीचे दिए गए बटन को दबाकर WhatsApp में बॉट (<strong>+34 698 28 89 73</strong>) को यह मैसेज भेजें:
-                                  <div className="mt-1">
-                                    <a
-                                      href="https://wa.me/34698288973?text=I%20allow%20callmebot%20to%20send%20me%20messages"
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10.5px] shadow-xs"
-                                    >
-                                      <span>🟢</span>
-                                      <span>Send "I allow callmebot to send me messages" to WhatsApp Bot</span>
-                                    </a>
-                                  </div>
-                                </li>
-                                <li>
-                                  बॉट तुरंत आपको रिप्लाई में <strong>API Key</strong> (जैसे: <code>123456</code>) भेजेगा।
-                                </li>
-                                <li>
-                                  वह API Key यहाँ डालकर Save & Test दबाएं:
-                                </li>
-                              </ol>
-
-                              <div className="flex items-center gap-2 pt-1">
-                                <input
-                                  type="text"
-                                  value={callmebotKeyInput}
-                                  onChange={e => setCallmebotKeyInput(e.target.value)}
-                                  placeholder="Enter CallMeBot API Key (e.g. 123456)"
-                                  className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none"
-                                />
-                                <button
-                                  type="button"
-                                  disabled={isTestingCallmebot}
-                                  onClick={handleSaveAndTestCallmebot}
-                                  className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs cursor-pointer shadow-xs disabled:opacity-50"
-                                >
-                                  {isTestingCallmebot ? 'Testing...' : 'Save & Test Direct WhatsApp'}
-                                </button>
-                              </div>
-
-                              {callmebotStatusMsg && (
-                                <p className={`text-[10.5px] font-bold ${callmebotStatusMsg.startsWith('✅') ? 'text-emerald-700' : 'text-rose-600'}`}>
-                                  {callmebotStatusMsg}
-                                </p>
-                              )}
-                            </div>
-                          )}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const clean = (phone || '9631359486').replace(/\D/g, '').slice(-10);
-                              const msg = `🔑 *Farm2Future Verification OTP: ${otpCode}*\n\nYour One-Time Password (OTP) is *${otpCode}*.\nValid for 10 minutes.\n\n🌾 Farm2Future Smart Agriculture Platform`;
-                              window.open(`https://api.whatsapp.com/send?phone=91${clean}&text=${encodeURIComponent(msg)}`, '_blank');
-                            }}
-                            className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer hover:scale-101"
-                          >
-                            <span>🟢</span>
-                            <span>Direct WhatsApp me bhejo (+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)})</span>
-                          </button>
-                          <a
-                            href={`sms:+91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
-                              `Farm2Future Verification OTP: ${otpCode}. Valid for 10 minutes. Do not share with anyone.`
-                            )}`}
-                            className="py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
-                          >
-                            <Smartphone className="w-3.5 h-3.5 text-sky-200" />
-                            <span>Open in Phone SMS App</span>
-                          </a>
-
-                          {/* 🔔 Free NTFY Mobile Push Alert */}
-                          <a
-                            href={`https://ntfy.sh/farm2future_${(phone || '9631359486').replace(/\D/g, '').slice(-10)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="sm:col-span-2 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
-                          >
-                            <span>🔔</span>
-                            <span>Live NTFY Mobile Push Alert (ntfy.sh/farm2future_{(phone || '9631359486').replace(/\D/g, '').slice(-10)})</span>
-                          </a>
+                        {/* Confirm Password */}
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+                            <span>पासवर्ड दोबारा दर्ज करें (Confirm) <span className="text-rose-500">*</span></span>
+                            {confirmPassword && (
+                              <span className={`text-[10px] font-bold ${password === confirmPassword ? 'text-emerald-600' : 'text-rose-500'}`}>
+                                {password === confirmPassword ? '✓ Matched' : '✗ Mismatch'}
+                              </span>
+                            )}
+                          </label>
+                          <div className="relative">
+                            <input
+                              type={showConfirmPassword ? "text" : "password"}
+                              required
+                              value={confirmPassword}
+                              onChange={e => {
+                                setConfirmPassword(e.target.value);
+                                setErrorMsg('');
+                              }}
+                              placeholder="पासवर्ड दोबारा दर्ज करें"
+                              className={`w-full pl-3 pr-10 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all ${
+                                confirmPassword
+                                  ? password === confirmPassword
+                                    ? 'border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 bg-white text-slate-900'
+                                    : 'border-rose-300 focus:ring-4 focus:ring-rose-500/15 bg-rose-50/30 text-slate-900'
+                                  : 'border-slate-300 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 bg-slate-50/50 text-slate-900'
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                              tabIndex={-1}
+                            >
+                              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-emerald-600" />}
+                            </button>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Security Helper Note */}
+                      <div className="p-2.5 bg-emerald-50/60 rounded-xl border border-emerald-200/80 flex items-center gap-2 text-[10.5px] text-emerald-900 font-medium">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>
+                          {language === 'hi'
+                            ? 'यह पासवर्ड आपके खाते को सुरक्षित रखता है। अगली बार लॉगिन करने के लिए किसी ओटीपी की जरूरत नहीं होगी, सिर्फ यह पासवर्ड डालकर सीधा लॉगिन होगा।'
+                            : 'This password secures your account. You can log in anytime using this password without waiting for OTP SMS.'}
+                        </span>
                       </div>
                     </div>
 
@@ -1437,16 +1096,32 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center gap-1">
-                              <span>Nearest APMC Mandi Collection Hub</span>
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="e.g. Nashik North APMC Hub"
-                              value={preferredMandi}
-                              onChange={e => setPreferredMandi(e.target.value)}
-                              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-slate-50/60 text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
-                            />
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="block text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                                <span>Nearest Target APMC Mandi</span>
+                              </label>
+                              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                📍 {district}, {state}
+                              </span>
+                            </div>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                list="target-mandi-list"
+                                placeholder="Nearest Target APMC Mandi"
+                                value={preferredMandi}
+                                onChange={e => setPreferredMandi(e.target.value)}
+                                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50/60 text-slate-900 focus:bg-white focus:border-emerald-500 transition-all"
+                              />
+                              <datalist id="target-mandi-list">
+                                {nearbyMandis.map(m => (
+                                  <option key={m} value={m} />
+                                ))}
+                              </datalist>
+                            </div>
+                            <p className="text-[10px] text-slate-500 mt-1">
+                              Auto-matched target mandi for your district.
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -1624,6 +1299,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         </div>
 
                         <div>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase block">Account Security</span>
+                          <span className="font-mono font-bold text-slate-800">••••••••</span>
+                          <span className="inline-block ml-1 px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-bold">
+                            Password Set
+                          </span>
+                        </div>
+
+                        <div>
                           <span className="text-[10px] text-slate-400 font-bold uppercase block">Territory / Location</span>
                           <span className="font-medium text-slate-800">{district}, {state}</span>
                         </div>
@@ -1635,8 +1318,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                               <span className="font-bold text-slate-800">{farmSize} Acres ({irrigationSource})</span>
                             </div>
                             <div>
-                              <span className="text-[10px] text-slate-400 font-bold uppercase block">Target Mandi</span>
-                              <span className="font-medium text-slate-800">{preferredMandi}</span>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase block">Nearest Target Mandi</span>
+                              <span className="font-semibold text-emerald-800">{preferredMandi || getNearestTargetMandi(state, district)}</span>
                             </div>
                           </>
                         ) : activeModalRole === 'buyer' ? (
@@ -1737,7 +1420,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Ramesh Patil / Priya Sharma"
+                    placeholder={language === 'hi' ? 'पंजीकृत नाम दर्ज करें (वैकल्पिक)' : 'e.g. Registered Full Name'}
                     value={name}
                     onChange={e => {
                       setName(e.target.value);
@@ -1779,81 +1462,40 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </div>
                 )}
 
-                {/* 📲 Demo OTP Verification for Login */}
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                      <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Instant Login Demo OTP Verification</span>
+                {/* 🔒 Account Password for Login */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Account Password (खाता पासवर्ड) <span className="text-rose-500">*</span></span>
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                      ● Mobile SMS
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
+                  </label>
+                  <div className="relative">
                     <input
-                      type="text"
-                      maxLength={6}
-                      value={otpCode}
-                      onChange={e => setOtpCode(e.target.value)}
-                      placeholder="6-Digit OTP"
-                      className="w-28 px-3 py-1.5 rounded-xl border border-slate-300 font-mono font-bold text-sm tracking-widest text-slate-900 text-center bg-white"
+                      type={showLoginPassword ? "text" : "password"}
+                      required
+                      placeholder={language === 'hi' ? 'अपना पासवर्ड दर्ज करें' : 'Enter your account password'}
+                      value={loginPassword}
+                      onChange={e => {
+                        setLoginPassword(e.target.value);
+                        setErrorMsg('');
+                      }}
+                      className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 bg-slate-50/60 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all"
                     />
                     <button
                       type="button"
-                      disabled={isSendingOtp}
-                      onClick={() => {
-                        sendOtpToPhone(phone || '9631359486', generateRandomOtp());
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      tabIndex={-1}
                     >
-                      <Smartphone className="w-3 h-3" />
-                      <span>{isSendingOtp ? 'Sending...' : 'Generate New OTP & Send'}</span>
+                      {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-emerald-600" />}
                     </button>
-                    {isOtpVerified && (
-                      <span className="text-[11px] text-emerald-700 font-bold flex items-center gap-1 ml-auto">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Verified</span>
-                      </span>
-                    )}
                   </div>
-
-                  <div className="flex items-center justify-between pt-1 text-[10px]">
-                    <span className="text-slate-500">
-                      Target: <strong className="text-slate-700 font-mono">+91 {(phone || '9631359486').replace(/\D/g, '').slice(-10)}</strong>
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={`https://api.whatsapp.com/send?phone=91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
-                          `🔑 *Farm2Future Login OTP: ${otpCode}*\n\nYour Login OTP is *${otpCode}*. Valid for 10 minutes.\n\n🌾 Farm2Future Platform`
-                        )}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1"
-                      >
-                        <span>🟢 WhatsApp</span>
-                      </a>
-                      <span className="text-slate-300">•</span>
-                      <a
-                        href={`sms:+91${(phone || '9631359486').replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
-                          `Farm2Future Login OTP: ${otpCode}. Valid for 10 minutes.`
-                        )}`}
-                        className="text-sky-700 hover:text-sky-800 font-bold flex items-center gap-1"
-                      >
-                        <Smartphone className="w-3 h-3" />
-                        <span>SMS App</span>
-                      </a>
-                      <span className="text-slate-300">•</span>
-                      <a
-                        href={`https://ntfy.sh/farm2future_${(phone || '9631359486').replace(/\D/g, '').slice(-10)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-purple-700 hover:text-purple-800 font-bold flex items-center gap-1"
-                      >
-                        <span>🔔 NTFY Push</span>
-                      </a>
-                    </div>
-                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    {language === 'hi' 
+                      ? 'पंजीकरण के समय बनाया गया अपना पासवर्ड दर्ज करें।' 
+                      : 'Enter the password you created during registration.'}
+                  </p>
                 </div>
 
                 <button
@@ -1861,7 +1503,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   disabled={isSubmitting}
                   className="w-full py-3.5 rounded-full bg-[#136A3B] hover:bg-[#0E542E] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>{isSubmitting ? 'Verifying & Signing In...' : 'Sign In to Dashboard →'}</span>
+                  <span>{isSubmitting ? 'Signing In...' : 'Sign In to Dashboard →'}</span>
                 </button>
               </div>
             )}

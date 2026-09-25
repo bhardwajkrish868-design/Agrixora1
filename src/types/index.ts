@@ -42,6 +42,8 @@ export interface User {
   aadhaarNumber?: string;
   gstin?: string;
   hubName?: string;
+  password?: string;
+  preferredMandi?: string;
 }
 
 export interface QualityParameter {
@@ -164,7 +166,9 @@ export interface VehicleDetails {
   originHub?: string;
   destinationWarehouse?: string;
   state: string;
+  district?: string;
   cityHub?: string;
+  hubLocation?: string;
   serviceType?: string;
   ratePerKm?: number;
   rating?: number;

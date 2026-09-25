@@ -160,6 +160,31 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
 
             {/* Right: Language, Notifications, User Menu */}
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Live Cloud DB Indicator Button */}
+              <button
+                type="button"
+                onClick={() => setIsCloudDbOpen(true)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  cloudStatus.tursoConnected || cloudStatus.mongoConnected
+                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300 shadow-xs'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
+                }`}
+                title="Live Cloud Database Status (लाइव क्लाउड डेटाबेस स्थिति)"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    cloudStatus.tursoConnected || cloudStatus.mongoConnected ? 'bg-emerald-400' : 'bg-amber-400'
+                  }`}></span>
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${
+                    cloudStatus.tursoConnected || cloudStatus.mongoConnected ? 'bg-emerald-500' : 'bg-amber-500'
+                  }`}></span>
+                </span>
+                <Cloud className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="hidden sm:inline font-mono">
+                  {cloudStatus.tursoConnected ? 'Turso 9GB Live' : (cloudStatus.mongoConnected ? 'Mongo Cloud' : 'Local DB')}
+                </span>
+              </button>
+
               {/* Language Selector */}
               <button
                 onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}

@@ -16,19 +16,23 @@ import {
   Award,
   Zap,
   Radio,
-  Clock
+  Clock,
+  Boxes,
+  ArrowRight
 } from 'lucide-react';
 import { ProductDetailModal } from './ProductDetailModal';
 import { HyperlocalRadar } from '../components/HyperlocalRadar';
 import { calculateDistanceKm, geocodeLocation, getHyperlocalDispatchEstimate } from '../utils/geoUtils';
+import { ALL_INDIAN_STATES, getDistrictsForState } from '../data/indiaLocations';
 
 export const MarketplaceView: React.FC = () => {
-  const { listings, selectedListingModal, setSelectedListingModal, userLocation, collectionHubs } = useAgri();
+  const { listings, selectedListingModal, setSelectedListingModal, userLocation, collectionHubs, bulkDemands, setActiveTab } = useAgri();
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedGrade, setSelectedGrade] = useState<string>('All');
   const [selectedState, setSelectedState] = useState<string>('All');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('All');
   const [maxPrice, setMaxPrice] = useState<number>(20000);
   const [sortBy, setSortBy] = useState<'distance' | 'price_asc' | 'price_desc' | 'freshness' | 'quantity'>('distance');
   const [selectedRadiusKm, setSelectedRadiusKm] = useState<number>(10);
@@ -36,7 +40,17 @@ export const MarketplaceView: React.FC = () => {
 
   const categories = ['All', 'Vegetables', 'Cereals & Grains', 'Fruits', 'Pulses', 'Oilseeds', 'Spices'];
   const grades = ['All', 'Grade A+', 'Grade A', 'Grade B', 'Organic Certified', 'Fair'];
-  const states = ['All', 'Maharashtra', 'Haryana', 'Uttar Pradesh', 'Madhya Pradesh', 'Andhra Pradesh', 'Karnataka', 'Rajasthan'];
+
+  // Dependent districts for chosen state
+  const availableDistricts = useMemo(() => {
+    if (selectedState === 'All') return [];
+    return getDistrictsForState(selectedState);
+  }, [selectedState]);
+
+  const handleStateChange = (newState: string) => {
+    setSelectedState(newState);
+    setSelectedDistrict('All');
+  };
 
   // Enrich listings with live distance & dispatch estimates
   const enrichedListings = useMemo(() => {
@@ -80,19 +94,24 @@ export const MarketplaceView: React.FC = () => {
 
     const itemLoc = item.farmerLocation || item.location || '';
     const itemSt = item.farmerState || item.state || '';
+    const itemDist = item.district || '';
     const matchesSearch = 
       item.cropName.toLowerCase().includes(search.toLowerCase()) ||
       item.variety.toLowerCase().includes(search.toLowerCase()) ||
       item.farmerName.toLowerCase().includes(search.toLowerCase()) ||
       itemLoc.toLowerCase().includes(search.toLowerCase()) ||
-      itemSt.toLowerCase().includes(search.toLowerCase());
+      itemSt.toLowerCase().includes(search.toLowerCase()) ||
+      itemDist.toLowerCase().includes(search.toLowerCase());
 
     const matchesCat = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesGrade = selectedGrade === 'All' || item.qualityGrade === selectedGrade;
-    const matchesState = selectedState === 'All' || itemSt === selectedState;
+    const matchesState = selectedState === 'All' || itemSt.toLowerCase() === selectedState.toLowerCase();
+    const matchesDistrict = selectedDistrict === 'All' || 
+      itemDist.toLowerCase() === selectedDistrict.toLowerCase() ||
+      itemLoc.toLowerCase().includes(selectedDistrict.toLowerCase());
     const matchesPrice = item.pricePerUnit <= maxPrice;
 
-    return matchesSearch && matchesCat && matchesGrade && matchesState && matchesPrice;
+    return matchesSearch && matchesCat && matchesGrade && matchesState && matchesDistrict && matchesPrice;
   }).sort((a, b) => {
     if (sortBy === 'distance') return a.distanceKm - b.distanceKm;
     if (sortBy === 'price_asc') return a.pricePerUnit - b.pricePerUnit;
@@ -120,6 +139,42 @@ export const MarketplaceView: React.FC = () => {
           <span>{filteredListings.length} Active Lots Available</span>
         </div>
       </div>
+
+      {/* 🏢 Institutional Bulk Demands Banner */}
+      {bulkDemands && bulkDemands.length > 0 && (
+        <div 
+          onClick={() => setActiveTab('bulk_pooling')}
+          className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-3xl p-4 sm:p-5 border border-emerald-500/40 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer hover:border-emerald-400 transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0 text-xl shadow-xs">
+              📦
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Bulk Pools Open ({bulkDemands.length})
+                </span>
+                <span className="text-xs font-bold text-emerald-300">
+                  ⚡ 4-Month Advance Contracts
+                </span>
+              </div>
+              <p className="text-xs text-slate-200 mt-1 font-medium">
+                {bulkDemands.map(b => `${b.demandNumber}: ${b.cropName} (${b.targetQuantityTons}T @ ₹${b.pricePerTon.toLocaleString('en-IN')}/T)`).join(' • ')}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="px-4 py-2 rounded-xl bg-emerald-500 group-hover:bg-emerald-400 text-slate-950 font-black text-xs shrink-0 flex items-center gap-1.5 shadow-sm cursor-pointer"
+          >
+            <Boxes className="w-4 h-4" />
+            <span>Open Bulk Pooling Bay</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* 📍 10 KM Hyper-Local Auto-Connect Radar */}
       <HyperlocalRadar
@@ -163,14 +218,28 @@ export const MarketplaceView: React.FC = () => {
             {/* State Filter */}
             <select
               value={selectedState}
-              onChange={e => setSelectedState(e.target.value)}
+              onChange={e => handleStateChange(e.target.value)}
               className="px-3 py-2.5 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white focus:ring-2 focus:ring-emerald-500"
             >
-              <option value="All">All Locations / States</option>
-              {states.slice(1).map(s => (
+              <option value="All">All India (All States)</option>
+              {ALL_INDIAN_STATES.map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
+
+            {/* Dependent District Filter - Active when a State is chosen */}
+            {selectedState !== 'All' && (
+              <select
+                value={selectedDistrict}
+                onChange={e => setSelectedDistrict(e.target.value)}
+                className="px-3 py-2.5 rounded-2xl border border-emerald-400 text-xs font-bold text-emerald-800 bg-emerald-50/70 focus:ring-2 focus:ring-emerald-500 animate-in fade-in duration-150"
+              >
+                <option value="All">All Districts in {selectedState}</option>
+                {availableDistricts.map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            )}
 
             {/* Sort Filter */}
             <select
@@ -227,6 +296,7 @@ export const MarketplaceView: React.FC = () => {
               setSelectedCategory('All');
               setSelectedGrade('All');
               setSelectedState('All');
+              setSelectedDistrict('All');
               setIsHyperlocalOnly(false);
               setSelectedRadiusKm(9999);
             }}

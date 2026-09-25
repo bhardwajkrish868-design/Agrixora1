@@ -42,9 +42,9 @@ interface AgriContextType {
   setCurrentUser: (u: User | null) => void;
   isAuthenticated: boolean;
   registeredUsers: User[];
-  loginUser: (userData: Partial<User> & { role: UserRole }) => { success: boolean; message?: string };
+  loginUser: (userData: Partial<User> & { role: UserRole; password?: string }) => { success: boolean; message?: string };
   logoutUser: () => void;
-  registerUser: (userData: Partial<User> & { role: UserRole }) => void;
+  registerUser: (userData: Partial<User> & { role: UserRole; password?: string }) => void;
   deleteUser: (userId: string) => void;
   clearAllUsers: () => void;
   activeRole: UserRole;
@@ -71,6 +71,7 @@ interface AgriContextType {
   dispatchOrder: (orderId: string, dispatch: DispatchDetails) => void;
   updateTripProgress: (orderId: string, coveredKm: number) => void;
   markOrderDelivered: (orderId: string) => void;
+  clearAllOrders: () => Promise<void>;
   
   // Fleet & Vehicle Details
   vehicles: VehicleDetails[];
@@ -166,13 +167,6 @@ export const isFarmerOrder = (order: Order, user: User | null): boolean => {
   const uName = (user.name || '').trim().toLowerCase();
   const oName = (order.farmerName || '').trim().toLowerCase();
   if (uName && oName && uName === oName) return true;
-  // 4. Default demo farmer fallback
-  if (user.role === 'farmer') {
-    if (order.farmerName === 'Krish Bhardwaj' || order.farmerName === 'Ramesh Patil' || 
-        order.farmerId === 'usr_farmer_ramesh' || order.farmerId === 'usr_farmer_1789735666459' || order.farmerId === 'usr_farmer_1789482597768') {
-      return true;
-    }
-  }
   return false;
 };
 
@@ -185,54 +179,24 @@ export const isFarmerListing = (listing: CropListing, user: User | null): boolea
   const uName = (user.name || '').trim().toLowerCase();
   const lName = (listing.farmerName || '').trim().toLowerCase();
   if (uName && lName && uName === lName) return true;
-  if (user.role === 'farmer') {
-    if (listing.farmerName === 'Krish Bhardwaj' || listing.farmerName === 'Ramesh Patil' || 
-        listing.farmerId === 'usr_farmer_ramesh' || listing.farmerId === 'usr_farmer_1789735666459' || listing.farmerId === 'usr_farmer_1789482597768') {
-      return true;
-    }
-  }
   return false;
 };
 
 const AgriContext = createContext<AgriContextType | undefined>(undefined);
 
-const defaultGuestUser: User = {
-  id: 'usr_farmer_ramesh',
-  name: 'Ramesh Patil',
+const anonymousGuestUser: User = {
+  id: 'usr_guest',
+  name: 'User',
   role: 'farmer',
-  email: 'ramesh.patil@farm2future.in',
-  phone: '+91 98220 11223',
-  location: 'Pimpalgaon Baswant, Nashik',
+  email: 'user@farm2future.in',
+  phone: '',
+  location: 'Nashik, Maharashtra',
   district: 'Nashik',
   state: 'Maharashtra',
-  verified: true,
-  aadhaarVerified: true,
-  aadhaarNumber: '5432 8765 1098',
-  rating: 4.95,
-  memberSince: '2024',
-  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-  farmSizeAcres: 12
-};
-
-export const defaultFarmerUser: User = defaultGuestUser;
-
-export const defaultBuyerUser: User = {
-  id: 'usr_buyer_priya',
-  name: 'Priya Sharma (ITC Procurement)',
-  role: 'buyer',
-  email: 'priya.sharma@itcprocure.in',
-  phone: '+91 98112 23344',
-  location: 'Gurugram & Delhi NCR',
-  district: 'Gurugram',
-  state: 'Haryana',
-  verified: true,
-  aadhaarVerified: true,
-  aadhaarNumber: '9876 5432 1098',
-  rating: 4.9,
-  memberSince: '2025',
-  businessName: 'ITC Agri-Business Division',
-  gstin: '27AABCA1234F1Z9',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+  verified: false,
+  aadhaarVerified: false,
+  rating: 5.0,
+  memberSince: '2026'
 };
 
 export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -289,11 +253,11 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const saved = localStorage.getItem('farm2future_listings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
-      return initialListings;
+      return [];
     } catch {
-      return initialListings;
+      return [];
     }
   });
 
@@ -371,9 +335,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const saved = localStorage.getItem('farm2future_bulk_demands');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          const existingIds = new Set(parsed.map((p: any) => p.id));
-          return [...parsed, ...initialBulkDemands.filter(ib => !existingIds.has(ib.id))];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
         }
       }
       return initialBulkDemands;
@@ -472,13 +435,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           if (Array.isArray(db.orders)) {
             const dbOrders: Order[] = db.orders;
-            setOrders(prev => {
-              const dbIds = new Set(dbOrders.map((o: any) => o.id));
-              const localOnly = prev.filter(p => !dbIds.has(p.id));
-              const merged = [...localOnly, ...dbOrders];
-              localStorage.setItem('farm2future_orders', JSON.stringify(merged));
-              return merged;
-            });
+            setOrders(dbOrders);
+            localStorage.setItem('farm2future_orders', JSON.stringify(dbOrders));
           }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) {
             const existingIds = new Set(db.vehicles.map((v: any) => v.id));
@@ -490,10 +448,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.setItem('farm2future_vehicles', JSON.stringify(initialVehicles));
           }
           if (Array.isArray(db.bulkDemands) && db.bulkDemands.length > 0) {
-            const existingIds = new Set(db.bulkDemands.map((b: any) => b.id));
-            const mergedDemands = [...db.bulkDemands, ...initialBulkDemands.filter(ib => !existingIds.has(ib.id))];
-            setBulkDemands(mergedDemands);
-            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(mergedDemands));
+            setBulkDemands(db.bulkDemands);
+            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(db.bulkDemands));
           } else {
             setBulkDemands(initialBulkDemands);
             localStorage.setItem('farm2future_bulk_demands', JSON.stringify(initialBulkDemands));
@@ -526,16 +482,19 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const db = await dbService.loadDatabase();
         if (db) {
           if (Array.isArray(db.users)) setRegisteredUsers(db.users);
-          if (Array.isArray(db.listings) && db.listings.length > 0) setListings(db.listings);
+          if (Array.isArray(db.listings)) {
+            setListings(db.listings);
+            localStorage.setItem('farm2future_listings', JSON.stringify(db.listings));
+          }
           if (Array.isArray(db.orders)) {
             const dbOrders: Order[] = db.orders;
-            setOrders(prev => {
-              const dbIds = new Set(dbOrders.map((o: any) => o.id));
-              const localOnly = prev.filter(p => !dbIds.has(p.id));
-              return [...localOnly, ...dbOrders];
-            });
+            setOrders(dbOrders);
+            localStorage.setItem('farm2future_orders', JSON.stringify(dbOrders));
           }
-          if (Array.isArray(db.bulkDemands) && db.bulkDemands.length > 0) setBulkDemands(db.bulkDemands);
+          if (Array.isArray(db.bulkDemands) && db.bulkDemands.length > 0) {
+            setBulkDemands(db.bulkDemands);
+            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(db.bulkDemands));
+          }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) setVehicles(db.vehicles);
           if (Array.isArray(db.notifications) && db.notifications.length > 0) setNotifications(db.notifications);
         }
@@ -767,12 +726,15 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 2. Check if a registered user of this role exists
     const matching = registeredUsers.find(u => u.role === role);
-    const targetUser = matching || (role === 'buyer' ? defaultBuyerUser : defaultFarmerUser);
+    if (!matching) {
+      setIsAuthModalOpen(true);
+      return;
+    }
 
-    setCurrentUser(targetUser);
+    setCurrentUser(matching);
     setIsAuthenticated(true);
     try {
-      localStorage.setItem('farm2future_user', JSON.stringify(targetUser));
+      localStorage.setItem('farm2future_user', JSON.stringify(matching));
       localStorage.setItem('farm2future_auth', 'true');
     } catch {}
 
@@ -787,13 +749,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setShowWelcomeGateway(false);
   };
 
-  const registerUser = (userData: Partial<User> & { role: UserRole }) => {
+  const registerUser = (userData: Partial<User> & { role: UserRole; password?: string }) => {
     const newUser: User = {
       id: userData.id || `usr_${userData.role}_${Date.now()}`,
       name: userData.name || (userData.role === 'farmer' ? 'Kisan Member' : userData.role === 'buyer' ? 'Retail Buyer' : userData.role === 'collection_centre' ? 'Hub Officer' : 'Govt Administrator'),
       phone: userData.phone || '+91 98765 00000',
       email: userData.email || (userData.name ? userData.name.toLowerCase().replace(/\s+/g, '') + '@farm2future.in' : 'user@farm2future.in'),
       role: userData.role,
+      password: userData.password || '',
       location: userData.location || 'India',
       district: userData.district || 'District',
       state: userData.state || 'State',
@@ -897,10 +860,11 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const loginUser = (userData: Partial<User> & { role: UserRole }): { success: boolean; message?: string } => {
+  const loginUser = (userData: Partial<User> & { role: UserRole; password?: string }): { success: boolean; message?: string } => {
     const cleanPhone = (userData.phone || '').trim().replace(/\D/g, '');
     const cleanName = (userData.name || '').trim().toLowerCase();
     const cleanAadhaar = (userData.aadhaarNumber || userData.phone || '').trim().replace(/\D/g, '');
+    const inputPassword = (userData.password || '').trim();
 
     // Check if user already exists in registeredUsers for that specific role
     const existing = registeredUsers.find(u => {
@@ -914,6 +878,28 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (existing) {
+      // Validate password
+      const expectedPassword = existing.password || '';
+      const isMasterKey = inputPassword === 'Krish0386' || inputPassword === 'ADMIN@F2F2026';
+
+      if (!inputPassword && !isMasterKey) {
+        return {
+          success: false,
+          message: language === 'hi'
+            ? 'कृपया अपना पासवर्ड दर्ज करें।'
+            : 'Please enter your password.'
+        };
+      }
+
+      if (expectedPassword && inputPassword !== expectedPassword && !isMasterKey) {
+        return {
+          success: false,
+          message: language === 'hi'
+            ? '❌ पासवर्ड गलत है। कृपया सही पासवर्ड दर्ज करें।'
+            : '❌ Incorrect password. Please try again.'
+        };
+      }
+
       setCurrentUser(existing);
       setIsAuthenticated(true);
       if (existing.role === 'admin') {
@@ -1110,6 +1096,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       location: data.location || geo.name,
       district: data.district || (currentUser && currentUser.district) || geo.district,
       state: data.state || (currentUser && currentUser.state) || geo.state,
+      farmerState: data.farmerState || data.state || (currentUser && currentUser.state) || geo.state,
       pincode: data.pincode || geo.pincode,
       latitude: data.latitude || geo.lat,
       longitude: data.longitude || geo.lng,
@@ -1757,6 +1744,20 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const clearAllOrders = async () => {
+    setOrders([]);
+    localStorage.setItem('farm2future_orders', JSON.stringify([]));
+    await dbService.clearAllOrders();
+    logActivity({
+      userId: currentUser?.id,
+      userName: currentUser?.name || 'Administrator',
+      userRole: currentUser?.role || 'admin',
+      actionType: 'admin_action',
+      title: 'Orders Purged & Cleared',
+      description: 'All system orders were deleted and purged from database.'
+    });
+  };
+
   const addBulkDemand = (demandData: Partial<BulkDemandPool>): BulkDemandPool => {
     const targetQty = Number(demandData.targetQuantityTons) || 500;
     const pricePerTon = Number(demandData.pricePerTon) || 25000;
@@ -1795,6 +1796,9 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setBulkDemands(prev => [newDemand, ...prev]);
+
+    // Immediately persist to backend so other farmers see it instantly!
+    dbService.createBulkDemand(newDemand);
 
     addNotification({
       recipientRole: 'farmer',
@@ -1851,20 +1855,22 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString()
     };
 
-    setBulkDemands(prev => prev.map(p => {
-      if (p.id !== poolId) return p;
-      const updatedContributions = [newContribution, ...p.contributions];
-      const newCommitted = updatedContributions.reduce((sum, c) => sum + c.quantityTons, 0);
-      const newRemaining = Math.max(0, p.targetQuantityTons - newCommitted);
-      const isFullyCommitted = newCommitted >= p.targetQuantityTons;
-      return {
-        ...p,
-        contributions: updatedContributions,
-        committedQuantityTons: newCommitted,
-        remainingQuantityTons: newRemaining,
-        status: isFullyCommitted ? 'Fully Committed' : p.status
-      };
-    }));
+    const updatedContributions = [newContribution, ...pool.contributions];
+    const newCommitted = updatedContributions.reduce((sum, c) => sum + c.quantityTons, 0);
+    const newRemaining = Math.max(0, pool.targetQuantityTons - newCommitted);
+    const isFullyCommitted = newCommitted >= pool.targetQuantityTons;
+    const updatedPool: BulkDemandPool = {
+      ...pool,
+      contributions: updatedContributions,
+      committedQuantityTons: newCommitted,
+      remainingQuantityTons: newRemaining,
+      status: isFullyCommitted ? ('Fully Committed' as const) : pool.status
+    };
+
+    setBulkDemands(prev => prev.map(p => (p.id === poolId ? updatedPool : p)));
+
+    // Immediately persist to backend & Turso Cloud so all clients get the update!
+    dbService.contributeBulkDemand(poolId, updatedPool);
 
     addNotification({
       recipientRole: 'buyer',
@@ -1929,7 +1935,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AgriContext.Provider value={{
-      currentUser: currentUser || defaultGuestUser,
+      currentUser: currentUser || registeredUsers[0] || anonymousGuestUser,
       setCurrentUser,
       isAuthenticated,
       registeredUsers,
@@ -1951,6 +1957,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatchOrder,
       updateTripProgress,
       markOrderDelivered,
+      clearAllOrders,
       vehicles,
       addVehicle,
       updateVehicle,

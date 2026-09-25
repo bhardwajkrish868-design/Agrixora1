@@ -95,6 +95,9 @@ const MainLayout: React.FC = () => {
 
     // Admin Routing
     if (activeRole === 'admin') {
+      if (activeTab === 'profile') {
+        return <ProfileView />;
+      }
       return <AdminDashboard />;
     }
 

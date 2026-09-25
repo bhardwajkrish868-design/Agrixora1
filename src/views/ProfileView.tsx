@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAgri } from '../context/AgriContext';
+import { ALL_INDIAN_STATES, getDistrictsForState, getDefaultDistrictForState, getNearestTargetMandi } from '../data/indiaLocations';
 import { 
   User as UserIcon, 
   ShieldCheck, 
@@ -19,7 +20,10 @@ import {
   Boxes,
   ShoppingBag,
   Clock,
-  CreditCard
+  CreditCard,
+  Eye,
+  EyeOff,
+  Store
 } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
@@ -30,10 +34,21 @@ export const ProfileView: React.FC = () => {
   const [aadhaarNumber, setAadhaarNumber] = useState(currentUser.aadhaarNumber || (currentUser.role === 'farmer' ? '5432 8765 1098' : currentUser.role === 'buyer' ? '9876 5432 1098' : '5432 8765 1098'));
   const [email, setEmail] = useState(currentUser.email);
   const [location, setLocation] = useState(currentUser.location);
-  const [district, setDistrict] = useState(currentUser.district);
-  const [state, setState] = useState(currentUser.state);
+  const [district, setDistrict] = useState(currentUser.district || 'Nashik');
+  const [state, setState] = useState(currentUser.state || 'Maharashtra');
+
+  // Dependent cascading districts list for selected state
+  const availableDistricts = useMemo(() => getDistrictsForState(state), [state]);
+
+  const handleStateChange = (newState: string) => {
+    setState(newState);
+    const def = getDefaultDistrictForState(newState);
+    setDistrict(def);
+  };
   const [farmSize, setFarmSize] = useState(currentUser.farmSizeAcres || 14.5);
   const [businessName, setBusinessName] = useState(currentUser.businessName || '');
+  const [password, setPassword] = useState(currentUser.password || '');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
   const handleAadhaarChange = (val: string) => {
@@ -48,12 +63,14 @@ export const ProfileView: React.FC = () => {
       ...currentUser,
       name,
       phone,
+      password: password.trim() || currentUser.password || '',
       aadhaarNumber: aadhaarNumber.trim(),
       aadhaarVerified: true,
       email,
       location,
       district,
       state,
+      preferredMandi: getNearestTargetMandi(state, district),
       farmSizeAcres: Number(farmSize),
       businessName: businessName || currentUser.businessName
     };
@@ -72,9 +89,10 @@ export const ProfileView: React.FC = () => {
     setTimeout(() => setIsSaved(false), 3000);
   };
 
-  // User-isolated activity history (only actions relevant to the current logged-in user)
+  // User-isolated activity history (admins see all events, other users see their own)
   const userHistory = (activityHistory || []).filter(item => {
     if (!currentUser) return false;
+    if (currentUser.role === 'admin' || activeRole === 'admin') return true;
     return item.userId === currentUser.id || item.userName === currentUser.name;
   });
 
@@ -182,7 +200,7 @@ export const ProfileView: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Mobile Contact (OTP Enabled)
+              Mobile Contact (Phone)
             </label>
             <input
               type="text"
@@ -191,6 +209,30 @@ export const ProfileView: React.FC = () => {
               onChange={e => setPhone(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+              <span>Account Login Password</span>
+              <span className="text-[10px] text-slate-400 font-normal">No OTP required</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-emerald-600" />}
+              </button>
+            </div>
           </div>
 
           <div>
@@ -274,28 +316,54 @@ export const ProfileView: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-              District
+              State
             </label>
-            <input
-              type="text"
-              required
-              value={district}
-              onChange={e => setDistrict(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500"
-            />
+            <select
+              value={state}
+              onChange={e => handleStateChange(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 bg-white"
+            >
+              {ALL_INDIAN_STATES.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-              State
+              District
             </label>
-            <input
-              type="text"
-              required
-              value={state}
-              onChange={e => setState(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500"
-            />
+            <select
+              value={district}
+              onChange={e => setDistrict(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 bg-white"
+            >
+              {availableDistricts.length > 0 ? (
+                availableDistricts.map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))
+              ) : (
+                <option value="">Select State first</option>
+              )}
+            </select>
+          </div>
+
+          {/* 🎯 Nearest Target APMC Mandi according to location */}
+          <div className="sm:col-span-2 p-3.5 bg-emerald-50/90 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Store className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider block">Nearest Target APMC Mandi</span>
+                <span className="font-extrabold text-slate-900 text-xs sm:text-sm">
+                  {getNearestTargetMandi(state, district)}
+                </span>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold text-emerald-800 bg-white px-2.5 py-1 rounded-full border border-emerald-300 self-start sm:self-center shadow-xs">
+              📍 Auto-matched to {district}, {state}
+            </span>
           </div>
         </div>
 
@@ -309,47 +377,53 @@ export const ProfileView: React.FC = () => {
       </form>
 
       {/* User Isolated Personal History & Audit Log */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <History className="w-5 h-5 text-emerald-600" />
-            <h2 className="text-base font-bold text-slate-900">My Activity & History Audit Trail</h2>
-          </div>
-          <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-            {userHistory.length} Recorded Events
-          </span>
-        </div>
-        <p className="text-xs text-slate-500">
-          This chronological history tracks your account events, logins, crop lots, orders, and state changes securely saved in the database.
-        </p>
-
-        <div className="space-y-3 pt-2">
-          {userHistory.length === 0 ? (
-            <div className="text-center py-8 text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl">
-              <Clock className="w-6 h-6 text-slate-300 mx-auto mb-2" />
-              <span>No recorded activities yet. Your logins, crop postings, and orders will appear here automatically.</span>
+      {currentUser.role !== 'farmer' && activeRole !== 'farmer' && (
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <History className="w-5 h-5 text-emerald-600" />
+              <h2 className="text-base font-bold text-slate-900">
+                {currentUser.role === 'admin' || activeRole === 'admin' ? 'Platform Activity & History Audit Trail' : 'My Activity & History Audit Trail'}
+              </h2>
             </div>
-          ) : (
-            userHistory.map(item => (
-              <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getBadgeClass(item.actionType)}`}>
-                      {item.actionType.replace('_', ' ').toUpperCase()}
-                    </span>
-                    <strong className="text-slate-900 font-bold">{item.title}</strong>
-                  </div>
-                  <p className="text-slate-600 text-[11px]">{item.description}</p>
-                </div>
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              {userHistory.length} Recorded Events
+            </span>
+          </div>
+          <p className="text-xs text-slate-500">
+            {currentUser.role === 'admin' || activeRole === 'admin'
+              ? 'This chronological history tracks all platform events, logins, crop lots, orders, and state changes securely saved in the database.'
+              : 'This chronological history tracks your account events, logins, crop lots, orders, and state changes securely saved in the database.'}
+          </p>
 
-                <div className="text-[10px] font-mono text-slate-400 whitespace-nowrap self-start sm:self-center">
-                  {new Date(item.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
-                </div>
+          <div className="space-y-3 pt-2">
+            {userHistory.length === 0 ? (
+              <div className="text-center py-8 text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl">
+                <Clock className="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                <span>No recorded activities yet. Your logins, crop postings, and orders will appear here automatically.</span>
               </div>
-            ))
-          )}
+            ) : (
+              userHistory.map(item => (
+                <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getBadgeClass(item.actionType)}`}>
+                        {item.actionType.replace('_', ' ').toUpperCase()}
+                      </span>
+                      <strong className="text-slate-900 font-bold">{item.title}</strong>
+                    </div>
+                    <p className="text-slate-600 text-[11px]">{item.description}</p>
+                  </div>
+
+                  <div className="text-[10px] font-mono text-slate-400 whitespace-nowrap self-start sm:self-center">
+                    {new Date(item.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

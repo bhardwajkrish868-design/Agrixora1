@@ -14,7 +14,10 @@ import {
   Bot,
   Phone,
   CheckCircle2,
-  BadgePercent
+  BadgePercent,
+  Boxes,
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import { RouteTripTracker } from '../components/RouteTripTracker';
 
@@ -22,6 +25,7 @@ export const FarmerOrdersView: React.FC = () => {
   const { 
     currentUser,
     orders, 
+    bulkDemands,
     isFarmerOrder,
     updateOrderStage,
     setActiveTab, 
@@ -79,6 +83,73 @@ export const FarmerOrdersView: React.FC = () => {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* ⚡ Institutional Bulk Demands & Pooled Orders Highlight */}
+      <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-300" />
+                ⚡ 4-Month Advance Contracts
+              </span>
+              <span className="text-xs font-semibold text-emerald-200">
+                {bulkDemands.length} Live Bulk Demands Open
+              </span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-black">
+              Institutional Bulk Orders (थोक खरीदार मांग पूल)
+            </h2>
+            <p className="text-xs text-slate-300 max-w-xl">
+              Large institutional buyers (like Prashant, ITC) have pre-funded 100% Escrow for bulk procurement. Open directly to accept tonnage!
+            </p>
+          </div>
+
+          <button
+            onClick={() => setActiveTab('bulk_pooling')}
+            className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center gap-2 transition-all shadow-md shrink-0 cursor-pointer"
+          >
+            <Boxes className="w-4 h-4" />
+            <span>Open Bulk Pooling Bay ({bulkDemands.length})</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {bulkDemands.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/10 relative z-10">
+            {bulkDemands.map(pool => (
+              <div 
+                key={pool.id}
+                onClick={() => setActiveTab('bulk_pooling')}
+                className="p-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 transition-all cursor-pointer flex items-center justify-between gap-3"
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold bg-white/20 px-1.5 py-0.5 rounded text-white">
+                      {pool.demandNumber}
+                    </span>
+                    <span className="text-xs font-black text-emerald-300">
+                      {pool.cropName}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 mt-1">
+                    ₹{pool.pricePerTon.toLocaleString('en-IN')}/Ton • Target: {pool.targetQuantityTons}T • 🏢 {pool.buyerOrg || pool.buyerName}
+                  </p>
+                  <p className="text-[10px] text-emerald-400 mt-0.5">
+                    📍 {pool.deliveryCity}, {pool.deliveryState} • Quota: {pool.committedQuantityTons}/{pool.targetQuantityTons}T
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shrink-0 cursor-pointer shadow-sm"
+                >
+                  Accept & Supply
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Filter Tabs */}

@@ -90,7 +90,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           { id: 'transport_services', label: 'State Transport Network', icon: Truck },
           { id: 'transactions', label: 'Escrow & Txns', icon: Receipt },
           { id: 'database', label: 'Database & Audit Logs', icon: Database, badge: activityHistory?.length || 0 },
-          { id: 'analytics', label: 'Supply Analytics', icon: BarChart3 }
+          { id: 'analytics', label: 'Supply Analytics', icon: BarChart3 },
+          { id: 'profile', label: 'Admin Profile & KYC', icon: User }
         ];
     }
   };

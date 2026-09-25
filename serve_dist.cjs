@@ -396,6 +396,10 @@ const server = http.createServer((req, res) => {
       if (!db) {
         db = readDb();
       }
+      if (db && !Array.isArray(db.bulkDemands)) {
+        const local = readDb();
+        db.bulkDemands = local.bulkDemands || [];
+      }
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
@@ -510,6 +514,164 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (reqPath === '/api/orders/clear' && req.method === 'POST') {
+    (async () => {
+      try {
+        if (turso.getIsConnected()) {
+          try { await turso.clearTursoOrders(); } catch (_) {}
+        }
+        if (mongo.getIsConnected()) {
+          try { await mongo.OrderModel.deleteMany({}); } catch (_) {}
+        }
+        const currentDb = readDb();
+        currentDb.orders = [];
+        writeDb(currentDb);
+
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true, message: 'All orders cleared successfully', cloudCleared: turso.getIsConnected() || mongo.getIsConnected() }));
+      } catch (err) {
+        res.writeHead(500, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
+  if (reqPath === '/api/listings/clear' && req.method === 'POST') {
+    (async () => {
+      try {
+        if (turso.getIsConnected()) {
+          try { await turso.clearTursoListings(); } catch (_) {}
+        }
+        if (mongo.getIsConnected()) {
+          try { if (mongo.ListingModel) await mongo.ListingModel.deleteMany({}); } catch (_) {}
+        }
+        const currentDb = readDb();
+        currentDb.listings = [];
+        writeDb(currentDb);
+
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true, message: 'All listings cleared successfully', cloudCleared: turso.getIsConnected() || mongo.getIsConnected() }));
+      } catch (err) {
+        res.writeHead(500, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
+  if (reqPath === '/api/bulk-demands' && req.method === 'GET') {
+    (async () => {
+      let bds = null;
+      if (turso.getIsConnected()) {
+        try {
+          const db = await turso.getAllTursoData();
+          bds = db?.bulkDemands || null;
+        } catch (_) {}
+      }
+      if (!bds && mongo.getIsConnected()) {
+        try {
+          const raw = await mongo.BulkDemandModel.find({}).lean();
+          bds = (raw || []).map(b => b.data || b);
+        } catch (_) {}
+      }
+      if (!bds) {
+        const db = readDb();
+        bds = db.bulkDemands || [];
+      }
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.end(JSON.stringify(bds));
+    })();
+    return;
+  }
+
+  if (reqPath === '/api/bulk-demands/create' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const demand = JSON.parse(body || '{}');
+        if (!demand.id) throw new Error('Bulk Demand ID required');
+
+        if (turso.getIsConnected()) {
+          try { await turso.saveTursoBulkDemand(demand); } catch (_) {}
+        }
+        if (mongo.getIsConnected()) {
+          try { await mongo.saveMongoBulkDemand(demand); } catch (_) {}
+        }
+
+        const currentDb = readDb();
+        if (!currentDb.bulkDemands) currentDb.bulkDemands = [];
+        currentDb.bulkDemands = [demand, ...currentDb.bulkDemands.filter(b => b.id !== demand.id)];
+        writeDb(currentDb);
+
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true, demand, cloudSaved: turso.getIsConnected() || mongo.getIsConnected() }));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  if (reqPath === '/api/bulk-demands/contribute' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { poolId, updatedPool } = JSON.parse(body || '{}');
+        if (!poolId || !updatedPool) throw new Error('poolId and updatedPool required');
+
+        if (turso.getIsConnected()) {
+          try { await turso.saveTursoBulkDemand(updatedPool); } catch (_) {}
+        }
+        if (mongo.getIsConnected()) {
+          try { await mongo.saveMongoBulkDemand(updatedPool); } catch (_) {}
+        }
+
+        const currentDb = readDb();
+        if (!currentDb.bulkDemands) currentDb.bulkDemands = [];
+        currentDb.bulkDemands = currentDb.bulkDemands.map(b => b.id === poolId ? updatedPool : b);
+        writeDb(currentDb);
+
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true, updatedPool, cloudSaved: turso.getIsConnected() || mongo.getIsConnected() }));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   if (reqPath === '/api/db/sync' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -521,13 +683,43 @@ const server = http.createServer((req, res) => {
         if (turso.getIsConnected()) {
           try {
             if (Array.isArray(payload.users)) {
+              const currentTurso = await turso.getAllTursoData();
+              const newIds = new Set(payload.users.map(u => u.id));
+              if (currentTurso && Array.isArray(currentTurso.users)) {
+                for (const eu of currentTurso.users) {
+                  if (!newIds.has(eu.id)) {
+                    await turso.deleteTursoUser(eu.id);
+                  }
+                }
+              }
               for (const u of payload.users) await turso.saveTursoUser(u);
             }
             if (Array.isArray(payload.listings)) {
-              for (const l of payload.listings) await turso.saveTursoListing(l);
+              if (payload.listings.length === 0) {
+                await turso.clearTursoListings();
+              } else {
+                for (const l of payload.listings) await turso.saveTursoListing(l);
+              }
             }
-            if (Array.isArray(payload.orders)) {
+            if (Array.isArray(payload.orders) && payload.orders.length > 0) {
               for (const o of payload.orders) await turso.saveTursoOrder(o);
+            }
+            if (Array.isArray(payload.bulkDemands)) {
+              for (const bd of payload.bulkDemands) {
+                await turso.saveTursoBulkDemand(bd);
+              }
+            }
+            if (Array.isArray(payload.vehicles)) {
+              for (const v of payload.vehicles) await turso.saveTursoVehicle(v);
+            }
+            if (Array.isArray(payload.notifications)) {
+              for (const n of payload.notifications) await turso.saveTursoNotification(n);
+            }
+            if (Array.isArray(payload.activityHistory)) {
+              for (const a of payload.activityHistory.slice(0, 50)) await turso.saveTursoActivity(a);
+            }
+            if (payload.adminPasskey) {
+              await turso.saveTursoSetting('adminPasskey', payload.adminPasskey);
             }
           } catch (_) {}
         }
@@ -536,13 +728,28 @@ const server = http.createServer((req, res) => {
         if (mongo.getIsConnected()) {
           try {
             if (Array.isArray(payload.users)) {
+              const newIds = payload.users.map(u => u.id);
+              await mongo.UserModel.deleteMany({ id: { $nin: newIds } });
               for (const u of payload.users) await mongo.saveMongoUser(u);
             }
             if (Array.isArray(payload.listings)) {
-              for (const l of payload.listings) await mongo.saveMongoListing(l);
+              if (payload.listings.length === 0) {
+                if (mongo.ListingModel) await mongo.ListingModel.deleteMany({});
+              } else {
+                for (const l of payload.listings) await mongo.saveMongoListing(l);
+              }
             }
             if (Array.isArray(payload.orders)) {
-              for (const o of payload.orders) await mongo.saveMongoOrder(o);
+              if (payload.orders.length === 0) {
+                await mongo.OrderModel.deleteMany({});
+              } else {
+                for (const o of payload.orders) await mongo.saveMongoOrder(o);
+              }
+            }
+            if (Array.isArray(payload.bulkDemands)) {
+              for (const bd of payload.bulkDemands) {
+                await mongo.saveMongoBulkDemand(bd);
+              }
             }
           } catch (_) {}
         }

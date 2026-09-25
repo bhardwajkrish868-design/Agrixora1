@@ -151,6 +151,11 @@ const SettingSchema = new mongoose.Schema({
   value: { type: mongoose.Schema.Types.Mixed }
 }, { timestamps: true });
 
+const BulkDemandSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  data: { type: Object, required: true }
+}, { timestamps: true, strict: false });
+
 // Models
 const UserModel = mongoose.models.User || mongoose.model('User', UserSchema);
 const ListingModel = mongoose.models.Listing || mongoose.model('Listing', ListingSchema);
@@ -159,6 +164,7 @@ const ActivityModel = mongoose.models.Activity || mongoose.model('Activity', Act
 const NotificationModel = mongoose.models.Notification || mongoose.model('Notification', NotificationSchema);
 const VehicleModel = mongoose.models.Vehicle || mongoose.model('Vehicle', VehicleSchema);
 const SettingModel = mongoose.models.Setting || mongoose.model('Setting', SettingSchema);
+const BulkDemandModel = mongoose.models.BulkDemand || mongoose.model('BulkDemand', BulkDemandSchema);
 
 let isConnected = false;
 let currentUri = process.env.MONGODB_URI || '';
@@ -253,15 +259,18 @@ async function getAllMongoData() {
   if (!isConnected) return null;
 
   try {
-    const [users, listings, orders, activities, notifications, vehicles, adminKeySetting] = await Promise.all([
+    const [users, listings, orders, activities, notifications, vehicles, adminKeySetting, bulkDemandsRaw] = await Promise.all([
       UserModel.find({}).lean(),
       ListingModel.find({}).lean(),
       OrderModel.find({}).lean(),
       ActivityModel.find({}).sort({ createdAt: -1 }).limit(500).lean(),
       NotificationModel.find({}).sort({ createdAt: -1 }).limit(100).lean(),
       VehicleModel.find({}).lean(),
-      SettingModel.findOne({ key: 'adminPasskey' }).lean()
+      SettingModel.findOne({ key: 'adminPasskey' }).lean(),
+      BulkDemandModel.find({}).lean()
     ]);
+
+    const bulkDemands = (bulkDemandsRaw || []).map(b => b.data || b);
 
     return {
       users: users || [],
@@ -271,6 +280,7 @@ async function getAllMongoData() {
       notifications: notifications || [],
       vehicles: vehicles || [],
       adminPasskey: adminKeySetting?.value || 'Krish0386',
+      bulkDemands: bulkDemands || [],
       lastUpdated: new Date().toISOString()
     };
   } catch (err) {
@@ -304,6 +314,15 @@ async function updateMongoOrder(orderId, updates) {
   );
 }
 
+async function saveMongoBulkDemand(demandData) {
+  if (!isConnected) return null;
+  return await BulkDemandModel.findOneAndUpdate(
+    { id: demandData.id },
+    { id: demandData.id, data: demandData },
+    { upsert: true, new: true }
+  );
+}
+
 async function recordMongoActivity(activityData) {
   if (!isConnected) return null;
   return await ActivityModel.findOneAndUpdate({ id: activityData.id }, activityData, { upsert: true, new: true });
@@ -318,9 +337,11 @@ module.exports = {
   saveMongoListing,
   saveMongoOrder,
   updateMongoOrder,
+  saveMongoBulkDemand,
   recordMongoActivity,
   UserModel,
   ListingModel,
   OrderModel,
-  ActivityModel
+  ActivityModel,
+  BulkDemandModel
 };

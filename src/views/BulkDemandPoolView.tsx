@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { BulkDemandPool, PoolContribution, QualityGrade, CropCategory } from '../types';
+import { ALL_INDIAN_STATES, getDistrictsForState, getDefaultDistrictForState } from '../data/indiaLocations';
 import { 
   Boxes, 
   TrendingUp, 
@@ -63,6 +64,16 @@ export const BulkDemandPoolView: React.FC = () => {
   const [supplyLocation, setSupplyLocation] = useState<string>(currentUser?.location || 'Nashik Farm Cluster');
   const [supplyState, setSupplyState] = useState<string>(currentUser?.state || 'Maharashtra');
   const [supplyDistrict, setSupplyDistrict] = useState<string>(currentUser?.district || 'Nashik');
+
+  // Dependent cascading districts list for supply commitment
+  const availableSupplyDistricts = useMemo(() => getDistrictsForState(supplyState), [supplyState]);
+
+  const handleSupplyStateChange = (newState: string) => {
+    setSupplyState(newState);
+    const def = getDefaultDistrictForState(newState);
+    setSupplyDistrict(def);
+  };
+
   const [supplyDispatchDate, setSupplyDispatchDate] = useState<string>(defaultDispatchDate);
   const [supplyGrade, setSupplyGrade] = useState<QualityGrade>('Grade A+');
   const [supplyMoisture, setSupplyMoisture] = useState<number>(11.5);
@@ -89,7 +100,7 @@ export const BulkDemandPoolView: React.FC = () => {
   const [newDescription, setNewDescription] = useState('4-Month Advance Pre-Harvest Bulk Contract. Total Escrow pre-funded in advance.');
 
   const categories = ['All', 'Cereals & Grains', 'Vegetables', 'Fruits', 'Pulses', 'Oilseeds', 'Spices'];
-  const states = ['All', 'Delhi', 'Maharashtra', 'Punjab', 'Haryana', 'Madhya Pradesh', 'Uttar Pradesh', 'Gujarat', 'Karnataka', 'Rajasthan'];
+  const states = ['All', ...ALL_INDIAN_STATES];
 
   // Filtered Bulk Demands
   const filteredDemands = bulkDemands.filter(demand => {
@@ -644,19 +655,40 @@ export const BulkDemandPoolView: React.FC = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                      State *
-                    </label>
-                    <select
-                      value={supplyState}
-                      onChange={e => setSupplyState(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-bold bg-white focus:ring-2 focus:ring-emerald-500"
-                    >
-                      {states.filter(s => s !== 'All').map(st => (
-                        <option key={st} value={st}>{st}</option>
-                      ))}
-                    </select>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                        State *
+                      </label>
+                      <select
+                        value={supplyState}
+                        onChange={e => handleSupplyStateChange(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-bold bg-white focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm"
+                      >
+                        {ALL_INDIAN_STATES.map(st => (
+                          <option key={st} value={st}>{st}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                        District *
+                      </label>
+                      <select
+                        value={supplyDistrict}
+                        onChange={e => setSupplyDistrict(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-bold bg-white focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm"
+                      >
+                        {availableSupplyDistricts.length > 0 ? (
+                          availableSupplyDistricts.map(d => (
+                            <option key={d} value={d}>{d}</option>
+                          ))
+                        ) : (
+                          <option value="">Select State first</option>
+                        )}
+                      </select>
+                    </div>
                   </div>
 
                   <div>
