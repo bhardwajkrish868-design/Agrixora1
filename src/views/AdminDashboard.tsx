@@ -56,6 +56,8 @@ export const AdminDashboard: React.FC = () => {
     orders, 
     collectionHubs, 
     vehicles,
+    bulkDemands,
+    deleteBulkDemand,
     stats, 
     activeTab,
     setActiveTab, 
@@ -1080,6 +1082,102 @@ export const AdminDashboard: React.FC = () => {
                           <Truck className="w-3 h-3 text-emerald-400" />
                           <span>Live Track</span>
                         </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Institutional Bulk Demand Pools Moderation & Deletion */}
+      {(activeTab === 'orders' || activeTab === 'overview' || activeTab === 'listings') && (
+        <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Boxes className="w-5 h-5 text-indigo-600" />
+                Institutional Bulk Demand Pools (500T+ Multi-Farmer Orders)
+              </h2>
+              <p className="text-xs text-slate-500">Live institutional buyer demands saved in Turso Cloud database</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-600">{bulkDemands?.length || 0} Active Demands</span>
+              <button
+                type="button"
+                onClick={() => setActiveTab('bulk_pooling')}
+                className="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <span>Open Pooling Bay</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-y border-slate-100">
+                <tr>
+                  <th className="py-3 px-4">Demand Ref</th>
+                  <th className="py-3 px-4">Buyer Organization</th>
+                  <th className="py-3 px-4">Crop</th>
+                  <th className="py-3 px-4">Target Qty</th>
+                  <th className="py-3 px-4">Committed</th>
+                  <th className="py-3 px-4">Rate / Ton</th>
+                  <th className="py-3 px-4">Total Budget</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {(!bulkDemands || bulkDemands.length === 0) ? (
+                  <tr>
+                    <td colSpan={9} className="py-8 text-center text-slate-400">
+                      No institutional bulk orders currently active in database.
+                    </td>
+                  </tr>
+                ) : (
+                  bulkDemands.map(pool => (
+                    <tr key={pool.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{pool.demandNumber}</td>
+                      <td className="py-3.5 px-4 font-semibold text-slate-800">{pool.buyerOrg}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-900">{pool.cropName}</td>
+                      <td className="py-3.5 px-4 font-semibold">{pool.targetQuantityTons} Tons</td>
+                      <td className="py-3.5 px-4 font-semibold text-emerald-700">
+                        {pool.committedQuantityTons} Tons ({Math.round((pool.committedQuantityTons / pool.targetQuantityTons) * 100)}%)
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-slate-700">₹{pool.pricePerTon.toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-900">₹{pool.totalBudget.toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          {pool.status}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('bulk_pooling')}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 cursor-pointer"
+                            title="View Full Pool"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This will remove it from Turso Cloud database.`)) {
+                                deleteBulkDemand(pool.id);
+                              }
+                            }}
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 cursor-pointer transition-colors"
+                            title="Delete Bulk Order"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))

@@ -29,16 +29,19 @@ import {
   SendHorizontal,
   Bot,
   BadgePercent,
-  Check
+  Check,
+  Trash2
 } from 'lucide-react';
 
 export const BulkDemandPoolView: React.FC = () => {
   const { 
     bulkDemands, 
     addBulkDemand, 
+    deleteBulkDemand,
     contributeToBulkDemand, 
     currentUser, 
     activeRole, 
+    isAdminAuthenticated,
     setActiveTab, 
     vehicles 
   } = useAgri();
@@ -413,25 +416,43 @@ export const BulkDemandPoolView: React.FC = () => {
                       </button>
                     </div>
 
-                    {/* Primary Button: Receive Order & Accept Supply */}
-                    <button
-                      onClick={() => handleOpenSupplyModal(pool)}
-                      disabled={isFullyFilled}
-                      className={`px-6 py-2.5 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
-                        isFullyFilled
-                          ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                          : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/25 hover:scale-105'
-                      }`}
-                    >
-                      <SendHorizontal className="w-4 h-4" />
-                      <span>
-                        {isFullyFilled 
-                          ? 'Quota Full (500T Complete)' 
-                          : activeRole === 'farmer' 
-                            ? '📥 Receive & Accept Order (मात्रा भेजें)' 
-                            : 'Commit Supply Allocation'}
-                      </span>
-                    </button>
+                    {/* Actions: Admin Delete + Primary Button */}
+                    <div className="flex items-center gap-2">
+                      {(activeRole === 'admin' || currentUser?.role === 'admin' || isAdminAuthenticated) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This cannot be undone.`)) {
+                              deleteBulkDemand(pool.id);
+                            }
+                          }}
+                          className="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title="Delete Bulk Order (Admin Only)"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>Delete Order</span>
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => handleOpenSupplyModal(pool)}
+                        disabled={isFullyFilled}
+                        className={`px-6 py-2.5 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                          isFullyFilled
+                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/25 hover:scale-105'
+                        }`}
+                      >
+                        <SendHorizontal className="w-4 h-4" />
+                        <span>
+                          {isFullyFilled 
+                            ? 'Quota Full (500T Complete)' 
+                            : activeRole === 'farmer' 
+                              ? '📥 Receive & Accept Order (मात्रा भेजें)' 
+                              : 'Commit Supply Allocation'}
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 

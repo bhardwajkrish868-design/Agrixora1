@@ -663,6 +663,37 @@ function databasePlugin() {
           return;
         }
 
+        if (url === '/api/bulk-demands/delete' && req.method === 'POST') {
+          let body = '';
+          req.on('data', (chunk: any) => { body += chunk; });
+          req.on('end', async () => {
+            try {
+              const { id } = JSON.parse(body || '{}');
+              if (!id) throw new Error('Bulk Demand ID required');
+
+              if (turso.getIsConnected()) {
+                try { await turso.deleteTursoBulkDemand(id); } catch (_) {}
+              }
+              if (mongo.getIsConnected() && mongo.BulkDemandModel) {
+                try { await mongo.BulkDemandModel.deleteOne({ id }); } catch (_) {}
+              }
+
+              const currentDb = readDb();
+              currentDb.bulkDemands = (currentDb.bulkDemands || []).filter((b: any) => b.id !== id);
+              writeDb(currentDb);
+
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 200;
+              res.end(JSON.stringify({ success: true, id, cloudDeleted: turso.getIsConnected() || mongo.getIsConnected() }));
+            } catch (err: any) {
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 400;
+              res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+
         if (url === '/api/db/sync' && req.method === 'POST') {
           let body = '';
           req.on('data', (chunk: any) => { body += chunk; });

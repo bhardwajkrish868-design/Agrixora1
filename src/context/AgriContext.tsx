@@ -82,6 +82,7 @@ interface AgriContextType {
   // Bulk Demand & Multi-Farmer Pooling (500T+ Aggregation)
   bulkDemands: BulkDemandPool[];
   addBulkDemand: (demand: Partial<BulkDemandPool>) => BulkDemandPool;
+  deleteBulkDemand: (id: string) => void;
   contributeToBulkDemand: (poolId: string, contribution: Partial<PoolContribution>) => PoolContribution | null;
   updateContributionStatus: (poolId: string, contributionId: string, status: PoolContribution['status']) => void;
 
@@ -1949,6 +1950,28 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
+  const deleteBulkDemand = (id: string) => {
+    const pool = bulkDemands.find(p => p.id === id);
+    setBulkDemands(prev => {
+      const updated = prev.filter(p => p.id !== id);
+      try {
+        localStorage.setItem('farm2future_bulk_demands', JSON.stringify(updated));
+      } catch (_) {}
+      return updated;
+    });
+
+    dbService.deleteBulkDemand(id);
+
+    logActivity({
+      userId: currentUser?.id,
+      userName: currentUser?.name || 'Administrator',
+      userRole: currentUser?.role || 'admin',
+      actionType: 'admin_action',
+      title: `Bulk Demand Removed (#${pool?.demandNumber || id})`,
+      description: `Bulk pooled order ${pool?.demandNumber || id} for ${pool?.cropName || 'crop'} (${pool?.targetQuantityTons || 0}T) was permanently deleted from database.`
+    });
+  };
+
   // Global computed stats
   const totalListingsCount = listings.length;
   const activeListingsCount = listings.filter(l => l.status === 'Active').length;
@@ -2003,6 +2026,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       deleteVehicle,
       bulkDemands,
       addBulkDemand,
+      deleteBulkDemand,
       contributeToBulkDemand,
       updateContributionStatus,
       selectedListingModal,

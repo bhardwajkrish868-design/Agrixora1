@@ -160,6 +160,20 @@ export const dbService = {
     }
   },
 
+  async deleteBulkDemand(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/bulk-demands/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend delete bulk demand failed', err);
+      return false;
+    }
+  },
+
   async logActivity(log: {
     userId?: string;
     userName?: string;
