@@ -485,6 +485,69 @@ function databasePlugin() {
           return;
         }
 
+        if (url === '/api/listings/create' && req.method === 'POST') {
+          let body = '';
+          req.on('data', (chunk: any) => { body += chunk; });
+          req.on('end', async () => {
+            try {
+              const listing = JSON.parse(body || '{}');
+              if (!listing.id) throw new Error('Listing ID required');
+
+              if (turso.getIsConnected()) {
+                try { await turso.saveTursoListing(listing); } catch (_) {}
+              }
+              if (mongo.getIsConnected()) {
+                try { await mongo.saveMongoListing(listing); } catch (_) {}
+              }
+
+              const currentDb = readDb();
+              if (!currentDb.listings) currentDb.listings = [];
+              currentDb.listings = [listing, ...currentDb.listings.filter((l: any) => l.id !== listing.id)];
+              writeDb(currentDb);
+
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 200;
+              res.end(JSON.stringify({ success: true, listing, cloudSaved: turso.getIsConnected() || mongo.getIsConnected() }));
+            } catch (err: any) {
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 400;
+              res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+
+        if (url === '/api/listings/delete' && req.method === 'POST') {
+          let body = '';
+          req.on('data', (chunk: any) => { body += chunk; });
+          req.on('end', async () => {
+            try {
+              const { id } = JSON.parse(body || '{}');
+              if (!id) throw new Error('Listing ID required');
+
+              if (turso.getIsConnected()) {
+                try { await turso.deleteTursoListing(id); } catch (_) {}
+              }
+              if (mongo.getIsConnected() && mongo.ListingModel) {
+                try { await mongo.ListingModel.deleteOne({ id }); } catch (_) {}
+              }
+
+              const currentDb = readDb();
+              currentDb.listings = (currentDb.listings || []).filter((l: any) => l.id !== id);
+              writeDb(currentDb);
+
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 200;
+              res.end(JSON.stringify({ success: true, id, cloudDeleted: turso.getIsConnected() || mongo.getIsConnected() }));
+            } catch (err: any) {
+              res.setHeader('Content-Type', 'application/json');
+              res.statusCode = 400;
+              res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+
         if (url === '/api/listings/clear' && req.method === 'POST') {
           (async () => {
             try {
@@ -607,43 +670,30 @@ function databasePlugin() {
             try {
               const payload = JSON.parse(body || '{}');
 
-              // Sync to Turso Cloud (9 GB) if connected
+              // Sync to Turso Cloud (9 GB) if connected - Upsert only, non-destructive
               if (turso.getIsConnected()) {
                 try {
-                  if (Array.isArray(payload.users)) {
-                    const currentTurso = await turso.getAllTursoData();
-                    const newIds = new Set(payload.users.map((u: any) => u.id));
-                    if (currentTurso && Array.isArray(currentTurso.users)) {
-                      for (const eu of currentTurso.users) {
-                        if (!newIds.has(eu.id)) {
-                          await turso.deleteTursoUser(eu.id);
-                        }
-                      }
-                    }
+                  if (Array.isArray(payload.users) && payload.users.length > 0) {
                     for (const u of payload.users) await turso.saveTursoUser(u);
                   }
-                  if (Array.isArray(payload.listings)) {
-                    if (payload.listings.length === 0) {
-                      await turso.clearTursoListings();
-                    } else {
-                      for (const l of payload.listings) await turso.saveTursoListing(l);
-                    }
+                  if (Array.isArray(payload.listings) && payload.listings.length > 0) {
+                    for (const l of payload.listings) await turso.saveTursoListing(l);
                   }
                   if (Array.isArray(payload.orders) && payload.orders.length > 0) {
                     for (const o of payload.orders) await turso.saveTursoOrder(o);
                   }
-                  if (Array.isArray(payload.bulkDemands)) {
+                  if (Array.isArray(payload.bulkDemands) && payload.bulkDemands.length > 0) {
                     for (const bd of payload.bulkDemands) {
                       await turso.saveTursoBulkDemand(bd);
                     }
                   }
-                  if (Array.isArray(payload.vehicles)) {
+                  if (Array.isArray(payload.vehicles) && payload.vehicles.length > 0) {
                     for (const v of payload.vehicles) await turso.saveTursoVehicle(v);
                   }
-                  if (Array.isArray(payload.notifications)) {
+                  if (Array.isArray(payload.notifications) && payload.notifications.length > 0) {
                     for (const n of payload.notifications) await turso.saveTursoNotification(n);
                   }
-                  if (Array.isArray(payload.activityHistory)) {
+                  if (Array.isArray(payload.activityHistory) && payload.activityHistory.length > 0) {
                     for (const a of payload.activityHistory.slice(0, 50)) await turso.saveTursoActivity(a);
                   }
                   if (payload.adminPasskey) {
@@ -652,29 +702,19 @@ function databasePlugin() {
                 } catch (_) {}
               }
 
-              // Sync to MongoDB Cloud if connected
+              // Sync to MongoDB Cloud if connected - Upsert only
               if (mongo.getIsConnected()) {
                 try {
-                  if (Array.isArray(payload.users)) {
-                    const newIds = payload.users.map((u: any) => u.id);
-                    await mongo.UserModel.deleteMany({ id: { $nin: newIds } });
+                  if (Array.isArray(payload.users) && payload.users.length > 0) {
                     for (const u of payload.users) await mongo.saveMongoUser(u);
                   }
-                  if (Array.isArray(payload.listings)) {
-                    if (payload.listings.length === 0) {
-                      if (mongo.ListingModel) await mongo.ListingModel.deleteMany({});
-                    } else {
-                      for (const l of payload.listings) await mongo.saveMongoListing(l);
-                    }
+                  if (Array.isArray(payload.listings) && payload.listings.length > 0) {
+                    for (const l of payload.listings) await mongo.saveMongoListing(l);
                   }
-                  if (Array.isArray(payload.orders)) {
-                    if (payload.orders.length === 0) {
-                      await mongo.OrderModel.deleteMany({});
-                    } else {
-                      for (const o of payload.orders) await mongo.saveMongoOrder(o);
-                    }
+                  if (Array.isArray(payload.orders) && payload.orders.length > 0) {
+                    for (const o of payload.orders) await mongo.saveMongoOrder(o);
                   }
-                  if (Array.isArray(payload.bulkDemands)) {
+                  if (Array.isArray(payload.bulkDemands) && payload.bulkDemands.length > 0) {
                     for (const bd of payload.bulkDemands) {
                       await mongo.saveMongoBulkDemand(bd);
                     }
@@ -685,7 +725,13 @@ function databasePlugin() {
               const currentDb = readDb();
               const updatedDb = {
                 ...currentDb,
-                ...payload,
+                users: (Array.isArray(payload.users) && payload.users.length > 0) ? payload.users : (currentDb.users || []),
+                listings: (Array.isArray(payload.listings) && payload.listings.length > 0) ? payload.listings : (currentDb.listings || []),
+                orders: (Array.isArray(payload.orders) && payload.orders.length > 0) ? payload.orders : (currentDb.orders || []),
+                vehicles: (Array.isArray(payload.vehicles) && payload.vehicles.length > 0) ? payload.vehicles : (currentDb.vehicles || []),
+                bulkDemands: (Array.isArray(payload.bulkDemands) && payload.bulkDemands.length > 0) ? payload.bulkDemands : (currentDb.bulkDemands || []),
+                notifications: (Array.isArray(payload.notifications) && payload.notifications.length > 0) ? payload.notifications : (currentDb.notifications || []),
+                activityHistory: (Array.isArray(payload.activityHistory) && payload.activityHistory.length > 0) ? payload.activityHistory : (currentDb.activityHistory || []),
                 adminPasskey: payload.adminPasskey || currentDb.adminPasskey || 'Krish0386'
               };
               writeDb(updatedDb);

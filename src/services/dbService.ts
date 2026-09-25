@@ -91,6 +91,34 @@ export const dbService = {
     }
   },
 
+  async createListing(listing: CropListing): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/listings/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(listing)
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend direct listing creation failed', err);
+      return false;
+    }
+  },
+
+  async deleteListing(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/listings/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend direct listing deletion failed', err);
+      return false;
+    }
+  },
+
   async clearAllListings(): Promise<boolean> {
     try {
       const res = await fetch(`${API_BASE}/api/listings/clear`, {
