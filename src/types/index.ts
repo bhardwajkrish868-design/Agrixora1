@@ -335,7 +335,7 @@ export interface NotificationItem {
   recipientId?: string;
   title: string;
   message: string;
-  type: 'order' | 'payment' | 'quality' | 'dispatch' | 'delivery' | 'market';
+  type: 'order' | 'payment' | 'quality' | 'dispatch' | 'delivery' | 'market' | 'alert';
   timestamp: string;
   read: boolean;
   orderId?: string;
@@ -444,5 +444,6 @@ export interface DatabaseState {
   notifications: NotificationItem[];
   activityHistory: ActivityLog[];
   adminPasskey: string;
+  deletedIds?: string[];
   lastUpdated: string;
 }

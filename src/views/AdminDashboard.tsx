@@ -1003,12 +1003,22 @@ export const AdminDashboard: React.FC = () => {
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button
+                            type="button"
                             onClick={() => {
-                              if (confirm('Delist this crop listing?')) {
+                              const ok = typeof window !== 'undefined' && window.confirm 
+                                ? window.confirm(`Delist and permanently remove crop listing #${l.id} (${l.cropName})?`)
+                                : true;
+                              if (ok) {
                                 deleteListing(l.id);
+                                addNotification({
+                                  title: 'Listing Removed by Admin',
+                                  message: `Listing #${l.id} (${l.cropName}) was removed by Admin.`,
+                                  type: 'alert',
+                                  recipientRole: 'all'
+                                });
                               }
                             }}
-                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600"
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer"
                             title="Remove Listing"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1168,8 +1178,17 @@ export const AdminDashboard: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => {
-                              if (confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This will remove it from Turso Cloud database.`)) {
+                              const ok = typeof window !== 'undefined' && window.confirm 
+                                ? window.confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This will remove it from Turso Cloud database.`)
+                                : true;
+                              if (ok) {
                                 deleteBulkDemand(pool.id);
+                                addNotification({
+                                  title: 'Bulk Order Removed by Admin',
+                                  message: `Bulk pooled order #${pool.demandNumber} (${pool.cropName}) was permanently deleted from database.`,
+                                  type: 'alert',
+                                  recipientRole: 'all'
+                                });
                               }
                             }}
                             className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 cursor-pointer transition-colors"

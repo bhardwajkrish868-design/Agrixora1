@@ -431,14 +431,16 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setRegisteredUsers(db.users);
             localStorage.setItem('farm2future_registered_users', JSON.stringify(db.users));
           }
+          const deletedSet = new Set(Array.isArray(db.deletedIds) ? db.deletedIds : []);
           if (Array.isArray(db.listings)) {
-            setListings(db.listings);
-            localStorage.setItem('farm2future_listings', JSON.stringify(db.listings));
+            const activeListings = db.listings.filter((l: any) => !deletedSet.has(l.id));
+            setListings(activeListings);
+            localStorage.setItem('farm2future_listings', JSON.stringify(activeListings));
           }
           if (Array.isArray(db.orders)) {
-            const dbOrders: Order[] = db.orders;
-            setOrders(dbOrders);
-            localStorage.setItem('farm2future_orders', JSON.stringify(dbOrders));
+            const activeOrders = (db.orders as Order[]).filter(o => !deletedSet.has(o.id));
+            setOrders(activeOrders);
+            localStorage.setItem('farm2future_orders', JSON.stringify(activeOrders));
           }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) {
             const existingIds = new Set(db.vehicles.map((v: any) => v.id));
@@ -449,12 +451,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setVehicles(initialVehicles);
             localStorage.setItem('farm2future_vehicles', JSON.stringify(initialVehicles));
           }
-          if (Array.isArray(db.bulkDemands) && db.bulkDemands.length > 0) {
-            setBulkDemands(db.bulkDemands);
-            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(db.bulkDemands));
-          } else {
-            setBulkDemands(initialBulkDemands);
-            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(initialBulkDemands));
+          if (Array.isArray(db.bulkDemands)) {
+            const activeBulkDemands = db.bulkDemands.filter((b: any) => !deletedSet.has(b.id));
+            setBulkDemands(activeBulkDemands);
+            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(activeBulkDemands));
           }
           if (Array.isArray(db.notifications) && db.notifications.length > 0) {
             setNotifications(db.notifications);
@@ -483,40 +483,22 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const db = await dbService.loadDatabase();
         if (db) {
+          const deletedSet = new Set(Array.isArray(db.deletedIds) ? db.deletedIds : []);
           if (Array.isArray(db.users)) setRegisteredUsers(db.users);
           if (Array.isArray(db.listings)) {
-            const fetchedListings = db.listings;
-            setListings(prev => {
-              const dbIds = new Set(fetchedListings.map((l: any) => l.id));
-              const now = Date.now();
-              const pendingLocals = prev.filter(l => {
-                if (dbIds.has(l.id)) return false;
-                const createdTime = l.createdAt ? new Date(l.createdAt).getTime() : 0;
-                return (now - createdTime) < 15000;
-              });
-              const merged = [...pendingLocals, ...fetchedListings];
-              localStorage.setItem('farm2future_listings', JSON.stringify(merged));
-              return merged;
-            });
+            const fetchedListings = db.listings.filter((l: any) => !deletedSet.has(l.id));
+            setListings(fetchedListings);
+            localStorage.setItem('farm2future_listings', JSON.stringify(fetchedListings));
           }
           if (Array.isArray(db.orders)) {
-            const fetchedOrders: Order[] = db.orders;
-            setOrders(prev => {
-              const dbIds = new Set(fetchedOrders.map((o: any) => o.id));
-              const now = Date.now();
-              const pendingLocals = prev.filter(o => {
-                if (dbIds.has(o.id)) return false;
-                const orderTime = o.orderDate ? new Date(o.orderDate).getTime() : 0;
-                return (now - orderTime) < 15000;
-              });
-              const merged = [...pendingLocals, ...fetchedOrders];
-              localStorage.setItem('farm2future_orders', JSON.stringify(merged));
-              return merged;
-            });
+            const fetchedOrders: Order[] = db.orders.filter((o: any) => !deletedSet.has(o.id));
+            setOrders(fetchedOrders);
+            localStorage.setItem('farm2future_orders', JSON.stringify(fetchedOrders));
           }
-          if (Array.isArray(db.bulkDemands) && db.bulkDemands.length > 0) {
-            setBulkDemands(db.bulkDemands);
-            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(db.bulkDemands));
+          if (Array.isArray(db.bulkDemands)) {
+            const fetchedBulkDemands = db.bulkDemands.filter((b: any) => !deletedSet.has(b.id));
+            setBulkDemands(fetchedBulkDemands);
+            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(fetchedBulkDemands));
           }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) setVehicles(db.vehicles);
           if (Array.isArray(db.notifications) && db.notifications.length > 0) setNotifications(db.notifications);

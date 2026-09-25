@@ -43,7 +43,8 @@ export const BulkDemandPoolView: React.FC = () => {
     activeRole, 
     isAdminAuthenticated,
     setActiveTab, 
-    vehicles 
+    vehicles,
+    addNotification
   } = useAgri();
 
   // Dynamic 4-Month in Advance Date Calculator
@@ -418,16 +419,25 @@ export const BulkDemandPoolView: React.FC = () => {
 
                     {/* Actions: Admin Delete + Primary Button */}
                     <div className="flex items-center gap-2">
-                      {(activeRole === 'admin' || currentUser?.role === 'admin' || isAdminAuthenticated) && (
+                      {(activeRole === 'admin' || currentUser?.role === 'admin' || isAdminAuthenticated || activeRole === 'buyer' || currentUser?.role === 'buyer' || (currentUser && pool.buyerId === currentUser.id)) && (
                         <button
                           type="button"
                           onClick={() => {
-                            if (confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This cannot be undone.`)) {
+                            const confirmed = typeof window !== 'undefined' && window.confirm 
+                              ? window.confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This cannot be undone.`)
+                              : true;
+                            if (confirmed) {
                               deleteBulkDemand(pool.id);
+                              addNotification({
+                                title: 'Bulk Order Deleted',
+                                message: `Bulk order #${pool.demandNumber} (${pool.cropName}) was permanently removed from database.`,
+                                type: 'alert',
+                                recipientRole: 'all'
+                              });
                             }
                           }}
                           className="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                          title="Delete Bulk Order (Admin Only)"
+                          title="Delete Bulk Order"
                         >
                           <Trash2 className="w-4 h-4" />
                           <span>Delete Order</span>

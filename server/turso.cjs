@@ -11,7 +11,16 @@ let isConnected = false;
 let currentUrl = process.env.TURSO_DATABASE_URL || DEFAULT_TURSO_URL;
 let currentToken = process.env.TURSO_AUTH_TOKEN || DEFAULT_TURSO_TOKEN;
 
+const deletedItemIds = new Set();
+
 async function initTables(c) {
+  await c.execute(`
+    CREATE TABLE IF NOT EXISTS deleted_items (
+      id TEXT PRIMARY KEY,
+      type TEXT,
+      deleted_at TEXT
+    );
+  `);
   await c.execute(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -340,6 +349,13 @@ async function connectTurso(customUrl, customToken) {
     currentUrl = url;
     currentToken = authToken;
 
+    try {
+      const delRes = await newClient.execute('SELECT id FROM deleted_items');
+      deletedItemIds.clear();
+      delRes.rows.forEach(r => deletedItemIds.add(String(r.id)));
+      console.log(`🛡️ Loaded ${deletedItemIds.size} deleted tombstones from Turso Cloud.`);
+    } catch (_) {}
+
     console.log('✅ Connected to Turso Cloud Database successfully!');
     return {
       success: true,
@@ -370,13 +386,13 @@ async function getAllTursoData() {
     ]);
 
     const users = userRes.rows.map(r => JSON.parse(r.data));
-    const listings = listingRes.rows.map(r => JSON.parse(r.data));
-    const orders = orderRes.rows.map(r => JSON.parse(r.data));
+    const listings = listingRes.rows.map(r => JSON.parse(r.data)).filter(l => !deletedItemIds.has(l.id));
+    const orders = orderRes.rows.map(r => JSON.parse(r.data)).filter(o => !deletedItemIds.has(o.id));
     const activityHistory = actRes.rows.map(r => JSON.parse(r.data));
     const notifications = notifRes.rows.map(r => JSON.parse(r.data));
     const vehicles = vehRes.rows.map(r => JSON.parse(r.data));
     const adminPasskey = settingRes.rows[0]?.value || 'Krish0386';
-    const bulkDemands = (bulkRes?.rows || []).map(r => JSON.parse(r.data));
+    const bulkDemands = (bulkRes?.rows || []).map(r => JSON.parse(r.data)).filter(b => !deletedItemIds.has(b.id));
 
     return {
       users,
@@ -387,6 +403,7 @@ async function getAllTursoData() {
       vehicles,
       adminPasskey,
       bulkDemands,
+      deletedIds: Array.from(deletedItemIds),
       lastUpdated: new Date().toISOString()
     };
   } catch (err) {
@@ -396,6 +413,7 @@ async function getAllTursoData() {
 }
 
 async function saveTursoOrder(order) {
+  if (!order || deletedItemIds.has(order.id)) return false;
   if (!isConnected || !client) return null;
   try {
     await client.execute({
@@ -479,6 +497,7 @@ async function saveTursoUser(user) {
 }
 
 async function saveTursoListing(listing) {
+  if (!listing || deletedItemIds.has(listing.id)) return false;
   if (!isConnected || !client) return null;
   try {
     await client.execute({
@@ -559,6 +578,7 @@ async function deleteTursoUser(userId) {
 }
 
 async function saveTursoBulkDemand(demand) {
+  if (!demand || deletedItemIds.has(demand.id)) return false;
   if (!isConnected || !client) return null;
   try {
     await client.execute({
@@ -584,12 +604,19 @@ async function saveTursoBulkDemand(demand) {
 }
 
 async function deleteTursoBulkDemand(id) {
+  deletedItemIds.add(id);
   if (!isConnected || !client) return false;
   try {
     await client.execute({
       sql: 'DELETE FROM bulk_demands WHERE id = ?',
       args: [id]
     });
+    try {
+      await client.execute({
+        sql: 'INSERT OR REPLACE INTO deleted_items (id, type, deleted_at) VALUES (?, ?, ?)',
+        args: [id, 'bulk_demand', new Date().toISOString()]
+      });
+    } catch (_) {}
     return true;
   } catch (err) {
     console.error('Error deleting bulk demand from Turso:', err.message);
@@ -729,12 +756,19 @@ async function saveTursoSetting(key, value) {
 }
 
 async function deleteTursoListing(id) {
+  deletedItemIds.add(id);
   if (!isConnected || !client) return false;
   try {
     await client.execute({
       sql: 'DELETE FROM listings WHERE id = ?',
       args: [id]
     });
+    try {
+      await client.execute({
+        sql: 'INSERT OR REPLACE INTO deleted_items (id, type, deleted_at) VALUES (?, ?, ?)',
+        args: [id, 'listing', new Date().toISOString()]
+      });
+    } catch (_) {}
     return true;
   } catch (err) {
     console.error('Error deleting listing from Turso:', err.message);
@@ -743,12 +777,19 @@ async function deleteTursoListing(id) {
 }
 
 async function deleteTursoOrder(id) {
+  deletedItemIds.add(id);
   if (!isConnected || !client) return false;
   try {
     await client.execute({
       sql: 'DELETE FROM orders WHERE id = ? OR order_number = ?',
       args: [id, id]
     });
+    try {
+      await client.execute({
+        sql: 'INSERT OR REPLACE INTO deleted_items (id, type, deleted_at) VALUES (?, ?, ?)',
+        args: [id, 'order', new Date().toISOString()]
+      });
+    } catch (_) {}
     return true;
   } catch (err) {
     console.error('Error deleting order from Turso:', err.message);
@@ -761,6 +802,8 @@ module.exports = {
   getIsConnected: () => isConnected,
   getTursoUrl: () => currentUrl ? currentUrl.replace(/:\/\/([^@]+)@/, '://****@') : '',
   getAllTursoData,
+  isDeletedId: (id) => deletedItemIds.has(id),
+  getDeletedIds: () => Array.from(deletedItemIds),
   saveTursoOrder,
   updateTursoOrder,
   deleteTursoOrder,

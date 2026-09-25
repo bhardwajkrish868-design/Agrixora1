@@ -361,9 +361,17 @@ function databasePlugin() {
             if (!db) {
               db = readDb();
             }
+            const local = readDb();
             if (db && !Array.isArray(db.bulkDemands)) {
-              const local = readDb();
               db.bulkDemands = local.bulkDemands || [];
+            }
+            const allDeleted = Array.from(new Set([...(db?.deletedIds || []), ...(local?.deletedIds || []), ...turso.getDeletedIds()]));
+            if (db) {
+              db.deletedIds = allDeleted;
+              const delSet = new Set(allDeleted);
+              db.listings = (db.listings || []).filter((l: any) => !delSet.has(l.id));
+              db.bulkDemands = (db.bulkDemands || []).filter((b: any) => !delSet.has(b.id));
+              db.orders = (db.orders || []).filter((o: any) => !delSet.has(o.id));
             }
             res.setHeader('Content-Type', 'application/json');
             res.statusCode = 200;
@@ -533,6 +541,8 @@ function databasePlugin() {
               }
 
               const currentDb = readDb();
+              if (!currentDb.deletedIds) currentDb.deletedIds = [];
+              if (!currentDb.deletedIds.includes(id)) currentDb.deletedIds.push(id);
               currentDb.listings = (currentDb.listings || []).filter((l: any) => l.id !== id);
               writeDb(currentDb);
 
@@ -679,6 +689,8 @@ function databasePlugin() {
               }
 
               const currentDb = readDb();
+              if (!currentDb.deletedIds) currentDb.deletedIds = [];
+              if (!currentDb.deletedIds.includes(id)) currentDb.deletedIds.push(id);
               currentDb.bulkDemands = (currentDb.bulkDemands || []).filter((b: any) => b.id !== id);
               writeDb(currentDb);
 
@@ -754,16 +766,18 @@ function databasePlugin() {
               }
 
               const currentDb = readDb();
+              const deletedSet = new Set([...(currentDb.deletedIds || []), ...turso.getDeletedIds()]);
               const updatedDb = {
                 ...currentDb,
                 users: (Array.isArray(payload.users) && payload.users.length > 0) ? payload.users : (currentDb.users || []),
-                listings: (Array.isArray(payload.listings) && payload.listings.length > 0) ? payload.listings : (currentDb.listings || []),
-                orders: (Array.isArray(payload.orders) && payload.orders.length > 0) ? payload.orders : (currentDb.orders || []),
+                listings: ((Array.isArray(payload.listings) && payload.listings.length > 0) ? payload.listings : (currentDb.listings || [])).filter((l: any) => !deletedSet.has(l.id)),
+                orders: ((Array.isArray(payload.orders) && payload.orders.length > 0) ? payload.orders : (currentDb.orders || [])).filter((o: any) => !deletedSet.has(o.id)),
                 vehicles: (Array.isArray(payload.vehicles) && payload.vehicles.length > 0) ? payload.vehicles : (currentDb.vehicles || []),
-                bulkDemands: (Array.isArray(payload.bulkDemands) && payload.bulkDemands.length > 0) ? payload.bulkDemands : (currentDb.bulkDemands || []),
+                bulkDemands: ((Array.isArray(payload.bulkDemands) && payload.bulkDemands.length > 0) ? payload.bulkDemands : (currentDb.bulkDemands || [])).filter((b: any) => !deletedSet.has(b.id)),
                 notifications: (Array.isArray(payload.notifications) && payload.notifications.length > 0) ? payload.notifications : (currentDb.notifications || []),
                 activityHistory: (Array.isArray(payload.activityHistory) && payload.activityHistory.length > 0) ? payload.activityHistory : (currentDb.activityHistory || []),
-                adminPasskey: payload.adminPasskey || currentDb.adminPasskey || 'Krish0386'
+                adminPasskey: payload.adminPasskey || currentDb.adminPasskey || 'Krish0386',
+                deletedIds: Array.from(deletedSet)
               };
               writeDb(updatedDb);
               res.setHeader('Content-Type', 'application/json');

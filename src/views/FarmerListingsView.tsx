@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export const FarmerListingsView: React.FC = () => {
-  const { currentUser, listings, isFarmerListing, deleteListing, setActiveTab, setSelectedListingModal, navigateBack } = useAgri();
+  const { currentUser, listings, isFarmerListing, deleteListing, setActiveTab, setSelectedListingModal, navigateBack, addNotification } = useAgri();
 
   const myListings = listings.filter(l => isFarmerListing(l, currentUser));
 
@@ -145,12 +145,22 @@ export const FarmerListingsView: React.FC = () => {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
-                    if (confirm('Are you sure you want to remove this listing?')) {
+                    const ok = typeof window !== 'undefined' && window.confirm 
+                      ? window.confirm(`Are you sure you want to permanently remove listing #${item.id} (${item.cropName})?`)
+                      : true;
+                    if (ok) {
                       deleteListing(item.id);
+                      addNotification({
+                        title: 'Listing Removed',
+                        message: `Listing #${item.id} (${item.cropName}) was delisted and permanently removed.`,
+                        type: 'alert',
+                        recipientRole: 'all'
+                      });
                     }
                   }}
-                  className="p-2 rounded-xl text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-colors"
+                  className="p-2 rounded-xl text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-colors cursor-pointer"
                   title="Delete Listing"
                 >
                   <Trash2 className="w-4 h-4" />
