@@ -18,16 +18,27 @@ import {
   PlusCircle,
   CheckCircle2,
   AlertCircle,
-  Thermometer,
   Droplets,
   Wind,
   Sprout,
-  HelpCircle,
   PhoneCall,
   Flame,
-  ArrowRight
+  ArrowRight,
+  ArrowUpRight,
+  Layers,
+  HelpCircle,
+  BarChart2
 } from 'lucide-react';
 import { useAgri } from '../context/AgriContext';
+
+interface ActionBtn {
+  label: string;
+  actionType: 'add_produce' | 'track_delivery' | 'market_prices' | 'call_helpline' | 'open_link' | 'query';
+  url?: string;
+  queryText?: string;
+  variant?: 'primary' | 'secondary' | 'outline' | 'amber';
+  icon?: string;
+}
 
 interface ChatMessage {
   id: string;
@@ -36,6 +47,8 @@ interface ChatMessage {
   timestamp: string;
   type?: 'general' | 'price' | 'weather' | 'disease' | 'scheme' | 'fertilizer' | 'action';
   cardData?: any;
+  actionButtons?: ActionBtn[];
+  followUpChips?: string[];
 }
 
 export const KisanAIVoiceAssistant: React.FC = () => {
@@ -53,35 +66,48 @@ export const KisanAIVoiceAssistant: React.FC = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechMuted, setSpeechMuted] = useState(false);
   const [inputText, setInputText] = useState('');
-  const [activeLang, setActiveLang] = useState<'hi' | 'en'>(language === 'hi' ? 'hi' : 'hi'); // Default Hindi
+  const [activeLang, setActiveLang] = useState<'hi' | 'en'>(language === 'hi' ? 'hi' : 'hi');
   const [transcriptLive, setTranscriptLive] = useState('');
-  const [activeTopicFilter, setActiveTopicFilter] = useState<string>('all');
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const voicesLoadedRef = useRef<SpeechSynthesisVoice[]>([]);
 
-  // Initial Welcome Messages
+  // Initial Welcome Messages with Interactive Buttons
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'msg-welcome-1',
       sender: 'assistant',
       text: activeLang === 'hi'
-        ? '🌾 **राम-राम किसान भाई! नमस्ते!** 🙏\n\nमैं हूँ आपका **Agrixora कृषि वाणी AI सहायक**।\nआप मुझसे बोलकर या लिखकर किसी भी फसल का आज का **मंडी भाव**, 3-दिन का **मौसम**, फसल में **कीड़े/पीलेपन की दवा**, **खाद की सही मात्रा**, या **PM-किसान योजना** की सटीक जानकारी ले सकते हैं।'
-        : '🌾 **Namaste Kisan Brother!** 🙏\n\nI am your **Agrixora Krishi Vani AI Voice Assistant**.\nYou can speak or type to ask about today\'s **Mandi prices**, 3-day **weather alerts**, **crop disease remedies**, **fertilizer dosage**, or **PM-Kisan schemes**.',
+        ? '🌾 **राम-राम किसान भाई! सादर प्रणाम!** 🙏\n\nमैं हूँ आपका **Agrixora कृषि वाणी AI सहायक**।\nनीचे दिए गए बटनों पर क्लिक करें या माइक दबाकर आज का **मंडी भाव**, 3-दिन का **मौसम अलर्ट**, **फसल में कीड़े/पीलेपन का पक्का इलाज**, या **फसल बेचने** की सहायता लें:'
+        : '🌾 **Namaste Kisan Brother!** 🙏\n\nI am your **Agrixora Krishi Vani AI Assistant**.\nClick any interactive action button below or speak into the mic to get live Mandi rates, weather alerts, crop remedies, or sell your harvest:',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      type: 'general'
+      type: 'general',
+      actionButtons: [
+        { label: '📊 आज का लाइव मंडी भाव देखें', actionType: 'market_prices', variant: 'primary', icon: 'trending' },
+        { label: '🌾 अपनी फसल सीधे बेचें (Add Produce)', actionType: 'add_produce', variant: 'secondary', icon: 'sprout' },
+        { label: '🚚 लाइव जीपीएस रीफर ट्रक ट्रैक करें', actionType: 'track_delivery', variant: 'outline', icon: 'truck' },
+        { label: '📞 किसान कॉल सेंटर (1800-180-1551)', actionType: 'call_helpline', variant: 'amber', icon: 'phone' }
+      ],
+      followUpChips: [
+        '🧅 आज का प्याज & टमाटर भाव',
+        '🌽 मक्का में कीड़ा / इल्ली की दवा',
+        '🍂 पत्तियों का पीलापन कैसे ठीक करें',
+        '🌦️ अगले 3 दिन का मौसम अलर्ट',
+        '💳 PM किसान ₹2000 किस्त e-KYC',
+        '🌱 यूरिया व DAP खाद की सही मात्रा'
+      ]
     }
   ]);
 
-  // Topic Categories for 1-Click Access
+  // Topic Categories for Top Bar
   const topicTabs = activeLang === 'hi' ? [
     { id: 'price', label: '📊 मंडी भाव', query: 'आज का प्याज, टमाटर और मक्का का मंडी भाव क्या है?' },
-    { id: 'weather', label: '🌦️ मौसम व बारिश', query: 'अगले 3 दिन का मौसम और बारिश का पूर्वानुमान क्या है?' },
-    { id: 'disease', label: '🐛 रोग व दवा', query: 'फसल में कीड़ा और पत्तियों का पीलापन कैसे ठीक करें?' },
+    { id: 'weather', label: '🌦️ मौसम अलर्ट', query: 'अगले 3 दिन का मौसम और बारिश का पूर्वानुमान क्या है?' },
+    { id: 'disease', label: '🐛 रोग व कीटनाशक', query: 'फसल में कीड़ा और पत्तियों का पीलापन कैसे ठीक करें?' },
     { id: 'fertilizer', label: '🌱 खाद व यूरिया', query: 'फसल में यूरिया, डीएपी और एनपीके खाद की सही मात्रा क्या है?' },
-    { id: 'scheme', label: '🏛️ PM किसान व बीमा', query: 'PM किसान ₹2000 और फसल बीमा योजना का लाभ कैसे लें?' },
+    { id: 'scheme', label: '🏛️ PM किसान व योजना', query: 'PM किसान ₹2000 और फसल बीमा योजना का लाभ कैसे लें?' },
     { id: 'sell', label: '📦 फसल बेचें', query: 'मुझे अपनी फसल मंडी में सीधे बेचना है' }
   ] : [
     { id: 'price', label: '📊 Mandi Rates', query: 'What is today Mandi price of Red Onion, Tomato & Maize?' },
@@ -90,25 +116,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
     { id: 'fertilizer', label: '🌱 Fertilizers', query: 'What is the recommended dosage of Urea, DAP and NPK?' },
     { id: 'scheme', label: '🏛️ PM Kisan', query: 'How to get PM Kisan ₹2000 installment and crop insurance?' },
     { id: 'sell', label: '📦 Sell Produce', query: 'I want to sell my produce directly on marketplace' }
-  ];
-
-  // Quick Action / Query Suggestions
-  const quickPrompts = activeLang === 'hi' ? [
-    { label: '🧅 आज का प्याज & टमाटर भाव', query: 'आज का प्याज और टमाटर का भाव क्या है?' },
-    { label: '🌽 मक्का में इल्ली / कीड़ा का इलाज', query: 'मक्का में कीड़ा और फॉल आर्मीवर्म का इलाज बताओ' },
-    { label: '🍂 पत्तियों का पीलापन कैसे रोकें', query: 'फसल की पत्तियों में पीलापन है क्या दवा डालें?' },
-    { label: '🌦️ कल बारिश होगी या नहीं?', query: 'कल मौसम कैसा रहेगा बारिश होगी क्या?' },
-    { label: '🌾 यूरिया व DAP डालने का सही समय', query: 'यूरिया और DAP खाद कितनी मात्रा में डालना चाहिए?' },
-    { label: '💳 PM किसान ₹2000 किस्त e-KYC', query: 'PM किसान योजना 2000 रुपये की किस्त की जानकारी दो' },
-    { label: '🚚 रीफर कोल्ड स्टोरेज ट्रक ट्रैकिंग', query: 'रीफर कोल्ड चेन ट्रक की लाइव लोकेशन और तापमान क्या है?' }
-  ] : [
-    { label: '🧅 Onion & Tomato Mandi Rates', query: 'What is today Mandi price of Red Onion and Tomato?' },
-    { label: '🌽 Fall Armyworm in Maize', query: 'How to cure fall armyworm and stem borer in maize?' },
-    { label: '🍂 Fix Leaf Yellowing', query: 'What fertilizer or spray cures yellow leaves in crops?' },
-    { label: '🌦️ Rain Forecast & Weather', query: 'Will it rain tomorrow and is spray safe?' },
-    { label: '🌾 Urea & DAP Dosage', query: 'What is the recommended dose of Urea and DAP per acre?' },
-    { label: '💳 PM Kisan ₹2000 Benefit', query: 'How to complete PM Kisan e-KYC and check installment?' },
-    { label: '🚚 Track Cold Chain Reefer', query: 'Track live Reefer cold storage logistics and temperature' }
   ];
 
   // Auto scroll to bottom
@@ -189,9 +196,8 @@ export const KisanAIVoiceAssistant: React.FC = () => {
     if (speechMuted || !synthRef.current) return;
 
     try {
-      synthRef.current.cancel(); // Stop any ongoing speech
+      synthRef.current.cancel();
 
-      // Clean markdown tags and prepare natural Hindi / English phonetic speech
       let cleanText = text
         .replace(/\*\*/g, '')
         .replace(/[*_#`]/g, '')
@@ -217,10 +223,9 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = activeLang === 'hi' ? 'hi-IN' : 'en-IN';
-      utterance.rate = activeLang === 'hi' ? 0.90 : 0.95; // relaxed natural pace
+      utterance.rate = activeLang === 'hi' ? 0.92 : 0.95;
       utterance.pitch = 1.0;
 
-      // Find authentic Hindi Indian voice
       const voices = voicesLoadedRef.current.length > 0 
         ? voicesLoadedRef.current 
         : synthRef.current.getVoices();
@@ -261,8 +266,8 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
     if (!recognitionRef.current) {
       alert(activeLang === 'hi' 
-        ? 'आपके ब्राउज़र में आवाज़ पहचान (Speech Recognition) सपोर्ट नहीं है। कृपया लिखकर प्रश्न पूछें।' 
-        : 'Speech recognition is not supported in this browser. Please type your query.');
+        ? 'आपके ब्राउज़र में आवाज़ पहचान (Speech Recognition) सपोर्ट नहीं है। कृपया नीचे दिए गए बटनों से प्रश्न पूछें।' 
+        : 'Speech recognition is not supported in this browser. Please use the interactive buttons.');
       return;
     }
 
@@ -284,7 +289,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
     const trimmed = query.trim();
     if (!trimmed) return;
 
-    // Add user message
     const userMsg: ChatMessage = {
       id: `usr-${Date.now()}`,
       sender: 'user',
@@ -295,7 +299,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
 
-    // Generate intelligent AI response
     setTimeout(() => {
       const response = generateAIResponse(trimmed.toLowerCase());
       setMessages(prev => [...prev, response]);
@@ -309,43 +312,51 @@ export const KisanAIVoiceAssistant: React.FC = () => {
     const q = rawQ.toLowerCase();
 
     // -------------------------------------------------------------
-    // 1. GREETINGS & SHISHTACHAR (नमस्ते, राम-राम, प्रणाम, हाल-चाल)
+    // 1. MANDI RATES & MSP (प्याज, टमाटर, मक्का, गेहूं, आलू, लहसुन, रेट, भाव)
     // -------------------------------------------------------------
-    if (q.includes('namaste') || q.includes('namaskar') || q.includes('ram ram') || q.includes('pranam') || q.includes('kisan') || q.includes('hello') || q.includes('hi') || q.includes('kaise ho') || q.includes('नमस्ते') || q.includes('प्रणाम') || q.includes('राम') || q.includes('हैलो')) {
+    if (
+      q.includes('bhav') || q.includes('rate') || q.includes('mandi') || q.includes('price') ||
+      q.includes('onion') || q.includes('pyaj') || q.includes('pyaaz') || q.includes('kanda') ||
+      q.includes('tamatar') || q.includes('tomato') || q.includes('makka') || q.includes('maize') ||
+      q.includes('wheat') || q.includes('gehu') || q.includes('aalu') || q.includes('potato') ||
+      q.includes('lahsun') || q.includes('garlic') || q.includes('msp') || q.includes('daam') ||
+      q.includes('भाव') || q.includes('रेट') || q.includes('मंडी') || q.includes('दाम') ||
+      q.includes('प्याज') || q.includes('टमाटर') || q.includes('मक्का') || q.includes('गेहूं') ||
+      q.includes('आलू') || q.includes('लहसुन')
+    ) {
+      const priceCards = [
+        { crop: isHi ? '🧅 लाल प्याज (Red Onion)' : 'Red Onion (Garwa Export)', mandi: 'हाजीपुर / नासिक APMC', rate: '₹26.50 / किलो', msp: '₹24.00', trend: '+4.2% मांग तेज' },
+        { crop: isHi ? '🍅 टमाटर हाइब्रिड (Tomato)' : 'Tomato Hybrid', mandi: 'पटना / पुणे APMC', rate: '₹45.00 / किलो', msp: '₹38.00', trend: '+6.1% मजबूत भाव' },
+        { crop: isHi ? '🌽 पीला मक्का (Yellow Maize)' : 'Yellow Maize (Makka)', mandi: 'वैशाली / गुलाबबाग', rate: '₹2,450 / क्विंटल', msp: '₹2,225', trend: 'MSP से ₹225 अधिक' },
+        { crop: isHi ? '🌾 शरबती गेहूं (Wheat)' : 'Sharbati Wheat C-306', mandi: 'करनाल / सीहोर APMC', rate: '₹2,950 / क्विंटल', msp: '₹2,275', trend: '+3.5% प्रीमियम' },
+        { crop: isHi ? '🥔 आलू चिपसोना (Potato)' : 'Potato Chipsona-1', mandi: 'आगरा / बिहार शरीफ', rate: '₹1,550 / क्विंटल', msp: '₹1,350', trend: 'कोल्ड स्टोरेज मांग' }
+      ];
+
       return {
         id: `ai-${Date.now()}`,
         sender: 'assistant',
         timestamp: timeStr,
-        type: 'general',
+        type: 'price',
         text: isHi
-          ? `🌾 **राम-राम किसान भाई! सादर प्रणाम!** 🙏\n\nमैं Agrixora कृषि वाणी AI हूँ। आज मैं आपकी क्या मदद कर सकता हूँ?\n\n- 📊 **मंडी भाव:** किसी भी फसल (प्याज, टमाटर, मक्का, गेहूं, आलू) का रेट पूछें।\n- 🌦️ **मौसम व बारिश:** 3 दिन का मौसम व स्प्रे समय जानें।\n- 🐛 **रोग व कीटनाशक:** फसल में कीड़े, झुलसा या पीलापन की दवा पूछें।\n- 🏛️ **PM-किसान योजना:** ₹2,000 किस्त व फसल बीमा क्लेम की जानकारी लें।\n- 📦 **फसल बेचें:** अपनी फसल Agrixora पर तुरंत लिस्ट करें।`
-          : `🌾 **Namaste Kisan Brother!** 🙏\n\nI am your Agrixora Krishi Vani AI Assistant. How can I help your farm today?\n\n- 📊 **Mandi Prices:** Ask live rates of Onion, Tomato, Maize, Wheat, etc.\n- 🌦️ **Weather & Rain:** Get 3-day forecast & spray timing.\n- 🐛 **Pest & Disease:** Get exact medicine dosage for crop diseases.\n- 🏛️ **PM-Kisan Schemes:** Check ₹2,000 installment & insurance.\n- 📦 **Sell Produce:** List your harvest directly for verified buyers.`,
+          ? `📊 **आज का लाइव कृषि मंडी भाव व MSP अपडेट:**\n\n- 🧅 **लाल प्याज:** ₹26.50/किलो (नासिक व हाजीपुर मंडी में मांग तेज है)\n- 🍅 **टमाटर हाइब्रिड:** ₹45.00/किलो (थोक आपूर्ति मजबूत)\n- 🌽 **पीला मक्का:** ₹2,450/क्विंटल (सरकारी MSP ₹2,225 से ₹225 अधिक)\n- 🌾 **शरबती गेहूं C-306:** ₹2,950/क्विंटल\n- 🥔 **आलू चिपसोना:** ₹1,550/क्विंटल\n\n💡 *सीधे Agrixora पर अपनी फसल लिस्ट करें और बिना बिचौलिए के 15-20% अधिक मुनाफा कमाएं।*`
+          : `📊 **Today's Live Mandi Benchmark & Rates:**\n\n- 🧅 **Red Onion:** ₹26.50/Kg (Strong export demand)\n- 🍅 **Tomato Hybrid:** ₹45.00/Kg (High retail demand)\n- 🌽 **Yellow Maize:** ₹2,450/Qtl (₹225 above Govt MSP)\n- 🌾 **Sharbati Wheat:** ₹2,950/Qtl\n- 🥔 **Potato:** ₹1,550/Qtl\n\n💡 *List your harvest directly on Agrixora for highest verified payouts.*`,
+        cardData: { priceCards },
+        actionButtons: [
+          { label: '🌾 इस भाव पर फसल लिस्ट करें (Add Produce)', actionType: 'add_produce', variant: 'primary', icon: 'sprout' },
+          { label: '📊 7-दिन का लाइव APMC चार्ट देखें', actionType: 'market_prices', variant: 'secondary', icon: 'trending' },
+          { label: '🚚 कोल्ड स्टोरेज रीफर वाहन बुक करें', actionType: 'track_delivery', variant: 'outline', icon: 'truck' }
+        ],
+        followUpChips: [
+          '🧅 नासिक व हाजीपुर प्याज का भाव',
+          '🌽 मक्का में इल्ली का इलाज',
+          '🌦️ 3 दिन का मौसम व बारिश',
+          '🌱 यूरिया व DAP डालने का समय'
+        ]
       };
     }
 
     // -------------------------------------------------------------
-    // 2. FERTILIZER & NUTRITION (खाद, यूरिया, DAP, NPK, जिंक, जाइम)
-    // -------------------------------------------------------------
-    if (q.includes('khad') || q.includes('urea') || q.includes('dap') || q.includes('npk') || q.includes('fertilizer') || q.includes('zinc') || q.includes('potash') || q.includes('खाद') || q.includes('यूरिया') || q.includes('डीएपी') || q.includes('पोटाश') || q.includes('जिंक') || q.includes('पोषक')) {
-      return {
-        id: `ai-${Date.now()}`,
-        sender: 'assistant',
-        timestamp: timeStr,
-        type: 'fertilizer',
-        text: isHi
-          ? `🌱 **फसल के लिए संतुलित खाद व उर्वरक तालिका (प्रति एकड़):**\n\n1. 🌾 **बुवाई के समय (Basal Dose):**\n   - **DAP (18:46:0):** 50 किलोग्राम (1 बोरी) प्रति एकड़।\n   - **MOP (पोटाश):** 25-30 किलोग्राम प्रति एकड़ (दानों की चमक व वजन बढ़ाने हेतु)।\n   - **जिंक सल्फेट (33%):** 5 किलोग्राम प्रति एकड़ (मिट्टी में मिलाकर डालें)।\n\n2. 🌿 **पहली व दूसरी सिंचाई पर (Top Dressing):**\n   - **नीम लेपित यूरिया:** 45 किलोग्राम प्रति एकड़।\n   - **नैनो यूरिया (Nano Urea):** 4 ml प्रति लीटर पानी (40-50 ml प्रति 15L टंकी) में स्प्रे करें।\n\n3. 💧 **फूल व फल बनते समय:**\n   - **NPK 0:52:34 या 19:19:19:** 1 किलोग्राम प्रति 150-200 लीटर पानी में घोलकर स्प्रे करें।\n\n💡 *सलाह: यूरिया हमेशा खेत में नमी होने पर ही डालें।*`
-          : `🌱 **Balanced Fertilizer & Nutrient Schedule (Per Acre):**\n\n1. 🌾 **At Sowing Time (Basal Dose):**\n   - **DAP (18:46:0):** 50 Kg (1 Bag) per acre.\n   - **MOP (Potash):** 25-30 Kg per acre for grain weight and shining.\n   - **Zinc Sulphate 33%:** 5 Kg per acre mixed in soil.\n\n2. 🌿 **Top Dressing (1st & 2nd Irrigation):**\n   - **Neem Coated Urea:** 45 Kg per acre.\n   - **Nano Urea:** 4 ml per Litre of water (40 ml per 15L sprayer tank).\n\n3. 💧 **Fruiting & Flowering Stage:**\n   - **NPK 19:19:19 or 0:52:34:** 1 Kg per 150-200 Litres of water.`,
-        cardData: {
-          dap: '50 Kg / Acre',
-          urea: '45 Kg / Acre',
-          potash: '25 Kg / Acre',
-          nanoUrea: '4 ml / Litre'
-        }
-      };
-    }
-
-    // -------------------------------------------------------------
-    // 3. CROP DISEASE, PEST & YELLOWING (रोग, कीड़ा, पीलापन, दवा, स्प्रे)
+    // 2. CROP DISEASE, PEST & YELLOWING (रोग, कीड़ा, पीलापन, दवा, स्प्रे)
     // -------------------------------------------------------------
     if (
       q.includes('disease') || q.includes('bimari') || q.includes('keeda') || q.includes('pest') ||
@@ -362,52 +373,62 @@ export const KisanAIVoiceAssistant: React.FC = () => {
         timestamp: timeStr,
         type: 'disease',
         text: isHi
-          ? `🌿 **फसल रोग व कीट निवारण विशेषज्ञ पर्ची (कृषि रक्षक गाइड):**\n\n1. 🍂 **पत्तियों का पीलापन (Yellowing of Leaves):**\n   - **कारण:** नाइट्रोजन व जिंक/आयरन की कमी।\n   - **उपचार:** **19:19:19 NPK (75 ग्राम)** + **चिलेटेड जिंक (15 ग्राम)** प्रति 15 लीटर पानी की टंकी में मिलाकर स्प्रे करें।\n\n2. 🐛 **मक्का, गोभी व सब्जियों में इल्ली / फॉल आर्मीवर्म:**\n   - **दवा:** **इमामेक्टिन बेंजोएट 5% SG (Emamectin Benzoate)** 8-10 ग्राम प्रति 15 लीटर टंकी में शाम के समय स्प्रे करें।\n   - **वैकल्पिक:** **कोराजन (Coragen / Chlorantraniliprole)** 6 ml प्रति 15 लीटर टंकी।\n\n3. 🍄 **टमाटर/आलू में झुलसा रोग (Late & Early Blight):**\n   - **दवा:** **मेंकोजेब 75% WP (Mancozeb)** या **साफ पाउडर (Saaf)** 35-40 ग्राम प्रति 15 लीटर टंकी।\n\n4. 🦟 **रस चूसक कीट (माहू, सफेद मक्खी, थ्रिप्स):**\n   - **दवा:** **इमिडाक्लोप्रिड 17.8% SL** 8-10 ml प्रति 15 लीटर टंकी।\n\n🌿 **जैविक उपाय:** नीम का तेल 1500 PPM (50 ml प्रति 15L टंकी) का छिड़काव करें।`
-          : `🌿 **Crop Health & Disease Prescription (Agri Doctor):**\n\n1. 🍂 **Leaf Yellowing (Chlorosis):**\n   - **Treatment:** Foliar spray of **NPK 19:19:19 (75g)** + **Chelated Zinc (15g)** in 15 Litre sprayer tank.\n\n2. 🐛 **Fall Armyworm & Caterpillars (Maize/Vegetables):**\n   - **Medicine:** **Emamectin Benzoate 5% SG** @ 8-10g per 15L tank or **Coragen** @ 6ml per 15L tank in evening.\n\n3. 🍄 **Tomato & Potato Blight (झुलसा रोग):**\n   - **Medicine:** **Mancozeb 75% WP** or **Saaf Powder** @ 35-40g per 15L tank.\n\n4. 🦟 **Sucking Pests (Aphids, Thrips, Whitefly):**\n   - **Medicine:** **Imidacloprid 17.8% SL** @ 8-10ml per 15L tank.`,
+          ? `🌿 **फसल रोग व कीट निवारण विशेषज्ञ पर्ची (Agri Doctor):**\n\n1. 🍂 **पत्तियों का पीलापन (Yellowing):**\n   - **दवा:** **19:19:19 NPK (75 ग्राम)** + **चिलेटेड जिंक (15 ग्राम)** प्रति 15 लीटर टंकी में मिलाकर छिड़कें।\n\n2. 🐛 **मक्का, गोभी व सब्जियों में इल्ली / फॉल आर्मीवर्म:**\n   - **दवा:** **इमामेक्टिन बेंजोएट 5% SG** 8-10 ग्राम प्रति 15 लीटर टंकी (शाम के समय) या **कोराजन** 6 ml प्रति टंकी।\n\n3. 🍄 **टमाटर/आलू में झुलसा रोग (Blight):**\n   - **दवा:** **मेंकोजेब 75% WP (Mancozeb)** या **साफ (Saaf)** 35-40 ग्राम प्रति 15 लीटर टंकी।\n\n4. 🦟 **रस चूसक कीट (माहू, सफेद मक्खी, थ्रिप्स):**\n   - **दवा:** **इमिडाक्लोप्रिड 17.8% SL** 8-10 ml प्रति 15 लीटर टंकी।\n\n🌿 **जैविक उपाय:** नीम का तेल 1500 PPM (50 ml प्रति 15L टंकी) का स्प्रे करें।`
+          : `🌿 **Crop Health & Disease Prescription (Agri Doctor):**\n\n1. 🍂 **Leaf Yellowing (Chlorosis):**\n   - **Foliar Spray:** **NPK 19:19:19 (75g)** + **Chelated Zinc (15g)** in 15L sprayer tank.\n\n2. 🐛 **Fall Armyworm & Caterpillars (Maize/Vegetables):**\n   - **Medicine:** **Emamectin Benzoate 5% SG** @ 8-10g per 15L tank in evening.\n\n3. 🍄 **Tomato & Potato Blight (झुलसा रोग):**\n   - **Medicine:** **Mancozeb 75% WP** @ 35-40g per 15L tank.\n\n4. 🦟 **Sucking Pests (Aphids, Thrips, Whitefly):**\n   - **Medicine:** **Imidacloprid 17.8% SL** @ 8-10ml per 15L tank.`,
         cardData: {
           cropTarget: isHi ? 'मक्का, टमाटर, प्याज, गेहूं, धान' : 'Maize, Tomato, Onion, Wheat, Paddy',
           remedy1: 'NPK 19:19:19 (75g) + Chelated Zinc (15g) / 15L',
           remedy2: 'Emamectin Benzoate 5% SG (10g) / 15L Tank',
           organic: isHi ? 'नीम तेल 1500 PPM (50 ml/15L टंकी)' : 'Neem Oil 1500 PPM (50 ml/15L tank)'
-        }
+        },
+        actionButtons: [
+          { label: '📞 कृषि विशेषज्ञ से बात करें (1800-180-1551)', actionType: 'call_helpline', variant: 'amber', icon: 'phone' },
+          { label: '🌦️ आज स्प्रे का मौसम व समय चेक करें', actionType: 'query', queryText: 'आज मौसम कैसा रहेगा क्या स्प्रे सुरक्षित है?', variant: 'secondary', icon: 'cloud' },
+          { label: '🌾 स्वस्थ फसल लिस्ट करें (Add Produce)', actionType: 'add_produce', variant: 'primary', icon: 'sprout' }
+        ],
+        followUpChips: [
+          '🍂 पत्तियों का पीलापन कैसे रोकें',
+          '🌽 मक्के में इल्ली की दवा',
+          '🍄 टमाटर में झुलसा रोग',
+          '🦟 सफेद मक्खी व थ्रिप्स का इलाज'
+        ]
       };
     }
 
     // -------------------------------------------------------------
-    // 4. MANDI RATES & MSP (प्याज, टमाटर, मक्का, गेहूं, आलू, लहसुन, रेट, भाव)
+    // 3. FERTILIZER & NUTRITION (खाद, यूरिया, DAP, NPK, जिंक, जाइम)
     // -------------------------------------------------------------
-    if (
-      q.includes('bhav') || q.includes('rate') || q.includes('mandi') || q.includes('price') ||
-      q.includes('onion') || q.includes('pyaj') || q.includes('pyaaz') || q.includes('kanda') ||
-      q.includes('tamatar') || q.includes('tomato') || q.includes('makka') || q.includes('maize') ||
-      q.includes('wheat') || q.includes('gehu') || q.includes('aalu') || q.includes('potato') ||
-      q.includes('lahsun') || q.includes('garlic') || q.includes('msp') || q.includes('daam') ||
-      q.includes('भाव') || q.includes('रेट') || q.includes('मंडी') || q.includes('दाम') ||
-      q.includes('प्याज') || q.includes('टमाटर') || q.includes('मक्का') || q.includes('गेहूं') ||
-      q.includes('आलू') || q.includes('लहसुन')
-    ) {
-      const priceCards = [
-        { crop: isHi ? '🧅 लाल प्याज (Red Onion)' : 'Red Onion (Export Grade)', mandi: 'हाजीपुर / नासिक APMC', rate: '₹26.50 / Kg', msp: '₹24.00', trend: '+4.2% मांग तेज' },
-        { crop: isHi ? '🍅 टमाटर हाइब्रिड (Tomato)' : 'Tomato Hybrid', mandi: 'पटना / पुणे APMC', rate: '₹45.00 / Kg', msp: '₹38.00', trend: '+6.1% मजबूत भाव' },
-        { crop: isHi ? '🌽 पीला मक्का (Yellow Maize)' : 'Yellow Maize (Makka)', mandi: 'वैशाली / गुलाबबाग', rate: '₹2,450 / क्विंटल', msp: '₹2,225', trend: 'MSP से ₹225 अधिक' },
-        { crop: isHi ? '🌾 शरबती गेहूं (Wheat)' : 'Sharbati Wheat C-306', mandi: 'करनाल / सीहोर APMC', rate: '₹2,950 / क्विंटल', msp: '₹2,275', trend: '+3.5% प्रीमियम' },
-        { crop: isHi ? '🥔 आलू चिपसोना (Potato)' : 'Potato Chipsona-1', mandi: 'आगरा / बिहार शरीफ', rate: '₹1,550 / क्विंटल', msp: '₹1,350', trend: 'कोल्ड स्टोरेज मांग' }
-      ];
-
+    if (q.includes('khad') || q.includes('urea') || q.includes('dap') || q.includes('npk') || q.includes('fertilizer') || q.includes('zinc') || q.includes('potash') || q.includes('खाद') || q.includes('यूरिया') || q.includes('डीएपी') || q.includes('पोटाश') || q.includes('जिंक') || q.includes('पोषक')) {
       return {
         id: `ai-${Date.now()}`,
         sender: 'assistant',
         timestamp: timeStr,
-        type: 'price',
+        type: 'fertilizer',
         text: isHi
-          ? `📊 **आज का लाइव कृषि मंडी भाव व MSP अपडेट:**\n\n- 🧅 **लाल प्याज (Garwa Grade):** ₹26.50/किलो (₹2,650/क्विंटल)\n- 🍅 **टमाटर हाइब्रिड:** ₹45.00/किलो (थोक मांग में 6% उछाल)\n- 🌽 **पीला मक्का (सुपर क्वालिटी):** ₹2,450/क्विंटल (सरकारी MSP ₹2,225 से ₹225 अधिक)\n- 🌾 **शरबती गेहूं C-306:** ₹2,950/क्विंटल\n- 🥔 **आलू (चिपसोना):** ₹1,550/क्विंटल\n\n💡 *सुझाव: Agrixora पर सीधे थोक खरीदार को बेचकर 15-20% अधिक मुनाफा पाएं।*`
-          : `📊 **Today's Live Mandi Benchmark & Rates:**\n\n- 🧅 **Red Onion:** ₹26.50/Kg (₹2,650/Qtl)\n- 🍅 **Tomato Hybrid:** ₹45.00/Kg (Strong demand)\n- 🌽 **Yellow Maize:** ₹2,450/Qtl (₹225 above MSP)\n- 🌾 **Sharbati Wheat:** ₹2,950/Qtl\n- 🥔 **Potato:** ₹1,550/Qtl\n\n💡 *Tip: Sell directly on Agrixora to bypass middlemen commissions.*`,
-        cardData: { priceCards }
+          ? `🌱 **फसल के लिए संतुलित खाद व उर्वरक तालिका (प्रति एकड़):**\n\n1. 🌾 **बुवाई के समय (Basal Dose):**\n   - **DAP (18:46:0):** 50 किलोग्राम (1 बोरी) प्रति एकड़।\n   - **MOP (पोटाश):** 25-30 किलोग्राम प्रति एकड़ (दानों की चमक व वजन बढ़ाने हेतु)।\n   - **जिंक सल्फेट (33%):** 5 किलोग्राम प्रति एकड़ (मिट्टी में मिलाकर डालें)।\n\n2. 🌿 **पहली व दूसरी सिंचाई पर (Top Dressing):**\n   - **नीम लेपित यूरिया:** 45 किलोग्राम प्रति एकड़।\n   - **नैनो यूरिया (Nano Urea):** 4 ml प्रति लीटर पानी (40-50 ml प्रति 15L टंकी) में स्प्रे करें।\n\n3. 💧 **फूल व फल बनते समय:**\n   - **NPK 0:52:34 या 19:19:19:** 1 किलोग्राम प्रति 150-200 लीटर पानी में घोलकर स्प्रे करें।`
+          : `🌱 **Balanced Fertilizer & Nutrient Schedule (Per Acre):**\n\n1. 🌾 **At Sowing Time (Basal Dose):**\n   - **DAP (18:46:0):** 50 Kg (1 Bag) per acre.\n   - **MOP (Potash):** 25-30 Kg per acre for grain weight.\n   - **Zinc Sulphate 33%:** 5 Kg per acre.\n\n2. 🌿 **Top Dressing (1st & 2nd Irrigation):**\n   - **Neem Coated Urea:** 45 Kg per acre.\n   - **Nano Urea:** 4 ml per Litre of water (40 ml per 15L tank).\n\n3. 💧 **Flowering Stage:**\n   - **NPK 19:19:19:** 1 Kg per 150-200 Litres of water.`,
+        cardData: {
+          dap: '50 Kg / एकड़',
+          urea: '45 Kg / एकड़',
+          potash: '25-30 Kg / एकड़',
+          nanoUrea: '4 ml / लीटर पानी'
+        },
+        actionButtons: [
+          { label: '🌾 फसल उत्पादन दर्ज करें (Add Produce)', actionType: 'add_produce', variant: 'primary', icon: 'sprout' },
+          { label: '📊 आज का मंडी भाव चेक करें', actionType: 'market_prices', variant: 'secondary', icon: 'trending' },
+          { label: '🌦️ सिंचाई हेतु मौसम पूर्वानुमान देखें', actionType: 'query', queryText: 'अगले 3 दिन का मौसम और बारिश का पूर्वानुमान क्या है?', variant: 'outline', icon: 'cloud' }
+        ],
+        followUpChips: [
+          '🌾 पहली सिंचाई पर यूरिया कितना डालें',
+          '💧 नैनो यूरिया स्प्रे की विधि',
+          '🍂 जिंक की कमी के लक्षण',
+          '🌽 मक्के में DAP की मात्रा'
+        ]
       };
     }
 
     // -------------------------------------------------------------
-    // 5. WEATHER & RAIN FORECAST (मौसम, बारिश, तापमान, धूप, हवा)
+    // 4. WEATHER & RAIN FORECAST (मौसम, बारिश, तापमान, धूप, हवा)
     // -------------------------------------------------------------
     if (
       q.includes('mausam') || q.includes('weather') || q.includes('barish') || q.includes('rain') ||
@@ -421,8 +442,8 @@ export const KisanAIVoiceAssistant: React.FC = () => {
         timestamp: timeStr,
         type: 'weather',
         text: isHi
-          ? `🌦️ **आगामी 3 दिनों का कृषि मौसम व वर्षा पूर्वानुमान:**\n\n- ☀️ **आज (दिन 1):** 28°C धूप खिली रहेगी, नमी 62%, हवा 11 km/h। (कीटनाशक व खाद छिड़काव के लिए अनुकूल समय)\n- ⛅ **कल (दिन 2):** 27°C आंशिक बादल छाए रहेंगे, हल्की बूंदाबांदी (20% संभावना)।\n- 🌧️ **परसों (दिन 3):** 25°C दोपहर बाद हल्की से मध्यम बारिश (3.5 mm) होने का अनुमान।\n\n⚠️ **किसान भाइयों के लिए जरूरी सलाह:**\n1. खलिहान या खुले में रखी फसल को तिरपाल से ढक लें।\n2. कीटनाशक का स्प्रे आज शाम 5 बजे तक पूरा कर लें।`
-          : `🌦️ **3-Day Agro-Meteorological Weather Alert:**\n\n- ☀️ **Today (Day 1):** 28°C Clear & Sunny, Humidity 62%, Wind 11 km/h. (Safe for spray)\n- ⛅ **Tomorrow (Day 2):** 27°C Partly Cloudy, 20% drizzle chance.\n- 🌧️ **Day 3:** 25°C Light to moderate rain (3.5 mm) expected.\n\n⚠️ **Advisory:** Cover harvested crops in shaded store. Finish pesticide sprays today before rain.`,
+          ? `🌦️ **आगामी 3 दिनों का कृषि मौसम व वर्षा पूर्वानुमान:**\n\n- ☀️ **आज (दिन 1):** 28°C धूप खिली रहेगी, नमी 62%, हवा 11 km/h। (कीटनाशक व खाद छिड़काव के लिए सर्वोत्तम समय)\n- ⛅ **कल (दिन 2):** 27°C आंशिक बादल छाए रहेंगे, हल्की बूंदाबांदी (20% संभावना)।\n- 🌧️ **परसों (दिन 3):** 25°C दोपहर बाद हल्की से मध्यम बारिश (3.5 mm) होने का अनुमान।\n\n⚠️ **किसान सलाह:** कटी हुई फसल को ऊंचे शेड में रखें। कीटनाशक स्प्रे आज शाम तक पूरा कर लें।`
+          : `🌦️ **3-Day Agro-Meteorological Weather Alert:**\n\n- ☀️ **Today (Day 1):** 28°C Clear & Sunny, Humidity 62%, Wind 11 km/h. (Optimal for spray)\n- ⛅ **Tomorrow (Day 2):** 27°C Partly Cloudy, 20% drizzle chance.\n- 🌧️ **Day 3:** 25°C Light rain (3.5 mm) expected in afternoon.\n\n⚠️ **Advisory:** Finish foliar pesticide sprays today before Day 3 rain.`,
         cardData: {
           temp: '28°C',
           condition: isHi ? 'धूप खिली हुई (अनुकूल)' : 'Clear & Sunny',
@@ -430,12 +451,23 @@ export const KisanAIVoiceAssistant: React.FC = () => {
           rainChance: '15%',
           wind: '11 km/h',
           sprayStatus: isHi ? '✅ आज स्प्रे के लिए सुरक्षित' : '✅ Safe for Spray'
-        }
+        },
+        actionButtons: [
+          { label: '📦 बारिश से पहले फसल लिस्ट करें', actionType: 'add_produce', variant: 'primary', icon: 'sprout' },
+          { label: '🚚 रीफर कोल्ड स्टोरेज ट्रक बुक करें', actionType: 'track_delivery', variant: 'secondary', icon: 'truck' },
+          { label: '🐛 आज के लिए सुरक्षित स्प्रे दवाएं देखें', actionType: 'query', queryText: 'फसल में कीड़ा और पत्तियों का पीलापन कैसे ठीक करें?', variant: 'outline', icon: 'bug' }
+        ],
+        followUpChips: [
+          '🌧️ क्या कल बारिश होगी?',
+          '☀️ आज स्प्रे का सही समय',
+          '🧅 आज का प्याज व टमाटर भाव',
+          '🚚 कोल्ड स्टोरेज रीफर वाहन'
+        ]
       };
     }
 
     // -------------------------------------------------------------
-    // 6. GOVT SCHEMES & SUBSIDY (PM किसान, किस्त, बीमा, केसीसी, सोलर पंप)
+    // 5. GOVT SCHEMES & SUBSIDY (PM किसान, किस्त, बीमा, केसीसी, सोलर पंप)
     // -------------------------------------------------------------
     if (
       q.includes('pm kisan') || q.includes('yojana') || q.includes('scheme') || q.includes('subsidy') ||
@@ -450,18 +482,29 @@ export const KisanAIVoiceAssistant: React.FC = () => {
         timestamp: timeStr,
         type: 'scheme',
         text: isHi
-          ? `🏛️ **प्रमुख सरकारी किसान योजनाएं व सहायता विवरण:**\n\n1. 💳 **PM-किसान सम्मान निधि (₹6,000 प्रति वर्ष):**\n   - प्रत्येक 4 माह में ₹2,000 सीधे बैंक खाते में (DBT)।\n   - किस्त पाने के लिए **e-KYC** और बैंक खाते में **आधार सीडिंग (DBT Active)** होना जरूरी है।\n   - आधिकारिक पोर्टल: pmkisan.gov.in (टोल-फ्री 155261 / 1800-180-1551)\n\n2. 🛡️ **प्रधानमंत्री फसल बीमा योजना (PMFBY):**\n   - बाढ़, सूखा या ओलावृष्टि से नुकसान पर 72 घंटे के भीतर हेल्पलाइन **14447** पर क्लेम दर्ज करें।\n\n3. 🚜 **किसान क्रेडिट कार्ड (KCC) 4% ब्याज लोन:**\n   - ₹3 लाख तक का कृषि ऋण मात्र 4% रियायती ब्याज दर पर।\n\n4. ☀️ **पीएम-कुसुम सोलर पंप योजना:**\n   - खेतों में सिंचाई हेतु सोलर पंप लगाने पर 60% से 90% तक सरकारी सब्सिडी।`
-          : `🏛️ **Key Govt Agricultural Welfare Schemes:**\n\n1. 💳 **PM-Kisan Samman Nidhi:**\n   - ₹6,000 annual direct benefit transfer in 3 installments of ₹2,000.\n   - Complete e-KYC on pmkisan.gov.in or CSC Center.\n\n2. 🛡️ **Pradhan Mantri Fasal Bima Yojana (PMFBY):**\n   - Crop loss claim within 72 hours on Toll-Free 14447.\n\n3. 🚜 **Kisan Credit Card (KCC):**\n   - Subsidized 4% interest rate crop loan up to ₹3.00 Lakhs.\n\n4. ☀️ **PM-KUSUM Solar Pump Scheme:**\n   - Up to 60-90% subsidy on agricultural solar pumps.`,
+          ? `🏛️ **प्रमुख सरकारी किसान योजनाएं व सहायता विवरण:**\n\n1. 💳 **PM-किसान सम्मान निधि (₹6,000 प्रति वर्ष):**\n   - प्रत्येक 4 माह में ₹2,000 सीधे बैंक खाते में (DBT)।\n   - किस्त पाने हेतु **e-KYC** और आधार बैंक सीडिंग अनिवार्य है।\n   - पोर्टल: pmkisan.gov.in (हेल्पलाइन 155261 / 1800-180-1551)\n\n2. 🛡️ **प्रधानमंत्री फसल बीमा योजना (PMFBY):**\n   - प्राकृतिक आपदा से फसल नष्ट होने पर 72 घंटे के भीतर टोल-फ्री **14447** पर क्लेम दर्ज कराएं।\n\n3. 🚜 **किसान क्रेडिट कार्ड (KCC) 4% ऋण:**\n   - ₹3 लाख तक का कृषि ऋण मात्र 4% रियायती ब्याज दर पर।\n\n4. ☀️ **पीएम-कुसुम सोलर पंप योजना:**\n   - खेत में सोलर पंप लगाने पर 60% से 90% तक सरकारी अनुदान।`
+          : `🏛️ **Key Govt Agricultural Welfare Schemes:**\n\n1. 💳 **PM-Kisan Samman Nidhi:**\n   - ₹6,000 annual direct benefit in 3 installments of ₹2,000.\n   - Complete e-KYC on pmkisan.gov.in.\n\n2. 🛡️ **Pradhan Mantri Fasal Bima Yojana (PMFBY):**\n   - Crop loss claim within 72 hours on Toll-Free 14447.\n\n3. 🚜 **Kisan Credit Card (KCC):**\n   - Subsidized 4% interest rate crop loan up to ₹3.00 Lakhs.\n\n4. ☀️ **PM-KUSUM Solar Pump Scheme:**\n   - Up to 60-90% subsidy for solar water pumps.`,
         cardData: {
           helpline: '1800-180-1551 (Kisan Call Centre)',
           kccLimit: '₹3,00,000 @ 4% p.a.',
           pmKisan: '₹2,000 Direct DBT'
-        }
+        },
+        actionButtons: [
+          { label: '📞 किसान हेल्पलाइन 1800-180-1551 डायल करें', actionType: 'call_helpline', variant: 'amber', icon: 'phone' },
+          { label: '🌐 PM किसान e-KYC पोर्टल खोलें', actionType: 'open_link', url: 'https://pmkisan.gov.in', variant: 'primary', icon: 'link' },
+          { label: '🌾 अपनी फसल Agrixora पर बेचें', actionType: 'add_produce', variant: 'secondary', icon: 'sprout' }
+        ],
+        followUpChips: [
+          '💳 ₹2000 किस्त e-KYC कैसे करें',
+          '🛡️ फसल बीमा 72 घंटे क्लेम',
+          '🚜 KCC 4% ऋण कैसे मिलेगा',
+          '☀️ सोलर पंप 90% सब्सिडी'
+        ]
       };
     }
 
     // -------------------------------------------------------------
-    // 7. SELL CROP / LIST PRODUCE (फसल बेचना, लिस्ट करना, मंडी में बेचना)
+    // 6. SELL CROP / LIST PRODUCE (फसल बेचना, लिस्ट करना, मंडी में बेचना)
     // -------------------------------------------------------------
     if (
       q.includes('bechna') || q.includes('sell') || q.includes('list') || q.includes('add produce') ||
@@ -474,17 +517,28 @@ export const KisanAIVoiceAssistant: React.FC = () => {
         timestamp: timeStr,
         type: 'action',
         text: isHi
-          ? `📦 **अपनी फसल Agrixora पर सीधे थोक खरीदारों को बेचें:**\n\nमैंने आपकी सहायता के लिए 'Add Produce' पेज तैयार कर दिया है। नीचे दिए गए हरे बटन को दबाकर आप 1 मिनट में अपनी फसल (फसल का नाम, मात्रा क्विंटल में, अपेक्षित भाव व नजदीकी FCI हब) दर्ज कर सकते हैं। Agrixora के सत्यापित खरीदार सीधे आपसे संपर्क करेंगे और एस्क्रो खाते द्वारा सुरक्षित भुगतान मिलेगा!`
-          : `📦 **Sell Your Produce Directly on Agrixora:**\n\nClick the button below to register your harvest details (crop name, quantity in Quintals, expected price & FCI hub). Verified institutional buyers will place direct orders with guaranteed escrow bank payment!`,
+          ? `📦 **अपनी फसल Agrixora पर सीधे थोक खरीदारों को बेचें:**\n\nमैंने आपकी सहायता के लिए 'Add Produce' पेज तैयार कर दिया है। नीचे दिए गए हरे बटन को दबाकर आप 1 मिनट में अपनी फसल दर्ज कर सकते हैं:\n\n- 💰 **गारंटीड एस्क्रो भुगतान:** डिलीवरी होते ही बैंक खाते में तुरंत ट्रांसफर।\n- 🏬 **FCI व थोक खरीदार:** Reliance, ITC, BigBasket व सरकारी हब सीधे खरीदेंगे।\n- 🚚 **रीफर कोल्ड-चेन परिवहन:** खेत से मंडी तक सुरक्षित डिलीवरी।`
+          : `📦 **Sell Your Produce Directly on Agrixora:**\n\nClick the primary button below to list your crop (Quantity in Quintals, expected price & nearest FCI collection hub). Verified institutional buyers will place orders with guaranteed escrow bank payment!`,
         cardData: {
           actionType: 'add_produce',
           btnText: isHi ? '🌾 नई फसल बिक्री हेतु दर्ज करें (Add Produce)' : '🌾 List New Crop for Sale'
-        }
+        },
+        actionButtons: [
+          { label: '🌾 नई फसल बिक्री हेतु दर्ज करें (Add Produce)', actionType: 'add_produce', variant: 'primary', icon: 'sprout' },
+          { label: '📊 वर्तमान मंडी भाव चेक करें', actionType: 'market_prices', variant: 'secondary', icon: 'trending' },
+          { label: '🚚 रीफर ट्रक लोकेशन देखें', actionType: 'track_delivery', variant: 'outline', icon: 'truck' }
+        ],
+        followUpChips: [
+          '🧅 आज का प्याज & टमाटर भाव',
+          '🌽 मक्का का आज का रेट',
+          '🚚 रीफर गाड़ी का भाड़ा',
+          '💳 पेमेंट बैंक में कैसे आता है'
+        ]
       };
     }
 
     // -------------------------------------------------------------
-    // 8. LOGISTICS & REEFER TRACKING (गाड़ी, ट्रक, रीफर, कोल्ड स्टोरेज, भाड़ा)
+    // 7. LOGISTICS & REEFER TRACKING (गाड़ी, ट्रक, रीफर, कोल्ड स्टोरेज, भाड़ा)
     // -------------------------------------------------------------
     if (
       q.includes('truck') || q.includes('track') || q.includes('reefer') || q.includes('cold') ||
@@ -503,12 +557,23 @@ export const KisanAIVoiceAssistant: React.FC = () => {
         cardData: {
           actionType: 'track_delivery',
           btnText: isHi ? '🚚 लाइव GPS रीफर मैप खोलें' : '🚚 Open Live Reefer GPS Map'
-        }
+        },
+        actionButtons: [
+          { label: '🚚 लाइव GPS रीफर मैप खोलें', actionType: 'track_delivery', variant: 'primary', icon: 'truck' },
+          { label: '🌾 नई फसल लोड बुक करें (Add Produce)', actionType: 'add_produce', variant: 'secondary', icon: 'sprout' },
+          { label: '📊 मंडी भाव चेक करें', actionType: 'market_prices', variant: 'outline', icon: 'trending' }
+        ],
+        followUpChips: [
+          '❄️ कोल्ड स्टोरेज का तापमान',
+          '🛣️ पटना हब पहुंचने का समय',
+          '🧅 प्याज का आज का भाव',
+          '📦 नई फसल लिस्ट करें'
+        ]
       };
     }
 
     // -------------------------------------------------------------
-    // 9. DEFAULT ULTRA-HELPFUL AGRICULTURAL FALLBACK
+    // 8. GENERAL / GREETING FALLBACK WITH COMPLETE ACTION TILES
     // -------------------------------------------------------------
     return {
       id: `ai-${Date.now()}`,
@@ -516,25 +581,47 @@ export const KisanAIVoiceAssistant: React.FC = () => {
       timestamp: timeStr,
       type: 'general',
       text: isHi
-        ? `🌾 **किसान भाई, मैंने आपका सवाल समझा!**\n\nकृषि वाणी AI आपकी इन मुख्य समस्याओं का तुरंत सटीक समाधान दे सकता है:\n\n1. 📊 **मंडी भाव:** "आज का प्याज, टमाटर या मक्का का भाव क्या है?"\n2. 🌦️ **मौसम पूर्वानुमान:** "कल बारिश होगी क्या और स्प्रे कब करें?"\n3. 🐛 **रोग व कीटनाशक:** "पत्तियों का पीलापन या इल्ली की दवा बताओ"\n4. 🌱 **खाद की मात्रा:** "यूरिया और DAP कितना डालना चाहिए?"\n5. 🏛️ **सरकारी योजनाएं:** "PM किसान 2000 किस्त कैसे चेक करें?"\n6. 📦 **फसल बेचना:** "मुझे अपनी फसल सीधे बेचना है"\n\n👉 *नीचे दिए गए किसी भी बटन को दबाएं या माइक दबाकर बोलें।*`
-        : `🌾 **Kisan Brother, I am ready to help!**\n\nHere are the top topics you can ask me directly:\n\n1. 📊 **Mandi Rates:** "What is today's Onion/Maize price?"\n2. 🌦️ **Weather Alert:** "Will it rain tomorrow?"\n3. 🐛 **Crop Doctor:** "How to cure leaf yellowing or caterpillars?"\n4. 🌱 **Fertilizer Guide:** "How much Urea and DAP per acre?"\n5. 🏛️ **PM-Kisan:** "How to check ₹2,000 installment status?"\n6. 📦 **Sell Produce:** "I want to list my crop for buyers"\n\n👉 *Tap any topic tab below or click the mic button to speak.*`
+        ? `🌾 **किसान भाई, मैंने आपकी बात समझी!**\n\nआप नीचे दिए गए बटनों पर 1-क्लिक करके तुरंत जानकारी व सेवा प्राप्त कर सकते हैं:`
+        : `🌾 **Kisan Brother, I am ready to help!**\n\nClick any interactive action button below for immediate resolution:`,
+      actionButtons: [
+        { label: '📊 आज का मंडी भाव चेक करें', actionType: 'market_prices', variant: 'primary', icon: 'trending' },
+        { label: '🌾 अपनी फसल सीधे बेचें (Add Produce)', actionType: 'add_produce', variant: 'secondary', icon: 'sprout' },
+        { label: '🐛 फसल में कीड़े/पीलेपन की दवा देखें', actionType: 'query', queryText: 'फसल में कीड़ा और पत्तियों का पीलापन कैसे ठीक करें?', variant: 'outline', icon: 'bug' },
+        { label: '🌦️ 3 दिन का मौसम व बारिश अलर्ट', actionType: 'query', queryText: 'अगले 3 दिन का मौसम और बारिश का पूर्वानुमान क्या है?', variant: 'outline', icon: 'cloud' },
+        { label: '🏛️ PM किसान सम्मान निधि ₹2000', actionType: 'query', queryText: 'PM किसान ₹2000 और फसल बीमा योजना का लाभ कैसे लें?', variant: 'outline', icon: 'scheme' },
+        { label: '🚚 रीफर कोल्ड स्टोरेज ट्रक ट्रैक करें', actionType: 'track_delivery', variant: 'outline', icon: 'truck' }
+      ],
+      followUpChips: [
+        '🧅 आज का प्याज & टमाटर भाव',
+        '🌽 मक्का में इल्ली की दवा',
+        '🍂 पत्तियों का पीलापन कैसे रोकें',
+        '🌱 यूरिया व DAP खाद की मात्रा',
+        '💳 PM किसान ₹2000 किस्त e-KYC',
+        '🚚 रीफर कोल्ड स्टोरेज गाड़ी'
+      ]
     };
   };
 
-  // Perform quick navigation action from card
-  const handleActionClick = (actionType: string) => {
-    if (actionType === 'add_produce') {
+  // Perform interactive action
+  const handleActionClick = (btn: ActionBtn) => {
+    if (btn.actionType === 'add_produce') {
       if (currentUser?.role !== 'farmer') {
         switchRole('farmer');
       }
       setActiveTab('add_produce');
       setIsOpen(false);
-    } else if (actionType === 'track_delivery') {
+    } else if (btn.actionType === 'track_delivery') {
       setActiveTab('track_delivery');
       setIsOpen(false);
-    } else if (actionType === 'market_prices') {
+    } else if (btn.actionType === 'market_prices') {
       setActiveTab('market_prices');
       setIsOpen(false);
+    } else if (btn.actionType === 'call_helpline') {
+      window.open('tel:18001801551', '_self');
+    } else if (btn.actionType === 'open_link' && btn.url) {
+      window.open(btn.url, '_blank');
+    } else if (btn.actionType === 'query' && btn.queryText) {
+      handleUserQuery(btn.queryText);
     }
   };
 
@@ -546,12 +633,38 @@ export const KisanAIVoiceAssistant: React.FC = () => {
         id: `msg-welcome-${Date.now()}`,
         sender: 'assistant',
         text: activeLang === 'hi'
-          ? '🌾 **राम-राम किसान भाई! नमस्ते!** 🙏\n\nमैं हूँ आपका **Agrixora कृषि वाणी AI सहायक**।\nआप मुझसे बोलकर या लिखकर किसी भी फसल का आज का **मंडी भाव**, 3-दिन का **मौसम**, फसल में **कीड़े/पीलेपन की दवा**, **खाद की सही मात्रा**, या **PM-किसान योजना** की सटीक जानकारी ले सकते हैं।'
-          : '🌾 **Namaste Kisan Brother!** 🙏\n\nI am your **Agrixora Krishi Vani AI Voice Assistant**.\nSpeak or type to check live Mandi prices, 3-day weather alerts, crop disease remedies, or sell your produce directly.',
+          ? '🌾 **राम-राम किसान भाई! सादर प्रणाम!** 🙏\n\nमैं हूँ आपका **Agrixora कृषि वाणी AI सहायक**।\nनीचे दिए गए बटनों पर क्लिक करें या माइक दबाकर आज का **मंडी भाव**, 3-दिन का **मौसम अलर्ट**, **फसल में कीड़े/पीलेपन का पक्का इलाज**, या **फसल बेचने** की सहायता लें:'
+          : '🌾 **Namaste Kisan Brother!** 🙏\n\nI am your **Agrixora Krishi Vani AI Assistant**.\nClick any interactive action button below or speak into the mic to get live Mandi rates, weather alerts, crop remedies, or sell your harvest:',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: 'general'
+        type: 'general',
+        actionButtons: [
+          { label: '📊 आज का लाइव मंडी भाव देखें', actionType: 'market_prices', variant: 'primary', icon: 'trending' },
+          { label: '🌾 अपनी फसल सीधे बेचें (Add Produce)', actionType: 'add_produce', variant: 'secondary', icon: 'sprout' },
+          { label: '🚚 लाइव जीपीएस रीफर ट्रक ट्रैक करें', actionType: 'track_delivery', variant: 'outline', icon: 'truck' },
+          { label: '📞 किसान कॉल सेंटर (1800-180-1551)', actionType: 'call_helpline', variant: 'amber', icon: 'phone' }
+        ],
+        followUpChips: [
+          '🧅 आज का प्याज & टमाटर भाव',
+          '🌽 मक्का में कीड़ा / इल्ली की दवा',
+          '🍂 पत्तियों का पीलापन कैसे ठीक करें',
+          '🌦️ अगले 3 दिन का मौसम अलर्ट',
+          '💳 PM किसान ₹2000 किस्त e-KYC',
+          '🌱 यूरिया व DAP खाद की सही मात्रा'
+        ]
       }
     ]);
+  };
+
+  const renderIcon = (icon?: string) => {
+    switch (icon) {
+      case 'trending': return <TrendingUp className="w-3.5 h-3.5" />;
+      case 'sprout': return <Sprout className="w-3.5 h-3.5" />;
+      case 'truck': return <Truck className="w-3.5 h-3.5" />;
+      case 'phone': return <PhoneCall className="w-3.5 h-3.5" />;
+      case 'cloud': return <CloudSun className="w-3.5 h-3.5" />;
+      case 'bug': return <Bug className="w-3.5 h-3.5" />;
+      default: return <ArrowRight className="w-3.5 h-3.5" />;
+    }
   };
 
   return (
@@ -569,7 +682,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
             className="relative group p-4 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-500 text-white shadow-2xl shadow-emerald-900/60 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-emerald-300/50 flex items-center justify-center cursor-pointer"
             title={activeLang === 'hi' ? 'कृषि वाणी AI सहायक खोलें' : 'Open Kisan AI Voice Assistant'}
           >
-            {/* Pulsing ring animation */}
             <span className="absolute -inset-1 rounded-full bg-emerald-400/40 animate-ping opacity-75" />
             <span className="absolute -inset-2.5 rounded-full bg-teal-500/25 blur-sm" />
             
@@ -586,7 +698,7 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
       {/* 🎙️ EXPANDABLE KISAN AI ASSISTANT MODAL / DRAWER */}
       {isOpen && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[480px] sm:h-[680px] z-50 flex flex-col bg-slate-900 text-slate-100 rounded-none sm:rounded-3xl shadow-2xl border border-emerald-500/40 overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[500px] sm:h-[700px] z-50 flex flex-col bg-slate-900 text-slate-100 rounded-none sm:rounded-3xl shadow-2xl border border-emerald-500/40 overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
           
           {/* TOP HEADER */}
           <div className="p-3.5 sm:p-4 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-b border-emerald-800/50 flex items-center justify-between">
@@ -600,21 +712,20 @@ export const KisanAIVoiceAssistant: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-extrabold text-white text-base tracking-wide flex items-center gap-1.5">
-                    {activeLang === 'hi' ? '🌾 कृषि वाणी AI (Kisan Voice)' : '🌾 Krishi Vani Voice AI'}
+                    {activeLang === 'hi' ? '🌾 कृषि वाणी AI सहायक' : '🌾 Krishi Vani Voice AI'}
                   </h3>
                   <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-500/40">
                     LIVE
                   </span>
                 </div>
                 <p className="text-[11px] text-emerald-300/90 font-medium">
-                  {activeLang === 'hi' ? 'स्मार्ट किसान आवाज़ सहायक • 24/7 कृषि गाइड' : 'Smart Voice Assistant • 24/7 Agro Guide'}
+                  {activeLang === 'hi' ? 'स्मार्ट किसान आवाज़ सहायक • 24/7 कृषि समाधान' : 'Smart Voice Assistant • 24/7 Agro Guide'}
                 </p>
               </div>
             </div>
 
             {/* Language Toggle & Controls */}
             <div className="flex items-center gap-1.5">
-              {/* Language Switch */}
               <button
                 onClick={() => {
                   const nextLang = activeLang === 'hi' ? 'en' : 'hi';
@@ -628,7 +739,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                 <span>{activeLang === 'hi' ? 'हिन्दी' : 'ENG'}</span>
               </button>
 
-              {/* Mute/Unmute TTS */}
               <button
                 onClick={() => {
                   if (isSpeaking && synthRef.current) {
@@ -647,7 +757,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                 {speechMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </button>
 
-              {/* Reset Chat */}
               <button
                 onClick={handleResetChat}
                 className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 transition-colors cursor-pointer"
@@ -656,7 +765,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                 <RefreshCw className="w-4 h-4" />
               </button>
 
-              {/* Close Drawer */}
               <button
                 onClick={() => {
                   if (synthRef.current) synthRef.current.cancel();
@@ -676,10 +784,7 @@ export const KisanAIVoiceAssistant: React.FC = () => {
             {topicTabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => {
-                  setActiveTopicFilter(tab.id);
-                  handleUserQuery(tab.query);
-                }}
+                onClick={() => handleUserQuery(tab.query)}
                 className="px-2.5 py-1 rounded-xl bg-slate-800/90 hover:bg-emerald-800/60 text-emerald-300 hover:text-white border border-emerald-500/30 text-[11px] font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1"
               >
                 <span>{tab.label}</span>
@@ -695,7 +800,7 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                 className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div 
-                  className={`max-w-[92%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed shadow-lg ${
+                  className={`max-w-[94%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed shadow-lg ${
                     msg.sender === 'user'
                       ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-br-none border border-emerald-400/30 font-medium'
                       : 'bg-slate-800/95 text-slate-100 rounded-bl-none border border-slate-700/90 backdrop-blur-md'
@@ -801,15 +906,58 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                     </div>
                   )}
 
-                  {/* 🚀 QUICK ACTION BUTTON */}
-                  {msg.type === 'action' && msg.cardData && (
-                    <button
-                      onClick={() => handleActionClick(msg.cardData.actionType)}
-                      className="mt-3 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer group"
-                    >
-                      <span>{msg.cardData.btnText}</span>
-                      <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
+                  {/* 🔘 INTERACTIVE ACTION BUTTONS (DIRECT 1-CLICK RESOLUTION) */}
+                  {msg.actionButtons && msg.actionButtons.length > 0 && (
+                    <div className="mt-3.5 pt-3 border-t border-slate-700/60 flex flex-col gap-2">
+                      <div className="text-[11px] font-bold text-emerald-300 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{activeLang === 'hi' ? 'तुरंत समाधान / 1-क्लिक एक्शन:' : 'Instant 1-Click Action Buttons:'}</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-2">
+                        {msg.actionButtons.map((btn, bIdx) => (
+                          <button
+                            key={bIdx}
+                            onClick={() => handleActionClick(btn)}
+                            className={`w-full py-2.5 px-3.5 rounded-xl font-bold text-xs shadow-md flex items-center justify-between gap-2 transition-all cursor-pointer group ${
+                              btn.variant === 'primary'
+                                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-950/50'
+                                : btn.variant === 'secondary'
+                                ? 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-indigo-950/50'
+                                : btn.variant === 'amber'
+                                ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white shadow-amber-950/50'
+                                : 'bg-slate-900/90 hover:bg-emerald-950/80 text-emerald-300 hover:text-white border border-emerald-500/40'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              {renderIcon(btn.icon)}
+                              <span>{btn.label}</span>
+                            </div>
+                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform opacity-80" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 💡 FOLLOW-UP QUICK QUERY CHIPS */}
+                  {msg.followUpChips && msg.followUpChips.length > 0 && (
+                    <div className="mt-3 pt-2.5 border-t border-slate-800">
+                      <div className="text-[10px] text-slate-400 font-semibold mb-1.5">
+                        {activeLang === 'hi' ? '👉 संबंधित सवाल पूछें (क्लिक करें):' : '👉 Related Questions (Click to Ask):'}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {msg.followUpChips.map((chip, cIdx) => (
+                          <button
+                            key={cIdx}
+                            onClick={() => handleUserQuery(chip)}
+                            className="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-emerald-900/80 text-slate-300 hover:text-emerald-200 border border-slate-700 hover:border-emerald-500/40 text-[10px] font-medium transition-colors cursor-pointer"
+                          >
+                            {chip}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   )}
 
                   {/* Audio Replay Button */}
@@ -850,19 +998,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
             <div ref={chatBottomRef} />
           </div>
 
-          {/* QUICK PROMPT SUGGESTIONS */}
-          <div className="px-3 py-2 bg-slate-950 border-t border-slate-800/80 overflow-x-auto whitespace-nowrap flex gap-1.5 scrollbar-none">
-            {quickPrompts.map((qp, i) => (
-              <button
-                key={i}
-                onClick={() => handleUserQuery(qp.query)}
-                className="px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-emerald-900/70 text-slate-300 hover:text-emerald-200 border border-slate-700 hover:border-emerald-500/40 text-[11px] font-medium transition-all shrink-0 cursor-pointer"
-              >
-                {qp.label}
-              </button>
-            ))}
-          </div>
-
           {/* FOOTER INPUT CONTROLS */}
           <div className="p-3 bg-slate-900 border-t border-slate-800">
             <form
@@ -872,7 +1007,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
               }}
               className="flex items-center gap-2"
             >
-              {/* Pulsing Voice Mic Button */}
               <button
                 type="button"
                 onClick={toggleListening}
@@ -886,7 +1020,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </button>
 
-              {/* Text Input Field */}
               <div className="flex-1 relative">
                 <input
                   type="text"
@@ -901,7 +1034,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                 />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={!inputText.trim()}
