@@ -22,7 +22,8 @@ import {
   initialNotifications,
   initialVehicles,
   initialBulkDemands,
-  initialListings
+  initialListings,
+  initialUsers
 } from '../data/mockData';
 import { calculateOrderFees } from '../utils/pricingUtils';
 import { dbService } from '../services/dbService';
@@ -527,16 +528,19 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const saved = localStorage.getItem('farm2future_registered_users');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed.filter((u: any) => !delSet.has(u.id)).map(u => {
             const perm = getPermanentAvatarForUser(u);
             return perm ? { ...u, avatar: perm } : u;
           });
         }
       }
-      return [];
+      return initialUsers.filter((u: any) => !delSet.has(u.id)).map(u => {
+        const perm = getPermanentAvatarForUser(u);
+        return perm ? { ...u, avatar: perm } : u;
+      });
     } catch {
-      return [];
+      return initialUsers;
     }
   });
 
@@ -920,7 +924,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const deletedSet = new Set(mergedDeleted);
 
           if (Array.isArray(db.users)) {
-            const activeUsers = db.users.filter((u: any) => !deletedSet.has(u.id));
+            let activeUsers = db.users.filter((u: any) => !deletedSet.has(u.id));
+            if (activeUsers.length === 0 && initialUsers.length > 0) {
+              activeUsers = initialUsers.filter((u: any) => !deletedSet.has(u.id));
+            }
             setRegisteredUsers(activeUsers);
             const sanitizedUsers = activeUsers.map(sanitizeUserForStorage);
             safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitizedUsers));
