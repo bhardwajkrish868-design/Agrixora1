@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
-const DEFAULT_TURSO_URL = 'libsql://farm2future-krish-x97.aws-ap-south-1.turso.io';
+const DEFAULT_TURSO_URL = 'libsql://agrixora-krish-x97.aws-ap-south-1.turso.io';
 const DEFAULT_TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTAxOTA4NjcsImlkIjoiMDFhMGNmYWYtZTgwMS03ZDUzLThhZTctMTlhNTMyMTA5NmU1Iiwia2lkIjoiNGkwXzg1Sy1TeVJ0Qkd2N0JwdlAwYnVJbExxd1NMZnBsQm4tbVpVUjdrVSIsInJpZCI6IjM0OTkwMzRhLWZjM2YtNGQ4Mi04MGQ5LTgyMGI4YmZkN2I2MSJ9.wDlnSuNtURvzEU7yCCADNul-QQiM2SxiCABaEig0EDrY6R9yQmWMNYcr56295_O1KE-mic8WvR3a4gMpjYVwBw';
 
 let client = null;
@@ -131,7 +131,7 @@ async function initTables(c) {
 
 async function autoMigrateFromJsonIfEmpty(c) {
   try {
-    const jsonPath = path.join(__dirname, '..', 'data', 'farm2future_db.json');
+    const jsonPath = path.join(__dirname, '..', 'data', 'agrixora_db.json');
     if (!fs.existsSync(jsonPath)) return;
 
     const raw = fs.readFileSync(jsonPath, 'utf-8');
@@ -803,7 +803,7 @@ async function transferAllLocalToTurso() {
     if (!conn.success) return { success: false, error: conn.error || 'Failed to connect to Turso' };
   }
   try {
-    const jsonPath = path.join(__dirname, '..', 'data', 'farm2future_db.json');
+    const jsonPath = path.join(__dirname, '..', 'data', 'agrixora_db.json');
     if (!fs.existsSync(jsonPath)) return { success: false, error: 'Local database file not found' };
     const localData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
 

@@ -1,5 +1,5 @@
 /**
- * 🌐 Farm2Future Real-Time Bidirectional Hindi & English Translation Engine
+ * 🌐 Agrixora Real-Time Bidirectional Hindi & English Translation Engine
  * Provides instant, zero-latency, full-interface translation across all DOM elements,
  * React components, modals, inputs, placeholders, and tooltips.
  */
@@ -120,10 +120,10 @@ export const MASTER_PHRASES: Record<string, string> = {
   "7-Day Trend": "7-दिवसीय रुझान",
   "30-Day Range": "30-दिवसीय दायरा",
   "Direct Selling Net Gain Calculator": "प्रत्यक्ष विक्रय शुद्ध लाभ कैलकुलेटर",
-  "Calculate extra revenue by selling on Farm2Future vs local middlemen": "स्थानीय बिचौलियों के मुकाबले Farm2Future पर बेचकर अतिरिक्त लाभ की गणना करें",
+  "Calculate extra revenue by selling on Agrixora vs local middlemen": "स्थानीय बिचौलियों के मुकाबले Agrixora पर बेचकर अतिरिक्त लाभ की गणना करें",
   "Your Harvest Volume (Quintals)": "आपकी फसल की मात्रा (क्विंटल)",
   "Local Mandi Return:": "स्थानीय मंडी से आय:",
-  "Farm2Future Direct Return:": "Farm2Future से सीधी आय:",
+  "Agrixora Direct Return:": "Agrixora से सीधी आय:",
   "Extra Profit!": "अतिरिक्त लाभ!",
   "List at Recommended Rate": "अनुशंसित दर पर लिस्ट करें",
 
@@ -359,8 +359,8 @@ export const MASTER_PHRASES: Record<string, string> = {
   "Guaranteed escrow payouts.": "गारंटीशुदा एस्क्रो भुगतान।",
 
   // Registration & Modal
-  "Join Farm2Future as Farmer": "किसान के रूप में Farm2Future से जुड़ें",
-  "Join Farm2Future as Buyer": "खरीदार के रूप में Farm2Future से जुड़ें",
+  "Join Agrixora as Farmer": "किसान के रूप में Agrixora से जुड़ें",
+  "Join Agrixora as Buyer": "खरीदार के रूप में Agrixora से जुड़ें",
   "Admin Enrollment": "सरकारी एडमिन नामांकन",
   "Hub Registration": "कलेक्शन हब पंजीकरण",
   "Farmer Sign In": "किसान लॉगिन",
@@ -1519,7 +1519,7 @@ export function applyLanguageToDOM(lang: 'en' | 'hi') {
 
     document.documentElement.lang = 'en';
     try {
-      localStorage.setItem('farm2future_language', 'en');
+      localStorage.setItem('agrixora_language', 'en');
     } catch {}
 
     // 3. React may commit asynchronous updates or transitions: run follow-up cleanups
@@ -1546,7 +1546,7 @@ export function applyLanguageToDOM(lang: 'en' | 'hi') {
   // lang === 'hi'
   document.documentElement.lang = 'hi';
   try {
-    localStorage.setItem('farm2future_language', 'hi');
+    localStorage.setItem('agrixora_language', 'hi');
   } catch {}
 
   isUpdatingDOM = true;

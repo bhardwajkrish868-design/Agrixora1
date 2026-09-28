@@ -1009,7 +1009,7 @@ export const FarmerDashboard: React.FC = () => {
                   {/* Slip Header */}
                   <div className="text-center pb-3 border-b border-slate-200 space-y-1">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
-                      FOOD CORPORATION OF INDIA & FARM2FUTURE AGRI-DIRECT
+                      FOOD CORPORATION OF INDIA & AGRIXORA AGRI-DIRECT
                     </span>
                     <h4 className="text-base font-black text-emerald-800 tracking-tight">
                       DIGITAL GATE INTAKE & WEIGHBRIDGE PASS

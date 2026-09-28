@@ -134,7 +134,7 @@ export const FarmerEarningsView: React.FC = () => {
     ]);
 
     const csvContent = [
-      `FARM2FUTURE AGRICULTURE PLATFORM - ANNUAL PAYOUT STATEMENT (FY 2025-26)`,
+      `AGRIXORA AGRICULTURE PLATFORM - ANNUAL PAYOUT STATEMENT (FY 2025-26)`,
       `Account Holder: ${currentUser.name || 'Krish Bhardwaj'}`,
       `Bank: HDFC Bank of India - Pimpalgaon Branch`,
       `Account Number: •••• •••• •••• 8912 | IFSC: HDFC0001924`,
@@ -167,7 +167,7 @@ export const FarmerEarningsView: React.FC = () => {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Official Farmer Annual Payout Statement - Farm2Future</title>
+<title>Official Farmer Annual Payout Statement - Agrixora</title>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 32px; background: #f8fafc; color: #0f172a; }
   .cert-container { max-width: 860px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
@@ -191,7 +191,7 @@ export const FarmerEarningsView: React.FC = () => {
 <div class="cert-container">
   <div class="header">
     <div>
-      <div class="brand">🌱 Farm2Future Escrow Clearing House</div>
+      <div class="brand">🌱 Agrixora Escrow Clearing House</div>
       <div style="font-size: 12px; color: #64748b; margin-top: 4px;">National Agriculture Electronic Direct Payout Certificate • FY 2025-26</div>
     </div>
     <div class="badge">✓ UIDAI Aadhaar e-KYC Verified</div>
@@ -268,7 +268,7 @@ export const FarmerEarningsView: React.FC = () => {
   <div class="stamp">
     <div>
       <strong>Certified Document Ref:</strong> F2F/STMT/FY26/${Math.floor(100000 + Math.random() * 900000)}<br>
-      Digitally Signed by Farm2Future Trust Clearing Corporation & ICICI / HDFC Nodal Escrow
+      Digitally Signed by Agrixora Trust Clearing Corporation & ICICI / HDFC Nodal Escrow
     </div>
     <div style="text-align: right;">
       Date Generated: ${new Date().toLocaleDateString('en-IN')}<br>

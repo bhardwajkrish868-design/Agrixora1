@@ -183,7 +183,7 @@ export const QuickRoleSwitcher: React.FC = () => {
                   <h3 className="text-base font-extrabold font-display">
                     {targetRole === 'collection_centre' ? 'Collection Hub Operator Access' : 'Government / Admin Access'}
                   </h3>
-                  <p className="text-[11px] text-purple-200">Restricted to authorized Farm2Future team members</p>
+                  <p className="text-[11px] text-purple-200">Restricted to authorized Agrixora team members</p>
                 </div>
               </div>
             </div>

@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
-// Define Mongoose Schemas for Farm2Future
+// Define Mongoose Schemas for Agrixora
 const UserSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
@@ -207,10 +207,10 @@ async function connectMongoDB(customUri) {
   }
 }
 
-// Auto-seed cloud database from local farm2future_db.json on first connection
+// Auto-seed cloud database from local agrixora_db.json on first connection
 async function autoMigrateFromJsonIfEmpty() {
   try {
-    const jsonPath = path.join(__dirname, '..', 'data', 'farm2future_db.json');
+    const jsonPath = path.join(__dirname, '..', 'data', 'agrixora_db.json');
     if (!fs.existsSync(jsonPath)) return;
 
     const raw = fs.readFileSync(jsonPath, 'utf-8');

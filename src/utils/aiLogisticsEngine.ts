@@ -143,7 +143,7 @@ export function assignOptimalTruckAI(params: AIAllocationParams): AIAllocationRe
           ? '8-Ton Insulated Cold Reefer' 
           : '12-Ton Multi-Axle Freight Truck',
       modelName: isMicroLocal ? 'Mahindra Zor Grand EV' : isPerishable ? 'Eicher Pro 2049 Reefer Plus' : 'Tata LPT 1613 Heavy',
-      transporterName: 'Farm2Future AI Smart Fleet Logistics',
+      transporterName: 'Agrixora AI Smart Fleet Logistics',
       driverName: 'Suresh Gaikwad (AI Dispatch)',
       driverPhone: '+91 98229 ' + Math.floor(10000 + Math.random() * 90000),
       driverLicenseNo: 'MH-1520210088991',

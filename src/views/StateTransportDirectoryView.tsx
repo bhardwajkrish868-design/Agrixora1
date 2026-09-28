@@ -311,7 +311,7 @@ export const StateTransportDirectoryView: React.FC = () => {
     const totalCost = Math.round(estimatedDistanceKm * rate);
     const cleanPhone = userMobileNumber.replace(/\D/g, '').slice(-10) || '9876543210';
 
-    const smsMessage = `Successful Granted! Farm2Future Agri-Transport confirmed for vehicle ${bookingVehicle.vehicleNo}. Driver: ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}). Route: ${pickupLocation} to ${dropLocation}. Fare: Rs ${totalCost.toLocaleString('en-IN')}.`;
+    const smsMessage = `Successful Granted! Agrixora Agri-Transport confirmed for vehicle ${bookingVehicle.vehicleNo}. Driver: ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}). Route: ${pickupLocation} to ${dropLocation}. Fare: Rs ${totalCost.toLocaleString('en-IN')}.`;
 
     // Add activity log
     logActivity({
@@ -376,7 +376,7 @@ export const StateTransportDirectoryView: React.FC = () => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission === 'granted') {
         try {
-          new Notification('✅ Successful Granted! (Farm2Future)', {
+          new Notification('✅ Successful Granted! (Agrixora)', {
             body: `Vehicle ${bookingVehicle.vehicleNo} confirmed. Driver: ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}). Est Fare: ₹${totalCost.toLocaleString('en-IN')}`,
             icon: '/favicon.ico'
           });
@@ -385,7 +385,7 @@ export const StateTransportDirectoryView: React.FC = () => {
         Notification.requestPermission().then(perm => {
           if (perm === 'granted') {
             try {
-              new Notification('✅ Successful Granted! (Farm2Future)', {
+              new Notification('✅ Successful Granted! (Agrixora)', {
                 body: `Vehicle ${bookingVehicle.vehicleNo} confirmed. Driver: ${bookingVehicle.driverName} (${bookingVehicle.driverPhone}). Est Fare: ₹${totalCost.toLocaleString('en-IN')}`,
                 icon: '/favicon.ico'
               });
@@ -419,13 +419,13 @@ export const StateTransportDirectoryView: React.FC = () => {
     <div className="space-y-6">
       {/* 📲 LIVE REAL & SIMULATED SMS PUSH NOTIFICATION TOAST */}
       {smsNotification && smsNotification.show && (() => {
-        const smsBodyText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
+        const smsBodyText = `✅ *Successful Granted! (Agrixora Agri-Transport)*\n\n` +
           `🚚 *Vehicle:* ${smsNotification.vehicleNo}\n` +
           `👤 *Driver:* ${smsNotification.driverName} (${smsNotification.driverPhone})\n` +
           `📍 *Trip:* ${smsNotification.origin} ➔ ${smsNotification.destination}\n` +
           `🌾 *Produce:* ${smsNotification.cropName}\n` +
           `💰 *Est Fare:* ₹${smsNotification.cost.toLocaleString('en-IN')}\n\n` +
-          `Thank you for booking through Farm2Future Agri-Transport.`;
+          `Thank you for booking through Agrixora Agri-Transport.`;
         const nativeSmsUrl = `sms:+91${smsNotification.phone}?body=${encodeURIComponent(smsBodyText.replace(/[*_]/g, ''))}`;
 
         return (
@@ -976,13 +976,13 @@ export const StateTransportDirectoryView: React.FC = () => {
             {bookingSuccess ? (() => {
               const cleanPhone = userMobileNumber.replace(/\D/g, '').slice(-10);
               const estFare = Math.round(estimatedDistanceKm * (bookingVehicle.ratePerKm || 28));
-              const smsBodyText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
+              const smsBodyText = `✅ *Successful Granted! (Agrixora Agri-Transport)*\n\n` +
                 `🚚 *Vehicle:* ${bookingVehicle.vehicleNo}\n` +
                 `👤 *Driver:* ${bookingVehicle.driverName} (${bookingVehicle.driverPhone})\n` +
                 `📍 *Trip:* ${pickupLocation} ➔ ${dropLocation}\n` +
                 `🌾 *Produce:* ${cargoWeightTons}T ${cropName}\n` +
                 `💰 *Est Fare:* ₹${estFare.toLocaleString('en-IN')}\n\n` +
-                `Thank you for using Farm2Future Agri-Logistics.`;
+                `Thank you for using Agrixora Agri-Logistics.`;
               const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(smsBodyText.replace(/[*_]/g, ''))}`;
 
               return (

@@ -485,7 +485,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           role: activeModalRole,
           name: cleanName,
           phone: formattedPhone,
-          email: email.trim() || (cleanName.toLowerCase().replace(/\s+/g, '') + '@farm2future.in'),
+          email: email.trim() || (cleanName.toLowerCase().replace(/\s+/g, '') + '@agrixora.in'),
           avatar: profilePhoto || undefined,
           password: password.trim(),
           aadhaarNumber: aadhaarNumber.trim(),
@@ -646,7 +646,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         phone: matched.phone || forgotIdentifier,
-        message: `Your Farm2Future password reset OTP is ${randomOtp}. Do not share this code with anyone.`
+        message: `Your Agrixora password reset OTP is ${randomOtp}. Do not share this code with anyone.`
       })
     }).catch(() => {});
   };
@@ -838,8 +838,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               </div>
               <h3 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-slate-900 leading-tight">
                 {authMode === 'register' ? (
-                  activeModalRole === 'farmer' ? (language === 'hi' ? 'किसान के रूप में Farm2Future से जुड़ें' : 'Join Farm2Future as Farmer') :
-                  activeModalRole === 'buyer' ? (language === 'hi' ? 'खरीदार के रूप में Farm2Future से जुड़ें' : 'Join Farm2Future as Buyer') :
+                  activeModalRole === 'farmer' ? (language === 'hi' ? 'किसान के रूप में Agrixora से जुड़ें' : 'Join Agrixora as Farmer') :
+                  activeModalRole === 'buyer' ? (language === 'hi' ? 'खरीदार के रूप में Agrixora से जुड़ें' : 'Join Agrixora as Buyer') :
                   activeModalRole === 'admin' ? (language === 'hi' ? 'सरकारी एडमिन नामांकन' : 'Admin Enrollment') : (language === 'hi' ? 'कलेक्शन हब पंजीकरण' : 'Hub Registration')
                 ) : authMode === 'login' ? (
                   activeModalRole === 'farmer' ? (language === 'hi' ? 'किसान लॉगिन' : 'Farmer Sign In') :
@@ -2490,7 +2490,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           {/* Soft Agricultural Backdrop Details */}
           <div 
             className="absolute inset-0 bg-cover bg-right-bottom opacity-15 pointer-events-none mix-blend-multiply"
-            style={{ backgroundImage: "url('/farm2future-bg.jpg')" }}
+            style={{ backgroundImage: "url('/agrixora-bg.jpg')" }}
           />
 
           {/* Decorative Rolling Hills & Windmills SVG */}

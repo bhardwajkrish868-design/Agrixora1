@@ -166,7 +166,7 @@ export const BuyerOrdersView: React.FC = () => {
   </div>
 
   <div class="footer">
-    <div>Farm2Future Blockchain Hash: 0x9f8b...32a1 • Certified Cryptographic Digital Signature</div>
+    <div>Agrixora Blockchain Hash: 0x9f8b...32a1 • Certified Cryptographic Digital Signature</div>
     <button onclick="window.print()" style="padding: 6px 14px; background: #065f46; color: white; border: none; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Print / Save PDF</button>
   </div>
 </div>

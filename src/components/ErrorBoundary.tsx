@@ -27,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleReset = () => {
     try {
-      localStorage.setItem('farm2future_active_tab', 'overview');
+      localStorage.setItem('agrixora_active_tab', 'overview');
     } catch (_) {}
     this.setState({ hasError: false, error: null });
     window.location.reload();
@@ -35,8 +35,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleGateway = () => {
     try {
-      localStorage.removeItem('farm2future_active_tab');
-      sessionStorage.removeItem('farm2future_in_portal');
+      localStorage.removeItem('agrixora_active_tab');
+      sessionStorage.removeItem('agrixora_in_portal');
     } catch (_) {}
     this.setState({ hasError: false, error: null });
     window.location.href = window.location.pathname;

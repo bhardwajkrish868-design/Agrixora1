@@ -42,7 +42,7 @@ export const CloudDatabaseModal: React.FC<CloudDatabaseModalProps> = ({ isOpen, 
   }>({
     connected: false,
     provider: 'local_json',
-    database: 'Local farm2future_db.json',
+    database: 'Local agrixora_db.json',
     maskedUri: '',
     tursoConnected: false,
     mongoConnected: false,
@@ -89,7 +89,7 @@ export const CloudDatabaseModal: React.FC<CloudDatabaseModalProps> = ({ isOpen, 
     const authToken = tursoToken.trim();
 
     if (!url) {
-      setMsg({ type: 'error', text: 'कृपया मान्य Turso Database URL दर्ज करें (उदा. libsql://farm2future-xxx.turso.io)।' });
+      setMsg({ type: 'error', text: 'कृपया मान्य Turso Database URL दर्ज करें (उदा. libsql://agrixora-xxx.turso.io)।' });
       return;
     }
 
@@ -365,7 +365,7 @@ export const CloudDatabaseModal: React.FC<CloudDatabaseModalProps> = ({ isOpen, 
                   type="text"
                   value={tursoUrl}
                   onChange={e => setTursoUrl(e.target.value)}
-                  placeholder="libsql://farm2future-yourname.turso.io"
+                  placeholder="libsql://agrixora-yourname.turso.io"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 text-xs font-mono text-slate-800 placeholder-slate-400 bg-white transition-all"
                 />
               </div>
@@ -416,7 +416,7 @@ export const CloudDatabaseModal: React.FC<CloudDatabaseModalProps> = ({ isOpen, 
                 <textarea
                   value={mongoUri}
                   onChange={e => setMongoUri(e.target.value)}
-                  placeholder="mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/farm2future?retryWrites=true&w=majority"
+                  placeholder="mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/agrixora?retryWrites=true&w=majority"
                   rows={2}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 text-xs font-mono text-slate-800 placeholder-slate-400 bg-white transition-all resize-none"
                 />
@@ -470,11 +470,11 @@ export const CloudDatabaseModal: React.FC<CloudDatabaseModalProps> = ({ isOpen, 
                 </div>
                 <div className="flex gap-2">
                   <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[10px]">2</span>
-                  <p>डैशबोर्ड में <strong>"Create Database"</strong> पर क्लिक करें और नाम रखें <code className="bg-slate-100 px-1 py-0.2 rounded font-mono text-emerald-700 font-bold">farm2future</code>.</p>
+                  <p>डैशबोर्ड में <strong>"Create Database"</strong> पर क्लिक करें और नाम रखें <code className="bg-slate-100 px-1 py-0.2 rounded font-mono text-emerald-700 font-bold">agrixora</code>.</p>
                 </div>
                 <div className="flex gap-2">
                   <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[10px]">3</span>
-                  <p>डेटाबेस पेज से <strong>Database URL</strong> (जैसे <code className="bg-slate-100 px-1 py-0.2 rounded font-mono text-emerald-700">libsql://farm2future-xxx.turso.io</code>) कॉपी करके ऊपर बॉक्स 1 में पेस्ट करें।</p>
+                  <p>डेटाबेस पेज से <strong>Database URL</strong> (जैसे <code className="bg-slate-100 px-1 py-0.2 rounded font-mono text-emerald-700">libsql://agrixora-xxx.turso.io</code>) कॉपी करके ऊपर बॉक्स 1 में पेस्ट करें।</p>
                 </div>
                 <div className="flex gap-2">
                   <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-[10px]">4</span>

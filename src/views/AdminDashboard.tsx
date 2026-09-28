@@ -317,13 +317,13 @@ export const AdminDashboard: React.FC = () => {
       activityHistory,
       adminPasskey: '***PROTECTED***',
       exportedAt: new Date().toISOString(),
-      platform: 'Farm2Future Smart Agricultural Platform'
+      platform: 'Agrixora Smart Agricultural Platform'
     };
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `farm2future_db_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `agrixora_db_backup_${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -545,7 +545,7 @@ export const AdminDashboard: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Primary Database File: <span className="font-mono text-emerald-300 text-[11px]">data/farm2future_db.json</span>
+                Primary Database File: <span className="font-mono text-emerald-300 text-[11px]">data/agrixora_db.json</span>
               </p>
             </div>
           </div>
@@ -884,7 +884,7 @@ export const AdminDashboard: React.FC = () => {
                 Database Storage & System Audit Logs
               </h2>
               <p className="text-xs text-slate-500">
-                Immutable activity records stored in <code className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-mono">data/farm2future_db.json</code>
+                Immutable activity records stored in <code className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-mono">data/agrixora_db.json</code>
               </p>
             </div>
 
@@ -1908,7 +1908,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <Receipt className="w-5 h-5 text-emerald-600" />
-              Farm2Future Smart Escrow Audit Ledger
+              Agrixora Smart Escrow Audit Ledger
             </h2>
             <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
               100% Cryptographically Reconciled

@@ -384,7 +384,7 @@ const anonymousGuestUser: User = {
   id: 'usr_guest',
   name: 'User',
   role: 'farmer',
-  email: 'user@farm2future.in',
+  email: 'user@agrixora.in',
   phone: '',
   location: 'Nashik, Maharashtra',
   district: 'Nashik',
@@ -397,7 +397,7 @@ const anonymousGuestUser: User = {
 
 export const getLocalDeletedSet = (): Set<string> => {
   try {
-    const saved = localStorage.getItem('farm2future_deleted_ids');
+    const saved = localStorage.getItem('agrixora_deleted_ids');
     return new Set(saved ? JSON.parse(saved) : []);
   } catch {
     return new Set();
@@ -409,13 +409,13 @@ export const recordLocalDeletedId = (id: string) => {
   try {
     const current = getLocalDeletedSet();
     current.add(id);
-    safeLocalStorage.setItem('farm2future_deleted_ids', JSON.stringify(Array.from(current)));
+    safeLocalStorage.setItem('agrixora_deleted_ids', JSON.stringify(Array.from(current)));
   } catch (_) {}
 };
 
 export const getLocalReadNotifSet = (): Set<string> => {
   try {
-    const saved = localStorage.getItem('farm2future_read_notif_ids');
+    const saved = localStorage.getItem('agrixora_read_notif_ids');
     return new Set(saved ? JSON.parse(saved) : []);
   } catch {
     return new Set();
@@ -429,13 +429,13 @@ export const recordLocalReadNotifIds = (ids: string[]): void => {
     ids.forEach(id => {
       if (id) current.add(id);
     });
-    safeLocalStorage.setItem('farm2future_read_notif_ids', JSON.stringify(Array.from(current)));
+    safeLocalStorage.setItem('agrixora_read_notif_ids', JSON.stringify(Array.from(current)));
   } catch (_) {}
 };
 
 export const getSavedAvatarsMap = (): Record<string, string> => {
   try {
-    const saved = localStorage.getItem('farm2future_user_avatars');
+    const saved = localStorage.getItem('agrixora_user_avatars');
     return saved ? JSON.parse(saved) : {};
   } catch {
     return {};
@@ -452,7 +452,7 @@ export const persistUserAvatar = (user: { id?: string; phone?: string; aadhaarNu
     const cleanAadhaar = (user.aadhaarNumber || '').replace(/\D/g, '');
     if (cleanAadhaar.length >= 10) map[`aadhaar_${cleanAadhaar}`] = avatar;
     if (user.name) map[`name_${user.name.trim().toLowerCase()}`] = avatar;
-    safeLocalStorage.setItem('farm2future_user_avatars', JSON.stringify(map));
+    safeLocalStorage.setItem('agrixora_user_avatars', JSON.stringify(map));
   } catch (_) {}
 };
 
@@ -501,15 +501,20 @@ export const safeLocalStorage = {
     } catch (e) {
       console.warn(`[SafeStorage] LocalStorage quota exceeded on key "${key}", freeing space...`);
       try {
-        localStorage.removeItem('farm2future_activity_history');
-        localStorage.removeItem('farm2future_notifications');
+        localStorage.removeItem('agrixora_activity_history');
+        localStorage.removeItem('agrixora_notifications');
         localStorage.setItem(key, value);
       } catch (_) {}
     }
   },
   getItem: (key: string): string | null => {
     try {
-      return localStorage.getItem(key);
+      const val = localStorage.getItem(key);
+      if (val !== null) return val;
+      if (key.startsWith('agrixora_')) {
+        return localStorage.getItem(key.replace('agrixora_', 'farm2future_'));
+      }
+      return null;
     } catch {
       return null;
     }
@@ -525,7 +530,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [registeredUsers, setRegisteredUsers] = useState<User[]>(() => {
     try {
       const delSet = getLocalDeletedSet();
-      const saved = localStorage.getItem('farm2future_registered_users');
+      const saved = localStorage.getItem('agrixora_registered_users');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -546,8 +551,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
-      const savedAuth = localStorage.getItem('farm2future_auth');
-      const saved = localStorage.getItem('farm2future_user');
+      const savedAuth = localStorage.getItem('agrixora_auth');
+      const saved = localStorage.getItem('agrixora_user');
       if (savedAuth === 'true' && saved) {
         const parsed = JSON.parse(saved);
         const permAvatar = getPermanentAvatarForUser(parsed);
@@ -564,8 +569,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
-      const savedAuth = localStorage.getItem('farm2future_auth');
-      const savedUser = localStorage.getItem('farm2future_user');
+      const savedAuth = localStorage.getItem('agrixora_auth');
+      const savedUser = localStorage.getItem('agrixora_user');
       return savedAuth === 'true' && !!savedUser;
     } catch {
       return false;
@@ -574,7 +579,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [adminPasskey, setAdminPasskey] = useState<string>(() => {
     try {
-      return localStorage.getItem('farm2future_admin_passkey') || 'Krish0386';
+      return localStorage.getItem('agrixora_admin_passkey') || 'Krish0386';
     } catch {
       return 'Krish0386';
     }
@@ -582,7 +587,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('farm2future_admin_auth') === 'true';
+      return localStorage.getItem('agrixora_admin_auth') === 'true';
     } catch {
       return false;
     }
@@ -591,7 +596,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [listings, setListings] = useState<CropListing[]>(() => {
     try {
       const delSet = getLocalDeletedSet();
-      const saved = localStorage.getItem('farm2future_listings');
+      const saved = localStorage.getItem('agrixora_listings');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -609,7 +614,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [userLocation, setUserLocationState] = useState<GeoCoordinate>(() => {
     try {
-      const saved = localStorage.getItem('farm2future_user_location');
+      const saved = localStorage.getItem('agrixora_user_location');
       return saved ? JSON.parse(saved) : DEFAULT_USER_LOCATION;
     } catch {
       return DEFAULT_USER_LOCATION;
@@ -618,7 +623,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setUserLocation = (loc: GeoCoordinate) => {
     setUserLocationState(loc);
-    localStorage.setItem('farm2future_user_location', JSON.stringify(loc));
+    localStorage.setItem('agrixora_user_location', JSON.stringify(loc));
   };
 
   const detectLiveLocation = async (): Promise<GeoCoordinate> => {
@@ -673,7 +678,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             state: targetState || geo.state || prev.state,
             pincode: currentUser.pincode || geo.pincode || prev.pincode
           };
-          try { localStorage.setItem('farm2future_user_location', JSON.stringify(syncedLoc)); } catch {}
+          try { localStorage.setItem('agrixora_user_location', JSON.stringify(syncedLoc)); } catch {}
           return syncedLoc;
         }
         return prev;
@@ -684,7 +689,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [orders, setOrders] = useState<Order[]>(() => {
     try {
       const delSet = getLocalDeletedSet();
-      const saved = localStorage.getItem('farm2future_orders');
+      const saved = localStorage.getItem('agrixora_orders');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return parsed.filter((o: any) => !delSet.has(o.id));
@@ -698,7 +703,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [vehicles, setVehicles] = useState<VehicleDetails[]>(() => {
     try {
       const delSet = getLocalDeletedSet();
-      const saved = localStorage.getItem('farm2future_vehicles');
+      const saved = localStorage.getItem('agrixora_vehicles');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
@@ -717,7 +722,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [bulkDemands, setBulkDemands] = useState<BulkDemandPool[]>(() => {
     try {
       const delSet = getLocalDeletedSet();
-      const saved = localStorage.getItem('farm2future_bulk_demands');
+      const saved = localStorage.getItem('agrixora_bulk_demands');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
@@ -734,7 +739,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const delSet = getLocalDeletedSet();
       const readSet = getLocalReadNotifSet();
-      const saved = safeLocalStorage.getItem('farm2future_notifications') || localStorage.getItem('farm2future_notifications');
+      const saved = safeLocalStorage.getItem('agrixora_notifications') || localStorage.getItem('agrixora_notifications');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -760,7 +765,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [activityHistory, setActivityHistory] = useState<ActivityLog[]>(() => {
     try {
-      const saved = localStorage.getItem('farm2future_activity_history');
+      const saved = localStorage.getItem('agrixora_activity_history');
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -787,7 +792,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   const [collectionHubs, setCollectionHubs] = useState<CollectionHub[]>(() => {
     try {
-      const saved = localStorage.getItem('farm2future_collection_hubs');
+      const saved = localStorage.getItem('agrixora_collection_hubs');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= initialCollectionHubs.length) {
@@ -800,7 +805,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [selectedHubId, setSelectedHubIdState] = useState<string>(() => {
     try {
-      return localStorage.getItem('farm2future_selected_hub_id') || initialCollectionHubs[0]?.id || 'fci_pb_moga';
+      return localStorage.getItem('agrixora_selected_hub_id') || initialCollectionHubs[0]?.id || 'fci_pb_moga';
     } catch {
       return initialCollectionHubs[0]?.id || 'fci_pb_moga';
     }
@@ -809,7 +814,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setSelectedHubId = (id: string) => {
     setSelectedHubIdState(id);
     try {
-      localStorage.setItem('farm2future_selected_hub_id', id);
+      localStorage.setItem('agrixora_selected_hub_id', id);
     } catch {}
   };
 
@@ -819,7 +824,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCollectionHubs(prev => {
       const updated = [hub, ...prev];
       try {
-        localStorage.setItem('farm2future_collection_hubs', JSON.stringify(updated));
+        localStorage.setItem('agrixora_collection_hubs', JSON.stringify(updated));
       } catch {}
       return updated;
     });
@@ -830,7 +835,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [historyStack, setHistoryStack] = useState<string[]>([]);
   const [activeTab, setActiveTabState] = useState<string>(() => {
     try {
-      return localStorage.getItem('farm2future_active_tab') || 'overview';
+      return localStorage.getItem('agrixora_active_tab') || 'overview';
     } catch {
       return 'overview';
     }
@@ -847,7 +852,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
   const [language, setLanguageState] = useState<'en' | 'hi'>(() => {
     try {
-      const saved = localStorage.getItem('farm2future_language');
+      const saved = localStorage.getItem('agrixora_language');
       return (saved === 'hi' || saved === 'en') ? saved : 'en';
     } catch {
       return 'en';
@@ -868,7 +873,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Stakeholder cohort mode: 'registered_now' (real live DB users) vs 'upcoming' (projected network)
   const [stakeholderCohortMode, setStakeholderCohortModeState] = useState<StakeholderCohortMode>(() => {
     try {
-      const saved = localStorage.getItem('farm2future_stakeholder_cohort');
+      const saved = localStorage.getItem('agrixora_stakeholder_cohort');
       return (saved === 'upcoming' || saved === 'registered_now') ? saved : 'registered_now';
     } catch {
       return 'registered_now';
@@ -878,7 +883,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setStakeholderCohortMode = useCallback((mode: StakeholderCohortMode) => {
     setStakeholderCohortModeState(mode);
     try {
-      localStorage.setItem('farm2future_stakeholder_cohort', mode);
+      localStorage.setItem('agrixora_stakeholder_cohort', mode);
     } catch {
       // ignore
     }
@@ -919,7 +924,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const currentLocalDeleted = Array.from(getLocalDeletedSet());
           const mergedDeleted = Array.from(new Set([...currentLocalDeleted, ...remoteDeleted]));
           try {
-            safeLocalStorage.setItem('farm2future_deleted_ids', JSON.stringify(mergedDeleted));
+            safeLocalStorage.setItem('agrixora_deleted_ids', JSON.stringify(mergedDeleted));
           } catch (_) {}
           const deletedSet = new Set(mergedDeleted);
 
@@ -930,7 +935,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             setRegisteredUsers(activeUsers);
             const sanitizedUsers = activeUsers.map(sanitizeUserForStorage);
-            safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitizedUsers));
+            safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(sanitizedUsers));
           }
           if (Array.isArray(db.listings)) {
             let activeListings = db.listings
@@ -942,28 +947,28 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 .map((l: any) => enrichListingWithFciHub(l));
             }
             setListings(activeListings);
-            safeLocalStorage.setItem('farm2future_listings', JSON.stringify(activeListings));
+            safeLocalStorage.setItem('agrixora_listings', JSON.stringify(activeListings));
           }
           if (Array.isArray(db.orders)) {
             const activeOrders = (db.orders as Order[]).filter(o => !deletedSet.has(o.id) && !deletedSet.has(o.orderNumber));
             setOrders(activeOrders);
-            safeLocalStorage.setItem('farm2future_orders', JSON.stringify(activeOrders));
+            safeLocalStorage.setItem('agrixora_orders', JSON.stringify(activeOrders));
           }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) {
             const activeVehicles = db.vehicles.filter((v: any) => !deletedSet.has(v.id) && !deletedSet.has(v.vehicleNo));
             const existingIds = new Set(activeVehicles.map((v: any) => v.id));
             const mergedVehicles = [...activeVehicles, ...initialVehicles.filter(iv => !deletedSet.has(iv.id) && !deletedSet.has(iv.vehicleNo) && !existingIds.has(iv.id))];
             setVehicles(mergedVehicles);
-            safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(mergedVehicles));
+            safeLocalStorage.setItem('agrixora_vehicles', JSON.stringify(mergedVehicles));
           } else {
             const activeVehicles = initialVehicles.filter(iv => !deletedSet.has(iv.id) && !deletedSet.has(iv.vehicleNo));
             setVehicles(activeVehicles);
-            safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(activeVehicles));
+            safeLocalStorage.setItem('agrixora_vehicles', JSON.stringify(activeVehicles));
           }
           if (Array.isArray(db.bulkDemands)) {
             const activeBulkDemands = db.bulkDemands.filter((b: any) => !deletedSet.has(b.id));
             setBulkDemands(activeBulkDemands);
-            safeLocalStorage.setItem('farm2future_bulk_demands', JSON.stringify(activeBulkDemands));
+            safeLocalStorage.setItem('agrixora_bulk_demands', JSON.stringify(activeBulkDemands));
           }
           if (Array.isArray(db.notifications)) {
             const readSet = getLocalReadNotifSet();
@@ -971,15 +976,15 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .filter((n: any) => !deletedSet.has(n.id))
               .map((n: any) => (n.read || readSet.has(n.id)) ? { ...n, read: true } : n);
             setNotifications(activeNotifs);
-            safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(activeNotifs));
+            safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(activeNotifs));
           }
           if (Array.isArray(db.activityHistory)) {
             setActivityHistory(db.activityHistory);
-            safeLocalStorage.setItem('farm2future_activity_history', JSON.stringify(db.activityHistory));
+            safeLocalStorage.setItem('agrixora_activity_history', JSON.stringify(db.activityHistory));
           }
           if (db.adminPasskey) {
             setAdminPasskey(db.adminPasskey);
-            safeLocalStorage.setItem('farm2future_admin_passkey', db.adminPasskey);
+            safeLocalStorage.setItem('agrixora_admin_passkey', db.adminPasskey);
           }
         }
       } catch (err) {
@@ -1005,7 +1010,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const mergedDeleted = Array.from(new Set([...currentLocalDeleted, ...remoteDeleted]));
           if (mergedDeleted.length > currentLocalDeleted.length) {
             try {
-              safeLocalStorage.setItem('farm2future_deleted_ids', JSON.stringify(mergedDeleted));
+              safeLocalStorage.setItem('agrixora_deleted_ids', JSON.stringify(mergedDeleted));
             } catch (_) {}
           }
           const deletedSet = new Set(mergedDeleted);
@@ -1017,7 +1022,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
               changedRemotely = true;
               setRegisteredUsers(fetchedUsers);
               const sanitizedUsers = fetchedUsers.map(sanitizeUserForStorage);
-              safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitizedUsers));
+              safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(sanitizedUsers));
             }
           }
           if (Array.isArray(db.listings)) {
@@ -1027,7 +1032,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (isDifferent(fetchedListings, listingsRef.current)) {
               changedRemotely = true;
               setListings(fetchedListings);
-              safeLocalStorage.setItem('farm2future_listings', JSON.stringify(fetchedListings));
+              safeLocalStorage.setItem('agrixora_listings', JSON.stringify(fetchedListings));
             }
           }
           if (Array.isArray(db.orders)) {
@@ -1035,7 +1040,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (isDifferent(fetchedOrders, ordersRef.current)) {
               changedRemotely = true;
               setOrders(fetchedOrders);
-              safeLocalStorage.setItem('farm2future_orders', JSON.stringify(fetchedOrders));
+              safeLocalStorage.setItem('agrixora_orders', JSON.stringify(fetchedOrders));
             }
           }
           if (Array.isArray(db.bulkDemands)) {
@@ -1043,7 +1048,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (isDifferent(fetchedBulkDemands, bulkDemandsRef.current)) {
               changedRemotely = true;
               setBulkDemands(fetchedBulkDemands);
-              safeLocalStorage.setItem('farm2future_bulk_demands', JSON.stringify(fetchedBulkDemands));
+              safeLocalStorage.setItem('agrixora_bulk_demands', JSON.stringify(fetchedBulkDemands));
             }
           }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) {
@@ -1051,7 +1056,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (isDifferent(fetchedVehicles, vehiclesRef.current)) {
               changedRemotely = true;
               setVehicles(fetchedVehicles);
-              safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(fetchedVehicles));
+              safeLocalStorage.setItem('agrixora_vehicles', JSON.stringify(fetchedVehicles));
             }
           }
           if (Array.isArray(db.notifications)) {
@@ -1062,7 +1067,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (isDifferent(fetchedNotifs, notificationsRef.current)) {
               changedRemotely = true;
               setNotifications(fetchedNotifs);
-              safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(fetchedNotifs));
+              safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(fetchedNotifs));
             }
           }
 
@@ -1095,7 +1100,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         activityHistory,
         adminPasskey
       });
-      safeLocalStorage.setItem('farm2future_bulk_demands', JSON.stringify(bulkDemands));
+      safeLocalStorage.setItem('agrixora_bulk_demands', JSON.stringify(bulkDemands));
     }, 800);
 
     return () => clearTimeout(timer);
@@ -1105,37 +1110,37 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (currentUser) {
       const sanitized = sanitizeUserForStorage(currentUser);
-      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
+      safeLocalStorage.setItem('agrixora_user', JSON.stringify(sanitized));
     }
   }, [currentUser]);
 
   useEffect(() => {
-    safeLocalStorage.setItem('farm2future_auth', String(isAuthenticated));
+    safeLocalStorage.setItem('agrixora_auth', String(isAuthenticated));
   }, [isAuthenticated]);
 
   useEffect(() => {
     const sanitizedList = registeredUsers.map(sanitizeUserForStorage);
-    safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitizedList));
+    safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(sanitizedList));
   }, [registeredUsers]);
 
   useEffect(() => {
-    safeLocalStorage.setItem('farm2future_listings', JSON.stringify(listings));
+    safeLocalStorage.setItem('agrixora_listings', JSON.stringify(listings));
   }, [listings]);
 
   useEffect(() => {
-    safeLocalStorage.setItem('farm2future_orders', JSON.stringify(orders));
+    safeLocalStorage.setItem('agrixora_orders', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
-    safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(vehicles));
+    safeLocalStorage.setItem('agrixora_vehicles', JSON.stringify(vehicles));
   }, [vehicles]);
 
   useEffect(() => {
-    safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(notifications));
+    safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
   useEffect(() => {
-    safeLocalStorage.setItem('farm2future_activity_history', JSON.stringify(activityHistory));
+    safeLocalStorage.setItem('agrixora_activity_history', JSON.stringify(activityHistory));
   }, [activityHistory]);
 
   const logActivity = (log: Omit<ActivityLog, 'id' | 'timestamp'>) => {
@@ -1157,7 +1162,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearActivityHistory = () => {
     setActivityHistory([]);
-    localStorage.removeItem('farm2future_activity_history');
+    localStorage.removeItem('agrixora_activity_history');
     dbService.syncDatabase({ activityHistory: [] });
   };
 
@@ -1217,7 +1222,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setVehicles(prev => {
       const updated = prev.filter(v => v.id !== id && v.vehicleNo !== id);
       try {
-        localStorage.setItem('farm2future_vehicles', JSON.stringify(updated));
+        localStorage.setItem('agrixora_vehicles', JSON.stringify(updated));
       } catch (_) {}
       return updated;
     });
@@ -1225,7 +1230,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setActiveTab = (tab: string, skipHistory: boolean = false) => {
     try {
-      localStorage.setItem('farm2future_active_tab', tab);
+      localStorage.setItem('agrixora_active_tab', tab);
     } catch {}
     setActiveTabState(current => {
       if (tab === current) return current;
@@ -1280,7 +1285,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [showWelcomeGateway, setShowWelcomeGatewayState] = useState<boolean>(() => {
     try {
-      const inPortal = sessionStorage.getItem('farm2future_in_portal');
+      const inPortal = sessionStorage.getItem('agrixora_in_portal');
       return inPortal !== 'true';
     } catch {
       return true;
@@ -1291,9 +1296,9 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setShowWelcomeGatewayState(show);
     try {
       if (show) {
-        sessionStorage.removeItem('farm2future_in_portal');
+        sessionStorage.removeItem('agrixora_in_portal');
       } else {
-        sessionStorage.setItem('farm2future_in_portal', 'true');
+        sessionStorage.setItem('agrixora_in_portal', 'true');
       }
     } catch {}
   };
@@ -1334,7 +1339,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setRegisteredUsers(prev => {
         const updated = [autoUser, ...prev.filter(u => u.id !== autoUser.id)];
-        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
+        safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
         dbService.syncDatabase({ users: updated });
         return updated;
       });
@@ -1356,11 +1361,11 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
     if (role === 'admin') {
       setIsAdminAuthenticated(true);
-      safeLocalStorage.setItem('farm2future_admin_auth', 'true');
+      safeLocalStorage.setItem('agrixora_admin_auth', 'true');
     }
     try {
-      localStorage.setItem('farm2future_user', JSON.stringify(matching));
-      localStorage.setItem('farm2future_auth', 'true');
+      localStorage.setItem('agrixora_user', JSON.stringify(matching));
+      localStorage.setItem('agrixora_auth', 'true');
     } catch {}
 
     if (role === 'buyer') {
@@ -1382,7 +1387,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: userData.id || `usr_${userData.role}_${Date.now()}`,
       name: userData.name || (userData.role === 'farmer' ? 'Kisan Member' : userData.role === 'buyer' ? 'Retail Buyer' : userData.role === 'collection_centre' ? 'Hub Officer' : 'Govt Administrator'),
       phone: userData.phone || '+91 98765 00000',
-      email: userData.email || (userData.name ? userData.name.toLowerCase().replace(/\s+/g, '') + '@farm2future.in' : 'user@farm2future.in'),
+      email: userData.email || (userData.name ? userData.name.toLowerCase().replace(/\s+/g, '') + '@agrixora.in' : 'user@agrixora.in'),
       role: userData.role,
       password: userData.password || '',
       location: userData.location || 'India',
@@ -1414,7 +1419,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const filtered = prev.filter(u => u && u.id !== newUser.id && !((u.phone || '') === newUser.phone && u.role === newUser.role));
       const updated = [newUser, ...filtered];
       const sanitized = updated.map(sanitizeUserForStorage);
-      safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitized));
+      safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(sanitized));
       dbService.saveUser(newUser);
       dbService.syncDatabase({ users: updated });
       return updated;
@@ -1424,7 +1429,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
     if (newUser.role === 'admin') {
       setIsAdminAuthenticated(true);
-      safeLocalStorage.setItem('farm2future_admin_auth', 'true');
+      safeLocalStorage.setItem('agrixora_admin_auth', 'true');
     }
     if (newUser.role === 'buyer') setActiveTab('marketplace');
     else if (newUser.role === 'collection_centre') setActiveTab('incoming');
@@ -1432,10 +1437,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     else setActiveTab('overview');
     
     const sanitizedUser = sanitizeUserForStorage(newUser);
-    safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitizedUser));
-    safeLocalStorage.setItem('farm2future_auth', 'true');
+    safeLocalStorage.setItem('agrixora_user', JSON.stringify(sanitizedUser));
+    safeLocalStorage.setItem('agrixora_auth', 'true');
     setShowWelcomeGatewayState(false);
-    try { sessionStorage.setItem('farm2future_in_portal', 'true'); } catch {}
+    try { sessionStorage.setItem('agrixora_in_portal', 'true'); } catch {}
 
     // Audit Log & Database Sync
     logActivity({
@@ -1456,7 +1461,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updated = prev.filter(u => u && u.id !== userId);
       try {
         const sanitized = updated.map(sanitizeUserForStorage);
-        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitized));
+        safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(sanitized));
       } catch (_) {}
       dbService.syncDatabase({ users: updated });
       return updated;
@@ -1466,8 +1471,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentUser?.id === userId) {
       setCurrentUser(null);
       setIsAuthenticated(false);
-      safeLocalStorage.removeItem('farm2future_user');
-      safeLocalStorage.setItem('farm2future_auth', 'false');
+      safeLocalStorage.removeItem('agrixora_user');
+      safeLocalStorage.setItem('agrixora_auth', 'false');
     }
 
     logActivity({
@@ -1482,14 +1487,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearAllUsers = () => {
     setRegisteredUsers([]);
-    safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify([]));
+    safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify([]));
     dbService.syncDatabase({ users: [] });
 
     // Reset current user session if not admin passkey
     setCurrentUser(null);
     setIsAuthenticated(false);
-    safeLocalStorage.removeItem('farm2future_user');
-    safeLocalStorage.setItem('farm2future_auth', 'false');
+    safeLocalStorage.removeItem('agrixora_user');
+    safeLocalStorage.setItem('agrixora_auth', 'false');
 
     logActivity({
       userId: currentUser?.id || 'admin',
@@ -1612,7 +1617,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setRegisteredUsers(prev => {
           const updated = [autoActivated, ...prev.filter(u => u.id !== autoActivated.id)];
-          safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
+          safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
           dbService.syncDatabase({ users: updated });
           return updated;
         });
@@ -1668,7 +1673,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
       if (userToLogin.role === 'admin') {
         setIsAdminAuthenticated(true);
-        safeLocalStorage.setItem('farm2future_admin_auth', 'true');
+        safeLocalStorage.setItem('agrixora_admin_auth', 'true');
       }
       if (userToLogin.role === 'buyer') setActiveTab('marketplace');
       else if (userToLogin.role === 'collection_centre') setActiveTab('incoming');
@@ -1676,10 +1681,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else setActiveTab('overview');
       
       const sanitized = sanitizeUserForStorage(userToLogin);
-      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
-      safeLocalStorage.setItem('farm2future_auth', 'true');
+      safeLocalStorage.setItem('agrixora_user', JSON.stringify(sanitized));
+      safeLocalStorage.setItem('agrixora_auth', 'true');
       setShowWelcomeGatewayState(false);
-      try { sessionStorage.setItem('farm2future_in_portal', 'true'); } catch {}
+      try { sessionStorage.setItem('agrixora_in_portal', 'true'); } catch {}
 
       // Audit Log & Database Sync
       logActivity({
@@ -1766,7 +1771,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updated = prev.map(u => u.id === target.id ? updatedUser : u);
       try {
         const sanitized = updated.map(sanitizeUserForStorage);
-        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitized));
+        safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(sanitized));
       } catch (_) {}
       dbService.syncDatabase({ users: updated });
       return updated;
@@ -1775,7 +1780,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentUser && currentUser.id === target.id) {
       setCurrentUser(updatedUser);
       const sanitized = sanitizeUserForStorage(updatedUser);
-      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
+      safeLocalStorage.setItem('agrixora_user', JSON.stringify(sanitized));
     }
 
     logActivity({
@@ -1812,7 +1817,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       avatar: targetAvatar
     };
     setCurrentUser(updatedUser);
-    safeLocalStorage.setItem('farm2future_user', JSON.stringify(updatedUser));
+    safeLocalStorage.setItem('agrixora_user', JSON.stringify(updatedUser));
     
     const cleanPhone = (currentUser.phone || updates.phone || '').replace(/\D/g, '').slice(-10);
     const cleanAadhaar = (currentUser.aadhaarNumber || updates.aadhaarNumber || '').replace(/\D/g, '');
@@ -1848,7 +1853,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedList.unshift(updatedUser);
       }
 
-      safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updatedList.map(sanitizeUserForStorage)));
+      safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(updatedList.map(sanitizeUserForStorage)));
       dbService.syncDatabase({ users: updatedList });
       return updatedList;
     });
@@ -1867,7 +1872,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const cleanKey = inputKey.trim();
     if (cleanKey === adminPasskey || cleanKey === 'Krish0386' || cleanKey === 'ADMIN@F2F2026') {
       setIsAdminAuthenticated(true);
-      safeLocalStorage.setItem('farm2future_admin_auth', 'true');
+      safeLocalStorage.setItem('agrixora_admin_auth', 'true');
       logActivity({
         userId: currentUser?.id || 'admin_usr',
         userName: currentUser?.name || 'Govt Administrator',
@@ -1891,7 +1896,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const cleanNew = newKey.trim();
     setAdminPasskey(cleanNew);
-    safeLocalStorage.setItem('farm2future_admin_passkey', cleanNew);
+    safeLocalStorage.setItem('agrixora_admin_passkey', cleanNew);
     
     // Sync passkey directly to database
     dbService.syncDatabase({ adminPasskey: cleanNew });
@@ -1910,7 +1915,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const lockAdminConsole = () => {
     setIsAdminAuthenticated(false);
-    localStorage.removeItem('farm2future_admin_auth');
+    localStorage.removeItem('agrixora_admin_auth');
     logActivity({
       userId: currentUser?.id || 'admin_usr',
       userName: currentUser?.name || 'Govt Administrator',
@@ -1935,11 +1940,11 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: `${currentUser.name} signed out.`
       });
     }
-    safeLocalStorage.removeItem('farm2future_user');
-    safeLocalStorage.removeItem('farm2future_auth');
-    safeLocalStorage.removeItem('farm2future_admin_auth');
-    safeLocalStorage.removeItem('farm2future_active_tab');
-    try { sessionStorage.removeItem('farm2future_in_portal'); } catch {}
+    safeLocalStorage.removeItem('agrixora_user');
+    safeLocalStorage.removeItem('agrixora_auth');
+    safeLocalStorage.removeItem('agrixora_admin_auth');
+    safeLocalStorage.removeItem('agrixora_active_tab');
+    try { sessionStorage.removeItem('agrixora_in_portal'); } catch {}
     setCurrentUser(null);
     setIsAuthenticated(false);
     setIsAdminAuthenticated(false);
@@ -1975,7 +1980,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setRegisteredUsers(prev => {
         const updated = [autoUser, ...prev.filter(u => u.id !== autoUser.id)];
-        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
+        safeLocalStorage.setItem('agrixora_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
         dbService.syncDatabase({ users: updated });
         return updated;
       });
@@ -1991,7 +1996,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
       if (role === 'admin') {
         setIsAdminAuthenticated(true);
-        safeLocalStorage.setItem('farm2future_admin_auth', 'true');
+        safeLocalStorage.setItem('agrixora_admin_auth', 'true');
       }
       if (role === 'farmer') setActiveTab('overview');
       else if (role === 'buyer') setActiveTab('marketplace');
@@ -1999,8 +2004,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (role === 'admin') setActiveTab('overview');
       
       const sanitized = sanitizeUserForStorage(existingSameUser);
-      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
-      safeLocalStorage.setItem('farm2future_auth', 'true');
+      safeLocalStorage.setItem('agrixora_user', JSON.stringify(sanitized));
+      safeLocalStorage.setItem('agrixora_auth', 'true');
 
       logActivity({
         userId: existingSameUser.id,
@@ -2033,7 +2038,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       if (isDuplicate) return prev;
       const updated = [newNotif, ...prev].slice(0, 50);
-      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(updated));
+      safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(updated));
       return updated;
     });
 
@@ -2049,7 +2054,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     recordLocalReadNotifIds([id]);
     setNotifications(prev => {
       const updated = prev.map(n => n.id === id ? { ...n, read: true } : n);
-      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(updated));
+      safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(updated));
       return updated;
     });
   };
@@ -2062,7 +2067,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const unreadSet = new Set(unreadIds);
       setNotifications(prev => {
         const updated = prev.map(n => unreadSet.has(n.id) ? { ...n, read: true } : n);
-        safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(updated));
+        safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(updated));
         return updated;
       });
     }
@@ -2072,7 +2077,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     recordLocalDeletedId(id);
     setNotifications(prev => {
       const next = prev.filter(n => n.id !== id);
-      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(next));
+      safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(next));
       return next;
     });
   };
@@ -2084,7 +2089,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const delSet = new Set(visibleIds);
     setNotifications(prev => {
       const next = prev.filter(n => !delSet.has(n.id));
-      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(next));
+      safeLocalStorage.setItem('agrixora_notifications', JSON.stringify(next));
       return next;
     });
   };
@@ -2163,7 +2168,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setListings(prev => {
       const updated = [newListing, ...prev];
       try {
-        localStorage.setItem('farm2future_listings', JSON.stringify(updated));
+        localStorage.setItem('agrixora_listings', JSON.stringify(updated));
       } catch (_) {}
       return updated;
     });
@@ -2216,7 +2221,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setListings(prev => {
       const updated = prev.filter(item => item.id !== id);
       try {
-        localStorage.setItem('farm2future_listings', JSON.stringify(updated));
+        localStorage.setItem('agrixora_listings', JSON.stringify(updated));
       } catch (_) {}
       return updated;
     });
@@ -2338,7 +2343,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
           timestamp: 'Just now',
           completed: true,
           current: true,
-          location: 'Farm2Future Smart Escrow Contract',
+          location: 'Agrixora Smart Escrow Contract',
           details: {
             verifiedWeight: quantity + ' ' + listing.unit + ' (Booked)',
             digitalSignature: 'SHA256:' + Math.random().toString(36).substring(2, 12),
@@ -2394,9 +2399,9 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Immediate localStorage persistence
     try {
-      const existingOrders = JSON.parse(localStorage.getItem('farm2future_orders') || '[]');
+      const existingOrders = JSON.parse(localStorage.getItem('agrixora_orders') || '[]');
       const updatedOrders = [newOrder, ...existingOrders.filter((o: any) => o.id !== newOrder.id)];
-      localStorage.setItem('farm2future_orders', JSON.stringify(updatedOrders));
+      localStorage.setItem('agrixora_orders', JSON.stringify(updatedOrders));
     } catch (_) {}
 
     // Immediate direct backend order creation (atomic and race-condition proof)
@@ -2603,7 +2608,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setOrders(prev => {
       const updated = [newOrder, ...prev];
-      safeLocalStorage.setItem('farm2future_orders', JSON.stringify(updated));
+      safeLocalStorage.setItem('agrixora_orders', JSON.stringify(updated));
       return updated;
     });
 
@@ -2941,7 +2946,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         recipientRole: 'buyer',
         recipientId: targetOrder.buyerId,
         title: 'Delivery Completed: ' + targetOrder.orderNumber,
-        message: 'Order marked as received. Thank you for using Farm2Future Direct Supply Chain!',
+        message: 'Order marked as received. Thank you for using Agrixora Direct Supply Chain!',
         type: 'delivery',
         orderId
       });
@@ -2981,7 +2986,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOrders(prev => {
       const updated = prev.filter(o => o.id !== orderId && o.orderNumber !== orderId);
       try {
-        localStorage.setItem('farm2future_orders', JSON.stringify(updated));
+        localStorage.setItem('agrixora_orders', JSON.stringify(updated));
       } catch (_) {}
       return updated;
     });
@@ -3009,7 +3014,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearAllOrders = async () => {
     setOrders([]);
-    localStorage.setItem('farm2future_orders', JSON.stringify([]));
+    localStorage.setItem('agrixora_orders', JSON.stringify([]));
     await dbService.clearAllOrders();
     logActivity({
       userId: currentUser?.id,
@@ -3206,7 +3211,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setBulkDemands(prev => {
       const updated = prev.filter(p => p.id !== id);
       try {
-        localStorage.setItem('farm2future_bulk_demands', JSON.stringify(updated));
+        localStorage.setItem('agrixora_bulk_demands', JSON.stringify(updated));
       } catch (_) {}
       return updated;
     });

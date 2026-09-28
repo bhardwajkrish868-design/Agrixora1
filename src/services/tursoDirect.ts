@@ -1,7 +1,7 @@
 import { DatabaseState, ActivityLog, User, CropListing, Order, NotificationItem, VehicleDetails, BulkDemandPool } from '../types';
 
 // Turso Cloud Database HTTP Endpoint Configuration
-const FALLBACK_TURSO_URL = 'https://farm2future-krish-x97.aws-ap-south-1.turso.io';
+const FALLBACK_TURSO_URL = 'https://agrixora-krish-x97.aws-ap-south-1.turso.io';
 const FALLBACK_TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTAxOTA4NjcsImlkIjoiMDFhMGNmYWYtZTgwMS03ZDUzLThhZTctMTlhNTMyMTA5NmU1Iiwia2lkIjoiNGkwXzg1Sy1TeVJ0Qkd2N0JwdlAwYnVJbExxd1NMZnBsQm4tbVpVUjdrVSIsInJpZCI6IjM0OTkwMzRhLWZjM2YtNGQ4Mi04MGQ5LTgyMGI4YmZkN2I2MSJ9.wDlnSuNtURvzEU7yCCADNul-QQiM2SxiCABaEig0EDrY6R9yQmWMNYcr56295_O1KE-mic8WvR3a4gMpjYVwBw';
 
 function getTursoEndpoint(): { pipelineUrl: string; token: string } {

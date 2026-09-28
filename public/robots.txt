@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://farm2future.netlify.app/sitemap.xml
+Sitemap: https://agrixora.netlify.app/sitemap.xml

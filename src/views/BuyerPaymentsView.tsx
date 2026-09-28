@@ -58,7 +58,7 @@ export const BuyerPaymentsView: React.FC = () => {
     ]);
 
     const csv = [
-      `FARM2FUTURE PROCUREMENT INVOICES & GST AUDIT REPORT`,
+      `AGRIXORA PROCUREMENT INVOICES & GST AUDIT REPORT`,
       `Generated Date: ${new Date().toLocaleDateString('en-IN')}`,
       `Buyer: ${currentUser.name || 'Krish Bhardwaj'}`,
       ``,
@@ -275,7 +275,7 @@ export const BuyerPaymentsView: React.FC = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center text-center space-y-2">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=4&data=${encodeURIComponent(
-                  `https://farm2future.gov.in/verify/escrow/${selectedReceiptOrder.orderNumber}`
+                  `https://agrixora.gov.in/verify/escrow/${selectedReceiptOrder.orderNumber}`
                 )}`}
                 alt="Escrow Verification QR"
                 className="w-36 h-36 rounded-xl bg-white p-1.5 shadow-sm border border-slate-200"

@@ -377,7 +377,7 @@ export const MarketPriceIntelligenceView: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-base">Direct Selling Net Gain Calculator</h3>
-                <p className="text-xs text-slate-500">Calculate extra revenue by selling on Farm2Future vs local middlemen</p>
+                <p className="text-xs text-slate-500">Calculate extra revenue by selling on Agrixora vs local middlemen</p>
               </div>
             </div>
 
@@ -400,7 +400,7 @@ export const MarketPriceIntelligenceView: React.FC = () => {
               </div>
 
               <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs space-y-1">
-                <span className="text-emerald-800 block uppercase font-bold text-[10px]">Farm2Future Direct Return:</span>
+                <span className="text-emerald-800 block uppercase font-bold text-[10px]">Agrixora Direct Return:</span>
                 <span className="text-base font-extrabold text-emerald-700">₹{estimatedPlatformTotal.toLocaleString('en-IN')}</span>
                 <span className="text-[10px] font-bold text-emerald-800 block">
                   + ₹{estimatedGain.toLocaleString('en-IN')} Extra Profit!

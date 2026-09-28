@@ -203,7 +203,7 @@ export const WelcomeGatewayView: React.FC = () => {
       {/* 🌾 Cinematic Scenic Farm Background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
-        style={{ backgroundImage: "url('/farm2future-bg.jpg')" }}
+        style={{ backgroundImage: "url('/agrixora-bg.jpg')" }}
       />
 
       {/* Radiant Light Theme Frosted & Vignette Overlay */}
@@ -219,7 +219,7 @@ export const WelcomeGatewayView: React.FC = () => {
         <div 
           onClick={handleLogoClick}
           className="flex items-center gap-2.5 cursor-pointer select-none group"
-          title="Farm2Future"
+          title="Agrixora"
         >
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-green-500 flex items-center justify-center text-white text-lg shadow-md shadow-emerald-700/20 ring-1 ring-emerald-600/20 group-hover:scale-105 transition-transform">
             🌱

@@ -489,7 +489,7 @@ export const FarmerOrdersView: React.FC = () => {
             <div className="p-5 rounded-2xl bg-slate-50 border-2 border-dashed border-emerald-500 space-y-4 text-slate-900" id="order-gate-pass">
               <div className="text-center pb-3 border-b border-slate-200 space-y-1">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
-                  FOOD CORPORATION OF INDIA & FARM2FUTURE AGRI-DIRECT
+                  FOOD CORPORATION OF INDIA & AGRIXORA AGRI-DIRECT
                 </span>
                 <h4 className="text-base font-black text-emerald-800 tracking-tight">
                   DIGITAL GATE INTAKE & WEIGHBRIDGE PASS

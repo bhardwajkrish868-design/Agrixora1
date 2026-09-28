@@ -30,7 +30,7 @@ const MIME = {
   '.ico': 'image/x-icon'
 };
 
-const DB_FILE = path.join(__dirname, 'data', 'farm2future_db.json');
+const DB_FILE = path.join(__dirname, 'data', 'agrixora_db.json');
 
 // Ensure data folder and db file exist
 if (!fs.existsSync(path.join(__dirname, 'data'))) {
@@ -261,7 +261,7 @@ const server = http.createServer((req, res) => {
     const isMongo = mongo.getIsConnected();
 
     let provider = 'local_json';
-    let database = 'Local farm2future_db.json';
+    let database = 'Local agrixora_db.json';
     let maskedUrl = '';
 
     if (isTurso) {
@@ -1026,7 +1026,7 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        const smsText = payload.message || `Successful Granted! Farm2Future Agri-Transport confirmed for vehicle ${payload.vehicleNo || 'MH-15-EG-4412'}. Driver: ${payload.driverName || 'Rameshwar'} (${payload.driverPhone || '+91 98231 44512'}). Fare: Rs ${payload.cost || 4290}.`;
+        const smsText = payload.message || `Successful Granted! Agrixora Agri-Transport confirmed for vehicle ${payload.vehicleNo || 'MH-15-EG-4412'}. Driver: ${payload.driverName || 'Rameshwar'} (${payload.driverPhone || '+91 98231 44512'}). Fare: Rs ${payload.cost || 4290}.`;
 
         const fast2smsKey = payload.apiKey || db.smsGateway?.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
         const twilioConfig = db.smsGateway?.twilio;
@@ -1049,7 +1049,7 @@ const server = http.createServer((req, res) => {
 
         // 📨 Telegram Bot Notification (Free alternate to WhatsApp/NTFY)
         if (telegramBotToken && telegramChatId) {
-          const tgMessage = `🌾 <b>Farm2Future Alert</b>\n${smsText}`;
+          const tgMessage = `🌾 <b>Agrixora Alert</b>\n${smsText}`;
           const tgResult = await sendTelegramMessage(telegramBotToken, telegramChatId, tgMessage);
           result.telegram = { success: tgResult.success, provider: 'telegram', details: tgResult };
         }

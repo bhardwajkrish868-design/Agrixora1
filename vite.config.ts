@@ -14,7 +14,7 @@ turso.connectTurso().catch(() => {});
 mongo.connectMongoDB().catch(() => {});
 
 function databasePlugin() {
-  const DB_FILE = path.resolve(__dirname, 'data', 'farm2future_db.json');
+  const DB_FILE = path.resolve(__dirname, 'data', 'agrixora_db.json');
 
   const ensureDb = () => {
     const dataDir = path.resolve(__dirname, 'data');
@@ -218,7 +218,7 @@ function databasePlugin() {
   };
 
   return {
-    name: 'farm2future-database-api',
+    name: 'agrixora-database-api',
     configureServer(server: any) {
       server.middlewares.use((req: any, res: any, next: any) => {
         const url = req.url ? req.url.split('?')[0] : '';
@@ -240,7 +240,7 @@ function databasePlugin() {
           const isMongo = mongo.getIsConnected();
 
           let provider = 'local_json';
-          let database = 'Local farm2future_db.json';
+          let database = 'Local agrixora_db.json';
           let maskedUrl = '';
 
           if (isTurso) {
@@ -881,7 +881,7 @@ function databasePlugin() {
                 return;
               }
 
-              const smsText = payload.message || `Successful Granted! Farm2Future Agri-Transport confirmed for vehicle ${payload.vehicleNo || 'MH-15-EG-4412'}. Driver: ${payload.driverName || 'Rameshwar'} (${payload.driverPhone || '+91 98231 44512'}). Fare: Rs ${payload.cost || 4290}.`;
+              const smsText = payload.message || `Successful Granted! Agrixora Agri-Transport confirmed for vehicle ${payload.vehicleNo || 'MH-15-EG-4412'}. Driver: ${payload.driverName || 'Rameshwar'} (${payload.driverPhone || '+91 98231 44512'}). Fare: Rs ${payload.cost || 4290}.`;
 
               const fast2smsKey = payload.apiKey || db.smsGateway?.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
               const twilioConfig = db.smsGateway?.twilio;
@@ -904,7 +904,7 @@ function databasePlugin() {
 
               // 📨 Telegram Bot Notification
               if (telegramBotToken && telegramChatId) {
-                const tgMessage = `🌾 <b>Farm2Future Alert</b>\n${smsText}`;
+                const tgMessage = `🌾 <b>Agrixora Alert</b>\n${smsText}`;
                 const tgResult = await sendTelegramMessage(telegramBotToken, telegramChatId, tgMessage);
                 result.telegram = { success: tgResult.success, provider: 'telegram', details: tgResult };
               }

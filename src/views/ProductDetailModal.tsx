@@ -223,7 +223,7 @@ export const ProductDetailModal: React.FC = () => {
     const dName = newOrder.dispatchDetails?.driverName || 'Assigned Driver';
     const dPhone = newOrder.dispatchDetails?.driverPhone || '+91 98231 44512';
 
-    const smsMessage = `✅ Order Successful & Transport Booked! (Farm2Future)\nOrder #${newOrder.orderNumber}: ${currentOrderQty} ${item.unit} ${item.cropName} (₹${totalPayable.toLocaleString('en-IN')}) confirmed.\nTransport Vehicle: ${vNo}\nDriver: ${dName} (${dPhone})\nDelivery to: ${deliveryAddress}`;
+    const smsMessage = `✅ Order Successful & Transport Booked! (Agrixora)\nOrder #${newOrder.orderNumber}: ${currentOrderQty} ${item.unit} ${item.cropName} (₹${totalPayable.toLocaleString('en-IN')}) confirmed.\nTransport Vehicle: ${vNo}\nDriver: ${dName} (${dPhone})\nDelivery to: ${deliveryAddress}`;
 
     const callmebotKey = undefined; // WhatsApp/NTFY removed
 
@@ -309,14 +309,14 @@ export const ProductDetailModal: React.FC = () => {
       {/* 📲 FLOATING BUYER SMS NOTIFICATION TOAST */}
       {smsNotification && smsNotification.show && (() => {
         const cleanPhone = smsNotification.phone;
-        const smsBodyText = `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
+        const smsBodyText = `✅ *Order Successful & Transport Booked! (Agrixora)*\n\n` +
           `📦 *Order Ref:* ${smsNotification.orderNumber}\n` +
           `🌾 *Produce:* ${smsNotification.quantity} ${smsNotification.cropName}\n` +
           `💰 *Total Paid:* ₹${smsNotification.totalAmount.toLocaleString('en-IN')}\n\n` +
           `🚚 *Transport Vehicle:* ${smsNotification.vehicleNo}\n` +
           `👤 *Driver:* ${smsNotification.driverName} (${smsNotification.driverPhone})\n` +
           `📍 *Delivery Address:* ${smsNotification.destination}\n\n` +
-          `Thank you for purchasing on Farm2Future!`;
+          `Thank you for purchasing on Agrixora!`;
         const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(smsBodyText.replace(/[*_]/g, ''))}`;
 
         return (
@@ -383,7 +383,7 @@ export const ProductDetailModal: React.FC = () => {
                   </a>
                   {/* 📨 Telegram Share */}
                   <a
-                    href={`https://t.me/share/url?url=${encodeURIComponent('https://farm2future.in')}&text=${encodeURIComponent(`Order ${smsNotification.orderNumber} Confirmed! ${smsNotification.quantity} ${smsNotification.cropName}. Vehicle: ${smsNotification.vehicleNo}, Driver: ${smsNotification.driverName} (${smsNotification.driverPhone}).`)}`}
+                    href={`https://t.me/share/url?url=${encodeURIComponent('https://agrixora.in')}&text=${encodeURIComponent(`Order ${smsNotification.orderNumber} Confirmed! ${smsNotification.quantity} ${smsNotification.cropName}. Vehicle: ${smsNotification.vehicleNo}, Driver: ${smsNotification.driverName} (${smsNotification.driverPhone}).`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
@@ -395,7 +395,7 @@ export const ProductDetailModal: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/10">
-                <span>Farm2Future Automated Buyer Gateway</span>
+                <span>Agrixora Automated Buyer Gateway</span>
                 <button
                   type="button"
                   onClick={() => setSmsNotification(null)}
@@ -467,7 +467,7 @@ export const ProductDetailModal: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-extrabold text-slate-900">Order Successful & Transport Booked!</h3>
                 <p className="text-xs text-slate-600 max-w-md mx-auto">
-                  ₹{totalPayable.toLocaleString('en-IN')} is locked securely in Farm2Future Escrow Vault. Transport vehicle has been dispatched for delivery.
+                  ₹{totalPayable.toLocaleString('en-IN')} is locked securely in Agrixora Escrow Vault. Transport vehicle has been dispatched for delivery.
                 </p>
               </div>
 
@@ -506,7 +506,7 @@ export const ProductDetailModal: React.FC = () => {
                   </a>
                   {/* 📨 Telegram Share */}
                   <a
-                    href={`https://t.me/share/url?url=${encodeURIComponent('https://farm2future.in')}&text=${encodeURIComponent(`Order ${createdOrderRef} Confirmed & Transport Booked! Vehicle: ${lastCreatedOrder?.dispatchDetails?.vehicleNo}, Driver: ${lastCreatedOrder?.dispatchDetails?.driverName}. Total: Rs ${totalPayable}.`)}`}
+                    href={`https://t.me/share/url?url=${encodeURIComponent('https://agrixora.in')}&text=${encodeURIComponent(`Order ${createdOrderRef} Confirmed & Transport Booked! Vehicle: ${lastCreatedOrder?.dispatchDetails?.vehicleNo}, Driver: ${lastCreatedOrder?.dispatchDetails?.driverName}. Total: Rs ${totalPayable}.`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
@@ -926,9 +926,9 @@ export const ProductDetailModal: React.FC = () => {
                           <div className="flex flex-col items-center p-2.5 bg-slate-50 rounded-2xl border-2 border-emerald-500/50 shadow-xs shrink-0">
                             <img
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=4&data=${encodeURIComponent(
-                                `upi://pay?pa=krishbhardwaj326@naviaxis&pn=Krish%20Bhardwaj&am=${totalPayable}&cu=INR&tn=Farm2Future%20Order`
+                                `upi://pay?pa=krishbhardwaj326@naviaxis&pn=Krish%20Bhardwaj&am=${totalPayable}&cu=INR&tn=Agrixora%20Order`
                               )}`}
-                              alt="Farm2Future UPI Escrow QR"
+                              alt="Agrixora UPI Escrow QR"
                               className="w-36 h-36 rounded-xl bg-white p-1.5 shadow-xs"
                             />
                             <span className="text-[10px] font-extrabold text-emerald-800 mt-1.5 flex items-center gap-1.5">
@@ -989,7 +989,7 @@ export const ProductDetailModal: React.FC = () => {
                             {/* Mobile Tap to Pay & Simulated Demo button */}
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                               <a
-                                href={`upi://pay?pa=krishbhardwaj326@naviaxis&pn=Krish%20Bhardwaj&am=${totalPayable}&cu=INR&tn=Farm2Future%20Order`}
+                                href={`upi://pay?pa=krishbhardwaj326@naviaxis&pn=Krish%20Bhardwaj&am=${totalPayable}&cu=INR&tn=Agrixora%20Order`}
                                 className="py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs cursor-pointer"
                               >
                                 <Smartphone className="w-3.5 h-3.5" />
@@ -1029,7 +1029,7 @@ export const ProductDetailModal: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                           <div className="p-2 bg-slate-50 rounded-xl">
                             <span className="text-slate-400 block text-[10px]">Beneficiary Name</span>
-                            <span className="font-bold text-slate-800">Farm2Future Agriculture Escrow Trust</span>
+                            <span className="font-bold text-slate-800">Agrixora Agriculture Escrow Trust</span>
                           </div>
                           <div className="p-2 bg-slate-50 rounded-xl flex items-center justify-between">
                             <div>
@@ -1204,7 +1204,7 @@ export const ProductDetailModal: React.FC = () => {
                   </div>
 
                   <div className="flex justify-between text-slate-600">
-                    <span>Farm2Future Tech Platform Fee (1.5%):</span>
+                    <span>Agrixora Tech Platform Fee (1.5%):</span>
                     <span className="font-semibold text-slate-900">₹{platformFee.toLocaleString('en-IN')}</span>
                   </div>
 

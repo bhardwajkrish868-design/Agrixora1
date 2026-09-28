@@ -482,7 +482,7 @@ export const SupplyChainTracker: React.FC = () => {
 
             <div className="w-36 h-36 bg-slate-50 rounded-2xl mx-auto flex items-center justify-center border-2 border-dashed border-slate-200 p-2">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://farm2future.gov.in/verify/${selectedOrder.orderNumber}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://agrixora.gov.in/verify/${selectedOrder.orderNumber}`}
                 alt="Consignment QR"
                 className="w-full h-full rounded-lg"
               />
@@ -499,7 +499,7 @@ export const SupplyChainTracker: React.FC = () => {
 <html>
 <head>
 <meta charset="utf-8">
-<title>Farm2Future Digital QR Gate Pass</title>
+<title>Agrixora Digital QR Gate Pass</title>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 30px; background: #f8fafc; color: #0f172a; }
   .pass { max-width: 600px; margin: 0 auto; background: white; border-radius: 24px; border: 2px solid #10b981; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
@@ -513,7 +513,7 @@ export const SupplyChainTracker: React.FC = () => {
 <div class="pass">
   <div class="header">
     <span class="badge">NATIONAL DIGITAL TRANSIT PERMIT</span>
-    <h2 style="margin: 10px 0 4px; color: #065f46;">🌱 Farm2Future Digital Gate Pass</h2>
+    <h2 style="margin: 10px 0 4px; color: #065f46;">🌱 Agrixora Digital Gate Pass</h2>
     <p style="font-size: 12px; color: #64748b; margin: 0;">UIDAI Aadhaar Verified & Mandi QC Authorized Transit Permit</p>
   </div>
   <div class="grid">
@@ -536,7 +536,7 @@ export const SupplyChainTracker: React.FC = () => {
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', `Farm2Future_Digital_Gate_Pass_${Date.now().toString().slice(-6)}.html`);
+                link.setAttribute('download', `Agrixora_Digital_Gate_Pass_${Date.now().toString().slice(-6)}.html`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
