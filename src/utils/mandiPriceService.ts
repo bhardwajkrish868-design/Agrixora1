@@ -1,5 +1,5 @@
 import { MandiPriceTrend, CropCategory } from '../types';
-import { getNearestTargetMandi, APMC_MANDI_DIRECTORY } from '../data/indiaLocations';
+import { getNearestTargetMandi } from '../data/indiaLocations';
 
 interface CropBaseRate {
   cropName: string;
@@ -14,7 +14,7 @@ interface CropBaseRate {
 }
 
 /**
- * 🌾 2026 Realistic Benchmark Rates by State
+ * 🌾 2025-2026 Realistic Benchmark Rates by State
  * Grounded in official AGMARKNET, eNAM, and Government MSP 2025-26 schedules.
  */
 const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
@@ -22,207 +22,196 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
     {
       cropName: 'Yellow Maize (Makka)',
       category: 'Cereals & Grains',
-      basePrice: 2280,
-      minPrice: 2120,
-      maxPrice: 2450,
+      basePrice: 2450,
+      minPrice: 2225,
+      maxPrice: 2580,
       volume: 5200,
       demandTrend: 'High',
       supplyTrend: 'Surplus',
       preferredMandiOverride: 'Gulabbagh Mega Grain & Maize Mandi, Purnia'
     },
     {
-      cropName: 'Common Paddy (Katarni / Masuri)',
-      category: 'Cereals & Grains',
-      basePrice: 2350,
-      minPrice: 2240,
-      maxPrice: 2490,
-      volume: 3800,
+      cropName: 'Red Onion (Special Grade)',
+      category: 'Vegetables',
+      basePrice: 2750,
+      minPrice: 2400,
+      maxPrice: 3150,
+      volume: 2400,
       demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Sasaram & Nokha Rice Mill Mandi, Rohtas'
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Hajipur Krishi Utpadan Mandi Samiti, Vaishali'
     },
     {
-      cropName: 'Wheat (Desi / Sharbati)',
+      cropName: 'Tomato Hybrid',
+      category: 'Vegetables',
+      basePrice: 2100,
+      minPrice: 1750,
+      maxPrice: 2450,
+      volume: 2800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Hajipur Krishi Utpadan Mandi Samiti, Vaishali'
+    },
+    {
+      cropName: 'Sharbati Wheat (C-306)',
       category: 'Cereals & Grains',
-      basePrice: 2580,
+      basePrice: 2650,
       minPrice: 2425,
-      maxPrice: 2750,
-      volume: 2900,
+      maxPrice: 2850,
+      volume: 3100,
       demandTrend: 'High',
       supplyTrend: 'Adequate'
     },
     {
       cropName: 'Potato (Aloo Jyoti / Red Pukhraj)',
       category: 'Vegetables',
-      basePrice: 1620,
-      minPrice: 1380,
-      maxPrice: 1860,
+      basePrice: 1580,
+      minPrice: 1350,
+      maxPrice: 1820,
       volume: 4200,
       demandTrend: 'Moderate',
       supplyTrend: 'Surplus',
       preferredMandiOverride: 'Bihar Sharif Krishi Upaj Potato & Grain Mandi'
     },
     {
+      cropName: 'Common Paddy (Katarni / Masuri)',
+      category: 'Cereals & Grains',
+      basePrice: 2380,
+      minPrice: 2300,
+      maxPrice: 2520,
+      volume: 3800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Sasaram & Nokha Rice Mill Mandi, Rohtas'
+    },
+    {
       cropName: 'Yellow Mustard (Pili Sarson)',
       category: 'Oilseeds',
-      basePrice: 5680,
-      minPrice: 5350,
-      maxPrice: 6050,
-      volume: 1300,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit'
-    },
-    {
-      cropName: 'Red Onion (Special Grade)',
-      category: 'Vegetables',
-      basePrice: 2740,
-      minPrice: 2400,
-      maxPrice: 3100,
-      volume: 2200,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit'
-    },
-    {
-      cropName: 'Tomato Hybrid',
-      category: 'Vegetables',
-      basePrice: 1850,
-      minPrice: 1520,
-      maxPrice: 2220,
-      volume: 2600,
-      demandTrend: 'Moderate',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Hajipur Krishi Utpadan Mandi Samiti, Vaishali'
-    },
-    {
-      cropName: 'Shahi Litchi / Fresh Fruits',
-      category: 'Fruits',
-      basePrice: 4200,
-      minPrice: 3600,
-      maxPrice: 4850,
-      volume: 1500,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Muzaffarpur Bazaar Samiti Shahi Litchi & Grain Mandi'
-    },
-    {
-      cropName: 'Green Chilli (Hari Mirch)',
-      category: 'Vegetables',
-      basePrice: 3400,
-      minPrice: 2900,
-      maxPrice: 3950,
-      volume: 850,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate'
-    },
-    {
-      cropName: 'Cauliflower (Phool Gobhi)',
-      category: 'Vegetables',
-      basePrice: 1650,
-      minPrice: 1350,
-      maxPrice: 1980,
-      volume: 1800,
-      demandTrend: 'Moderate',
-      supplyTrend: 'Surplus'
-    }
-  ],
-
-  'Punjab': [
-    {
-      cropName: 'Wheat (PBW-725 / Unnat Sharbati)',
-      category: 'Cereals & Grains',
-      basePrice: 2520,
-      minPrice: 2425,
-      maxPrice: 2680,
-      volume: 8900,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Khanna & Ludhiana APMC Grain Market'
-    },
-    {
-      cropName: 'Basmati Rice (1121 Pusa)',
-      category: 'Cereals & Grains',
-      basePrice: 4950,
-      minPrice: 4500,
-      maxPrice: 5400,
-      volume: 4600,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Bhagtanwala Grain Mandi, Amritsar'
-    },
-    {
-      cropName: 'Paddy (Parmal / PR-126)',
-      category: 'Cereals & Grains',
-      basePrice: 2360,
-      minPrice: 2300,
-      maxPrice: 2460,
-      volume: 6800,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Moga FCI Modern Steel Silo & APMC Mandi'
-    },
-    {
-      cropName: 'Cotton (Narma / White Gold)',
-      category: 'Commercial',
-      basePrice: 7250,
-      minPrice: 6800,
-      maxPrice: 7650,
-      volume: 1800,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Bathinda Main Cotton & Wheat APMC Mandi'
-    },
-    {
-      cropName: 'Seed & Table Potato',
-      category: 'Vegetables',
-      basePrice: 1450,
-      minPrice: 1250,
-      maxPrice: 1680,
-      volume: 3200,
-      demandTrend: 'Moderate',
-      supplyTrend: 'Surplus',
-      preferredMandiOverride: 'Maqsudan Grain & Vegetable Mandi, Jalandhar'
-    },
-    {
-      cropName: 'Yellow Mustard',
-      category: 'Oilseeds',
-      basePrice: 5750,
-      minPrice: 5400,
-      maxPrice: 6100,
+      basePrice: 5850,
+      minPrice: 5450,
+      maxPrice: 6250,
       volume: 1400,
       demandTrend: 'High',
       supplyTrend: 'Deficit'
     },
     {
-      cropName: 'Kinnow Citrus Fruit',
-      category: 'Fruits',
-      basePrice: 2800,
-      minPrice: 2300,
-      maxPrice: 3350,
-      volume: 2400,
+      cropName: 'Green Chilli (G4 Teja)',
+      category: 'Vegetables',
+      basePrice: 4200,
+      minPrice: 3600,
+      maxPrice: 4800,
+      volume: 950,
       demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Abohar & Fazilka Cotton & Kinnow Mandi'
+      supplyTrend: 'Adequate'
     },
     {
-      cropName: 'Green Peas (Matar)',
+      cropName: 'Shahi Litchi / Chinia Banana',
+      category: 'Fruits',
+      basePrice: 2250,
+      minPrice: 1800,
+      maxPrice: 2650,
+      volume: 1600,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Muzaffarpur Bazaar Samiti Shahi Litchi Mandi'
+    }
+  ],
+
+  'Jharkhand': [
+    {
+      cropName: 'Yellow Maize (Makka)',
+      category: 'Cereals & Grains',
+      basePrice: 2420,
+      minPrice: 2225,
+      maxPrice: 2550,
+      volume: 3200,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Ranchi Pandra Mega Agriculture Market Yard'
+    },
+    {
+      cropName: 'Tomato Hybrid',
       category: 'Vegetables',
-      basePrice: 3850,
-      minPrice: 3200,
-      maxPrice: 4400,
-      volume: 1100,
+      basePrice: 2200,
+      minPrice: 1800,
+      maxPrice: 2600,
+      volume: 3100,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Bokaro Chas Krishi Mandi Samiti'
+    },
+    {
+      cropName: 'Green Chilli (Hari Mirch)',
+      category: 'Vegetables',
+      basePrice: 4400,
+      minPrice: 3800,
+      maxPrice: 5100,
+      volume: 850,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate'
+    },
+    {
+      cropName: 'Potato (Pukhraj / Jyoti)',
+      category: 'Vegetables',
+      basePrice: 1650,
+      minPrice: 1400,
+      maxPrice: 1900,
+      volume: 2900,
+      demandTrend: 'Moderate',
+      supplyTrend: 'Surplus',
+      preferredMandiOverride: 'Jamshedpur Golmuri Krishi Upaj Mandi'
+    },
+    {
+      cropName: 'Red Onion',
+      category: 'Vegetables',
+      basePrice: 2800,
+      minPrice: 2450,
+      maxPrice: 3200,
+      volume: 1900,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit'
+    },
+    {
+      cropName: 'Paddy (Swarna / IR-36)',
+      category: 'Cereals & Grains',
+      basePrice: 2350,
+      minPrice: 2300,
+      maxPrice: 2480,
+      volume: 3400,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate'
+    },
+    {
+      cropName: 'Cauliflower / Cabbage',
+      category: 'Vegetables',
+      basePrice: 1600,
+      minPrice: 1200,
+      maxPrice: 1950,
+      volume: 1800,
       demandTrend: 'Moderate',
       supplyTrend: 'Adequate'
+    },
+    {
+      cropName: 'Ginger (Adrak)',
+      category: 'Vegetables',
+      basePrice: 8200,
+      minPrice: 7200,
+      maxPrice: 9500,
+      volume: 650,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Hazaribagh Krishi Upaj Mandi'
     }
   ],
 
   'Maharashtra': [
     {
-      cropName: 'Red Onion (Garva / Pol)',
+      cropName: 'Red Onion (Garva Export Grade)',
       category: 'Vegetables',
       basePrice: 2650,
       minPrice: 2200,
-      maxPrice: 2950,
-      volume: 4200,
+      maxPrice: 3100,
+      volume: 4800,
       demandTrend: 'High',
       supplyTrend: 'Deficit',
       preferredMandiOverride: 'Lasalgaon & Panchavati APMC Yard, Nashik'
@@ -230,474 +219,493 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
     {
       cropName: 'Tomato Hybrid',
       category: 'Vegetables',
-      basePrice: 1950,
-      minPrice: 1500,
-      maxPrice: 2300,
+      basePrice: 2200,
+      minPrice: 1700,
+      maxPrice: 2600,
       volume: 3800,
       demandTrend: 'Moderate',
       supplyTrend: 'Adequate',
       preferredMandiOverride: 'Gultekdi APMC Market Yard, Pune'
     },
     {
-      cropName: 'Yellow Soybean (JS-335 / 9560)',
+      cropName: 'Yellow Soybean (JS-335)',
       category: 'Oilseeds',
-      basePrice: 4680,
-      minPrice: 4350,
-      maxPrice: 4980,
-      volume: 2900,
+      basePrice: 4750,
+      minPrice: 4400,
+      maxPrice: 5100,
+      volume: 3100,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
       preferredMandiOverride: 'Latur Pulses & Oilseed Mega APMC Yard'
     },
     {
-      cropName: 'Wheat (Lokwan / Sharbati)',
-      category: 'Cereals & Grains',
-      basePrice: 2780,
-      minPrice: 2550,
-      maxPrice: 3050,
-      volume: 1900,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Rahata & Ahmednagar Main APMC Mandi'
-    },
-    {
-      cropName: 'Cotton (Kapas)',
+      cropName: 'Cotton (Long Staple / Kapas)',
       category: 'Commercial',
-      basePrice: 7150,
-      minPrice: 6800,
-      maxPrice: 7580,
+      basePrice: 7450,
+      minPrice: 7100,
+      maxPrice: 7850,
       volume: 2400,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Jalgaon Banana & Cotton APMC Mandi'
+      preferredMandiOverride: 'Akola Cotton & Grain Mega APMC'
     },
     {
-      cropName: 'Pomegranate (Bhagwa Special)',
-      category: 'Fruits',
-      basePrice: 8400,
-      minPrice: 6500,
-      maxPrice: 10200,
-      volume: 850,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Siddheshwar APMC Grain & Onion Market, Solapur'
-    },
-    {
-      cropName: 'Turmeric (Salem / Rajapuri)',
-      category: 'Spices',
-      basePrice: 14200,
-      minPrice: 12500,
-      maxPrice: 16000,
-      volume: 650,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Sangli Turmeric & Raisin APMC Terminal'
-    },
-    {
-      cropName: 'Nagpur Orange (Santra)',
-      category: 'Fruits',
-      basePrice: 3600,
-      minPrice: 2900,
-      maxPrice: 4250,
+      cropName: 'Tur / Arhar (White Maruti)',
+      category: 'Pulses',
+      basePrice: 9800,
+      minPrice: 8800,
+      maxPrice: 10800,
       volume: 1600,
       demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Kalamna APMC Mega Grain & Orange Yard, Nagpur'
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Latur Pulses & Oilseed Mega APMC Yard'
     },
     {
       cropName: 'Grapes (Thompson Seedless)',
       category: 'Fruits',
       basePrice: 6200,
-      minPrice: 4800,
+      minPrice: 5200,
       maxPrice: 7500,
-      volume: 1200,
+      volume: 2100,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Pimpalgaon Baswant Grapes APMC Yard'
+    },
+    {
+      cropName: 'Desi Chana (Gram)',
+      category: 'Pulses',
+      basePrice: 6100,
+      minPrice: 5650,
+      maxPrice: 6550,
+      volume: 2300,
       demandTrend: 'High',
       supplyTrend: 'Adequate'
+    },
+    {
+      cropName: 'Pomegranate (Bhagwa Grade A)',
+      category: 'Fruits',
+      basePrice: 8500,
+      minPrice: 7000,
+      maxPrice: 11000,
+      volume: 1400,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Solapur APMC Pomegranate & Onion Yard'
     }
   ],
 
   'Uttar Pradesh': [
     {
-      cropName: 'Potato (Jyoti / Pukhraj / Chipsona)',
+      cropName: 'Potato (Kufri Chipsona-1 / Jyoti)',
       category: 'Vegetables',
-      basePrice: 1480,
-      minPrice: 1280,
-      maxPrice: 1720,
-      volume: 6400,
+      basePrice: 1520,
+      minPrice: 1300,
+      maxPrice: 1780,
+      volume: 6800,
       demandTrend: 'Moderate',
       supplyTrend: 'Surplus',
-      preferredMandiOverride: 'Agra Kuberpur & Achhnera APMC Mandi Yard'
+      preferredMandiOverride: 'Khandauli Potato Cold Chain Mandi, Agra'
     },
     {
-      cropName: 'Wheat (Kalyan / Sharbati)',
+      cropName: 'Sharbati Wheat (HD-2967)',
       category: 'Cereals & Grains',
-      basePrice: 2480,
-      minPrice: 2350,
-      maxPrice: 2640,
-      volume: 5200,
+      basePrice: 2520,
+      minPrice: 2425,
+      maxPrice: 2720,
+      volume: 7200,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Dubagga & Naveen Galla Mandi Sitapur Road, Lucknow'
+      preferredMandiOverride: 'Kanpur Grain & Oilseed Mandi'
     },
     {
-      cropName: 'Common Paddy / Basmati Rice',
+      cropName: 'Paddy (Basmati 1509 / Sugandha)',
       category: 'Cereals & Grains',
-      basePrice: 2380,
-      minPrice: 2250,
-      maxPrice: 2550,
-      volume: 4100,
+      basePrice: 3850,
+      minPrice: 3400,
+      maxPrice: 4300,
+      volume: 4500,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Pilibhit Paddy & Wheat Krishi Mandi'
+      preferredMandiOverride: 'Aligarh & Hathras APMC Grain Mandi'
     },
     {
       cropName: 'Yellow Mustard (Sarson)',
       category: 'Oilseeds',
-      basePrice: 5620,
-      minPrice: 5300,
-      maxPrice: 5980,
-      volume: 1900,
+      basePrice: 5820,
+      minPrice: 5400,
+      maxPrice: 6250,
+      volume: 2600,
       demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Dhanipur Krishi Utpadan Mandi, Aligarh'
+      supplyTrend: 'Deficit'
     },
     {
-      cropName: 'Jaggery / Gur (Kolhu Special)',
-      category: 'Commercial',
-      basePrice: 3850,
-      minPrice: 3500,
-      maxPrice: 4250,
-      volume: 2100,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Muzaffarnagar Mega Jaggery (Gur) & Grain Mandi'
-    },
-    {
-      cropName: 'Green Peas (Matar)',
+      cropName: 'Green Chilli (Hari Mirch)',
       category: 'Vegetables',
-      basePrice: 3650,
-      minPrice: 3100,
-      maxPrice: 4200,
-      volume: 1700,
-      demandTrend: 'Moderate',
+      basePrice: 4100,
+      minPrice: 3500,
+      maxPrice: 4700,
+      volume: 1400,
+      demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Farrukhabad Potato & Grain Mega Mandi'
+      preferredMandiOverride: 'Varanasi Chandpur Vegetable APMC'
+    },
+    {
+      cropName: 'Garlic (Desi Lahsun)',
+      category: 'Vegetables',
+      basePrice: 13500,
+      minPrice: 11000,
+      maxPrice: 16500,
+      volume: 950,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit'
     },
     {
       cropName: 'Red Onion',
       category: 'Vegetables',
       basePrice: 2680,
       minPrice: 2350,
-      maxPrice: 3020,
-      volume: 2800,
+      maxPrice: 3050,
+      volume: 3600,
       demandTrend: 'High',
       supplyTrend: 'Deficit'
-    },
-    {
-      cropName: 'Tomato Hybrid',
-      category: 'Vegetables',
-      basePrice: 1920,
-      minPrice: 1580,
-      maxPrice: 2280,
-      volume: 2500,
-      demandTrend: 'Moderate',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Pahariya Naveen Krishi Mandi, Varanasi'
     }
   ],
 
   'Madhya Pradesh': [
     {
-      cropName: 'Sharbati Wheat (Sehore Golden)',
+      cropName: 'Sharbati Wheat (Sehore Golden C-306)',
       category: 'Cereals & Grains',
-      basePrice: 3350,
-      minPrice: 2900,
-      maxPrice: 3750,
-      volume: 3900,
+      basePrice: 3150,
+      minPrice: 2800,
+      maxPrice: 3600,
+      volume: 5800,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Sehore Sharbati Wheat APMC Mega Yard'
+      preferredMandiOverride: 'Sehore Krishi Upaj Mandi (World Famous Sharbati Hub)'
     },
     {
-      cropName: 'Yellow Soybean (Pithampur Grade)',
+      cropName: 'Yellow Soybean (JS-9560)',
       category: 'Oilseeds',
-      basePrice: 4620,
-      minPrice: 4300,
-      maxPrice: 4920,
-      volume: 4800,
+      basePrice: 4720,
+      minPrice: 4380,
+      maxPrice: 5050,
+      volume: 6400,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Devi Ahilya Bai Holkar APMC Mandi, Choithram, Indore'
+      preferredMandiOverride: 'Ujjain & Indore Devi Ahilya Bai APMC Mandi'
     },
     {
-      cropName: 'Garlic (Lahsun / Desi / Ooty)',
-      category: 'Spices',
-      basePrice: 11500,
-      minPrice: 9000,
-      maxPrice: 14200,
-      volume: 1100,
+      cropName: 'Garlic (Mandsaur / Ooty Special)',
+      category: 'Vegetables',
+      basePrice: 14500,
+      minPrice: 11500,
+      maxPrice: 18200,
+      volume: 2800,
       demandTrend: 'High',
       supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Mandsaur Garlic & Spices Mega Mandi'
+      preferredMandiOverride: 'Mandsaur & Neemuch Mega Garlic & Spices APMC'
     },
     {
-      cropName: 'Chana (Desi Chickpeas / Gram)',
+      cropName: 'Kabuli Chana (Dollar Gram)',
       category: 'Pulses',
-      basePrice: 6150,
-      minPrice: 5750,
-      maxPrice: 6580,
-      volume: 2200,
+      basePrice: 8800,
+      minPrice: 7800,
+      maxPrice: 9900,
+      volume: 2100,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Chimanganj Mandi Samiti, Ujjain'
+      preferredMandiOverride: 'Indore APMC Yard'
     },
     {
-      cropName: 'Coriander Seeds (Dhaniya)',
+      cropName: 'Desi Chana (Gram)',
+      category: 'Pulses',
+      basePrice: 5980,
+      minPrice: 5650,
+      maxPrice: 6350,
+      volume: 3900,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate'
+    },
+    {
+      cropName: 'Coriander (Dhaniya Badami)',
       category: 'Spices',
       basePrice: 7400,
       minPrice: 6800,
-      maxPrice: 8100,
-      volume: 950,
+      maxPrice: 8200,
+      volume: 1800,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Guna Coriander (Dhaniya) Mega Mandi'
-    },
-    {
-      cropName: 'Maize (Makka)',
-      category: 'Cereals & Grains',
-      basePrice: 2260,
-      minPrice: 2080,
-      maxPrice: 2420,
-      volume: 3100,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Chhindwara Corn & Orange APMC Mandi'
+      preferredMandiOverride: 'Kumbhraj & Guna Coriander Mega Mandi'
     },
     {
       cropName: 'Red Onion',
       category: 'Vegetables',
-      basePrice: 2580,
-      minPrice: 2200,
-      maxPrice: 2920,
-      volume: 2700,
+      basePrice: 2550,
+      minPrice: 2150,
+      maxPrice: 2950,
+      volume: 3800,
       demandTrend: 'High',
       supplyTrend: 'Deficit'
     }
   ],
 
-  'Gujarat': [
+  'Punjab': [
     {
-      cropName: 'Cotton (Shankar-6 / Kapas)',
+      cropName: 'Basmati Rice (1121 Pusa Super Fine)',
+      category: 'Cereals & Grains',
+      basePrice: 4850,
+      minPrice: 4400,
+      maxPrice: 5300,
+      volume: 5400,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Bhagtanwala Grain Mandi, Amritsar'
+    },
+    {
+      cropName: 'Wheat (PBW-725 / Unnat Sharbati)',
+      category: 'Cereals & Grains',
+      basePrice: 2480,
+      minPrice: 2425,
+      maxPrice: 2620,
+      volume: 9800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Khanna & Ludhiana APMC Grain Market'
+    },
+    {
+      cropName: 'Paddy (PR-126 / Parmal)',
+      category: 'Cereals & Grains',
+      basePrice: 2360,
+      minPrice: 2300,
+      maxPrice: 2480,
+      volume: 7600,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Moga FCI Modern Steel Silo & APMC Mandi'
+    },
+    {
+      cropName: 'Cotton (Narma / White Gold)',
       category: 'Commercial',
-      basePrice: 7320,
-      minPrice: 6950,
-      maxPrice: 7750,
-      volume: 4500,
+      basePrice: 7400,
+      minPrice: 7000,
+      maxPrice: 7850,
+      volume: 2200,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Bedi Yard APMC Mandi, Rajkot'
+      preferredMandiOverride: 'Bathinda Main Cotton & Wheat APMC Mandi'
     },
     {
-      cropName: 'Groundnut (Mungfali / Bold)',
-      category: 'Oilseeds',
-      basePrice: 6450,
-      minPrice: 6050,
-      maxPrice: 6880,
-      volume: 3800,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Junagadh Groundnut & Kesar Mango APMC Mandi'
-    },
-    {
-      cropName: 'Cumin Seeds (Jeera Special)',
-      category: 'Spices',
-      basePrice: 24500,
-      minPrice: 21000,
-      maxPrice: 28200,
-      volume: 850,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Unjha Mega Spices APMC Terminal (World\'s Largest Cumin Mandi)'
-    },
-    {
-      cropName: 'Potato (Deesa Cold Storage)',
+      cropName: 'Seed & Table Potato',
       category: 'Vegetables',
       basePrice: 1550,
-      minPrice: 1350,
-      maxPrice: 1780,
-      volume: 5100,
+      minPrice: 1300,
+      maxPrice: 1800,
+      volume: 4100,
       demandTrend: 'Moderate',
       supplyTrend: 'Surplus',
-      preferredMandiOverride: 'Deesa Potato & Mustard APMC Mandi'
+      preferredMandiOverride: 'Maqsudan Grain & Vegetable Mandi, Jalandhar'
     },
     {
-      cropName: 'Castor Seed (Erandi)',
-      category: 'Oilseeds',
-      basePrice: 6100,
-      minPrice: 5750,
-      maxPrice: 6450,
-      volume: 1800,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Patan Cumin & Mustard APMC Mandi'
-    },
-    {
-      cropName: 'Kesar Mango / Banana',
+      cropName: 'Kinnow Citrus Fruit',
       category: 'Fruits',
-      basePrice: 5800,
-      minPrice: 4500,
-      maxPrice: 7200,
-      volume: 1400,
+      basePrice: 2900,
+      minPrice: 2400,
+      maxPrice: 3500,
+      volume: 2800,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Talala Kesar Mango APMC Mega Yard'
-    },
-    {
-      cropName: 'Red Onion (Mahuva / Bhavnagar)',
-      category: 'Vegetables',
-      basePrice: 2480,
-      minPrice: 2150,
-      maxPrice: 2850,
-      volume: 3400,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Chitra APMC Market Yard, Bhavnagar'
+      preferredMandiOverride: 'Abohar & Fazilka Cotton & Kinnow Mandi'
     }
   ],
 
   'Haryana': [
     {
-      cropName: 'Basmati Rice (1121 Pusa)',
+      cropName: 'Basmati Rice (1121 Pusa Super Fine)',
       category: 'Cereals & Grains',
-      basePrice: 4880,
-      minPrice: 4450,
+      basePrice: 4850,
+      minPrice: 4400,
       maxPrice: 5300,
-      volume: 5400,
+      volume: 6200,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Karnal APMC Mega Grain Yard'
+      preferredMandiOverride: 'Karnal & Taraori Basmati Mega APMC'
     },
     {
-      cropName: 'Wheat (WH-1105 / HD-2967)',
+      cropName: 'Wheat (HD-3086 / DBW-187)',
       category: 'Cereals & Grains',
-      basePrice: 2490,
+      basePrice: 2480,
       minPrice: 2425,
       maxPrice: 2650,
-      volume: 6800,
+      volume: 8400,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Sirsa Cotton & Wheat APMC Mandi'
+      preferredMandiOverride: 'Sirsa & Hisar Grain APMC Mandi'
     },
     {
       cropName: 'Yellow Mustard (Sarson)',
       category: 'Oilseeds',
-      basePrice: 5780,
-      minPrice: 5450,
-      maxPrice: 6150,
-      volume: 2100,
+      basePrice: 5900,
+      minPrice: 5550,
+      maxPrice: 6300,
+      volume: 3800,
       demandTrend: 'High',
       supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Rewari Mustard & Bajra APMC Mandi'
+      preferredMandiOverride: 'Rewari & Narnaul Oilseed APMC Yard'
     },
     {
-      cropName: 'Pearl Millet (Bajra)',
-      category: 'Cereals & Grains',
-      basePrice: 2320,
-      minPrice: 2150,
-      maxPrice: 2500,
-      volume: 2800,
-      demandTrend: 'Moderate',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Bhiwani Grain & Mustard APMC Mandi'
-    },
-    {
-      cropName: 'Cotton (Narma)',
+      cropName: 'Cotton (American Narma)',
       category: 'Commercial',
-      basePrice: 7180,
-      minPrice: 6800,
-      maxPrice: 7550,
-      volume: 1600,
+      basePrice: 7380,
+      minPrice: 7000,
+      maxPrice: 7800,
+      volume: 2500,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Hisar New Grain & Fodder APMC Mandi'
+      preferredMandiOverride: 'Sirsa Cotton & Grain Mega Yard'
+    },
+    {
+      cropName: 'Bajra (Pearl Millet)',
+      category: 'Cereals & Grains',
+      basePrice: 2450,
+      minPrice: 2300,
+      maxPrice: 2625,
+      volume: 3100,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate'
+    }
+  ],
+
+  'Gujarat': [
+    {
+      cropName: 'Cumin Seed (Jeera Special Bold)',
+      category: 'Spices',
+      basePrice: 24500,
+      minPrice: 21000,
+      maxPrice: 28500,
+      volume: 3200,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Unjha Mega Spices & Jeera APMC (World Capital of Cumin)'
+    },
+    {
+      cropName: 'Groundnut (Mungfali Pods)',
+      category: 'Oilseeds',
+      basePrice: 6650,
+      minPrice: 6100,
+      maxPrice: 7250,
+      volume: 4500,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Gondal & Rajkot Mega Groundnut APMC Market'
+    },
+    {
+      cropName: 'Cotton (Shankar-6 Premium)',
+      category: 'Commercial',
+      basePrice: 7350,
+      minPrice: 6950,
+      maxPrice: 7750,
+      volume: 4800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Rajkot Bedi Market Yard'
+    },
+    {
+      cropName: 'Castor Seed (Erandi)',
+      category: 'Oilseeds',
+      basePrice: 5850,
+      minPrice: 5500,
+      maxPrice: 6200,
+      volume: 3100,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate'
+    },
+    {
+      cropName: 'Sesame Seed (Til White)',
+      category: 'Oilseeds',
+      basePrice: 12800,
+      minPrice: 11500,
+      maxPrice: 14200,
+      volume: 1200,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit'
+    },
+    {
+      cropName: 'Red Onion (Mahuva Red)',
+      category: 'Vegetables',
+      basePrice: 2480,
+      minPrice: 2100,
+      maxPrice: 2850,
+      volume: 3600,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Mahuva APMC Dehydration & Onion Mandi, Bhavnagar'
     }
   ],
 
   'Rajasthan': [
     {
-      cropName: 'Yellow Mustard (Sarson)',
+      cropName: 'Mustard (Sarson Bold 42% Oil)',
       category: 'Oilseeds',
-      basePrice: 5820,
-      minPrice: 5480,
-      maxPrice: 6180,
-      volume: 3900,
+      basePrice: 5920,
+      minPrice: 5650,
+      maxPrice: 6300,
+      volume: 6200,
       demandTrend: 'High',
       supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Bharatpur Mustard & Bajra Mega Mandi'
+      preferredMandiOverride: 'Alwar & Bharatpur Mega Mustard APMC Yard'
     },
     {
-      cropName: 'Cumin Seeds (Jeera)',
+      cropName: 'Guar Seed (Guar Gum)',
+      category: 'Commercial',
+      basePrice: 5350,
+      minPrice: 4950,
+      maxPrice: 5800,
+      volume: 3400,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Bikaner Grain & Guar Mega Mandi'
+    },
+    {
+      cropName: 'Fenugreek (Methi Dana)',
       category: 'Spices',
-      basePrice: 23800,
-      minPrice: 20500,
-      maxPrice: 27500,
-      volume: 780,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Paota & Basni Krishi Upaj Mandi, Jodhpur'
-    },
-    {
-      cropName: 'Wheat (Desi Sharbati)',
-      category: 'Cereals & Grains',
-      basePrice: 2510,
-      minPrice: 2425,
-      maxPrice: 2690,
-      volume: 4400,
+      basePrice: 6100,
+      minPrice: 5500,
+      maxPrice: 6800,
+      volume: 1600,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Sri Ganganagar New Dhan Mandi'
-    },
-    {
-      cropName: 'Yellow Soybean',
-      category: 'Oilseeds',
-      basePrice: 4600,
-      minPrice: 4300,
-      maxPrice: 4920,
-      volume: 3200,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Bhamashah APMC Mega Grain & Soybean Mandi, Kota'
-    },
-    {
-      cropName: 'Fenugreek (Methi)',
-      category: 'Spices',
-      basePrice: 6200,
-      minPrice: 5600,
-      maxPrice: 6850,
-      volume: 650,
-      demandTrend: 'High',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Nagaur Methi & Cumin Krishi Mandi'
+      preferredMandiOverride: 'Nagaur & Merta City Spices Mandi'
     },
     {
       cropName: 'Isabgol (Psyllium Husk)',
-      category: 'Medicinal',
-      basePrice: 14500,
-      minPrice: 12800,
-      maxPrice: 16200,
-      volume: 550,
+      category: 'Commercial',
+      basePrice: 14200,
+      minPrice: 12500,
+      maxPrice: 16500,
+      volume: 1100,
       demandTrend: 'High',
       supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Barmer Isabgol & Cumin Mandi'
+      preferredMandiOverride: 'Jalore & Sumerpur APMC Market'
     },
     {
-      cropName: 'Pearl Millet (Bajra)',
+      cropName: 'Soybean (Kota Yellow)',
+      category: 'Oilseeds',
+      basePrice: 4650,
+      minPrice: 4300,
+      maxPrice: 4980,
+      volume: 4200,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Bhamashah Krishi Upaj Mandi, Kota'
+    },
+    {
+      cropName: 'Bajra (Desi Pearl Millet)',
       category: 'Cereals & Grains',
-      basePrice: 2340,
-      minPrice: 2180,
-      maxPrice: 2520,
-      volume: 3100,
-      demandTrend: 'Moderate',
+      basePrice: 2420,
+      minPrice: 2300,
+      maxPrice: 2625,
+      volume: 4800,
+      demandTrend: 'High',
       supplyTrend: 'Adequate'
     }
   ],
@@ -706,46 +714,13 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
     {
       cropName: 'Tomato Hybrid',
       category: 'Vegetables',
-      basePrice: 1980,
-      minPrice: 1550,
-      maxPrice: 2350,
-      volume: 4500,
+      basePrice: 2150,
+      minPrice: 1600,
+      maxPrice: 2550,
+      volume: 5200,
       demandTrend: 'Moderate',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Kolar Mega Tomato & Silk APMC Market'
-    },
-    {
-      cropName: 'Red Gram (Tur Dal / Pigeon Pea)',
-      category: 'Pulses',
-      basePrice: 9800,
-      minPrice: 8900,
-      maxPrice: 10800,
-      volume: 1400,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Kalaburagi Tur (Red Gram) Mega APMC Mandi'
-    },
-    {
-      cropName: 'Byadagi Red Chilli',
-      category: 'Spices',
-      basePrice: 28500,
-      minPrice: 24000,
-      maxPrice: 33000,
-      volume: 920,
-      demandTrend: 'High',
-      supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Byadagi Mega Red Chilly APMC Terminal'
-    },
-    {
-      cropName: 'Maize (Yellow Corn)',
-      category: 'Cereals & Grains',
-      basePrice: 2250,
-      minPrice: 2050,
-      maxPrice: 2420,
-      volume: 3800,
-      demandTrend: 'Moderate',
-      supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Davanagere Maize & Cotton APMC Mandi'
+      preferredMandiOverride: 'Kolar APMC Market (Asia\'s 2nd Largest Tomato Market)'
     },
     {
       cropName: 'Sona Masoori Paddy',
@@ -753,7 +728,7 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
       basePrice: 2680,
       minPrice: 2450,
       maxPrice: 2920,
-      volume: 3600,
+      volume: 3900,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
       preferredMandiOverride: 'Gangavathi Mega Rice Mill APMC Yard'
@@ -761,13 +736,35 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
     {
       cropName: 'Red Onion',
       category: 'Vegetables',
-      basePrice: 2550,
-      minPrice: 2200,
-      maxPrice: 2900,
-      volume: 2600,
+      basePrice: 2600,
+      minPrice: 2250,
+      maxPrice: 2980,
+      volume: 3100,
       demandTrend: 'High',
       supplyTrend: 'Deficit',
-      preferredMandiOverride: 'Yeshwanthpur APMC Yard & Binny Mill Market, Bengaluru'
+      preferredMandiOverride: 'Yeshwanthpur APMC Yard, Bengaluru'
+    },
+    {
+      cropName: 'Arecanut (Supari Rashi)',
+      category: 'Commercial',
+      basePrice: 46500,
+      minPrice: 42000,
+      maxPrice: 51000,
+      volume: 1200,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Shimoga & Sagar Arecanut APMC'
+    },
+    {
+      cropName: 'Arabica Coffee Beans',
+      category: 'Plantation',
+      basePrice: 32000,
+      minPrice: 28000,
+      maxPrice: 36000,
+      volume: 850,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Chikkamagaluru & Hassan Coffee Exchange'
     }
   ],
 
@@ -778,7 +775,7 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
       basePrice: 18500,
       minPrice: 16000,
       maxPrice: 21500,
-      volume: 2800,
+      volume: 3800,
       demandTrend: 'High',
       supplyTrend: 'Deficit',
       preferredMandiOverride: 'Guntur Mirchi Yard (Asia\'s Largest Dry Chili Market)'
@@ -786,10 +783,10 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
     {
       cropName: 'Tomato Hybrid',
       category: 'Vegetables',
-      basePrice: 1920,
-      minPrice: 1500,
-      maxPrice: 2300,
-      volume: 3900,
+      basePrice: 2100,
+      minPrice: 1650,
+      maxPrice: 2450,
+      volume: 4200,
       demandTrend: 'Moderate',
       supplyTrend: 'Adequate',
       preferredMandiOverride: 'Madanapalle Mega Tomato APMC Market, Chittoor'
@@ -797,10 +794,10 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
     {
       cropName: 'Paddy (BPT-5204 / Samba Mahsuri)',
       category: 'Cereals & Grains',
-      basePrice: 2620,
-      minPrice: 2400,
-      maxPrice: 2850,
-      volume: 3400,
+      basePrice: 2650,
+      minPrice: 2420,
+      maxPrice: 2880,
+      volume: 3900,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
       preferredMandiOverride: 'Nellore Rice Millers & Paddy APMC Mandi'
@@ -808,24 +805,270 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
     {
       cropName: 'Groundnut (Mungfali Pods)',
       category: 'Oilseeds',
-      basePrice: 6350,
-      minPrice: 5900,
-      maxPrice: 6800,
-      volume: 2100,
+      basePrice: 6450,
+      minPrice: 5950,
+      maxPrice: 6900,
+      volume: 2600,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
       preferredMandiOverride: 'Kurnool APMC Onion & Groundnut Yard'
+    }
+  ],
+
+  'Telangana': [
+    {
+      cropName: 'Turmeric (Haldi Finger)',
+      category: 'Spices',
+      basePrice: 13800,
+      minPrice: 11500,
+      maxPrice: 16200,
+      volume: 2400,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Nizamabad Mega Turmeric APMC Yard'
     },
     {
-      cropName: 'Sweet Orange / Banana',
-      category: 'Fruits',
-      basePrice: 3200,
-      minPrice: 2600,
-      maxPrice: 3800,
-      volume: 1800,
+      cropName: 'Cotton (Warangal MCU-5)',
+      category: 'Commercial',
+      basePrice: 7480,
+      minPrice: 7100,
+      maxPrice: 7850,
+      volume: 3200,
       demandTrend: 'High',
       supplyTrend: 'Adequate',
-      preferredMandiOverride: 'Anantapur Groundnut & Sweet Orange APMC Yard'
+      preferredMandiOverride: 'Enumamula Cotton Market Yard, Warangal'
+    },
+    {
+      cropName: 'Paddy (Telangana Sona / RNR 15048)',
+      category: 'Cereals & Grains',
+      basePrice: 2620,
+      minPrice: 2400,
+      maxPrice: 2850,
+      volume: 4100,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Khammam Agricultural Market Committee'
+    },
+    {
+      cropName: 'Red Chilli (Warangal Teja)',
+      category: 'Spices',
+      basePrice: 17800,
+      minPrice: 15200,
+      maxPrice: 20500,
+      volume: 2100,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit'
+    }
+  ],
+
+  'West Bengal': [
+    {
+      cropName: 'Raw Jute (TD-5 Golden Fibre)',
+      category: 'Commercial',
+      basePrice: 5450,
+      minPrice: 5100,
+      maxPrice: 5850,
+      volume: 4200,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Samsi & Siliguri Jute & Grain APMC Mandi'
+    },
+    {
+      cropName: 'Paddy (Gobindobhog / Minikit)',
+      category: 'Cereals & Grains',
+      basePrice: 2580,
+      minPrice: 2350,
+      maxPrice: 2850,
+      volume: 5800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Burdwan Rice Bowl APMC Market'
+    },
+    {
+      cropName: 'Potato (Jyoti Hooghly)',
+      category: 'Vegetables',
+      basePrice: 1480,
+      minPrice: 1250,
+      maxPrice: 1720,
+      volume: 6400,
+      demandTrend: 'Moderate',
+      supplyTrend: 'Surplus',
+      preferredMandiOverride: 'Tarakeswar & Singur Potato Cold Chain Hub'
+    },
+    {
+      cropName: 'Pointed Gourd (Parwal)',
+      category: 'Vegetables',
+      basePrice: 3600,
+      minPrice: 3000,
+      maxPrice: 4200,
+      volume: 1200,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate'
+    }
+  ],
+
+  'Tamil Nadu': [
+    {
+      cropName: 'Turmeric (Erode Finger)',
+      category: 'Spices',
+      basePrice: 14200,
+      minPrice: 12000,
+      maxPrice: 16500,
+      volume: 2800,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Erode Turmeric Market Complex (Yellow City)'
+    },
+    {
+      cropName: 'Tender Coconut (Pollachi 1000 Nuts)',
+      category: 'Plantation',
+      basePrice: 24000,
+      minPrice: 20000,
+      maxPrice: 28000,
+      volume: 3400,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Pollachi Coconut APMC Market'
+    },
+    {
+      cropName: 'Banana (Grand Naine / Poovan)',
+      category: 'Fruits',
+      basePrice: 2150,
+      minPrice: 1750,
+      maxPrice: 2500,
+      volume: 3800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Tiruchirappalli & Theni Banana Market'
+    },
+    {
+      cropName: 'Paddy (Ponni / CR-1009)',
+      category: 'Cereals & Grains',
+      basePrice: 2650,
+      minPrice: 2400,
+      maxPrice: 2850,
+      volume: 4600,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Thanjavur Rice Granary APMC Market'
+    }
+  ],
+
+  'Himachal Pradesh': [
+    {
+      cropName: 'Apple (Royal Delicious / Kinnaur)',
+      category: 'Fruits',
+      basePrice: 9800,
+      minPrice: 7500,
+      maxPrice: 13500,
+      volume: 4200,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Shimla Dhalli & Parwanoo Mega Fruit APMC'
+    },
+    {
+      cropName: 'Off-Season Tomato (Solan Special)',
+      category: 'Vegetables',
+      basePrice: 2800,
+      minPrice: 2200,
+      maxPrice: 3400,
+      volume: 2600,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Solan APMC (City of Red Gold)'
+    },
+    {
+      cropName: 'Garlic (Hill Snow White)',
+      category: 'Vegetables',
+      basePrice: 16500,
+      minPrice: 13500,
+      maxPrice: 19500,
+      volume: 850,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit'
+    }
+  ],
+
+  'Jammu & Kashmir': [
+    {
+      cropName: 'Kashmiri Apple (Delicious / Kulu)',
+      category: 'Fruits',
+      basePrice: 8900,
+      minPrice: 7200,
+      maxPrice: 12500,
+      volume: 5800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Sopore Apple Mandi (Asia\'s 2nd Largest Apple Hub)'
+    },
+    {
+      cropName: 'Walnut (Kashmiri In-Shell)',
+      category: 'Plantation',
+      basePrice: 28000,
+      minPrice: 24000,
+      maxPrice: 34000,
+      volume: 950,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'Parimpora Fruit Mandi, Srinagar'
+    },
+    {
+      cropName: 'Saffron (Pampore Pure Mongra)',
+      category: 'Spices',
+      basePrice: 245000,
+      minPrice: 210000,
+      maxPrice: 280000,
+      volume: 120,
+      demandTrend: 'High',
+      supplyTrend: 'Deficit',
+      preferredMandiOverride: 'India International Kashmir Saffron Trading Centre, Pampore'
+    }
+  ],
+
+  'Delhi': [
+    {
+      cropName: 'Red Onion (Lasalgaon / Alwar Supply)',
+      category: 'Vegetables',
+      basePrice: 2750,
+      minPrice: 2400,
+      maxPrice: 3150,
+      volume: 8500,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Azadpur APMC Market (Asia\'s Largest Wholesale Mandi)'
+    },
+    {
+      cropName: 'Tomato Hybrid',
+      category: 'Vegetables',
+      basePrice: 2250,
+      minPrice: 1800,
+      maxPrice: 2700,
+      volume: 7200,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Azadpur APMC Market'
+    },
+    {
+      cropName: 'Potato (Agra & Punjab Supply)',
+      category: 'Vegetables',
+      basePrice: 1580,
+      minPrice: 1350,
+      maxPrice: 1850,
+      volume: 9200,
+      demandTrend: 'Moderate',
+      supplyTrend: 'Surplus',
+      preferredMandiOverride: 'Azadpur APMC Market'
+    },
+    {
+      cropName: 'Basmati Rice (1121 Aged)',
+      category: 'Cereals & Grains',
+      basePrice: 4950,
+      minPrice: 4500,
+      maxPrice: 5400,
+      volume: 4800,
+      demandTrend: 'High',
+      supplyTrend: 'Adequate',
+      preferredMandiOverride: 'Narela & Najafgarh Grain APMC'
     }
   ]
 };
@@ -834,14 +1077,14 @@ const STATE_CROP_BENCHMARKS: Record<string, CropBaseRate[]> = {
  * Fallback National Benchmark Crops for other States & Union Territories
  */
 const NATIONAL_DEFAULT_CROPS: CropBaseRate[] = [
-  { cropName: 'Wheat (Grade A)', category: 'Cereals & Grains', basePrice: 2500, minPrice: 2425, maxPrice: 2700, volume: 3200, demandTrend: 'High', supplyTrend: 'Adequate' },
-  { cropName: 'Paddy / Rice (Common)', category: 'Cereals & Grains', basePrice: 2340, minPrice: 2300, maxPrice: 2480, volume: 3600, demandTrend: 'High', supplyTrend: 'Adequate' },
-  { cropName: 'Red Onion', category: 'Vegetables', basePrice: 2650, minPrice: 2300, maxPrice: 3000, volume: 2400, demandTrend: 'High', supplyTrend: 'Deficit' },
-  { cropName: 'Potato (Table Grade)', category: 'Vegetables', basePrice: 1550, minPrice: 1350, maxPrice: 1780, volume: 3800, demandTrend: 'Moderate', supplyTrend: 'Surplus' },
-  { cropName: 'Tomato Hybrid', category: 'Vegetables', basePrice: 1950, minPrice: 1600, maxPrice: 2300, volume: 2900, demandTrend: 'Moderate', supplyTrend: 'Adequate' },
-  { cropName: 'Yellow Mustard', category: 'Oilseeds', basePrice: 5700, minPrice: 5400, maxPrice: 6100, volume: 1600, demandTrend: 'High', supplyTrend: 'Deficit' },
-  { cropName: 'Yellow Maize', category: 'Cereals & Grains', basePrice: 2260, minPrice: 2100, maxPrice: 2420, volume: 2800, demandTrend: 'High', supplyTrend: 'Adequate' },
-  { cropName: 'Green Chilli', category: 'Vegetables', basePrice: 3600, minPrice: 3100, maxPrice: 4200, volume: 950, demandTrend: 'High', supplyTrend: 'Adequate' }
+  { cropName: 'Sharbati Wheat (Grade A)', category: 'Cereals & Grains', basePrice: 2550, minPrice: 2425, maxPrice: 2750, volume: 3800, demandTrend: 'High', supplyTrend: 'Adequate' },
+  { cropName: 'Paddy / Rice (Common)', category: 'Cereals & Grains', basePrice: 2360, minPrice: 2300, maxPrice: 2500, volume: 4200, demandTrend: 'High', supplyTrend: 'Adequate' },
+  { cropName: 'Red Onion (Garwa Grade)', category: 'Vegetables', basePrice: 2680, minPrice: 2350, maxPrice: 3100, volume: 3200, demandTrend: 'High', supplyTrend: 'Deficit' },
+  { cropName: 'Potato (Table Grade)', category: 'Vegetables', basePrice: 1550, minPrice: 1350, maxPrice: 1820, volume: 4600, demandTrend: 'Moderate', supplyTrend: 'Surplus' },
+  { cropName: 'Tomato Hybrid', category: 'Vegetables', basePrice: 2150, minPrice: 1750, maxPrice: 2500, volume: 3600, demandTrend: 'Moderate', supplyTrend: 'Adequate' },
+  { cropName: 'Yellow Mustard (Sarson)', category: 'Oilseeds', basePrice: 5850, minPrice: 5500, maxPrice: 6250, volume: 2200, demandTrend: 'High', supplyTrend: 'Deficit' },
+  { cropName: 'Yellow Maize (Makka)', category: 'Cereals & Grains', basePrice: 2420, minPrice: 2225, maxPrice: 2550, volume: 3400, demandTrend: 'High', supplyTrend: 'Adequate' },
+  { cropName: 'Green Chilli (Hari Mirch)', category: 'Vegetables', basePrice: 4200, minPrice: 3600, maxPrice: 4800, volume: 1100, demandTrend: 'High', supplyTrend: 'Adequate' }
 ];
 
 /**
@@ -850,17 +1093,15 @@ const NATIONAL_DEFAULT_CROPS: CropBaseRate[] = [
 function generateHistoricalTrends(currentPrice: number, minPrice: number, maxPrice: number, volume: number) {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const historical7Days = days.map((day, idx) => {
-    // Generate gentle realistic random variation (-3% to +3%)
     const variationMultiplier = 0.97 + (idx * 0.008) + ((idx % 2 === 0 ? 0.01 : -0.01));
     const dayPrice = Math.round(currentPrice * variationMultiplier);
     const dayVol = Math.round(volume * (0.85 + (idx * 0.04)));
     return { day, price: dayPrice, volume: dayVol };
   });
 
-  // Ensure Sunday (today) matches currentPrice
   historical7Days[historical7Days.length - 1].price = currentPrice;
 
-  const dates = ['01 Sep', '05 Sep', '10 Sep', '15 Sep', '20 Sep', '24 Sep', '26 Sep'];
+  const dates = ['01 Sep', '05 Sep', '10 Sep', '15 Sep', '20 Sep', '24 Sep', '28 Sep'];
   const historical30Days = dates.map((date, idx) => {
     const factor = 0.92 + (idx * 0.013);
     const mPrice = Math.round(currentPrice * factor);
@@ -889,14 +1130,13 @@ export function getMandiPricesForLocation(stateName?: string, districtName?: str
   const cropList = STATE_CROP_BENCHMARKS[resolvedState] || NATIONAL_DEFAULT_CROPS;
 
   return cropList.map((crop, index) => {
-    // Yesterday's price variation (-1.5% to +2.5%)
-    const dailyDelta = Math.round(((index % 3 === 0 ? 1 : -1) * (index + 2) * 18));
+    // Yesterday's price variation
+    const dailyDelta = Math.round(((index % 3 === 0 ? 1 : -1) * (index + 2) * 16));
     const yesterdayPrice = crop.basePrice - dailyDelta;
     const change = dailyDelta;
     const changePercent = Number(((change / yesterdayPrice) * 100).toFixed(2));
 
     // Platform AI Recommended Selling Price (Fair Farmgate Premium over Mandi Modal)
-    // Saves 4-6% mandi broker / APMC cess commission
     const aiPremium = Math.round(crop.basePrice * 0.045);
     const recommendedFarmerSellingPrice = crop.basePrice + aiPremium;
 

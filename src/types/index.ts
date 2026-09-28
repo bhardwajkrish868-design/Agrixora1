@@ -16,7 +16,7 @@ export type PaymentStatus =
   | 'refunded'
   | 'pending';
 
-export type CropCategory = 'Cereals & Grains' | 'Vegetables' | 'Fruits' | 'Pulses' | 'Oilseeds' | 'Spices' | 'Commercial' | 'Medicinal';
+export type CropCategory = 'Cereals & Grains' | 'Vegetables' | 'Fruits' | 'Pulses' | 'Oilseeds' | 'Spices' | 'Commercial' | 'Medicinal' | 'Plantation';
 
 export interface User {
   id: string;

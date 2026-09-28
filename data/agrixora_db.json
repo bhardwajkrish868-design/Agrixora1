@@ -466,12 +466,12 @@
       "farmerLocation": "Vaishali, Bihar, Bihar",
       "cropName": "Red Onion (Special Grade)",
       "category": "Vegetables",
-      "variety": "Grade A Quality Harvest",
+      "variety": "Nashik Garwa Double Skin Export Grade",
       "quantity": 100,
       "unit": "Kg",
       "qualityGrade": "Grade A+",
-      "pricePerUnit": 10,
-      "expectedPriceTotal": 600,
+      "pricePerUnit": 28,
+      "expectedPriceTotal": 2800,
       "harvestDate": "2026-09-28",
       "availableDate": "Immediate Dispatch",
       "location": "Vaishali, Bihar",
@@ -499,8 +499,8 @@
       "createdAt": "2026-09-28T06:27:16.661Z",
       "viewsCount": 1,
       "bidsCount": 0,
-      "recommendedPrice": 60,
-      "mandiBenchmarkPrice": -30
+      "recommendedPrice": 28,
+      "mandiBenchmarkPrice": 26.5
     },
     {
       "id": "LST-013307-819",
@@ -510,7 +510,7 @@
       "farmerLocation": "Vaishali, Bihar, Bihar",
       "cropName": "Yellow Maize (Makka)",
       "category": "Cereals & Grains",
-      "variety": "Grade A Quality Harvest",
+      "variety": "Pioneer High Starch Feed & Industrial Grade",
       "quantity": 60,
       "unit": "Kg",
       "qualityGrade": "Grade A+",
@@ -543,8 +543,8 @@
       "createdAt": "2026-09-28T06:13:33.307Z",
       "viewsCount": 1,
       "bidsCount": 0,
-      "recommendedPrice": 75,
-      "mandiBenchmarkPrice": -15
+      "recommendedPrice": 25,
+      "mandiBenchmarkPrice": 24.5
     }
   ],
   "orders": [

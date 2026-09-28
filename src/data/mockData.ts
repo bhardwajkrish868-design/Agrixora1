@@ -465,15 +465,15 @@ export const initialListings: CropListing[] = [
     farmerId: 'usr_farmer_1790199790561',
     farmerName: 'Krish Bhardwaj',
     farmerPhone: '+91 9631359486',
-    farmerLocation: 'Vaishali, Bihar, Bihar',
+    farmerLocation: 'Vaishali, Bihar',
     cropName: 'Red Onion (Special Grade)',
     category: 'Vegetables',
-    variety: 'Grade A Quality Harvest',
+    variety: 'Nashik Garwa Double Skin Export Grade',
     quantity: 100,
     unit: 'Kg',
     qualityGrade: 'Grade A+',
-    pricePerUnit: 10,
-    expectedPriceTotal: 600,
+    pricePerUnit: 28,
+    expectedPriceTotal: 2800,
     harvestDate: '2026-09-28',
     availableDate: 'Immediate Dispatch',
     location: 'Vaishali, Bihar',
@@ -494,25 +494,25 @@ export const initialListings: CropListing[] = [
     images: [
       'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80'
     ],
-    description: 'Freshly harvested, uniformly graded, harvested under optimal weather. Stored in shaded farm warehouse.',
-    moisturePercent: 12,
+    description: 'Chawl-cured, double-skin red onions directly from farmgate. Zero sprout, high pungent quality certified by APMC lab.',
+    moisturePercent: 11.5,
     organicCertified: true,
     status: 'Active',
     createdAt: '2026-09-28T06:27:16.661Z',
-    viewsCount: 1,
-    bidsCount: 0,
-    recommendedPrice: 60,
-    mandiBenchmarkPrice: -30
+    viewsCount: 24,
+    bidsCount: 3,
+    recommendedPrice: 28,
+    mandiBenchmarkPrice: 26.5
   },
   {
     id: 'LST-013307-819',
     farmerId: 'usr_farmer_1790199790561',
     farmerName: 'Krish Bhardwaj',
     farmerPhone: '+91 9631359486',
-    farmerLocation: 'Vaishali, Bihar, Bihar',
+    farmerLocation: 'Vaishali, Bihar',
     cropName: 'Yellow Maize (Makka)',
     category: 'Cereals & Grains',
-    variety: 'Grade A Quality Harvest',
+    variety: 'Pioneer High Starch Feed & Industrial Grade',
     quantity: 60,
     unit: 'Kg',
     qualityGrade: 'Grade A+',
@@ -538,15 +538,15 @@ export const initialListings: CropListing[] = [
     images: [
       'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80'
     ],
-    description: 'Freshly harvested, uniformly graded, harvested under optimal weather. Stored in shaded farm warehouse.',
-    moisturePercent: 12,
+    description: 'Sun-dried premium yellow maize with <12% moisture. Zero aflatoxin, sorted for bulk poultry feed & industrial buyers.',
+    moisturePercent: 11.2,
     organicCertified: true,
     status: 'Active',
     createdAt: '2026-09-28T06:13:33.307Z',
-    viewsCount: 1,
-    bidsCount: 0,
-    recommendedPrice: 75,
-    mandiBenchmarkPrice: -15
+    viewsCount: 38,
+    bidsCount: 5,
+    recommendedPrice: 25,
+    mandiBenchmarkPrice: 24.5
   }
 ];
 
