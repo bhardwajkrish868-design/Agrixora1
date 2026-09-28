@@ -128,16 +128,43 @@ export const ROUTE_PRESETS: Record<string, RoutePreset> = {
       { name: 'Bowenpally Mega Mandi Hyderabad', distancePercent: 100, type: 'destination', description: 'Unloading dock' }
     ]
   },
+  // ✅ CORRECTED: Patna to Hajipur — 20 km via Mahatma Gandhi Setu (Bihar only, NOT West Bengal)
+  'patna_hajipur': {
+    routeHighway: 'NH-19 & Mahatma Gandhi Setu Bridge (Patna–Hajipur, Bihar)',
+    totalDistanceKm: 20,
+    defaultSpeedKmph: 28,
+    checkpoints: [
+      { name: 'Patna Mithapur Agri Hub (Gandhi Maidan Side)', distancePercent: 0, type: 'origin', description: 'Consignment loaded — eWay Bill generated' },
+      { name: 'Mahatma Gandhi Setu Toll Plaza (Patna End)', distancePercent: 30, type: 'toll', description: 'Bridge toll paid — crossing Ganga river' },
+      { name: 'Gandhi Setu Mid-Bridge GPS Point', distancePercent: 55, type: 'checkpoint', description: 'River crossing — 5.6 km bridge over Ganga' },
+      { name: 'Hajipur End Toll Booth', distancePercent: 80, type: 'toll', description: 'Bihar side — entering Vaishali district' },
+      { name: 'Hajipur APMC Mandi Terminal (Vaishali)', distancePercent: 100, type: 'destination', description: 'Unloading dock — banana & vegetable mandi' }
+    ]
+  },
+  // Bihar intra-state: Patna to Muzaffarpur (75 km)
+  'patna_muzaffarpur': {
+    routeHighway: 'NH-27 Patna–Muzaffarpur Bihar Agri Corridor',
+    totalDistanceKm: 75,
+    defaultSpeedKmph: 42,
+    checkpoints: [
+      { name: 'Patna Mithapur Agri Hub', distancePercent: 0, type: 'origin', description: 'Maize & vegetables loaded' },
+      { name: 'Hajipur Bypass Junction (NH-27)', distancePercent: 28, type: 'junction', description: 'Crossing Ganga via Gandhi Setu' },
+      { name: 'Vaishali Agri Checkpoint (Lalganj)', distancePercent: 55, type: 'checkpoint', description: 'Weight check — 2.5T verified' },
+      { name: 'Muzaffarpur Bypass Toll', distancePercent: 82, type: 'toll', description: 'Approaching Litchi belt' },
+      { name: 'Muzaffarpur APMC Mandi Terminal', distancePercent: 100, type: 'destination', description: 'Litchi & banana wholesale terminal' }
+    ]
+  },
+  // Bihar to Kolkata (correct inter-state route)
   'bengal_bihar': {
-    routeHighway: 'NH-19 Grand Trunk Eastern Corridor (Patna-Kolkata)',
+    routeHighway: 'NH-19 Grand Trunk Eastern Corridor (Patna–Kolkata via Jharkhand)',
     totalDistanceKm: 580,
     defaultSpeedKmph: 50,
     checkpoints: [
-      { name: 'Patna Mithapur Agricultural Hub', distancePercent: 0, type: 'origin', description: 'Consignment sealed' },
-      { name: 'Bakhtiyarpur Toll Plaza', distancePercent: 18, type: 'toll', description: 'Fastag clearance' },
-      { name: 'Dhanbad-Asansol Coal & Agro Belt', distancePercent: 52, type: 'checkpoint', description: 'Bengal Border check' },
-      { name: 'Durgapur Expressway Toll', distancePercent: 78, type: 'toll', description: 'Approaching Kolkata ring' },
-      { name: 'Kolkata Posta Mandi Terminal', distancePercent: 100, type: 'destination', description: 'Destination dock' }
+      { name: 'Patna Mithapur Agricultural Hub', distancePercent: 0, type: 'origin', description: 'Consignment sealed — Bihar origin' },
+      { name: 'Bakhtiyarpur Toll Plaza (NH-19)', distancePercent: 18, type: 'toll', description: 'Fastag clearance — Patna outskirts' },
+      { name: 'Dhanbad-Asansol Jharkhand Corridor', distancePercent: 52, type: 'checkpoint', description: 'Jharkhand–West Bengal border check' },
+      { name: 'Durgapur Expressway Toll (WB)', distancePercent: 78, type: 'toll', description: 'West Bengal — approaching Kolkata ring' },
+      { name: 'Kolkata Posta Mandi Terminal', distancePercent: 100, type: 'destination', description: 'Destination dock — Kolkata wholesale market' }
     ]
   },
   'himachal_delhi': {
@@ -187,7 +214,16 @@ export function getRouteTripDetails(
     preset = ROUTE_PRESETS['rajasthan_delhi'];
   } else if (originNorm.includes('guntur') || originNorm.includes('andhra') || originNorm.includes('hyderabad') || destNorm.includes('telangana')) {
     preset = ROUTE_PRESETS['andhra_telangana'];
-  } else if (originNorm.includes('patna') || originNorm.includes('bihar') || originNorm.includes('kolkata') || destNorm.includes('bengal')) {
+  // ✅ Patna → Hajipur (20 km, Bihar only — crosses Ganga via Gandhi Setu)
+  } else if ((originNorm.includes('patna') && (destNorm.includes('hajipur') || destNorm.includes('vaishali'))) ||
+             (destNorm.includes('patna') && originNorm.includes('hajipur'))) {
+    preset = ROUTE_PRESETS['patna_hajipur'];
+  // ✅ Patna → Muzaffarpur (75 km, Bihar)
+  } else if ((originNorm.includes('patna') && destNorm.includes('muzaffarpur')) ||
+             (originNorm.includes('muzaffarpur') && destNorm.includes('patna'))) {
+    preset = ROUTE_PRESETS['patna_muzaffarpur'];
+  // Bihar → West Bengal (long inter-state via Jharkhand)
+  } else if (originNorm.includes('patna') || originNorm.includes('bihar') || originNorm.includes('kolkata') || destNorm.includes('bengal') || destNorm.includes('kolkata')) {
     preset = ROUTE_PRESETS['bengal_bihar'];
   } else if (originNorm.includes('karnal') || destNorm.includes('delhi') || destNorm.includes('haryana') || destNorm.includes('azadpur')) {
     preset = ROUTE_PRESETS['karnal_delhi'];

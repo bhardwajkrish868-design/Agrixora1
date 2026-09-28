@@ -847,16 +847,31 @@ export const StateTransportDirectoryView: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Operating Routes */}
+                  {/* Operating Routes with Google Maps links */}
                   {veh.operatingRoutes && veh.operatingRoutes.length > 0 && (
                     <div className="space-y-1">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Corridors Served:</span>
                       <div className="flex flex-wrap gap-1">
-                        {veh.operatingRoutes.map(rt => (
-                          <span key={rt} className="text-[10px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
-                            {rt}
-                          </span>
-                        ))}
+                        {veh.operatingRoutes.map(rt => {
+                          // Build Google Maps directions URL from route name
+                          const parts = rt.split(/[-–→to]+/i).map(s => s.trim()).filter(Boolean);
+                          const mapsUrl = parts.length >= 2
+                            ? `https://www.google.com/maps/dir/${encodeURIComponent(parts[0] + ', India')}/${encodeURIComponent(parts[parts.length - 1] + ', India')}`
+                            : `https://www.google.com/maps/search/${encodeURIComponent(rt + ', India')}`;
+                          return (
+                            <a
+                              key={rt}
+                              href={mapsUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Open route in Google Maps"
+                              className="text-[10px] font-medium bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100 hover:border-blue-400 transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                              <svg className="w-2.5 h-2.5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                              {rt}
+                            </a>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -1044,7 +1059,19 @@ export const StateTransportDirectoryView: React.FC = () => {
                     </div>
                     <div className="flex justify-between items-center text-slate-700">
                       <span className="text-slate-500">Trip Route:</span>
-                      <strong className="text-slate-900 truncate max-w-[220px]">{pickupLocation} ➔ {dropLocation}</strong>
+                      <div className="flex items-center gap-1.5">
+                        <strong className="text-slate-900 truncate max-w-[160px]">{pickupLocation} ➔ {dropLocation}</strong>
+                        <a
+                          href={`https://www.google.com/maps/dir/${encodeURIComponent(pickupLocation + ', India')}/${encodeURIComponent(dropLocation + ', India')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Open in Google Maps"
+                          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold px-1.5 py-0.5 rounded transition-colors flex-shrink-0"
+                        >
+                          <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                          Maps
+                        </a>
+                      </div>
                     </div>
                     <div className="flex justify-between items-center text-slate-700 border-t border-slate-100 pt-1.5">
                       <span className="text-slate-500">Estimated Fare:</span>
