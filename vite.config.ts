@@ -113,48 +113,8 @@ function databasePlugin() {
     });
   };
 
-  const sendCallMeBotWhatsApp = (phone: string, apiKey: string, message: string): Promise<any> => {
-    return new Promise((resolve) => {
-      try {
-        const cleanPhone = (phone || '').replace(/\D/g, '').slice(-10);
-        const internationalPhone = '+91' + cleanPhone;
-        const encodedPhone = encodeURIComponent(internationalPhone);
-        const encodedMsg = encodeURIComponent(message);
-        const cleanApiKey = encodeURIComponent((apiKey || '').trim());
-        const url = `https://api.callmebot.com/whatsapp.php?phone=${encodedPhone}&text=${encodedMsg}&apikey=${cleanApiKey}`;
 
-        const req = https.get(url, (res) => {
-          let data = '';
-          res.on('data', (chunk) => { data += chunk; });
-          res.on('end', () => {
-            const lower = data.toLowerCase();
-            const isSuccess = Boolean(res.statusCode && res.statusCode >= 200 && res.statusCode < 300) &&
-              !lower.includes('apikey is invalid') &&
-              !lower.includes('apikey can not be') &&
-              !lower.includes('error');
-            resolve({
-              success: isSuccess,
-              provider: 'callmebot',
-              statusCode: res.statusCode,
-              phone: internationalPhone,
-              rawResponse: data.substring(0, 300)
-            });
-          });
-        });
 
-        req.on('error', (e) => {
-          resolve({ success: false, provider: 'callmebot', error: e.message, phone: internationalPhone });
-        });
-
-        req.setTimeout(10000, () => {
-          req.destroy();
-          resolve({ success: false, provider: 'callmebot', error: 'CallMeBot WhatsApp gateway timed out', phone: internationalPhone });
-        });
-      } catch (err: any) {
-        resolve({ success: false, provider: 'callmebot', error: err.message });
-      }
-    });
-  };
 
   const sendTwilioSms = (accountSid: string, authToken: string, fromNumber: string, phone: string, message: string): Promise<any> => {
     return new Promise((resolve) => {
@@ -211,40 +171,8 @@ function databasePlugin() {
     });
   };
 
-  const sendNtfyPush = (topic: string, title: string, message: string, tags?: string[]): Promise<any> => {
-    const cleanTopic = (topic || 'farm2future_krish').replace(/[^a-zA-Z0-9_-]/g, '');
-    const cleanTitle = (title || 'Farm2Future Notification').replace(/[^\x20-\x7E]/g, '').trim() || 'Farm2Future Notification';
-    return new Promise((resolve) => {
-      try {
-        const tagStr = Array.isArray(tags) ? tags.join(',') : (tags || 'bell');
-        const req = https.request(`https://ntfy.sh/${cleanTopic}`, {
-          method: 'POST',
-          headers: {
-            'Title': cleanTitle,
-            'Priority': 'urgent',
-            'Tags': tagStr
-          }
-        }, (res) => {
-          let data = '';
-          res.on('data', (chunk: any) => { data += chunk; });
-          res.on('end', () => {
-            resolve({ success: res.statusCode && res.statusCode >= 200 && res.statusCode < 300, statusCode: res.statusCode, topic: cleanTopic });
-          });
-        });
-        req.on('error', (err: any) => {
-          resolve({ success: false, error: err.message, topic: cleanTopic });
-        });
-        req.setTimeout(6000, () => {
-          req.destroy();
-          resolve({ success: false, error: 'Timeout', topic: cleanTopic });
-        });
-        req.write(message);
-        req.end();
-      } catch (e: any) {
-        resolve({ success: false, error: e.message, topic: cleanTopic });
-      }
-    });
-  };
+
+
 
   return {
     name: 'farm2future-database-api',
@@ -848,21 +776,18 @@ function databasePlugin() {
           const db = readDb();
           const gateway = db.smsGateway || {};
           const fast2smsKey = gateway.fast2smsApiKey || process.env.FAST2SMS_API_KEY || '';
-          const callmebotKey = gateway.callmebotApiKey || process.env.CALLMEBOT_API_KEY || '';
           const twilioConfig = gateway.twilio || {};
           res.setHeader('Content-Type', 'application/json');
           res.statusCode = 200;
           res.end(JSON.stringify({
-            configured: Boolean(fast2smsKey || twilioConfig.accountSid || callmebotKey),
-            provider: callmebotKey ? 'callmebot' : (fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none')),
-            callmebotConfigured: Boolean(callmebotKey),
-            maskedCallmebotKey: callmebotKey ? (callmebotKey.slice(0, 2) + '••••' + callmebotKey.slice(-2)) : '',
+            configured: Boolean(fast2smsKey || twilioConfig.accountSid),
+            provider: fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none'),
             maskedKey: fast2smsKey ? (fast2smsKey.substring(0, 4) + '••••••••' + fast2smsKey.slice(-4)) : ''
           }));
           return;
         }
 
-        // SMS / WhatsApp Config - POST
+        // SMS Config - POST
         if (url === '/api/sms/config' && req.method === 'POST') {
           let body = '';
           req.on('data', (chunk: any) => { body += chunk; });
@@ -874,71 +799,22 @@ function databasePlugin() {
               if (payload.fast2smsApiKey !== undefined) {
                 db.smsGateway.fast2smsApiKey = (payload.fast2smsApiKey || '').trim();
               }
-              if (payload.callmebotApiKey !== undefined) {
-                db.smsGateway.callmebotApiKey = (payload.callmebotApiKey || '').trim();
-              }
               if (payload.twilio !== undefined) {
                 db.smsGateway.twilio = payload.twilio;
               }
               writeDb(db);
               const fast2smsKey = db.smsGateway.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
-              const callmebotKey = db.smsGateway.callmebotApiKey || process.env.CALLMEBOT_API_KEY;
               const twilioConfig = db.smsGateway.twilio || {};
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 200;
               res.end(JSON.stringify({
                 success: true,
-                configured: Boolean(fast2smsKey || twilioConfig.accountSid || callmebotKey),
-                callmebotConfigured: Boolean(callmebotKey),
-                provider: callmebotKey ? 'callmebot' : (fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none'))
+                configured: Boolean(fast2smsKey || twilioConfig.accountSid),
+                provider: fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none')
               }));
             } catch (err: any) {
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 400;
-              res.end(JSON.stringify({ success: false, error: err.message }));
-            }
-          });
-          return;
-        }
-
-        // WhatsApp Test Endpoint - POST
-        if (url === '/api/whatsapp/test' && req.method === 'POST') {
-          let body = '';
-          req.on('data', (chunk: any) => { body += chunk; });
-          req.on('end', async () => {
-            try {
-              const payload = JSON.parse(body || '{}');
-              const db = readDb();
-              const cleanPhone = (payload.phone || '9631359486').replace(/\D/g, '').slice(-10);
-              const apiKey = (payload.apiKey || db.smsGateway?.callmebotApiKey || process.env.CALLMEBOT_API_KEY || '').trim();
-
-              if (!apiKey) {
-                res.setHeader('Content-Type', 'application/json');
-                res.statusCode = 400;
-                res.end(JSON.stringify({ success: false, error: 'CallMeBot API Key required' }));
-                return;
-              }
-
-              const testMessage = payload.message || `🌾 Farm2Future: WhatsApp Bot Direct Connected!\n✅ Direct WhatsApp notification test successful for +91 ${cleanPhone}. Time: ${new Date().toLocaleTimeString('en-IN')}`;
-              const waResult = await sendCallMeBotWhatsApp(cleanPhone, apiKey, testMessage);
-
-              if (waResult.success && payload.saveKey) {
-                if (!db.smsGateway) db.smsGateway = {};
-                db.smsGateway.callmebotApiKey = apiKey;
-                writeDb(db);
-              }
-
-              res.setHeader('Content-Type', 'application/json');
-              res.statusCode = 200;
-              res.end(JSON.stringify({
-                success: waResult.success,
-                phone: '+91 ' + cleanPhone,
-                provider: 'callmebot',
-                details: waResult
-              }));
-            } catch (err: any) {
-              res.setHeader('Content-Type', 'application/json');
-              res.statusCode = 500;
               res.end(JSON.stringify({ success: false, error: err.message }));
             }
           });
@@ -965,7 +841,6 @@ function databasePlugin() {
               const smsText = payload.message || `Successful Granted! Farm2Future Agri-Transport confirmed for vehicle ${payload.vehicleNo || 'MH-15-EG-4412'}. Driver: ${payload.driverName || 'Rameshwar'} (${payload.driverPhone || '+91 98231 44512'}). Fare: Rs ${payload.cost || 4290}.`;
 
               const fast2smsKey = payload.apiKey || db.smsGateway?.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
-              const callmebotKey = payload.callmebotApiKey || db.smsGateway?.callmebotApiKey || process.env.CALLMEBOT_API_KEY;
               const twilioConfig = db.smsGateway?.twilio;
 
               let result: any = null;
@@ -978,38 +853,9 @@ function databasePlugin() {
                   success: true,
                   simulated: true,
                   provider: 'simulation',
-                  message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key or use 1-Click WhatsApp/SMS link.'
+                  message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key.'
                 };
               }
-
-              // 🟢 Direct Automated WhatsApp Delivery via CallMeBot Bot Gateway
-              let waResult: any = null;
-              if (callmebotKey) {
-                waResult = await sendCallMeBotWhatsApp(cleanPhone, callmebotKey, smsText);
-              }
-
-              result.whatsapp = {
-                success: Boolean(waResult && waResult.success),
-                delivered: Boolean(waResult && waResult.success),
-                provider: waResult ? 'callmebot' : 'client_direct',
-                phone: '+91 ' + cleanPhone,
-                url: `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(smsText)}`,
-                details: waResult
-              };
-
-              // 🚀 Multi-Channel Mobile Push Alerts via NTFY (100% Free, Instant Phone Chime)
-              const ntfyTitle = payload.title || (smsText.includes('OTP') ? '🔑 Farm2Future Verification OTP' : (smsText.includes('Order') ? '✅ Farm2Future Order Confirmed' : '🚚 Farm2Future Transport Booked'));
-              const ntfyTags = smsText.includes('OTP') ? ['key', 'lock'] : (smsText.includes('Transport') ? ['truck', 'white_check_mark'] : ['package', 'white_check_mark']);
-
-              const ntfyPhoneRes = await sendNtfyPush('farm2future_' + cleanPhone, ntfyTitle, smsText, ntfyTags);
-              const ntfyKrishRes = await sendNtfyPush('farm2future_krish', ntfyTitle, smsText, ntfyTags);
-
-              result.ntfy = {
-                success: Boolean(ntfyPhoneRes.success || ntfyKrishRes.success),
-                topic: 'farm2future_' + cleanPhone,
-                globalTopic: 'farm2future_krish',
-                webUrl: `https://ntfy.sh/farm2future_${cleanPhone}`
-              };
 
               if (!db.activityHistory) db.activityHistory = [];
               db.activityHistory.unshift({

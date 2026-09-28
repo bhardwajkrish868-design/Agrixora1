@@ -195,40 +195,7 @@ function sendTwilioSms(accountSid, authToken, fromNumber, phone, message) {
   });
 }
 
-function sendNtfyPush(topic, title, message, tags) {
-  const cleanTopic = (topic || 'farm2future_krish').replace(/[^a-zA-Z0-9_-]/g, '');
-  const cleanTitle = (title || 'Farm2Future Notification').replace(/[^\x20-\x7E]/g, '').trim() || 'Farm2Future Notification';
-  return new Promise((resolve) => {
-    try {
-      const tagStr = Array.isArray(tags) ? tags.join(',') : (tags || 'bell');
-      const req = https.request(`https://ntfy.sh/${cleanTopic}`, {
-        method: 'POST',
-        headers: {
-          'Title': cleanTitle,
-          'Priority': 'urgent',
-          'Tags': tagStr
-        }
-      }, (res) => {
-        let data = '';
-        res.on('data', chunk => { data += chunk; });
-        res.on('end', () => {
-          resolve({ success: res.statusCode >= 200 && res.statusCode < 300, statusCode: res.statusCode, topic: cleanTopic });
-        });
-      });
-      req.on('error', (err) => {
-        resolve({ success: false, error: err.message, topic: cleanTopic });
-      });
-      req.setTimeout(6000, () => {
-        req.destroy();
-        resolve({ success: false, error: 'Timeout', topic: cleanTopic });
-      });
-      req.write(message);
-      req.end();
-    } catch (e) {
-      resolve({ success: false, error: e.message, topic: cleanTopic });
-    }
-  });
-}
+
 
 const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost:3000'}`);
@@ -948,17 +915,14 @@ const server = http.createServer((req, res) => {
     const db = readDb();
     const gateway = db.smsGateway || {};
     const fast2smsKey = gateway.fast2smsApiKey || process.env.FAST2SMS_API_KEY || '';
-    const callmebotKey = gateway.callmebotApiKey || process.env.CALLMEBOT_API_KEY || '';
     const twilioConfig = gateway.twilio || {};
     res.writeHead(200, {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*'
     });
     res.end(JSON.stringify({
-      configured: Boolean(fast2smsKey || twilioConfig.accountSid || callmebotKey),
-      provider: callmebotKey ? 'callmebot' : (fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none')),
-      callmebotConfigured: Boolean(callmebotKey),
-      maskedCallmebotKey: callmebotKey ? (callmebotKey.slice(0, 2) + '••••' + callmebotKey.slice(-2)) : '',
+      configured: Boolean(fast2smsKey || twilioConfig.accountSid),
+      provider: fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none'),
       maskedKey: fast2smsKey ? (fast2smsKey.substring(0, 4) + '••••••••' + fast2smsKey.slice(-4)) : ''
     }));
     return;
@@ -976,15 +940,11 @@ const server = http.createServer((req, res) => {
         if (payload.fast2smsApiKey !== undefined) {
           db.smsGateway.fast2smsApiKey = (payload.fast2smsApiKey || '').trim();
         }
-        if (payload.callmebotApiKey !== undefined) {
-          db.smsGateway.callmebotApiKey = (payload.callmebotApiKey || '').trim();
-        }
         if (payload.twilio !== undefined) {
           db.smsGateway.twilio = payload.twilio;
         }
         writeDb(db);
         const fast2smsKey = db.smsGateway.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
-        const callmebotKey = db.smsGateway.callmebotApiKey || process.env.CALLMEBOT_API_KEY;
         const twilioConfig = db.smsGateway.twilio || {};
         res.writeHead(200, {
           'Content-Type': 'application/json',
@@ -992,9 +952,8 @@ const server = http.createServer((req, res) => {
         });
         res.end(JSON.stringify({
           success: true,
-          configured: Boolean(fast2smsKey || twilioConfig.accountSid || callmebotKey),
-          callmebotConfigured: Boolean(callmebotKey),
-          provider: callmebotKey ? 'callmebot' : (fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none'))
+          configured: Boolean(fast2smsKey || twilioConfig.accountSid),
+          provider: fast2smsKey ? 'fast2sms' : (twilioConfig.accountSid ? 'twilio' : 'none')
         }));
       } catch (err) {
         res.writeHead(400, {
@@ -1044,21 +1003,6 @@ const server = http.createServer((req, res) => {
             message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key or use SMS link.'
           };
         }
-
-        // 🚀 Multi-Channel Mobile Push Alerts via NTFY (100% Free, Instant Phone Chime)
-        const ntfyTitle = payload.title || (smsText.includes('OTP') ? '🔑 Farm2Future Verification OTP' : (smsText.includes('Order') ? '✅ Farm2Future Order Confirmed' : '🚚 Farm2Future Transport Booked'));
-        const ntfyTags = smsText.includes('OTP') ? ['key', 'lock'] : (smsText.includes('Transport') ? ['truck', 'white_check_mark'] : ['package', 'white_check_mark']);
-        
-        const ntfyPhoneRes = await sendNtfyPush('farm2future_' + cleanPhone, ntfyTitle, smsText, ntfyTags);
-        const ntfyKrishRes = await sendNtfyPush('farm2future_krish', ntfyTitle, smsText, ntfyTags);
-
-        result.ntfy = {
-          success: Boolean(ntfyPhoneRes && ntfyPhoneRes.success),
-          topic: 'farm2future_' + cleanPhone,
-          globalTopic: 'farm2future_krish',
-          webUrl: `https://ntfy.sh/farm2future_${cleanPhone}`,
-          resDetails: ntfyPhoneRes
-        };
 
         // Record SMS in activity history
         if (!db.activityHistory) db.activityHistory = [];

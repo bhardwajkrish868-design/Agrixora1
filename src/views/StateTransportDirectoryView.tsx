@@ -342,10 +342,8 @@ export const StateTransportDirectoryView: React.FC = () => {
       recipientRole: 'all'
     });
 
-    const callmebotKey = typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || undefined) : undefined;
 
-
-    // Call real SMS Gateway API endpoint with CallMeBot support
+    // Call real SMS Gateway API endpoint
     let apiDelivery: any = null;
     try {
       const res = await fetch('/api/send-sms', {
@@ -359,8 +357,7 @@ export const StateTransportDirectoryView: React.FC = () => {
           driverPhone: bookingVehicle.driverPhone,
           origin: pickupLocation,
           destination: dropLocation,
-          cost: totalCost,
-          callmebotApiKey: callmebotKey
+          cost: totalCost
         })
       });
       apiDelivery = await res.json();
