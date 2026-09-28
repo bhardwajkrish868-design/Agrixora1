@@ -5,6 +5,7 @@ interface StatCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
+  actionText?: string;
   icon: LucideIcon;
   trend?: {
     value: string;
@@ -18,6 +19,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
   subtitle,
+  actionText,
   icon: Icon,
   trend,
   colorScheme = 'emerald',
@@ -54,7 +56,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   return (
     <div 
       onClick={onClick}
-      className={`bg-white rounded-2xl p-5 border border-slate-100 shadow-soft transition-all duration-300 hover:shadow-card hover:-translate-y-0.5 ${onClick ? 'cursor-pointer hover:border-agri-300' : ''}`}
+      className={`bg-white rounded-2xl p-5 border border-slate-100 shadow-soft transition-all duration-300 hover:shadow-card hover:-translate-y-0.5 group ${onClick ? 'cursor-pointer hover:border-emerald-300' : ''}`}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
@@ -63,6 +65,11 @@ export const StatCard: React.FC<StatCardProps> = ({
             <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{value}</h3>
           </div>
           {subtitle && <p className="text-xs text-slate-500 font-medium">{subtitle}</p>}
+          {actionText && (
+            <p className="text-[11px] font-semibold text-emerald-600 group-hover:text-emerald-700 flex items-center gap-1 pt-0.5 transition-colors">
+              {actionText}
+            </p>
+          )}
         </div>
         <div className={`p-3 rounded-xl shadow-md ${colorStyles.iconBg}`}>
           <Icon className="w-5 h-5" />

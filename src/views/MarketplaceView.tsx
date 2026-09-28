@@ -575,7 +575,7 @@ export const MarketplaceView: React.FC = () => {
                   {/* Price Box */}
                   <div className="p-3 bg-slate-50 rounded-2xl flex items-baseline justify-between border border-slate-100">
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase font-semibold block">Price / {(item.unit || 'Quintals').slice(0, -1)}</span>
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold block">Price / {item.unit || 'Kg'}</span>
                       <span className="text-lg font-extrabold text-emerald-700">
                         ₹{item.pricePerUnit.toLocaleString('en-IN')}
                       </span>

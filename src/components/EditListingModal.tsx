@@ -363,7 +363,9 @@ export const EditListingModal: React.FC<EditListingModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                {language === 'hi' ? `अपेक्षित मूल्य (₹ / ${unit.slice(0, -1)}) *` : `Expected Price (₹ / ${unit.slice(0, -1)}) *`}
+                {language === 'hi' 
+                  ? `अपेक्षित मूल्य (₹ / ${unit === 'Kg' || unit === 'KG' ? 'Kg' : unit.endsWith('s') ? unit.slice(0, -1) : unit}) *` 
+                  : `Expected Price (₹ / ${unit === 'Kg' || unit === 'KG' ? 'Kg' : unit.endsWith('s') ? unit.slice(0, -1) : unit}) *`}
               </label>
               <div className="relative">
                 <span className="absolute left-3.5 top-2.5 text-slate-500 font-bold">₹</span>

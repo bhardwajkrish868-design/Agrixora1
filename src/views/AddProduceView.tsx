@@ -438,7 +438,7 @@ export const AddProduceView: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Expected Price (₹ / {form.unit.slice(0, -1)}) *
+              Expected Price (₹ / {String(form.unit) === 'Kg' || String(form.unit) === 'KG' ? 'Kg' : form.unit.endsWith('s') ? form.unit.slice(0, -1) : form.unit}) *
             </label>
             <div className="relative">
               <span className="absolute left-3.5 top-2.5 text-slate-500 font-bold">₹</span>

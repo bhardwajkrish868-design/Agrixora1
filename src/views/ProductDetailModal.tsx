@@ -651,7 +651,7 @@ export const ProductDetailModal: React.FC = () => {
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                       <span className="text-[10px] text-slate-400 uppercase font-semibold block">Available Lot</span>
-                      <span className="font-bold text-slate-900 text-sm">{item.quantity} {item.unit || 'Quintals'}</span>
+                      <span className="font-bold text-slate-900 text-sm">{item.quantity} {item.unit || 'Kg'}</span>
                     </div>
 
                     <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
@@ -666,7 +666,7 @@ export const ProductDetailModal: React.FC = () => {
 
                     <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                       <span className="text-[10px] text-slate-400 uppercase font-semibold block">Direct Farm Price</span>
-                      <span className="font-bold text-emerald-700 text-sm">₹{item.pricePerUnit.toLocaleString('en-IN')}/{(item.unit || 'Quintals').slice(0, -1)}</span>
+                      <span className="font-bold text-emerald-700 text-sm">₹{item.pricePerUnit.toLocaleString('en-IN')}/{item.unit || 'Kg'}</span>
                     </div>
                   </div>
 

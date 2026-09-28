@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { findNearestFciHub } from '../utils/geoUtils';
 import { getNearestTargetMandi } from '../data/indiaLocations';
+import { calculateProduceSummary } from '../utils/unitUtils';
 import { StatCard } from '../components/StatCard';
 import { 
   ResponsiveContainer, 
@@ -66,7 +67,9 @@ export const FarmerDashboard: React.FC = () => {
   const myListings = listings.filter(l => isFarmerListing(l, currentUser));
   const myOrders = orders.filter(o => isFarmerOrder(o, currentUser));
   
-  const totalProduceListed = myListings.reduce((sum, l) => sum + l.quantity, 0);
+  const produceSummary = useMemo(() => {
+    return calculateProduceSummary(myListings);
+  }, [myListings]);
   const activeOrdersCount = myOrders.filter(o => o.currentStage !== 'delivered').length;
   const totalEarnings = myOrders.filter(o => o.paymentStatus === 'disbursed_to_farmer').reduce((sum, o) => sum + o.farmerPayout, 0);
   const pendingEscrowPayout = myOrders.filter(o => o.paymentStatus === 'escrow_locked').reduce((sum, o) => sum + o.farmerPayout, 0);
@@ -309,8 +312,9 @@ export const FarmerDashboard: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Produce Listed"
-          value={`${totalProduceListed} Qtl`}
-          subtitle={`${myListings.length} Active Crop Lots`}
+          value={produceSummary.displayValue}
+          subtitle={produceSummary.lotSubtitle}
+          actionText="View quantity by unit →"
           icon={Sprout}
           trend={{ value: '18%', isPositive: true }}
           colorScheme="emerald"
@@ -833,8 +837,8 @@ export const FarmerDashboard: React.FC = () => {
                           {item.qualityGrade}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500">{item.variety} • {item.quantity} {item.unit || 'Quintals'}</p>
-                      <p className="text-xs font-bold text-slate-800 mt-0.5">₹{item.pricePerUnit}/{(item.unit || 'Quintals').slice(0, -1)}</p>
+                      <p className="text-[11px] text-slate-500">{item.variety} • {item.quantity} {item.unit || 'Kg'}</p>
+                      <p className="text-xs font-bold text-slate-800 mt-0.5">₹{item.pricePerUnit.toLocaleString('en-IN')}/{item.unit || 'Kg'}</p>
                     </div>
                   </div>
                 ))
