@@ -952,7 +952,7 @@ function databasePlugin() {
 
 export default defineConfig({
   plugins: [react(), databasePlugin()],
-  base: './',
+  base: '/',
   server: {
     port: 5173,
     host: true
