@@ -2184,6 +2184,9 @@ export const CollectionCentreView: React.FC = () => {
                       onChange={e => handleRouteChange(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 bg-white focus:ring-2 focus:ring-emerald-500"
                     >
+                      <option value="patna_hajipur">Bihar: NH-19 & Gandhi Setu Patna–Hajipur (20 km)</option>
+                      <option value="patna_muzaffarpur">Bihar: NH-27 Patna–Muzaffarpur Agri Corridor (75 km)</option>
+                      <option value="bengal_bihar">Inter-State: NH-19 Patna–Kolkata Eastern Corridor (580 km)</option>
                       <option value="nashik_mumbai">Maharashtra: NH-60 Mumbai-Nashik Corridor (165 km)</option>
                       <option value="pune_mumbai">Maharashtra: Mumbai-Pune Expressway (148 km)</option>
                       <option value="karnal_delhi">Haryana/NCR: NH-44 Karnal-Delhi Corridor (128 km)</option>
@@ -2194,7 +2197,6 @@ export const CollectionCentreView: React.FC = () => {
                       <option value="karnataka_tamilnadu">South: NH-44/48 Bengaluru-Chennai Corridor (345 km)</option>
                       <option value="rajasthan_delhi">Rajasthan: NH-48 Jaipur-Delhi Pink City (270 km)</option>
                       <option value="andhra_telangana">AP/TS: NH-65 Guntur-Hyderabad Corridor (275 km)</option>
-                      <option value="bengal_bihar">East: NH-19 Patna-Kolkata Eastern Corridor (580 km)</option>
                       <option value="himachal_delhi">Himalayan: NH-5/44 Shimla-Delhi Apple Link (340 km)</option>
                     </select>
                   </div>
