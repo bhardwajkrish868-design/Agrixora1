@@ -710,44 +710,44 @@ export const KisanAIVoiceAssistant: React.FC = () => {
             title="Click outside to close"
           />
 
-          <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[500px] sm:h-[700px] z-50 flex flex-col bg-slate-900 text-slate-100 rounded-none sm:rounded-3xl shadow-2xl border border-emerald-500/40 overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+          <div className="fixed inset-0 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[390px] sm:h-[490px] max-w-[94vw] max-h-[82vh] z-50 flex flex-col bg-slate-900 text-slate-100 rounded-none sm:rounded-2xl shadow-2xl border border-emerald-500/40 overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
           
           {/* TOP HEADER */}
-          <div className="p-3.5 sm:p-4 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-b border-emerald-800/50 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative p-2.5 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-950">
-                <Mic className="w-5 h-5" />
+          <div className="py-2.5 px-3 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-b border-emerald-800/50 flex items-center justify-between">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="relative p-1.5 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-sm shrink-0">
+                <Mic className="w-4 h-4" />
                 {isSpeaking && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-amber-400 rounded-full border-2 border-slate-900 animate-ping" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-amber-400 rounded-full border border-slate-900 animate-ping" />
                 )}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-white text-base tracking-wide flex items-center gap-1.5">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-extrabold text-white text-xs sm:text-sm tracking-wide truncate">
                     {activeLang === 'hi' ? '🌾 कृषि वाणी AI सहायक' : '🌾 Krishi Vani Voice AI'}
                   </h3>
-                  <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-500/40">
+                  <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-mono font-bold border border-emerald-500/40">
                     LIVE
                   </span>
                 </div>
-                <p className="text-[11px] text-emerald-300/90 font-medium">
-                  {activeLang === 'hi' ? 'स्मार्ट किसान आवाज़ सहायक • 24/7 कृषि समाधान' : 'Smart Voice Assistant • 24/7 Agro Guide'}
+                <p className="text-[10px] text-emerald-300/80 font-medium truncate">
+                  {activeLang === 'hi' ? '24/7 स्मार्ट किसान आवाज़ सहायक' : '24/7 Smart Agro Voice AI'}
                 </p>
               </div>
             </div>
 
             {/* Language Toggle & Controls */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={() => {
                   const nextLang = activeLang === 'hi' ? 'en' : 'hi';
                   setActiveLang(nextLang);
                   setLanguage(nextLang);
                 }}
-                className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                 title="Toggle Hindi / English"
               >
-                <Languages className="w-3.5 h-3.5 text-emerald-400" />
+                <Languages className="w-3 h-3 text-emerald-400" />
                 <span>{activeLang === 'hi' ? 'हिन्दी' : 'ENG'}</span>
               </button>
 
@@ -759,41 +759,41 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                   }
                   setSpeechMuted(!speechMuted);
                 }}
-                className={`p-2 rounded-xl border text-xs transition-colors cursor-pointer ${
+                className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
                   speechMuted 
                     ? 'bg-red-500/20 text-red-400 border-red-500/30' 
                     : 'bg-slate-800 text-emerald-400 border-slate-700 hover:bg-slate-700'
                 }`}
-                title={speechMuted ? 'Unmute Audio (आवाज़ चालू करें)' : 'Mute Audio (आवाज़ बंद करें)'}
+                title={speechMuted ? 'Unmute Audio' : 'Mute Audio'}
               >
-                {speechMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                {speechMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
               </button>
 
               <button
                 onClick={handleResetChat}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 transition-colors cursor-pointer"
-                title="Restart Chat (नई बातचीत)"
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+                title="Restart Chat"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-3.5 h-3.5" />
               </button>
 
               <button
                 onClick={handleCloseAssistant}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-300 border border-slate-700 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-300 border border-slate-700 transition-colors cursor-pointer"
                 title="Close"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
           {/* 📑 TOPIC FILTER TABS (1-Click Instant Resolution) */}
-          <div className="p-2 bg-slate-950/95 border-b border-slate-800 overflow-x-auto whitespace-nowrap flex gap-1.5 scrollbar-none">
+          <div className="py-1.5 px-2 bg-slate-950/95 border-b border-slate-800 overflow-x-auto whitespace-nowrap flex gap-1 scrollbar-none">
             {topicTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleUserQuery(tab.query)}
-                className="px-2.5 py-1 rounded-xl bg-slate-800/90 hover:bg-emerald-800/60 text-emerald-300 hover:text-white border border-emerald-500/30 text-[11px] font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1"
+                className="px-2 py-0.5 rounded-lg bg-slate-800/90 hover:bg-emerald-800/60 text-emerald-300 hover:text-white border border-emerald-500/30 text-[10px] font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1"
               >
                 <span>{tab.label}</span>
               </button>
@@ -801,35 +801,35 @@ export const KisanAIVoiceAssistant: React.FC = () => {
           </div>
 
           {/* CHAT MESSAGES STREAM */}
-          <div className="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-3.5 bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 scrollbar-thin scrollbar-thumb-slate-700">
+          <div className="flex-1 p-3 overflow-y-auto space-y-2.5 bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 scrollbar-thin scrollbar-thumb-slate-700">
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
                 className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div 
-                  className={`max-w-[94%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed shadow-lg ${
+                  className={`max-w-[95%] rounded-2xl p-2.5 text-xs leading-relaxed shadow-md ${
                     msg.sender === 'user'
                       ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-br-none border border-emerald-400/30 font-medium'
                       : 'bg-slate-800/95 text-slate-100 rounded-bl-none border border-slate-700/90 backdrop-blur-md'
                   }`}
                 >
-                  <div className="whitespace-pre-line">
+                  <div className="whitespace-pre-line text-xs">
                     {msg.text}
                   </div>
 
                   {/* 📊 VISUAL PRICE CARD */}
                   {msg.type === 'price' && msg.cardData?.priceCards && (
-                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                       {msg.cardData.priceCards.map((pc: any, idx: number) => (
-                        <div key={idx} className="p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 flex flex-col justify-between shadow-xs">
+                        <div key={idx} className="p-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 flex flex-col justify-between shadow-xs">
                           <div>
-                            <div className="text-[11px] font-bold text-emerald-300">{pc.crop}</div>
-                            <div className="text-[10px] text-slate-400">{pc.mandi}</div>
+                            <div className="text-[10px] font-bold text-emerald-300">{pc.crop}</div>
+                            <div className="text-[9px] text-slate-400">{pc.mandi}</div>
                           </div>
-                          <div className="mt-2 flex items-baseline justify-between pt-1 border-t border-slate-800">
-                            <span className="text-sm font-black text-amber-400">{pc.rate}</span>
-                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-600/30">{pc.trend}</span>
+                          <div className="mt-1 flex items-baseline justify-between pt-1 border-t border-slate-800">
+                            <span className="text-xs font-black text-amber-400">{pc.rate}</span>
+                            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/80 px-1 py-0.2 rounded border border-emerald-600/30">{pc.trend}</span>
                           </div>
                         </div>
                       ))}
@@ -838,33 +838,33 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
                   {/* 🌦️ VISUAL WEATHER CARD */}
                   {msg.type === 'weather' && msg.cardData && (
-                    <div className="mt-3 p-3.5 rounded-xl bg-gradient-to-r from-blue-950/70 to-slate-900/90 border border-blue-500/40">
+                    <div className="mt-2 p-2.5 rounded-xl bg-gradient-to-r from-blue-950/70 to-slate-900/90 border border-blue-500/40">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <CloudSun className="w-7 h-7 text-amber-400 animate-pulse" />
+                        <div className="flex items-center gap-2">
+                          <CloudSun className="w-5 h-5 text-amber-400 animate-pulse" />
                           <div>
-                            <span className="text-xl font-black text-white">{msg.cardData.temp}</span>
-                            <span className="text-xs text-slate-300 ml-2 font-medium">{msg.cardData.condition}</span>
+                            <span className="text-base font-black text-white">{msg.cardData.temp}</span>
+                            <span className="text-[11px] text-slate-300 ml-1.5 font-medium">{msg.cardData.condition}</span>
                           </div>
                         </div>
-                        <span className="text-[10px] px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
                           {msg.cardData.sprayStatus}
                         </span>
                       </div>
-                      <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-slate-800 text-[10px] text-slate-300">
-                        <div className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-blue-400" /> {msg.cardData.humidity} नमी</div>
-                        <div className="flex items-center gap-1"><CloudSun className="w-3.5 h-3.5 text-amber-400" /> {msg.cardData.rainChance} वर्षा</div>
-                        <div className="flex items-center gap-1"><Wind className="w-3.5 h-3.5 text-teal-400" /> {msg.cardData.wind}</div>
+                      <div className="grid grid-cols-3 gap-1.5 mt-2 pt-1.5 border-t border-slate-800 text-[9px] text-slate-300">
+                        <div className="flex items-center gap-1"><Droplets className="w-3 h-3 text-blue-400" /> {msg.cardData.humidity}</div>
+                        <div className="flex items-center gap-1"><CloudSun className="w-3 h-3 text-amber-400" /> {msg.cardData.rainChance}</div>
+                        <div className="flex items-center gap-1"><Wind className="w-3 h-3 text-teal-400" /> {msg.cardData.wind}</div>
                       </div>
                     </div>
                   )}
 
                   {/* 🐛 VISUAL DISEASE PRESCRIPTION CARD */}
                   {msg.type === 'disease' && msg.cardData && (
-                    <div className="mt-3 p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-[11px] space-y-2">
-                      <div className="font-bold text-amber-300 flex items-center gap-1.5 border-b border-amber-600/30 pb-1">
-                        <Bug className="w-4 h-4 text-amber-400" />
-                        <span>{activeLang === 'hi' ? 'अनुशंसित कृषि रक्षक उपचार व सटीक मात्रा' : 'Recommended Agro Chemical Dosage'}</span>
+                    <div className="mt-2 p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-[10px] space-y-1.5">
+                      <div className="font-bold text-amber-300 flex items-center gap-1 border-b border-amber-600/30 pb-1">
+                        <Bug className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{activeLang === 'hi' ? 'अनुशंसित कृषि रक्षक उपचार' : 'Recommended Agro Chemical'}</span>
                       </div>
                       <div className="text-slate-200">
                         <span className="text-emerald-400 font-bold">1. </span> {msg.cardData.remedy1}
@@ -872,62 +872,50 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                       <div className="text-slate-200">
                         <span className="text-emerald-400 font-bold">2. </span> {msg.cardData.remedy2}
                       </div>
-                      <div className="text-emerald-300 text-[10px] bg-emerald-950/60 p-1.5 rounded-lg border border-emerald-600/30">
-                        🌿 <strong>{activeLang === 'hi' ? 'जैविक उपाय:' : 'Organic Alternative:'}</strong> {msg.cardData.organic}
+                      <div className="text-emerald-300 text-[9px] bg-emerald-950/60 p-1 rounded-md border border-emerald-600/30">
+                        🌿 <strong>{activeLang === 'hi' ? 'जैविक:' : 'Organic:'}</strong> {msg.cardData.organic}
                       </div>
                     </div>
                   )}
 
                   {/* 🌱 VISUAL FERTILIZER CARD */}
                   {msg.type === 'fertilizer' && msg.cardData && (
-                    <div className="mt-3 grid grid-cols-2 gap-2 text-[11px]">
-                      <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30">
-                        <div className="text-slate-400 text-[10px]">DAP खाद (बुवाई)</div>
-                        <div className="font-black text-emerald-400 text-xs">{msg.cardData.dap}</div>
+                    <div className="mt-2 grid grid-cols-2 gap-1.5 text-[10px]">
+                      <div className="p-1.5 rounded-lg bg-slate-900 border border-emerald-500/30">
+                        <div className="text-slate-400 text-[9px]">DAP खाद</div>
+                        <div className="font-bold text-emerald-400 text-[11px]">{msg.cardData.dap}</div>
                       </div>
-                      <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30">
-                        <div className="text-slate-400 text-[10px]">यूरिया (सिंचाई पर)</div>
-                        <div className="font-black text-amber-400 text-xs">{msg.cardData.urea}</div>
-                      </div>
-                      <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30">
-                        <div className="text-slate-400 text-[10px]">पोटाश MOP</div>
-                        <div className="font-black text-cyan-400 text-xs">{msg.cardData.potash}</div>
-                      </div>
-                      <div className="p-2 rounded-xl bg-slate-900 border border-emerald-500/30">
-                        <div className="text-slate-400 text-[10px]">नैनो यूरिया स्प्रे</div>
-                        <div className="font-black text-emerald-300 text-xs">{msg.cardData.nanoUrea}</div>
+                      <div className="p-1.5 rounded-lg bg-slate-900 border border-emerald-500/30">
+                        <div className="text-slate-400 text-[9px]">यूरिया</div>
+                        <div className="font-bold text-amber-400 text-[11px]">{msg.cardData.urea}</div>
                       </div>
                     </div>
                   )}
 
                   {/* 🏛️ VISUAL SCHEME CARD */}
                   {msg.type === 'scheme' && msg.cardData && (
-                    <div className="mt-3 p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-[11px] space-y-1.5">
+                    <div className="mt-2 p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-[10px] space-y-1">
                       <div className="flex items-center justify-between text-emerald-300 font-bold">
-                        <span>📞 किसान कॉल सेंटर हेल्पलाइन:</span>
+                        <span>📞 हेल्पलाइन:</span>
                         <span className="text-amber-400 font-mono font-black">{msg.cardData.helpline}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-slate-300">
-                        <span>KCC ऋण सीमा:</span>
-                        <span className="text-white font-bold">{msg.cardData.kccLimit}</span>
                       </div>
                     </div>
                   )}
 
                   {/* 🔘 INTERACTIVE ACTION BUTTONS (DIRECT 1-CLICK RESOLUTION) */}
                   {msg.actionButtons && msg.actionButtons.length > 0 && (
-                    <div className="mt-3.5 pt-3 border-t border-slate-700/60 flex flex-col gap-2">
-                      <div className="text-[11px] font-bold text-emerald-300 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                        <span>{activeLang === 'hi' ? 'तुरंत समाधान / 1-क्लिक एक्शन:' : 'Instant 1-Click Action Buttons:'}</span>
+                    <div className="mt-2.5 pt-2 border-t border-slate-700/60 flex flex-col gap-1.5">
+                      <div className="text-[10px] font-bold text-emerald-300 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-400" />
+                        <span>{activeLang === 'hi' ? 'तुरंत समाधान / 1-क्लिक:' : '1-Click Actions:'}</span>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-2">
+                      <div className="grid grid-cols-1 gap-1.5">
                         {msg.actionButtons.map((btn, bIdx) => (
                           <button
                             key={bIdx}
                             onClick={() => handleActionClick(btn)}
-                            className={`w-full py-2.5 px-3.5 rounded-xl font-bold text-xs shadow-md flex items-center justify-between gap-2 transition-all cursor-pointer group ${
+                            className={`w-full py-1.5 px-2.5 rounded-lg font-bold text-[11px] shadow-sm flex items-center justify-between gap-1.5 transition-all cursor-pointer group ${
                               btn.variant === 'primary'
                                 ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-950/50'
                                 : btn.variant === 'secondary'
@@ -937,11 +925,11 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                                 : 'bg-slate-900/90 hover:bg-emerald-950/80 text-emerald-300 hover:text-white border border-emerald-500/40'
                             }`}
                           >
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 truncate">
                               {renderIcon(btn.icon)}
-                              <span>{btn.label}</span>
+                              <span className="truncate">{btn.label}</span>
                             </div>
-                            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform opacity-80" />
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform opacity-80 shrink-0" />
                           </button>
                         ))}
                       </div>
@@ -950,16 +938,16 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
                   {/* 💡 FOLLOW-UP QUICK QUERY CHIPS */}
                   {msg.followUpChips && msg.followUpChips.length > 0 && (
-                    <div className="mt-3 pt-2.5 border-t border-slate-800">
-                      <div className="text-[10px] text-slate-400 font-semibold mb-1.5">
-                        {activeLang === 'hi' ? '👉 संबंधित सवाल पूछें (क्लिक करें):' : '👉 Related Questions (Click to Ask):'}
+                    <div className="mt-2 pt-2 border-t border-slate-800">
+                      <div className="text-[9px] text-slate-400 font-semibold mb-1">
+                        {activeLang === 'hi' ? '👉 संबंधित सवाल (क्लिक करें):' : '👉 Related Questions:'}
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1">
                         {msg.followUpChips.map((chip, cIdx) => (
                           <button
                             key={cIdx}
                             onClick={() => handleUserQuery(chip)}
-                            className="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-emerald-900/80 text-slate-300 hover:text-emerald-200 border border-slate-700 hover:border-emerald-500/40 text-[10px] font-medium transition-colors cursor-pointer"
+                            className="px-2 py-0.5 rounded-md bg-slate-900/90 hover:bg-emerald-900/80 text-slate-300 hover:text-emerald-200 border border-slate-700 hover:border-emerald-500/40 text-[10px] font-medium transition-colors cursor-pointer"
                           >
                             {chip}
                           </button>
@@ -970,15 +958,15 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
                   {/* Audio Replay Button */}
                   {msg.sender === 'assistant' && (
-                    <div className="mt-2.5 pt-1.5 border-t border-slate-700/50 flex items-center justify-between text-[10px] text-slate-400">
+                    <div className="mt-2 pt-1 border-t border-slate-700/50 flex items-center justify-between text-[9px] text-slate-400">
                       <span className="font-mono">{msg.timestamp}</span>
                       <button
                         onClick={() => speakText(msg.text)}
-                        className="hover:text-emerald-400 flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-900/60 hover:bg-slate-900 text-emerald-300 transition-colors cursor-pointer border border-slate-700"
-                        title="Replay Audio (आवाज़ में सुनें)"
+                        className="hover:text-emerald-400 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-900/60 hover:bg-slate-900 text-emerald-300 transition-colors cursor-pointer border border-slate-700 text-[10px]"
+                        title="Replay Audio"
                       >
-                        <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{activeLang === 'hi' ? 'आवाज़ में सुनें' : 'Listen Audio'}</span>
+                        <Volume2 className="w-3 h-3 text-emerald-400" />
+                        <span>{activeLang === 'hi' ? 'सुने' : 'Listen'}</span>
                       </button>
                     </div>
                   )}
@@ -988,46 +976,44 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
             {/* 🎙️ LIVE ACOUSTIC VOICE WAVE OVERLAY */}
             {isListening && (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/95 via-slate-900 to-teal-950 border-2 border-emerald-400/80 text-white shadow-2xl space-y-3 animate-in zoom-in-95">
+              <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-950/95 via-slate-900 to-teal-950 border border-emerald-400/80 text-white shadow-xl space-y-2 animate-in zoom-in-95">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-3 w-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="relative flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                     </span>
-                    <span className="text-xs font-black text-amber-400 tracking-wide uppercase">
-                      {activeLang === 'hi' ? '🔴 लाइव वॉइस रिकॉर्डिंग चालू है' : '🔴 Live Voice Recording'}
+                    <span className="text-[11px] font-black text-amber-400 uppercase">
+                      {activeLang === 'hi' ? '🔴 आवाज़ सुन रहा हूँ...' : '🔴 Listening...'}
                     </span>
                   </div>
 
                   <button
                     type="button"
                     onClick={toggleListening}
-                    className="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[10px] shadow-sm transition-colors cursor-pointer"
+                    className="px-2 py-0.5 rounded-md bg-red-600 hover:bg-red-500 text-white font-bold text-[9px] transition-colors cursor-pointer"
                   >
-                    {activeLang === 'hi' ? 'पूरा हुआ (Stop)' : 'Done (Stop)'}
+                    Stop
                   </button>
                 </div>
 
-                {/* Live Real-time Acoustic Waveform Bars */}
-                <div className="flex items-center justify-center gap-1.5 py-2 bg-slate-950/80 rounded-xl border border-emerald-500/30">
-                  <span className="w-1.5 h-3 bg-emerald-400 rounded-full animate-pulse" />
-                  <span className="w-1.5 h-6 bg-teal-400 rounded-full animate-pulse delay-75" />
-                  <span className="w-1.5 h-8 bg-amber-400 rounded-full animate-pulse delay-150" />
-                  <span className="w-1.5 h-10 bg-emerald-300 rounded-full animate-pulse delay-300" />
-                  <span className="w-1.5 h-7 bg-teal-300 rounded-full animate-pulse delay-200" />
-                  <span className="w-1.5 h-9 bg-amber-300 rounded-full animate-pulse delay-100" />
-                  <span className="w-1.5 h-5 bg-emerald-400 rounded-full animate-pulse delay-75" />
-                  <span className="w-1.5 h-3 bg-teal-400 rounded-full animate-pulse" />
+                {/* Live Waveform */}
+                <div className="flex items-center justify-center gap-1 py-1.5 bg-slate-950/80 rounded-lg border border-emerald-500/30">
+                  <span className="w-1 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                  <span className="w-1 h-5 bg-teal-400 rounded-full animate-pulse delay-75" />
+                  <span className="w-1 h-7 bg-amber-400 rounded-full animate-pulse delay-150" />
+                  <span className="w-1 h-8 bg-emerald-300 rounded-full animate-pulse delay-300" />
+                  <span className="w-1 h-6 bg-teal-300 rounded-full animate-pulse delay-200" />
+                  <span className="w-1 h-4 bg-amber-300 rounded-full animate-pulse delay-100" />
+                  <span className="w-1 h-2 bg-emerald-400 rounded-full animate-pulse" />
                 </div>
 
-                {/* Spoken Text Box */}
-                <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-xs text-slate-200 min-h-[36px] flex items-center">
-                  <span className="text-emerald-400 font-bold mr-1.5">🎙️</span>
-                  <span className="italic font-medium text-emerald-200">
+                {/* Spoken Text */}
+                <div className="p-2 rounded-lg bg-slate-900/90 border border-slate-700 text-[11px] text-slate-200 min-h-[30px] flex items-center">
+                  <span className="italic text-emerald-200 truncate">
                     {transcriptLive 
                       ? `"${transcriptLive}"` 
-                      : (activeLang === 'hi' ? 'स्पष्ट आवाज़ में अपना सवाल बोलिए (जैसे: आज का प्याज का भाव क्या है)...' : 'Speak clearly (e.g., What is today onion price)...')}
+                      : (activeLang === 'hi' ? 'बोलिए किसान भाई...' : 'Speak now...')}
                   </span>
                 </div>
               </div>
@@ -1037,25 +1023,25 @@ export const KisanAIVoiceAssistant: React.FC = () => {
           </div>
 
           {/* FOOTER INPUT CONTROLS */}
-          <div className="p-3 bg-slate-900 border-t border-slate-800">
+          <div className="p-2 bg-slate-900 border-t border-slate-800">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleUserQuery(inputText);
               }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5"
             >
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`p-3 rounded-2xl transition-all duration-300 shadow-lg cursor-pointer flex items-center justify-center shrink-0 ${
+                className={`p-2 rounded-xl transition-all duration-300 shadow-md cursor-pointer flex items-center justify-center shrink-0 ${
                   isListening
-                    ? 'bg-red-600 text-white animate-pulse ring-4 ring-red-500/50'
-                    : 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white hover:scale-105 active:scale-95 shadow-emerald-900/50'
+                    ? 'bg-red-600 text-white animate-pulse ring-2 ring-red-500/50'
+                    : 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white hover:scale-105 active:scale-95'
                 }`}
-                title={isListening ? 'Stop Listening (बोलना बंद करें)' : 'Click to Speak (माइक दबाकर बोलें)'}
+                title={isListening ? 'Stop' : 'Speak'}
               >
-                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
               </button>
 
               <div className="flex-1 relative">
@@ -1065,20 +1051,20 @@ export const KisanAIVoiceAssistant: React.FC = () => {
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder={
                     activeLang === 'hi' 
-                      ? 'माइक दबाकर बोलें या यहाँ प्रश्न लिखें...' 
-                      : 'Click mic to speak or type question here...'
+                      ? 'माइक दबाकर बोलें या यहाँ लिखें...' 
+                      : 'Click mic to speak or type...'
                   }
-                  className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all pr-9"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all pr-7"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={!inputText.trim()}
-                className="p-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-md transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-sm transition-colors cursor-pointer shrink-0"
                 title="Send"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-3.5 h-3.5" />
               </button>
             </form>
           </div>
