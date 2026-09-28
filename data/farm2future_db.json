@@ -19,59 +19,22 @@
       "farmSizeAcres": 5
     },
     {
-      "id": "usr_buyer_1790534660861",
-      "name": "Ankit Kumar Mahato",
-      "phone": "+91 9631289876",
-      "email": "ankit9631289876@gmail.com",
-      "role": "buyer",
-      "password": "Ankit@123",
-      "location": "Ranchi, Jharkhand",
-      "district": "Ranchi",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1165 4654 6655",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "businessName": "Ankit Kumar Mahato Agro Buyer"
-    },
-    {
-      "id": "usr_farmer_1790532496880",
-      "name": "captain",
-      "phone": "+91 9431369829",
-      "email": "captain@farm2future.in",
+      "id": "usr_farmer_1790344684960",
+      "name": "fafuyfua",
+      "phone": "+91 5465464885",
+      "email": "fafuyfua@farm2future.in",
       "role": "farmer",
-      "password": "prashant001",
+      "password": "prashnat100",
       "location": "Bokaro, Jharkhand",
       "district": "Bokaro",
       "state": "Jharkhand",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "2165 6468 4686",
+      "aadhaarNumber": "4654 6546 4654",
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 100
-    },
-    {
-      "id": "usr_buyer_1790449303210",
-      "name": "KIT KAT",
-      "phone": "+91 7894561236",
-      "email": "ankit123@gmail.com",
-      "role": "buyer",
-      "password": "Ankit@123",
-      "location": "Buxar, Bihar",
-      "district": "Buxar",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "5465 4546 5454",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "HOTEL HILLTOWN",
-      "gstin": "44564BJDCBJB4146"
+      "farmSizeAcres": 5
     },
     {
       "id": "usr_admin_1790557419802",
@@ -164,134 +127,76 @@
       "gstin": "646ghguy"
     },
     {
-      "id": "usr_buyer_1790370389880",
-      "name": "Krish Bhardwaj",
-      "phone": "+91 9631359486",
-      "email": "bhardwajkrish868@gmail.com",
+      "id": "usr_buyer_1790449303210",
+      "name": "KIT KAT",
+      "phone": "+91 7894561236",
+      "email": "ankit123@gmail.com",
       "role": "buyer",
-      "password": "2007",
-      "location": "Vaishali, Bihar",
-      "district": "Vaishali",
+      "password": "Ankit@123",
+      "location": "Buxar, Bihar",
+      "district": "Buxar",
       "state": "Bihar",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1234 5678 9012",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCAC0AIUDASIAAhEBAxEB/8QAHAAAAgEFAQAAAAAAAAAAAAAAAwYAAQIEBQcI/8QAOxAAAQMDAgQEAwYFAwUBAAAAAQIDEQAEBRIhBhMxQSJRYXEHFIEVIzJCkaFSscHR8BZi4QglcrLxgv/EABsBAAEFAQEAAAAAAAAAAAAAAAEAAgMEBQYH/8QAMBEAAQMDAgQEBQQDAAAAAAAAAQACAwQRIRIxBRNBcSJRYZEUgbHR8AYyocFCUuH/2gAMAwEAAhEDEQA/ANxpq0po2mpprsVxRCDoqhTRikVaU0kEHTUKYommoU0bodEAJ3qrggbVfpg1VSJFG+UR+3CElAImKGEQqsiIEVQIkzTgbIOGEJSJjaqhEUUiqBNC+FIRkKzSKrpq8piqpTTbpHdC01UJoumppoEpqHAqVeRUpllIFmlFWkUbTVpRNPCbZBKappoumpppIEIMVNNFKKppopoGUHTU00Upq3TSS2QymppoumqaaCcAN0Ep3qoTRCmppo3Qvd10MiqhNX6arFBFpzdDiqxV0VWKSSGU1KJFSkiszTUIq/TU00E5CKatijFNU0UUCEMpq0poxTVpTSSIQtNU00bT6VQppXQsg6appopRU00UrIUVNNE0VNFBIhD01NFF01NNC6NsIQRvVSmKJpqaaV0LIUVKJpqUbpWWZBqaaviq6TTNSn5ZQtBqaTRdJqkGlqS0FCIq2KOQfKrdNHUhpQoqRRdNU00roaELT6VSBRtAqhR5UrpaULTU00XRU0UroaUGKkUXT6VNNK6WlCCammi6KmihdO0oWmpRdFSlqQ0KP31tb2zly46nlNI1qKfFA9h7VSwyNvkWuYwuYjUk9Uz50t4y6wuLtCjJBAfd+7Gh4tq0EiVHUrQAJnqJ32J67OyZxzbjisZlktJZ3fNzb7QSNi6ABtv3MT2rkT+omRuHNYQO30K6QcJe5gc22VvKpFa2zZzVy58y27jrxhK9BTZu6tomTOw7d59O9EOT5CSu7Yft0AwOY2R+/Sr8HHaSU2D7H1UEnDZmbtWdFTTWPbZOzu45Nw2okxEwf0rLitNlQ14u03VR1ORurNNYeVy2Pwlqq6yN01bMp/Ms9fQDqT6Cs+K85fF7KXl3xbdW1wtZaYMMpVMJGkTpHkSP1ps9Ty23CdFS63WKdcr8dbFrUjGY111WqAt9QSI9hP8ASgM/G15xAWcdbHaSkLUD7dIrjQQ4vxBKj5mKKyrkrSVplKTvq2HtWaa2UndaIooQMtXesN8YMTfkJyFq9YSdPMB5rcxPUDUO/btTxZXltkrZF1ZvofZWJStBkGvOuKW34ueQtelJmEqSnpG6YHn1IgwK33D/ABXc8J3nKsylTWsF5lSioKTHaOh29SOnSrMPEHXtIq83DW21Rrueiqaaut3UXLDbyCClxIUIM7EUTTWpqWVoKDpqafSi6ammldENKFp9KlF01KbdP5ZXDg3fZRq1OUtiyWwtxYQmDA2TrH5ZUCI8t9qzcjikYm6t8laZS8Qh5Cua2uYK9iCCDvIkdOiR1B23TRteKL51IbabuGEgOOQVKUN9J2MfxHf+IeZAZr22slY6zwrqnXnHEKc5zhJWFGJOrrt4dpiBXm3FuJx01SKdovsPTa9/5XpnBqEz0jJCNyTbt5+YwudWWcfxePTftZd5KyoBphbgXKxqOopO46kee4+m9TxpxVZ2Vy2u4Zv0hI8Fw2FgpAGrcEGIV16yImm1H/TibbLYu4OecvLDWtN6C2lK1AgqCgTIMmAZ8++9bDiH/p6wacI4nG5fLMOFSQpu6cQ4l4agAIATHpB79KvycN1bgHuFUNbE9xuPbH5lI1p8WOH3cay/meHVFwDdTGkr0k6U6pg7kHadonemiw4t4Pt3nGW8q9ZkN83lXCpQkHuDvO4IAmfTpSj8X+FcZa8WYuxwVk0xbMttKuG2ydBhalBJ8iQQdhJ9Zmkr7CvC781kDy7MKSFOpXrS4op6oG0mQSAYiOggio3UIieTE5zTvg/dRti5oaXtu3Ym3Xy7lehGHre5Zaetr6zuGnSUocbdGlwgxCT0JntNcM+IvDdxlviBkXVs3DbLXKQv7oqVq5aew7R39RTLiMbe4rHMW9kXHUquG31NaCEFJKDsRsTG5Pv5Uu8S8R3dpkHbh6ztDclwlTetegwAlJHc7AHrToqmsc2z36h0wAfslJwyCF4cFi43hIPlSU2t+5pPRNqoQP39Kl1wdh3HuUq9U2dIJ1o0EHvsf71s+H/irjGtKLpFxj1gHUhD5U0s+Y2JG/amWz4vwV5kEO3V1aIU4ObpuNMKGnSJJEiBt9KrudUh2bj87K7EyCRpyEhXXDmUDGvHupuGEpUfCIKwNzPY7HvS3kra+xt8r5lhxLjStJKkkE+h9fevSGMd4WzSUqtfsvnCSnkkok+ZKTSP8ZrB2/fxtra/evvOC2Uk+IlSpjcdQKmpq6TmiKQKhUUsZjLm7hMvwyefuODLFx8GfGE6iJ0hRHkI8vpTTFL+EyGLwljb4lPMZRbNoQlTiCNZjcx2kmd63TGRs7mA1ctLJ3ACxP6V1tPVxOaA1wK5OWI6ibI0VIq7Y1WBVnmhQlisIqVdA86lLmBLSuVcL3rj7yru3Tu+lK3NZAUpSp0k6e2kt+e895FON4Wk5xpdw42llgK8ZVGlJIEmdhsk1dguAlWtrz2rUWQZS2yWeeF80ggBQVtAEDbalbiReQsrpy5v0XFs0y8laCphKmnE+EaVSCle35T3ryiThstRXB7hZpzc9V6rBxGCGiaGHLRa3Vdzs8zYZtqzatr6wuErBdKWF6yYiNhtG+//ADWDxddZC6t2rS1sH27nVz2krSeWVIjbmD8OonTHUAzsASOBt5azzVwq9s7eztLhAPKet2CwVEKEShO3UT26DdP5t/fcQ5uyxYVkcxflpx1osr5qlA7LMgn8MADvBmN4IHdtjeW3OFxpmax21wm64+FuZzmddus3kLFq8vG0POMWiSQ0ANIBO0SBHcHSryml/ir4fP2vD1u1ccOXanGFK15Vp9S02yirwqS0mDyxqJUdE/QCiq+L68SlasLw/ZqyLyEwNRWpzTJKjpQFLPiPVU77nrWsvPjNeZKzcx+YYbatlLSHW21pLqRJ3SUqnSpQAgSSIPQiTUxiRuTlSRVBc0QFxDSQfY7olzgcriMLbZy/Fwq2u3G2bRpt+XGEqEI1iClPgKpIO3iBjVXP7/hp2/yJsg+q4cYSlvmukkqKQBO5JHtO3Suu8JcWu8bfMIyuOU1j7ZSXbYLtzugmQiUwFCWwdgZkdjvz/jV9HDfG+SCQltrnlwJRAASsBYAjpsoVUmjcweE4G31VuncxxOrNzvnpjr7pSc+HN01lbZp1SVP3jvRKiSfMmn7jr4O/afKcwzbTLjDKEuW42LsDsex96TbPi7NZXiJt/HW/OS2daUBQSdKQdkyRq6nseprreEyufv7I3mTtmmHmX4GlyVLbI/MO3bfvFUpHyNIJVxjInAtaMFIfCvwq4htWmHVBm0WiS6FoIJ32gg7++1M+aumMK+xd3afmX7NJdQhKSVlUpTqTHfcgdNzTy7lCtmEKIEbg1jYbBMZ9m5fv03KbNLqUBbMJ1qkAeMjspRMeaR7UwPdI+7d0WtjjGmTb3Six8XcJfaWbrE3riRrJU82gwE/ihRXMjV9N/KrlZDhnNXzjFm2tLyVctxtgrWsLj+DRBE7atW9Mlxw/gkMqs2XLW6Zxl9rfYdCEO3CNwpBCknUATB/iE+YrLzxxnAZt38Pjk2f2jbDnO27gIlEAFKPw6imZVG8DvJqP4hsgMk7dJuR3sbXxbeyow0bJiI4jqBJAz5d7kY6ZS9jMfl0upTaOXzKUgqVzGitpCQN506oG3kD+9bVr/VBcUE2Fpdt7aVtq5YV06ajvt6U529+5f8SFRZbSoWzZCNlLSImFKiYlW0E9Z2rimAs+Nb3MOPYLIus4q7uHi1c3SVLRCSZUQpMLJUR+ET12G8X+VURNaYX79Dt+fJURSxSasWt63T0/nU2pCbmxvGVnsUbfQzvUrWX178ROHnxjX+H8dlXkJDnPYKy2UK6QokbyFSCNoHYipQ+Prm4Lfp9woDRRf7rpGSuLNH/Yrd1LjwCTcIHVDalTuexI/n6g1zr4q2FnecPLNy9yVta+W5rMbIKjCQQFHw7T3+s5+davsfYh7Ew4UCFoUnWoiZ1Cepk7zNIWc4utMvZrZfxFqq8cQpDlylwNqA2EpBSZIHme3sKg5zqjSWCwaeh7K4dMdwTulThKxYfuk297kLXHNrYVcIcfOkbAHQdwNUkjzJER0re5ZeR4jbYvbaweyVlYNJs7flNOJaUgFSTMJJV94objuO3ZatU5BgpuLC2aQ+4AEuFgKlRWkSkmUjbfYCYJ7EBzxDedu79duchftN3jiuUhx4qUEDVOj1kBPnE7VoPlfpIJ8KqMaA8Foz7pFyGG4iDWPt37S6YWVqZatbi1JSHFT+EFGnckRPSRFZzPBd6Rw2oLtFP3Db1y49eunlupSEqLEQQIQPLcqVuQBHX7bALvpvrHIpt+bJUTboVqXq31oI2UCkAzJGmO1UynBl5lseLK5yFoS298wh9q1LbiHZJKgQoiTJBkEb9Kz3V4uAce6ttpsEpY+E+VfvMDjsMu1S9oW66t5xQ3ggQkidJSlSZQoA+KZ321vxxsWkZS3uA6ldw+wOYiZUAnwhR9CNv/AMmtticRn+GeTa3N7i227D75lq1CiLlwhSZXP4SAZ2G89dhGh4wyV9l8ZkFZu6ZDq3EFpppIKWkpBATMAyVEHqQCTA3q3HSTTP5zR4f4TPjI4gIic+SQuHsepV2FoxV7dx0Noo6wa6Xj139mLddi5kGLcukvWuRIU4hJ6hJEECZ2M/Tvy7H57JYR5BYuHAhskgDv7+dMyfiRkciQ2LMvPL2BQO/1qN7HO8rLRZM1osd10u7yvKbgL1KPhSkdVKOwH60nWnGuXRl8lgW0Xj9u+v5dNlqU4lRTCVqSAJhUKO3TUTM+KmThDDXDxRfZBIXdqHgaTuGidoHmr1/TzPTLbgx3JY9sZHHsqebKSjS5pcAHSdMRG3f3pkAsSGC6ir/HHZxtdcJytweGbi0vrq+WbhAJctShKkoUpStwInUTv2UJ6JgV0TBfEm2v+IrexzGFcx9ldXItbd+1eLiW3QZQ28kiUqG0mZiNoBNav4v2wtcUMW7klpvisPBm5eQgpbBkqEAFREjSme3eN+VYvOWimmrW7uHro2yQlhl9qGo1CRrDmwOkfiED0O9WKejilbZwvY4uLZCzpJ3NEbdtIAxkd/7XpniHiyzQm/tMdkrF/JmyWEC1jU2s+FKiNR3SIJHTt3EoGHy1txddcPWxunMZa41fMSpN0VG6eSUAQmBAlJ3PQKIgVo+GbSyurG3u7e9CbLSA5YHcyImDuY3JHoExBGzN9oNJSzcW7YcXZLJDvJUJJX+ZCkmPCVCQTEA9qrV088TeSxul3nv/AF75Pdb0fDYHN5pkBBA6WHe5ORfGwIXUrLjfEXDQQ1fsrfbA5zSFpKmid/EmSUzvsalcWyGZvL8tsN5e1w6bYFMW6Ur5smZJWVER5dpPnUqc8SaDa31+yzTwyduLX9QRb5ZTq7YOItHEW2ltapUEMkspKvUpE77T6VxfibDZZL1xcX+NuWlqWVqVpJTJM7KAj9K7oEghIbMAbxsAatyFsq8sXrZLimFuoKOYnYonuKxqWpMBva90JYuYN15x4fU1a5S1F1q5IeSVJUAIQVDUIiTIAnft+noC3tWrpz7U+VCDjykWwmEvJITrUQR+WBEEQUmTvFczRwxbWDTqX2EtZxsnlN3Ucl1JIGpJUQmRPcnp0pvwik85hN5ctW2XtrRSWnFL1NOhSCEhRH4khUK2mDO+++lNI158P56qtCC3dOzSUclNwhrlquEpcUkjeSBM+ta7O5T7PtghCvv3dkx2Hc1sC+0Q2hC+YlCEpCx+YARNc/4szLYyV26kalMFNsj/AHEJ1Hb01EfSmcJpG1NZZ2QM/nzR4hUGGnJbucLWZbILC+Q2v71ZlSp3ApY4nxNxe4pKLNJWtp1Li0DqsAHp7GCB6VtbdCypTzpKnXN9+30/zpTZjuHXW8f83dgsNr2TI8Sz2gf1rv6gNdGWHquWp3GN2sDIXD7bE5C+vBbMWry3Vfl0mU+p8q6vwP8ACfJhaHF2waUoeJ57aB5AdabcRa8pTdnZlxAUYJSqSfUydzT/AGivlOVaspGpQ6D9/oP861z0nCwDl2F0EPFy8Xa23qrMDw7a4FpKWUh+7V+dXUf2FMaCbREuLOpfUgbn28hWOh5q1SpUzpEuLA39Ej1NaJfECr+9cVqKGmzBKT19B/n9KlZCGjS0WAUT5nPdqcblA+InwzxfxMxyWLoOsXtuk/K3STKmleqdgpPTYwfIivK/FvA2Y4CzJsclbhhwOFLbgJU1dIiNaZEepBM+MCK9jW2ZS06lkuBKo/B6+UDvQs5ZjN2RaUiyuBMm2uWEOpX5TI2NAxknyTeYALjK8W4fNXLFyzbgNstOKCXNKI1D1imnM8ZZ3hjLqtcTfG2tgEqguFSSoiTKVTv+0AVsPiL8M3OGX3M9i2VixaUFv22+q3M7xO+n9xI6jovZLiXLKxl49jb/AF4O8fYFzar0k81CEqSVIMkCUnpsrRvO1Mm1MOh6ETg/xNTfjONuIMgguv34XchKQtTNmlxJTuU7SmDufOfpUrrXDLHBAxzV5jbM2TN22lzlBDoHftHvv39gKlZL4Lu3aFvsqKWwvAT66ioUoCkGSrf8R2q5dwW1SQdEdz3/AEq0rRy+WhKh27fyrBfedtVoJSFJPTV1/aubLvJNCy1pYvkFm6tWnUnfS6kKH71jf6Uwlvc/MIxNilwxuGUnSeu20CsizuW7tKvu06vMGD/esskJkrB0+n+TRa42tdIjqgPOotLdbxV900kqVAE6QO36VzX5S6zt44tDTjmhxbiiB4RqOob9O8D2Apw4zvQzYtWjRJN24EwkwdIIJg/pVcFaJtLFlpCQNay6vSOqt9v5V2P6cp+XEZzu7A7D/qxOKy63iPoEbhrg+1trkP3EXCmoPiEJB9B3+tWcQZb7TvyGVarZnwpI6E9z/nlW1zVwrF4NYQSlThCSodif+Af2pUwrKspeotwNDe6nFk/hQOpntt+5roWAuJkd0WLUOsBE3qm/hqzFlZHIPSVvQGkd47R6k/tFblb6cTaO3dyQXlpKlx1SgbwP5e5qWjQd0PqQENIGlhEfhT5+5/l9a0+df+cvbS1UZRcXLbRH+wHUr+lQnxuyrTQI2ABZmcyS7DGtMvKKXeWHXwDtzFiSPoBpHvS1ZXxQ80lUfdNqu3QTAUoiQP8A1j2o3GF4by6u1JkSGwRPQyU0p390Wre8ck6iQJmCBqotYNOeqa6Q37JxayZfUVlyVKMqVO5NMmFyxJ5a5U4PIEyIrkWIzTrj6GGyAtwgAq/CgefsKdsXfIUltbK1ctJ2J6uEdac9mLINkIN09ZnDMZqwdPLSt5bZbLUSHUnYpV6RI3rzFxzwHccIP3LmIQ65hL9uHdUKDELSQgq9wIJ6jbeJr1Li8h8wlBSQARISNyB9KWeNOHrW4W5bXDQNne+KP4Vggz9DBFUzHrBjO/RTGTlkSDbr90m8BWDn+jcUHnFSGdgRBAnp6/52iJTIhlu2QlhEhLYCQB2AG3SpXJPrJWuI2XQMiYWgoTbiFJ1kBQHSR0rGurx1TqeUzMiCojYetFSh9CEpWGymIPYxROUkJ0wNJ7kViZsrAWC3eG2CkqQlatW8bgVtWXg41MbdqxSwluVoSmTspOkf5/8AaKFqU0SSECPy9qLbolK/Ezhe4nsLcj7ptnmkbTJUQf2T51v8APmLhWvcpM+XXf8AvSk+4bniK+0rK2woJG87pABj6yP1pywaEW1o7cr0pSAVKUT0A/8AlekUEfKpGD0H85XLzu1zuPr9FpuPMiDdNWaY0sIlf/kreP001lcD48LZL7gB5viX/wCIPT6qH7UiZG9cvbt24cIl1wrIHbcmK6jgEG0xlu2T41JSVEeQG39/rWi8aGBqz4/HKXlb5b/hWQQNKdqX34+3LIHqwlx0+5gCtwtYKFAmPpWoTLt288vppKQf0qsMBXTlarJwoQrZS3C4rf8AKKTc+sOt3amyAlOpYjvG/wDSmPiJ4pQ6QojcIH+4f5NK11DrakExrBTPvTxsCojkkLTW14UoQtlZQXjpUR1Ce4/SR9ad+Hb1brQUspRsEpSP4R5elc5w6tV6to7aGiYJ2mf+Kb8JkDbvCBqcMAKV29vKpDYqMi2V1vh28UgckAJ7idvf3pjy1iMpiHUSVONp5jYA/MB0+u4j1pAw95ynUug6ij1roWKukFCBq1z4thPWqUtwQ4K1FZ7S0pHSBcISdQChsZ8qlZ/ElgcdkFqCVBl8laDH6j6E/pFSopOF01Q4ykZKY3iE0A5XktQFnUQTO01ehZUCntUqV5w1dYgOSTy5ISTvWJzFJICSUidOxPp/epUpJzUr4nxZB5Z6qK1k+pVTZmVqteE3y2YKkBJnyKgk/tUqV6s3ZvyXHu/z+aQLZpLt20hU6S4kH1GoV1FpRDkDoAAPSpUqWfdVqfZZilEMmD1FYiwEhQGwNSpVZyuhI/ErqtbSOxlR95itC8TqSPWpUov/AGhRjdLNiSniW6QD4dJ/9qYGyUOyO1SpRad0HJ6wFwty1aKoJPUke396f+HrhzkpGr8KtI9qlSonbFOi3TEQl1tKnUIcP+8THtUqVKpkq1Zf/9k=",
-      "gstin": "",
-      "preferredMandi": "Hajipur Krishi Utpadan Mandi Samiti, Vaishali",
-      "farmSizeAcres": 20
-    },
-    {
-      "id": "usr_buyer_1790448537989",
-      "name": "KRISH BHARDWAJ",
-      "phone": "+91 8809845947",
-      "email": "bhardwajkrish621@gmail.com",
-      "role": "buyer",
-      "password": "2007",
-      "location": "Vaishali, Bihar",
-      "district": "Vaishali",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1541 4165 4868",
+      "aadhaarNumber": "5465 4546 5454",
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "KRISH BHARDWAJ AGRO BUYER"
+      "businessName": "HOTEL HILLTOWN",
+      "gstin": "44564BJDCBJB4146"
     },
     {
-      "id": "usr_collection_centre_1789738899022",
-      "name": "Krish Bhardwaj",
-      "phone": "+91 9631359486",
-      "email": "bhardwajkrish868@gmail.com",
-      "role": "collection_centre",
-      "location": "Nashik, Maharashtra",
-      "district": "Nashik",
-      "state": "Maharashtra",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1234 5678 9012",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "data:image/jpeg;base64,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",
-      "hubName": "Nashik Hub",
-      "password": "2007"
-    },
-    {
-      "id": "usr_farmer_1790344684960",
-      "name": "fafuyfua",
-      "phone": "+91 5465464885",
-      "email": "fafuyfua@farm2future.in",
-      "role": "farmer",
-      "password": "prashnat100",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "4654 6546 4654",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_buyer_1790493224601",
-      "name": "cap01",
+      "id": "usr_farmer_1790532496880",
+      "name": "captain",
       "phone": "+91 9431369829",
-      "email": "cap01@farm2future.in",
-      "role": "buyer",
-      "password": "2006",
+      "email": "captain@farm2future.in",
+      "role": "farmer",
+      "password": "prashant001",
       "location": "Bokaro, Jharkhand",
       "district": "Bokaro",
       "state": "Jharkhand",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "2159 8498 4546",
+      "aadhaarNumber": "2165 6468 4686",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "krishkbc",
-      "gstin": "46ghhghhvh"
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 100
     },
     {
-      "id": "usr_buyer_1790344074689",
-      "name": "cutm",
-      "phone": "+91 6564654684",
-      "email": "cutm@farm2future.in",
+      "id": "usr_buyer_1790534660861",
+      "name": "Ankit Kumar Mahato",
+      "phone": "+91 9631289876",
+      "email": "ankit9631289876@gmail.com",
       "role": "buyer",
-      "password": "prashnat100",
-      "location": "Nashik, Maharashtra",
-      "district": "Nashik",
-      "state": "Maharashtra",
+      "password": "Ankit@123",
+      "location": "Ranchi, Jharkhand",
+      "district": "Ranchi",
+      "state": "Jharkhand",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1156 4846 5454",
+      "aadhaarNumber": "1165 4654 6655",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "gdfddy",
-      "gstin": "hgfft546"
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "businessName": "Ankit Kumar Mahato Agro Buyer"
     },
     {
-      "id": "usr_farmer_1790448537989",
-      "name": "KRISH BHARDWAJ",
-      "phone": "+91 8809845947",
-      "email": "bhardwajkrish621@gmail.com",
-      "role": "farmer",
+      "id": "usr_admin_1790345133665",
+      "name": "Krish Bhardwaj",
+      "phone": "+91 9631359486",
+      "email": "bhardwajkrish868@gmail.com",
+      "role": "admin",
       "password": "2007",
       "location": "Vaishali, Bihar",
       "district": "Vaishali",
       "state": "Bihar",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1541 4165 4868",
+      "aadhaarNumber": "1234 5678 9012",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
+      "avatar": "data:image/jpeg;base64,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"
     },
     {
       "id": "usr_farmer_1790343170363",
@@ -368,6 +273,118 @@
       "gstin": "gfg4"
     },
     {
+      "id": "usr_buyer_1790493224601",
+      "name": "cap01",
+      "phone": "+91 9431369829",
+      "email": "cap01@farm2future.in",
+      "role": "buyer",
+      "password": "2006",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "2159 8498 4546",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "krishkbc",
+      "gstin": "46ghhghhvh"
+    },
+    {
+      "id": "usr_buyer_1790344074689",
+      "name": "cutm",
+      "phone": "+91 6564654684",
+      "email": "cutm@farm2future.in",
+      "role": "buyer",
+      "password": "prashnat100",
+      "location": "Nashik, Maharashtra",
+      "district": "Nashik",
+      "state": "Maharashtra",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1156 4846 5454",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "gdfddy",
+      "gstin": "hgfft546"
+    },
+    {
+      "id": "usr_farmer_1790448537989",
+      "name": "KRISH BHARDWAJ",
+      "phone": "+91 8809845947",
+      "email": "bhardwajkrish621@gmail.com",
+      "role": "farmer",
+      "password": "2007",
+      "location": "Vaishali, Bihar",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1541 4165 4868",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 5
+    },
+    {
+      "id": "usr_buyer_1790370389880",
+      "name": "Krish Bhardwaj",
+      "phone": "+91 9631359486",
+      "email": "bhardwajkrish868@gmail.com",
+      "role": "buyer",
+      "password": "2007",
+      "location": "Vaishali, Bihar",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1234 5678 9012",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "data:image/jpeg;base64,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",
+      "gstin": "",
+      "preferredMandi": "Hajipur Krishi Utpadan Mandi Samiti, Vaishali",
+      "farmSizeAcres": 20
+    },
+    {
+      "id": "usr_buyer_1790448537989",
+      "name": "KRISH BHARDWAJ",
+      "phone": "+91 8809845947",
+      "email": "bhardwajkrish621@gmail.com",
+      "role": "buyer",
+      "password": "2007",
+      "location": "Vaishali, Bihar",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1541 4165 4868",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "KRISH BHARDWAJ AGRO BUYER"
+    },
+    {
+      "id": "usr_collection_centre_1789738899022",
+      "name": "Krish Bhardwaj",
+      "phone": "+91 9631359486",
+      "email": "bhardwajkrish868@gmail.com",
+      "role": "collection_centre",
+      "location": "Nashik, Maharashtra",
+      "district": "Nashik",
+      "state": "Maharashtra",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1234 5678 9012",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCAC0AIUDASIAAhEBAxEB/8QAHAAAAgEFAQAAAAAAAAAAAAAAAwYAAQIEBQcI/8QAOxAAAQMDAgQEAwYFAwUBAAAAAQIDEQAEBRIhBhMxQSJRYXEHFIEVIzJCkaFSscHR8BZi4QglcrLxgv/EABsBAAEFAQEAAAAAAAAAAAAAAAEAAgMEBQYH/8QAMBEAAQMDAgQEBQQDAAAAAAAAAQACAwQRIRIxBRNBcSJRYZEUgbHR8AYyocFCUuH/2gAMAwEAAhEDEQA/ANxpq0po2mpprsVxRCDoqhTRikVaU0kEHTUKYommoU0bodEAJ3qrggbVfpg1VSJFG+UR+3CElAImKGEQqsiIEVQIkzTgbIOGEJSJjaqhEUUiqBNC+FIRkKzSKrpq8piqpTTbpHdC01UJoumppoEpqHAqVeRUpllIFmlFWkUbTVpRNPCbZBKappoumpppIEIMVNNFKKppopoGUHTU00Upq3TSS2QymppoumqaaCcAN0Ep3qoTRCmppo3Qvd10MiqhNX6arFBFpzdDiqxV0VWKSSGU1KJFSkiszTUIq/TU00E5CKatijFNU0UUCEMpq0poxTVpTSSIQtNU00bT6VQppXQsg6appopRU00UrIUVNNE0VNFBIhD01NFF01NNC6NsIQRvVSmKJpqaaV0LIUVKJpqUbpWWZBqaaviq6TTNSn5ZQtBqaTRdJqkGlqS0FCIq2KOQfKrdNHUhpQoqRRdNU00roaELT6VSBRtAqhR5UrpaULTU00XRU0UroaUGKkUXT6VNNK6WlCCammi6KmihdO0oWmpRdFSlqQ0KP31tb2zly46nlNI1qKfFA9h7VSwyNvkWuYwuYjUk9Uz50t4y6wuLtCjJBAfd+7Gh4tq0EiVHUrQAJnqJ32J67OyZxzbjisZlktJZ3fNzb7QSNi6ABtv3MT2rkT+omRuHNYQO30K6QcJe5gc22VvKpFa2zZzVy58y27jrxhK9BTZu6tomTOw7d59O9EOT5CSu7Yft0AwOY2R+/Sr8HHaSU2D7H1UEnDZmbtWdFTTWPbZOzu45Nw2okxEwf0rLitNlQ14u03VR1ORurNNYeVy2Pwlqq6yN01bMp/Ms9fQDqT6Cs+K85fF7KXl3xbdW1wtZaYMMpVMJGkTpHkSP1ps9Ty23CdFS63WKdcr8dbFrUjGY111WqAt9QSI9hP8ASgM/G15xAWcdbHaSkLUD7dIrjQQ4vxBKj5mKKyrkrSVplKTvq2HtWaa2UndaIooQMtXesN8YMTfkJyFq9YSdPMB5rcxPUDUO/btTxZXltkrZF1ZvofZWJStBkGvOuKW34ueQtelJmEqSnpG6YHn1IgwK33D/ABXc8J3nKsylTWsF5lSioKTHaOh29SOnSrMPEHXtIq83DW21Rrueiqaaut3UXLDbyCClxIUIM7EUTTWpqWVoKDpqafSi6ammldENKFp9KlF01KbdP5ZXDg3fZRq1OUtiyWwtxYQmDA2TrH5ZUCI8t9qzcjikYm6t8laZS8Qh5Cua2uYK9iCCDvIkdOiR1B23TRteKL51IbabuGEgOOQVKUN9J2MfxHf+IeZAZr22slY6zwrqnXnHEKc5zhJWFGJOrrt4dpiBXm3FuJx01SKdovsPTa9/5XpnBqEz0jJCNyTbt5+YwudWWcfxePTftZd5KyoBphbgXKxqOopO46kee4+m9TxpxVZ2Vy2u4Zv0hI8Fw2FgpAGrcEGIV16yImm1H/TibbLYu4OecvLDWtN6C2lK1AgqCgTIMmAZ8++9bDiH/p6wacI4nG5fLMOFSQpu6cQ4l4agAIATHpB79KvycN1bgHuFUNbE9xuPbH5lI1p8WOH3cay/meHVFwDdTGkr0k6U6pg7kHadonemiw4t4Pt3nGW8q9ZkN83lXCpQkHuDvO4IAmfTpSj8X+FcZa8WYuxwVk0xbMttKuG2ydBhalBJ8iQQdhJ9Zmkr7CvC781kDy7MKSFOpXrS4op6oG0mQSAYiOggio3UIieTE5zTvg/dRti5oaXtu3Ym3Xy7lehGHre5Zaetr6zuGnSUocbdGlwgxCT0JntNcM+IvDdxlviBkXVs3DbLXKQv7oqVq5aew7R39RTLiMbe4rHMW9kXHUquG31NaCEFJKDsRsTG5Pv5Uu8S8R3dpkHbh6ztDclwlTetegwAlJHc7AHrToqmsc2z36h0wAfslJwyCF4cFi43hIPlSU2t+5pPRNqoQP39Kl1wdh3HuUq9U2dIJ1o0EHvsf71s+H/irjGtKLpFxj1gHUhD5U0s+Y2JG/amWz4vwV5kEO3V1aIU4ObpuNMKGnSJJEiBt9KrudUh2bj87K7EyCRpyEhXXDmUDGvHupuGEpUfCIKwNzPY7HvS3kra+xt8r5lhxLjStJKkkE+h9fevSGMd4WzSUqtfsvnCSnkkok+ZKTSP8ZrB2/fxtra/evvOC2Uk+IlSpjcdQKmpq6TmiKQKhUUsZjLm7hMvwyefuODLFx8GfGE6iJ0hRHkI8vpTTFL+EyGLwljb4lPMZRbNoQlTiCNZjcx2kmd63TGRs7mA1ctLJ3ACxP6V1tPVxOaA1wK5OWI6ibI0VIq7Y1WBVnmhQlisIqVdA86lLmBLSuVcL3rj7yru3Tu+lK3NZAUpSp0k6e2kt+e895FON4Wk5xpdw42llgK8ZVGlJIEmdhsk1dguAlWtrz2rUWQZS2yWeeF80ggBQVtAEDbalbiReQsrpy5v0XFs0y8laCphKmnE+EaVSCle35T3ryiThstRXB7hZpzc9V6rBxGCGiaGHLRa3Vdzs8zYZtqzatr6wuErBdKWF6yYiNhtG+//ADWDxddZC6t2rS1sH27nVz2krSeWVIjbmD8OonTHUAzsASOBt5azzVwq9s7eztLhAPKet2CwVEKEShO3UT26DdP5t/fcQ5uyxYVkcxflpx1osr5qlA7LMgn8MADvBmN4IHdtjeW3OFxpmax21wm64+FuZzmddus3kLFq8vG0POMWiSQ0ANIBO0SBHcHSryml/ir4fP2vD1u1ccOXanGFK15Vp9S02yirwqS0mDyxqJUdE/QCiq+L68SlasLw/ZqyLyEwNRWpzTJKjpQFLPiPVU77nrWsvPjNeZKzcx+YYbatlLSHW21pLqRJ3SUqnSpQAgSSIPQiTUxiRuTlSRVBc0QFxDSQfY7olzgcriMLbZy/Fwq2u3G2bRpt+XGEqEI1iClPgKpIO3iBjVXP7/hp2/yJsg+q4cYSlvmukkqKQBO5JHtO3Suu8JcWu8bfMIyuOU1j7ZSXbYLtzugmQiUwFCWwdgZkdjvz/jV9HDfG+SCQltrnlwJRAASsBYAjpsoVUmjcweE4G31VuncxxOrNzvnpjr7pSc+HN01lbZp1SVP3jvRKiSfMmn7jr4O/afKcwzbTLjDKEuW42LsDsex96TbPi7NZXiJt/HW/OS2daUBQSdKQdkyRq6nseprreEyufv7I3mTtmmHmX4GlyVLbI/MO3bfvFUpHyNIJVxjInAtaMFIfCvwq4htWmHVBm0WiS6FoIJ32gg7++1M+aumMK+xd3afmX7NJdQhKSVlUpTqTHfcgdNzTy7lCtmEKIEbg1jYbBMZ9m5fv03KbNLqUBbMJ1qkAeMjspRMeaR7UwPdI+7d0WtjjGmTb3Six8XcJfaWbrE3riRrJU82gwE/ihRXMjV9N/KrlZDhnNXzjFm2tLyVctxtgrWsLj+DRBE7atW9Mlxw/gkMqs2XLW6Zxl9rfYdCEO3CNwpBCknUATB/iE+YrLzxxnAZt38Pjk2f2jbDnO27gIlEAFKPw6imZVG8DvJqP4hsgMk7dJuR3sbXxbeyow0bJiI4jqBJAz5d7kY6ZS9jMfl0upTaOXzKUgqVzGitpCQN506oG3kD+9bVr/VBcUE2Fpdt7aVtq5YV06ajvt6U529+5f8SFRZbSoWzZCNlLSImFKiYlW0E9Z2rimAs+Nb3MOPYLIus4q7uHi1c3SVLRCSZUQpMLJUR+ET12G8X+VURNaYX79Dt+fJURSxSasWt63T0/nU2pCbmxvGVnsUbfQzvUrWX178ROHnxjX+H8dlXkJDnPYKy2UK6QokbyFSCNoHYipQ+Prm4Lfp9woDRRf7rpGSuLNH/Yrd1LjwCTcIHVDalTuexI/n6g1zr4q2FnecPLNy9yVta+W5rMbIKjCQQFHw7T3+s5+davsfYh7Ew4UCFoUnWoiZ1Cepk7zNIWc4utMvZrZfxFqq8cQpDlylwNqA2EpBSZIHme3sKg5zqjSWCwaeh7K4dMdwTulThKxYfuk297kLXHNrYVcIcfOkbAHQdwNUkjzJER0re5ZeR4jbYvbaweyVlYNJs7flNOJaUgFSTMJJV94objuO3ZatU5BgpuLC2aQ+4AEuFgKlRWkSkmUjbfYCYJ7EBzxDedu79duchftN3jiuUhx4qUEDVOj1kBPnE7VoPlfpIJ8KqMaA8Foz7pFyGG4iDWPt37S6YWVqZatbi1JSHFT+EFGnckRPSRFZzPBd6Rw2oLtFP3Db1y49eunlupSEqLEQQIQPLcqVuQBHX7bALvpvrHIpt+bJUTboVqXq31oI2UCkAzJGmO1UynBl5lseLK5yFoS298wh9q1LbiHZJKgQoiTJBkEb9Kz3V4uAce6ttpsEpY+E+VfvMDjsMu1S9oW66t5xQ3ggQkidJSlSZQoA+KZ321vxxsWkZS3uA6ldw+wOYiZUAnwhR9CNv/AMmtticRn+GeTa3N7i227D75lq1CiLlwhSZXP4SAZ2G89dhGh4wyV9l8ZkFZu6ZDq3EFpppIKWkpBATMAyVEHqQCTA3q3HSTTP5zR4f4TPjI4gIic+SQuHsepV2FoxV7dx0Noo6wa6Xj139mLddi5kGLcukvWuRIU4hJ6hJEECZ2M/Tvy7H57JYR5BYuHAhskgDv7+dMyfiRkciQ2LMvPL2BQO/1qN7HO8rLRZM1osd10u7yvKbgL1KPhSkdVKOwH60nWnGuXRl8lgW0Xj9u+v5dNlqU4lRTCVqSAJhUKO3TUTM+KmThDDXDxRfZBIXdqHgaTuGidoHmr1/TzPTLbgx3JY9sZHHsqebKSjS5pcAHSdMRG3f3pkAsSGC6ir/HHZxtdcJytweGbi0vrq+WbhAJctShKkoUpStwInUTv2UJ6JgV0TBfEm2v+IrexzGFcx9ldXItbd+1eLiW3QZQ28kiUqG0mZiNoBNav4v2wtcUMW7klpvisPBm5eQgpbBkqEAFREjSme3eN+VYvOWimmrW7uHro2yQlhl9qGo1CRrDmwOkfiED0O9WKejilbZwvY4uLZCzpJ3NEbdtIAxkd/7XpniHiyzQm/tMdkrF/JmyWEC1jU2s+FKiNR3SIJHTt3EoGHy1txddcPWxunMZa41fMSpN0VG6eSUAQmBAlJ3PQKIgVo+GbSyurG3u7e9CbLSA5YHcyImDuY3JHoExBGzN9oNJSzcW7YcXZLJDvJUJJX+ZCkmPCVCQTEA9qrV088TeSxul3nv/AF75Pdb0fDYHN5pkBBA6WHe5ORfGwIXUrLjfEXDQQ1fsrfbA5zSFpKmid/EmSUzvsalcWyGZvL8tsN5e1w6bYFMW6Ur5smZJWVER5dpPnUqc8SaDa31+yzTwyduLX9QRb5ZTq7YOItHEW2ltapUEMkspKvUpE77T6VxfibDZZL1xcX+NuWlqWVqVpJTJM7KAj9K7oEghIbMAbxsAatyFsq8sXrZLimFuoKOYnYonuKxqWpMBva90JYuYN15x4fU1a5S1F1q5IeSVJUAIQVDUIiTIAnft+noC3tWrpz7U+VCDjykWwmEvJITrUQR+WBEEQUmTvFczRwxbWDTqX2EtZxsnlN3Ucl1JIGpJUQmRPcnp0pvwik85hN5ctW2XtrRSWnFL1NOhSCEhRH4khUK2mDO+++lNI158P56qtCC3dOzSUclNwhrlquEpcUkjeSBM+ta7O5T7PtghCvv3dkx2Hc1sC+0Q2hC+YlCEpCx+YARNc/4szLYyV26kalMFNsj/AHEJ1Hb01EfSmcJpG1NZZ2QM/nzR4hUGGnJbucLWZbILC+Q2v71ZlSp3ApY4nxNxe4pKLNJWtp1Li0DqsAHp7GCB6VtbdCypTzpKnXN9+30/zpTZjuHXW8f83dgsNr2TI8Sz2gf1rv6gNdGWHquWp3GN2sDIXD7bE5C+vBbMWry3Vfl0mU+p8q6vwP8ACfJhaHF2waUoeJ57aB5AdabcRa8pTdnZlxAUYJSqSfUydzT/AGivlOVaspGpQ6D9/oP861z0nCwDl2F0EPFy8Xa23qrMDw7a4FpKWUh+7V+dXUf2FMaCbREuLOpfUgbn28hWOh5q1SpUzpEuLA39Ej1NaJfECr+9cVqKGmzBKT19B/n9KlZCGjS0WAUT5nPdqcblA+InwzxfxMxyWLoOsXtuk/K3STKmleqdgpPTYwfIivK/FvA2Y4CzJsclbhhwOFLbgJU1dIiNaZEepBM+MCK9jW2ZS06lkuBKo/B6+UDvQs5ZjN2RaUiyuBMm2uWEOpX5TI2NAxknyTeYALjK8W4fNXLFyzbgNstOKCXNKI1D1imnM8ZZ3hjLqtcTfG2tgEqguFSSoiTKVTv+0AVsPiL8M3OGX3M9i2VixaUFv22+q3M7xO+n9xI6jovZLiXLKxl49jb/AF4O8fYFzar0k81CEqSVIMkCUnpsrRvO1Mm1MOh6ETg/xNTfjONuIMgguv34XchKQtTNmlxJTuU7SmDufOfpUrrXDLHBAxzV5jbM2TN22lzlBDoHftHvv39gKlZL4Lu3aFvsqKWwvAT66ioUoCkGSrf8R2q5dwW1SQdEdz3/AEq0rRy+WhKh27fyrBfedtVoJSFJPTV1/aubLvJNCy1pYvkFm6tWnUnfS6kKH71jf6Uwlvc/MIxNilwxuGUnSeu20CsizuW7tKvu06vMGD/esskJkrB0+n+TRa42tdIjqgPOotLdbxV900kqVAE6QO36VzX5S6zt44tDTjmhxbiiB4RqOob9O8D2Apw4zvQzYtWjRJN24EwkwdIIJg/pVcFaJtLFlpCQNay6vSOqt9v5V2P6cp+XEZzu7A7D/qxOKy63iPoEbhrg+1trkP3EXCmoPiEJB9B3+tWcQZb7TvyGVarZnwpI6E9z/nlW1zVwrF4NYQSlThCSodif+Af2pUwrKspeotwNDe6nFk/hQOpntt+5roWAuJkd0WLUOsBE3qm/hqzFlZHIPSVvQGkd47R6k/tFblb6cTaO3dyQXlpKlx1SgbwP5e5qWjQd0PqQENIGlhEfhT5+5/l9a0+df+cvbS1UZRcXLbRH+wHUr+lQnxuyrTQI2ABZmcyS7DGtMvKKXeWHXwDtzFiSPoBpHvS1ZXxQ80lUfdNqu3QTAUoiQP8A1j2o3GF4by6u1JkSGwRPQyU0p390Wre8ck6iQJmCBqotYNOeqa6Q37JxayZfUVlyVKMqVO5NMmFyxJ5a5U4PIEyIrkWIzTrj6GGyAtwgAq/CgefsKdsXfIUltbK1ctJ2J6uEdac9mLINkIN09ZnDMZqwdPLSt5bZbLUSHUnYpV6RI3rzFxzwHccIP3LmIQ65hL9uHdUKDELSQgq9wIJ6jbeJr1Li8h8wlBSQARISNyB9KWeNOHrW4W5bXDQNne+KP4Vggz9DBFUzHrBjO/RTGTlkSDbr90m8BWDn+jcUHnFSGdgRBAnp6/52iJTIhlu2QlhEhLYCQB2AG3SpXJPrJWuI2XQMiYWgoTbiFJ1kBQHSR0rGurx1TqeUzMiCojYetFSh9CEpWGymIPYxROUkJ0wNJ7kViZsrAWC3eG2CkqQlatW8bgVtWXg41MbdqxSwluVoSmTspOkf5/8AaKFqU0SSECPy9qLbolK/Ezhe4nsLcj7ptnmkbTJUQf2T51v8APmLhWvcpM+XXf8AvSk+4bniK+0rK2woJG87pABj6yP1pywaEW1o7cr0pSAVKUT0A/8AlekUEfKpGD0H85XLzu1zuPr9FpuPMiDdNWaY0sIlf/kreP001lcD48LZL7gB5viX/wCIPT6qH7UiZG9cvbt24cIl1wrIHbcmK6jgEG0xlu2T41JSVEeQG39/rWi8aGBqz4/HKXlb5b/hWQQNKdqX34+3LIHqwlx0+5gCtwtYKFAmPpWoTLt288vppKQf0qsMBXTlarJwoQrZS3C4rf8AKKTc+sOt3amyAlOpYjvG/wDSmPiJ4pQ6QojcIH+4f5NK11DrakExrBTPvTxsCojkkLTW14UoQtlZQXjpUR1Ce4/SR9ad+Hb1brQUspRsEpSP4R5elc5w6tV6to7aGiYJ2mf+Kb8JkDbvCBqcMAKV29vKpDYqMi2V1vh28UgckAJ7idvf3pjy1iMpiHUSVONp5jYA/MB0+u4j1pAw95ynUug6ij1roWKukFCBq1z4thPWqUtwQ4K1FZ7S0pHSBcISdQChsZ8qlZ/ElgcdkFqCVBl8laDH6j6E/pFSopOF01Q4ykZKY3iE0A5XktQFnUQTO01ehZUCntUqV5w1dYgOSTy5ISTvWJzFJICSUidOxPp/epUpJzUr4nxZB5Z6qK1k+pVTZmVqteE3y2YKkBJnyKgk/tUqV6s3ZvyXHu/z+aQLZpLt20hU6S4kH1GoV1FpRDkDoAAPSpUqWfdVqfZZilEMmD1FYiwEhQGwNSpVZyuhI/ErqtbSOxlR95itC8TqSPWpUov/AGhRjdLNiSniW6QD4dJ/9qYGyUOyO1SpRad0HJ6wFwty1aKoJPUke396f+HrhzkpGr8KtI9qlSonbFOi3TEQl1tKnUIcP+8THtUqVKpkq1Zf/9k=",
+      "hubName": "Nashik Hub",
+      "password": "2007"
+    },
+    {
       "id": "usr_admin_1790489016351",
       "name": "Ankit Kumar Mahato",
       "phone": "+91 9631289876",
@@ -401,23 +418,6 @@
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
       "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_admin_1790345133665",
-      "name": "Krish Bhardwaj",
-      "phone": "+91 9631359486",
-      "email": "bhardwajkrish868@gmail.com",
-      "role": "admin",
-      "password": "2007",
-      "location": "Vaishali, Bihar",
-      "district": "Vaishali",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1234 5678 9012",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "data:image/jpeg;base64,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"
     }
   ],
   "listings": [
@@ -430,7 +430,7 @@
       "cropName": "Red Onion (Special Grade)",
       "category": "Vegetables",
       "variety": "Grade A Quality Harvest",
-      "quantity": 60,
+      "quantity": 100,
       "unit": "Kg",
       "qualityGrade": "Grade A+",
       "pricePerUnit": 10,
@@ -952,6 +952,339 @@
   ],
   "notifications": [
     {
+      "recipientRole": "farmer",
+      "title": "Harvest Consignment Dispatched!",
+      "message": "Your crop consignment (Order #F2F-ORD-9374) has been loaded onto truck PB-10-CZ-4521 and is en route to the buyer.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556695856_2u8y",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556982855_tae2",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle UK-07-BC-1122 (Trilok Rawat) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-5890",
+      "id": "notif_1790526686810_1m7w",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "title": "Listing Removed",
+      "message": "Listing #LST-144404-231 (Tomato) was delisted and permanently removed.",
+      "type": "alert",
+      "recipientRole": "all",
+      "id": "notif_1790448716778_uttq",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790446127421",
+      "title": "Supply Confirmed: 10 Tons for mango",
+      "message": "captain (Jharkhand) confirmed 10 Tons towards your BLK-2026-100MAN order. Total committed: 35/100T.",
+      "type": "order",
+      "id": "notif_1790532580356_tys0",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790370389880",
+      "title": "Order Confirmed & AI Truck Assigned (F2F-ORD-8209)",
+      "message": "AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre) with 99.4% match score. Delivery fee of ₹48 secured in escrow.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7962",
+      "linkTab": "track_delivery",
+      "id": "notif_1790552905956_ni2q",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "title": "Order #F2F-ORD-9139 Removed",
+      "message": "Order #F2F-ORD-9139 (Cauliflower & Green Peas) was permanently deleted from database.",
+      "type": "alert",
+      "recipientRole": "admin",
+      "id": "notif_1790541001482_bf59",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1790532496880",
+      "title": "Supply Confirmed: 25 Tons (mango)",
+      "message": "Your produce batch of 25 Tons for BLK-2026-100MAN (mango) is confirmed! Guaranteed Payout: ₹66,250.",
+      "type": "order",
+      "id": "notif_1790532540038_gres",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "title": "Bulk Order Deleted",
+      "message": "Bulk order #BLK-2026-50WOW (wow momos) was permanently removed from database.",
+      "type": "alert",
+      "recipientRole": "all",
+      "id": "notif_1790515943645_b93b",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790446127421",
+      "title": "Supply Confirmed: 25 Tons for mango",
+      "message": "captain (Jharkhand) confirmed 25 Tons towards your BLK-2026-100MAN order. Total committed: 25/100T.",
+      "type": "order",
+      "id": "notif_1790532539858_5btm",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "collection_centre",
+      "title": "AI Fleet Dispatched: MH-15-DC-2290",
+      "message": "AI auto-assigned Tata Ace Gold Diesel Plus (Driver: Sanjay Bhamre) for order F2F-ORD-8209.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7962",
+      "linkTab": "incoming",
+      "id": "notif_1790552905955_l24u",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "title": "Listing Removed by Admin",
+      "message": "Listing #LST-VEG-BR-02 (Potato) was removed by Admin.",
+      "type": "alert",
+      "recipientRole": "all",
+      "id": "notif_1790492612802_cth0",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "collection_centre",
+      "recipientId": "usr_collection_centre_1789738899022",
+      "title": "Supply Confirmed: 50 Tons (wow momos)",
+      "message": "Your produce batch of 50 Tons for BLK-2026-50WOW (wow momos) is confirmed! Guaranteed Payout: ₹1,32,500.",
+      "type": "order",
+      "id": "notif_1790494860190_eko9",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "New Crop Available on Marketplace",
+      "message": "Krish Bhardwaj listed 60 Kg of Yellow Maize (Makka) (Grade A Quality Harvest).",
+      "type": "market",
+      "id": "notif_1790552841825_dylc",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Harvest Consignment Dispatched!",
+      "message": "Your crop consignment (Order #F2F-ORD-8209) has been loaded onto truck AS-01-TY-4422 and is en route to the buyer.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7962",
+      "id": "notif_1790556994057_aje2",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_mh_01",
+      "title": "Payment Disbursed: ₹84,710",
+      "message": "Order F2F-ORD-7721 delivered successfully. Escrow funds transferred to your bank account.",
+      "type": "payment",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790453195893_4x2n",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "collection_centre",
+      "title": "AI Fleet Dispatched: MH-15-DC-2290",
+      "message": "AI auto-assigned Tata Ace Gold Diesel Plus (Driver: Sanjay Bhamre) for order F2F-ORD-9374.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "linkTab": "incoming",
+      "id": "notif_1790555797549_xglw",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790370389880",
+      "title": "Delivery Completed: F2F-ORD-1489",
+      "message": "Order marked as received. Thank you for using Farm2Future Direct Supply Chain!",
+      "type": "delivery",
+      "orderId": "ORD-2026-5592",
+      "id": "notif_1790453204068_nyzp",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-19 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7962",
+      "id": "notif_1790556994057_ubdm",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1790532496880",
+      "title": "Supply Confirmed: 10 Tons (mango)",
+      "message": "Your produce batch of 10 Tons for BLK-2026-100MAN (mango) is confirmed! Guaranteed Payout: ₹26,500.",
+      "type": "order",
+      "id": "notif_1790532580366_ac8h",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1790199790561",
+      "title": "New Order Received for Yellow Maize (Makka)!",
+      "message": "Krish Bhardwaj ordered 50 Kg. Net farmer payout ₹1,231 secured. Buyer paid ₹148 for transport.",
+      "type": "order",
+      "orderId": "ORD-2026-8098",
+      "linkTab": "orders",
+      "id": "notif_1790555797549_1nft",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "collection_centre",
+      "title": "🏢 Aggregation Call: 50T wow momos",
+      "message": "Open aggregation pool #BLK-2026-50WOW. Consolidate member farmer produce and assign hub capacity.",
+      "type": "market",
+      "id": "notif_1790493469608_i4m3",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Produce Quality Verified at Hub",
+      "message": "Your crop batch successfully cleared QC with grade: Grade A+.",
+      "type": "quality",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556689761_qvd5",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "collection_centre",
+      "title": "🏢 Aggregation Call: 100T mango",
+      "message": "Open aggregation pool #BLK-2026-100MAN. Consolidate member farmer produce and assign hub capacity.",
+      "type": "market",
+      "id": "notif_1790532086237_upfc",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790525841819_274r",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1790345709190",
+      "title": "Produce Listed Successfully!",
+      "message": "Your listing for 60 Quintals of Wheat (Grade A) is now saved in database and live on marketplace.",
+      "type": "market",
+      "id": "notif_1790488552280_c3o2",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556689761_h1zs",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-2026-5592",
+      "id": "notif_1790525968349_idfn",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790370389880",
+      "title": "Delivery Completed: F2F-ORD-8209",
+      "message": "Order marked as received. Thank you for using Farm2Future Direct Supply Chain!",
+      "type": "delivery",
+      "orderId": "ORD-2026-7962",
+      "id": "notif_1790557108085_84p3",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790370389880",
+      "title": "Delivery Completed: F2F-ORD-7721",
+      "message": "Order marked as received. Thank you for using Farm2Future Direct Supply Chain!",
+      "type": "delivery",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790453195893_ji82",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle PB-10-CZ-4521 (Balwinder Singh) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556695856_vdc9",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Produce Quality Verified at Hub",
+      "message": "Your crop batch successfully cleared QC with grade: Grade A+.",
+      "type": "quality",
+      "orderId": "ORD-2026-5890",
+      "id": "notif_1790492788502_9hp6",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle KL-07-CP-3211 (George Varghese) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-5592",
+      "id": "notif_1790526693667_qew7",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
       "recipientRole": "buyer",
       "title": "New Crop Available on Marketplace",
       "message": "Krish Bhardwaj listed 60 Kg of Red Onion (Special Grade) (Grade A Quality Harvest).",
@@ -1412,528 +1745,161 @@
       "id": "notif_1790450739528_b067",
       "timestamp": "Just now",
       "read": true
-    },
-    {
-      "recipientRole": "farmer",
-      "title": "Harvest Consignment Dispatched!",
-      "message": "Your crop consignment (Order #F2F-ORD-9374) has been loaded onto truck PB-10-CZ-4521 and is en route to the buyer.",
-      "type": "dispatch",
-      "orderId": "ORD-2026-8098",
-      "id": "notif_1790556695856_2u8y",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Consignment Dispatched & Live Tracking Active!",
-      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-60 .",
-      "type": "dispatch",
-      "orderId": "ORD-2026-8098",
-      "id": "notif_1790556982855_tae2",
-      "timestamp": "Just now",
-      "read": false
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Consignment Dispatched & Live Tracking Active!",
-      "message": "Vehicle UK-07-BC-1122 (Trilok Rawat) has left the hub for your warehouse via NH-60 .",
-      "type": "dispatch",
-      "orderId": "ORD-2026-5890",
-      "id": "notif_1790526686810_1m7w",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "title": "Listing Removed",
-      "message": "Listing #LST-144404-231 (Tomato) was delisted and permanently removed.",
-      "type": "alert",
-      "recipientRole": "all",
-      "id": "notif_1790448716778_uttq",
-      "timestamp": "Just now",
-      "read": true
     }
   ],
   "activityHistory": [
     {
-      "id": "act_1790576836761_qau95",
+      "id": "act_1790577329656_dobuc",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "add_produce",
-      "title": "Produce Listed: Red Onion (Special Grade)",
-      "description": "Krish Bhardwaj posted 60 Kg of Red Onion (Special Grade) (Grade A Quality Harvest) at ₹10/K.",
-      "timestamp": "2026-09-28T06:27:16.761Z",
+      "title": "Crop Listing Updated (#LST-836661-621)",
+      "description": "Listing LST-836661-621 was updated.",
+      "timestamp": "2026-09-28T06:35:29.656Z",
       "metadata": {
         "listingId": "LST-836661-621",
-        "quantity": 60,
-        "cropName": "Red Onion (Special Grade)"
-      }
-    },
-    {
-      "id": "act_1790576801590_1ievy",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T06:26:41.590Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790576764333_8t4r3",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T06:26:04.333Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538703809_msqrx",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-108)",
-      "description": "Listing LST-108 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:43.809Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790453194258_j0adn",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "delivered",
-      "title": "Order Delivered & Escrow Released: F2F-ORD-7721",
-      "description": "Order F2F-ORD-7721 confirmed delivered. Escrow payout of ₹84,710 instantly disbursed to Dnyaneshwar Shinde.",
-      "timestamp": "2026-09-26T20:06:34.258Z",
-      "metadata": {
-        "orderId": "ORD-INTRA-MH-2026",
-        "farmerPayout": 84710
-      }
-    },
-    {
-      "id": "act_1790556598208_mmepd",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into collection_centre portal.",
-      "timestamp": "2026-09-28T00:49:58.208Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "collection_centre"
-      }
-    },
-    {
-      "id": "act_1790538709549_2uvb7",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-107)",
-      "description": "Listing LST-107 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:49.549Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790574952264_uorh9",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T05:55:52.264Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790556604543_fwpgf",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "qc_certified",
-      "title": "QC Certificate Issued (Grade A+)",
-      "description": "Order F2F-ORD-8209 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
-      "timestamp": "2026-09-28T00:50:04.543Z",
-      "metadata": {
-        "orderId": "ORD-2026-7962",
-        "certificateId": "QC-CERT-MH-2828",
-        "grade": "Grade A+"
-      }
-    },
-    {
-      "id": "act_1790576112283_d6jkn",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T06:15:12.283Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790576097597_8918x",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T06:14:57.597Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790552905971_rvitq",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-8209)",
-      "description": "Krish Bhardwaj ordered 10 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹48 delivery fee.",
-      "timestamp": "2026-09-27T23:48:25.971Z",
-      "metadata": {
-        "orderId": "ORD-2026-7962",
-        "orderNumber": "F2F-ORD-8209",
-        "totalAmount": 305,
-        "logisticsFee": 48,
-        "vehicleNo": "MH-15-DC-2290",
-        "aiMatchScore": 99.4
-      }
-    },
-    {
-      "id": "act_1790552905954_z98yk",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "add_produce",
-      "title": "Crop Listing Updated (#LST-841798-865)",
-      "description": "Listing LST-841798-865 was updated.",
-      "timestamp": "2026-09-27T23:48:25.954Z",
-      "metadata": {
-        "listingId": "LST-841798-865",
         "updates": {
-          "quantity": 50
+          "cropName": "Red Onion (Special Grade)",
+          "category": "Vegetables",
+          "variety": "Grade A Quality Harvest",
+          "quantity": 100,
+          "unit": "Kg",
+          "qualityGrade": "Grade A+",
+          "pricePerUnit": 10,
+          "harvestDate": "2026-09-28",
+          "location": "Vaishali, Bihar",
+          "state": "Bihar",
+          "district": "Vaishali",
+          "pincode": "844101",
+          "latitude": 25.6858,
+          "longitude": 85.2146,
+          "moisturePercent": 12,
+          "organicCertified": true,
+          "description": "Freshly harvested, uniformly graded, harvested under optimal weather. Stored in shaded farm warehouse.",
+          "images": [
+            "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80"
+          ],
+          "status": "Active",
+          "collectionCentreId": "fci_br_patna",
+          "fciHubName": "FCI Digha Ghat Food Storage Depot - Patna",
+          "fciHubCode": "FCI-BR-PAT-01",
+          "fciHubDistanceKm": 12,
+          "fciHubType": "FCI Food Storage Depot (FSD)",
+          "fciHubDistrict": "Patna",
+          "fciHubState": "Bihar",
+          "nearestMandi": "Hajipur Krishi Utpadan Mandi Samiti, Vaishali"
         }
       }
     },
     {
-      "id": "act_1790556545641_jd7tb",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "stage_update",
-      "title": "Order Stage Updated: COLLECTED AT HUB",
-      "description": "Order F2F-ORD-9374 advanced to stage collected at hub.",
-      "timestamp": "2026-09-28T00:49:05.641Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "newStage": "collected_at_hub"
-      }
-    },
-    {
-      "id": "act_1790554474950_leoh9",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T00:14:34.950Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790492458316_1epgx",
-      "userId": "usr_farmer_1790345709190",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "Admin Master Console Unlocked",
-      "description": "Administrator verified passkey and gained high-privilege oversight access.",
-      "timestamp": "2026-09-27T07:00:58.317Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790532580367_jc5xa",
-      "userId": "usr_farmer_1790532496880",
-      "userName": "captain",
-      "userRole": "farmer",
-      "actionType": "bulk_supply_sent",
-      "title": "Sent 10T for mango (BLK-2026-100MAN)",
-      "description": "captain committed to send 10 Tons (₹26,500) from Bokaro, Jharkhand, Jharkhand.",
-      "timestamp": "2026-09-27T18:09:40.367Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790556982855_w9vbj",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Bikash Gogoi",
-      "userRole": "collection_centre",
-      "actionType": "dispatched",
-      "title": "Consignment Dispatched: AS-01-TY-4422",
-      "description": "Order F2F-ORD-9374 dispatched via Brahmaputra Organic Express Cargo (AS-01-TY-4422, Driver: Bikash Gogoi) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
-      "timestamp": "2026-09-28T00:56:22.855Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "vehicleNo": "AS-01-TY-4422",
-        "eWayBillNo": "EWB-2026-72893123",
-        "modelName": "Tata Ultra Sleek T.7",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
-      }
-    },
-    {
-      "id": "act_1790554518710_cdfgh",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "stage_update",
-      "title": "Order Stage Updated: COLLECTED AT HUB",
-      "description": "Order F2F-ORD-8209 advanced to stage collected at hub.",
-      "timestamp": "2026-09-28T00:15:18.710Z",
-      "metadata": {
-        "orderId": "ORD-2026-7962",
-        "newStage": "collected_at_hub"
-      }
-    },
-    {
-      "id": "act_1790450739490_1ukpc",
-      "userId": "usr_buyer_1790449303210",
-      "userName": "KIT KAT",
-      "userRole": "buyer",
-      "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9139)",
-      "description": "KIT KAT ordered 1 Quintals of Cauliflower & Green Peas. AI auto-assigned HP-12-KL-8833 (Surinder Thakur, 99.4% match). Buyer paid ₹220 delivery fee.",
-      "timestamp": "2026-09-26T19:25:39.490Z",
-      "metadata": {
-        "orderId": "ORD-2026-5890",
-        "orderNumber": "F2F-ORD-9139",
-        "totalAmount": 1912,
-        "logisticsFee": 220,
-        "vehicleNo": "HP-12-KL-8833",
-        "aiMatchScore": 99.4
-      }
-    },
-    {
-      "id": "act_1790526737246_3nfsp",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-27T16:32:17.246Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790552860326_7igdz",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into buyer portal.",
-      "timestamp": "2026-09-27T23:47:40.326Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "buyer"
-      }
-    },
-    {
-      "id": "act_1790555797567_96wzr",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9374)",
-      "description": "Krish Bhardwaj ordered 50 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹148 delivery fee.",
-      "timestamp": "2026-09-28T00:36:37.567Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "orderNumber": "F2F-ORD-9374",
-        "totalAmount": 1430,
-        "logisticsFee": 148,
-        "vehicleNo": "MH-15-DC-2290",
-        "aiMatchScore": 99.4
-      }
-    },
-    {
-      "id": "act_1790557440805_x1tbn",
-      "userId": "usr_admin_1790557419802",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "User Profile Deleted",
-      "description": "Admin deleted user profile ID usr_admin_1790345133665 from database.",
-      "timestamp": "2026-09-28T01:04:00.805Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790557419805_psdct",
-      "userId": "usr_admin_1790557419802",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "register",
-      "title": "New Account Registered",
-      "description": "Krish Bhardwaj created a new admin account from Vaishali, Bihar.",
-      "timestamp": "2026-09-28T01:03:39.805Z",
-      "metadata": {
-        "phone": "+91 96313594886",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790538714385_or473",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-109)",
-      "description": "Listing LST-109 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:54.385Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1789556053599_nlzkz",
-      "userId": "usr_farmer_1789482597768",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "delivered",
-      "title": "Order Delivered & Escrow Released: F2F-ORD-4000",
-      "description": "Order F2F-ORD-4000 confirmed delivered. Escrow payout of ₹2,068 instantly disbursed to Krish Bhardwaj.",
-      "timestamp": "2026-09-16T10:54:13.599Z",
-      "metadata": {
-        "orderId": "ORD-2026-2989",
-        "farmerPayout": 2068
-      }
-    },
-    {
-      "id": "act_1790552841826_qp7xx",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "add_produce",
-      "title": "Produce Listed: Yellow Maize (Makka)",
-      "description": "Krish Bhardwaj posted 60 Kg of Yellow Maize (Makka) (Grade A Quality Harvest) at ₹25/K.",
-      "timestamp": "2026-09-27T23:47:21.826Z",
-      "metadata": {
-        "listingId": "LST-841798-865",
-        "quantity": 60,
-        "cropName": "Yellow Maize (Makka)"
-      }
-    },
-    {
-      "id": "act_1790490784876_ltrzo",
-      "userId": "usr_farmer_1790345709190",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into farmer portal.",
-      "timestamp": "2026-09-27T06:33:04.876Z",
-      "metadata": {
-        "phone": "+91 9631289876",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790507334565_iyeyy",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "qc_certified",
-      "title": "QC Certificate Issued (Grade A+)",
-      "description": "Order F2F-ORD-7721 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
-      "timestamp": "2026-09-27T11:08:54.565Z",
-      "metadata": {
-        "orderId": "ORD-INTRA-MH-2026",
-        "certificateId": "QC-CERT-MH-6716",
-        "grade": "Grade A+"
-      }
-    },
-    {
-      "id": "act_1790557101173_jlem6",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "delivered",
-      "title": "Order Delivered & Escrow Released: F2F-ORD-9374",
-      "description": "Order F2F-ORD-9374 confirmed delivered. Escrow payout of ₹1,231 instantly disbursed to Krish Bhardwaj.",
-      "timestamp": "2026-09-28T00:58:21.173Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "farmerPayout": 1231
-      }
-    },
-    {
-      "id": "act_1790490727221_8wjy2",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-27T06:32:07.221Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790556976681_uewan",
+      "id": "act_1790556607692_5of92",
       "userId": "usr_collection_centre_1789738899022",
       "userName": "Krish Bhardwaj",
       "userRole": "collection_centre",
       "actionType": "qc_certified",
       "title": "QC Certificate Issued (Grade A+)",
       "description": "Order F2F-ORD-9374 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
-      "timestamp": "2026-09-28T00:56:16.681Z",
+      "timestamp": "2026-09-28T00:50:07.692Z",
       "metadata": {
         "orderId": "ORD-2026-8098",
-        "certificateId": "QC-CERT-MH-6310",
+        "certificateId": "QC-CERT-MH-2725",
         "grade": "Grade A+"
       }
     },
     {
-      "id": "act_1790554473743_60l8i",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "profile_update",
-      "title": "Password Reset Successful",
-      "description": "Krish Bhardwaj (farmer) reset their account password successfully.",
-      "timestamp": "2026-09-28T00:14:33.743Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790515632567_pchey",
+      "id": "act_1790556586294_1oxbc",
       "userId": "usr_admin_1790345133665",
       "userName": "Krish Bhardwaj",
       "userRole": "admin",
       "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T00:49:46.294Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790557321162_3o944",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T01:02:01.162Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790542462730_a1cqo",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
       "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-27T13:27:12.567Z",
+      "description": "Krish Bhardwaj logged into collection_centre portal.",
+      "timestamp": "2026-09-27T20:54:22.730Z",
       "metadata": {
         "phone": "+91 9631359486",
-        "role": "admin"
+        "role": "collection_centre"
+      }
+    },
+    {
+      "id": "act_1790538719054_za5sc",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "Bulk Demand Removed (#BLK-2026-100MAN)",
+      "description": "Bulk pooled order BLK-2026-100MAN for mango (100T) was permanently deleted from database.",
+      "timestamp": "2026-09-27T19:51:59.054Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790556645453_bfe1u",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-9374",
+      "description": "Order F2F-ORD-9374 confirmed delivered. Escrow payout of ₹1,231 instantly disbursed to Krish Bhardwaj.",
+      "timestamp": "2026-09-28T00:50:45.453Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "farmerPayout": 1231
+      }
+    },
+    {
+      "id": "act_1790556639284_1bx87",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Mohan Singh Rathore",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: RJ-14-GH-6543",
+      "description": "Order F2F-ORD-9374 dispatched via Marwar Spices & Seed Transport (RJ-14-GH-6543, Driver: Mohan Singh Rathore) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 1228.5 km.",
+      "timestamp": "2026-09-28T00:50:39.284Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "RJ-14-GH-6543",
+        "eWayBillNo": "EWB-2026-54220560",
+        "modelName": "Ashok Leyland Boss 1415 HB",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556638227_jixkg",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Mohan Singh Rathore",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: RJ-14-GH-6543",
+      "description": "Order F2F-ORD-9374 dispatched via Marwar Spices & Seed Transport (RJ-14-GH-6543, Driver: Mohan Singh Rathore) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 1228.5 km.",
+      "timestamp": "2026-09-28T00:50:38.227Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "RJ-14-GH-6543",
+        "eWayBillNo": "EWB-2026-26641321",
+        "modelName": "Ashok Leyland Boss 1415 HB",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
       }
     },
     {
@@ -2038,114 +2004,486 @@
       }
     },
     {
-      "id": "act_1790557321162_3o944",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T01:02:01.162Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790542462730_a1cqo",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into collection_centre portal.",
-      "timestamp": "2026-09-27T20:54:22.730Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "collection_centre"
-      }
-    },
-    {
-      "id": "act_1790538719054_za5sc",
+      "id": "act_1790515632567_pchey",
       "userId": "usr_admin_1790345133665",
       "userName": "Krish Bhardwaj",
       "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "Bulk Demand Removed (#BLK-2026-100MAN)",
-      "description": "Bulk pooled order BLK-2026-100MAN for mango (100T) was permanently deleted from database.",
-      "timestamp": "2026-09-27T19:51:59.054Z",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-27T13:27:12.567Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790554473743_60l8i",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Password Reset Successful",
+      "description": "Krish Bhardwaj (farmer) reset their account password successfully.",
+      "timestamp": "2026-09-28T00:14:33.743Z",
       "metadata": {}
     },
     {
-      "id": "act_1790556645453_bfe1u",
+      "id": "act_1790507334565_iyeyy",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "qc_certified",
+      "title": "QC Certificate Issued (Grade A+)",
+      "description": "Order F2F-ORD-7721 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
+      "timestamp": "2026-09-27T11:08:54.565Z",
+      "metadata": {
+        "orderId": "ORD-INTRA-MH-2026",
+        "certificateId": "QC-CERT-MH-6716",
+        "grade": "Grade A+"
+      }
+    },
+    {
+      "id": "act_1790557101173_jlem6",
       "userId": "usr_collection_centre_1789738899022",
       "userName": "Krish Bhardwaj",
       "userRole": "buyer",
       "actionType": "delivered",
       "title": "Order Delivered & Escrow Released: F2F-ORD-9374",
       "description": "Order F2F-ORD-9374 confirmed delivered. Escrow payout of ₹1,231 instantly disbursed to Krish Bhardwaj.",
-      "timestamp": "2026-09-28T00:50:45.453Z",
+      "timestamp": "2026-09-28T00:58:21.173Z",
       "metadata": {
         "orderId": "ORD-2026-8098",
         "farmerPayout": 1231
       }
     },
     {
-      "id": "act_1790556639284_1bx87",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Mohan Singh Rathore",
-      "userRole": "collection_centre",
-      "actionType": "dispatched",
-      "title": "Consignment Dispatched: RJ-14-GH-6543",
-      "description": "Order F2F-ORD-9374 dispatched via Marwar Spices & Seed Transport (RJ-14-GH-6543, Driver: Mohan Singh Rathore) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 1228.5 km.",
-      "timestamp": "2026-09-28T00:50:39.284Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "vehicleNo": "RJ-14-GH-6543",
-        "eWayBillNo": "EWB-2026-54220560",
-        "modelName": "Ashok Leyland Boss 1415 HB",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
-      }
-    },
-    {
-      "id": "act_1790556638227_jixkg",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Mohan Singh Rathore",
-      "userRole": "collection_centre",
-      "actionType": "dispatched",
-      "title": "Consignment Dispatched: RJ-14-GH-6543",
-      "description": "Order F2F-ORD-9374 dispatched via Marwar Spices & Seed Transport (RJ-14-GH-6543, Driver: Mohan Singh Rathore) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 1228.5 km.",
-      "timestamp": "2026-09-28T00:50:38.227Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "vehicleNo": "RJ-14-GH-6543",
-        "eWayBillNo": "EWB-2026-26641321",
-        "modelName": "Ashok Leyland Boss 1415 HB",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
-      }
-    },
-    {
-      "id": "act_1790556607692_5of92",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "qc_certified",
-      "title": "QC Certificate Issued (Grade A+)",
-      "description": "Order F2F-ORD-9374 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
-      "timestamp": "2026-09-28T00:50:07.692Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "certificateId": "QC-CERT-MH-2725",
-        "grade": "Grade A+"
-      }
-    },
-    {
-      "id": "act_1790556586294_1oxbc",
+      "id": "act_1790490727221_8wjy2",
       "userId": "usr_admin_1790345133665",
       "userName": "Krish Bhardwaj",
       "userRole": "admin",
       "actionType": "login",
       "title": "User Logged Out",
       "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T00:49:46.294Z",
+      "timestamp": "2026-09-27T06:32:07.221Z",
       "metadata": {}
+    },
+    {
+      "id": "act_1790556976681_uewan",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "qc_certified",
+      "title": "QC Certificate Issued (Grade A+)",
+      "description": "Order F2F-ORD-9374 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
+      "timestamp": "2026-09-28T00:56:16.681Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "certificateId": "QC-CERT-MH-6310",
+        "grade": "Grade A+"
+      }
+    },
+    {
+      "id": "act_1790555797567_96wzr",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9374)",
+      "description": "Krish Bhardwaj ordered 50 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹148 delivery fee.",
+      "timestamp": "2026-09-28T00:36:37.567Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "orderNumber": "F2F-ORD-9374",
+        "totalAmount": 1430,
+        "logisticsFee": 148,
+        "vehicleNo": "MH-15-DC-2290",
+        "aiMatchScore": 99.4
+      }
+    },
+    {
+      "id": "act_1790557440805_x1tbn",
+      "userId": "usr_admin_1790557419802",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "User Profile Deleted",
+      "description": "Admin deleted user profile ID usr_admin_1790345133665 from database.",
+      "timestamp": "2026-09-28T01:04:00.805Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790557419805_psdct",
+      "userId": "usr_admin_1790557419802",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "register",
+      "title": "New Account Registered",
+      "description": "Krish Bhardwaj created a new admin account from Vaishali, Bihar.",
+      "timestamp": "2026-09-28T01:03:39.805Z",
+      "metadata": {
+        "phone": "+91 96313594886",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790538714385_or473",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-109)",
+      "description": "Listing LST-109 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:54.385Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1789556053599_nlzkz",
+      "userId": "usr_farmer_1789482597768",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-4000",
+      "description": "Order F2F-ORD-4000 confirmed delivered. Escrow payout of ₹2,068 instantly disbursed to Krish Bhardwaj.",
+      "timestamp": "2026-09-16T10:54:13.599Z",
+      "metadata": {
+        "orderId": "ORD-2026-2989",
+        "farmerPayout": 2068
+      }
+    },
+    {
+      "id": "act_1790552841826_qp7xx",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "add_produce",
+      "title": "Produce Listed: Yellow Maize (Makka)",
+      "description": "Krish Bhardwaj posted 60 Kg of Yellow Maize (Makka) (Grade A Quality Harvest) at ₹25/K.",
+      "timestamp": "2026-09-27T23:47:21.826Z",
+      "metadata": {
+        "listingId": "LST-841798-865",
+        "quantity": 60,
+        "cropName": "Yellow Maize (Makka)"
+      }
+    },
+    {
+      "id": "act_1790490784876_ltrzo",
+      "userId": "usr_farmer_1790345709190",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Ankit Kumar Mahato logged into farmer portal.",
+      "timestamp": "2026-09-27T06:33:04.876Z",
+      "metadata": {
+        "phone": "+91 9631289876",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790492458316_1epgx",
+      "userId": "usr_farmer_1790345709190",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "Admin Master Console Unlocked",
+      "description": "Administrator verified passkey and gained high-privilege oversight access.",
+      "timestamp": "2026-09-27T07:00:58.317Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790532580367_jc5xa",
+      "userId": "usr_farmer_1790532496880",
+      "userName": "captain",
+      "userRole": "farmer",
+      "actionType": "bulk_supply_sent",
+      "title": "Sent 10T for mango (BLK-2026-100MAN)",
+      "description": "captain committed to send 10 Tons (₹26,500) from Bokaro, Jharkhand, Jharkhand.",
+      "timestamp": "2026-09-27T18:09:40.367Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790556982855_w9vbj",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Bikash Gogoi",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: AS-01-TY-4422",
+      "description": "Order F2F-ORD-9374 dispatched via Brahmaputra Organic Express Cargo (AS-01-TY-4422, Driver: Bikash Gogoi) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:56:22.855Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "AS-01-TY-4422",
+        "eWayBillNo": "EWB-2026-72893123",
+        "modelName": "Tata Ultra Sleek T.7",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790554518710_cdfgh",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "stage_update",
+      "title": "Order Stage Updated: COLLECTED AT HUB",
+      "description": "Order F2F-ORD-8209 advanced to stage collected at hub.",
+      "timestamp": "2026-09-28T00:15:18.710Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "newStage": "collected_at_hub"
+      }
+    },
+    {
+      "id": "act_1790450739490_1ukpc",
+      "userId": "usr_buyer_1790449303210",
+      "userName": "KIT KAT",
+      "userRole": "buyer",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9139)",
+      "description": "KIT KAT ordered 1 Quintals of Cauliflower & Green Peas. AI auto-assigned HP-12-KL-8833 (Surinder Thakur, 99.4% match). Buyer paid ₹220 delivery fee.",
+      "timestamp": "2026-09-26T19:25:39.490Z",
+      "metadata": {
+        "orderId": "ORD-2026-5890",
+        "orderNumber": "F2F-ORD-9139",
+        "totalAmount": 1912,
+        "logisticsFee": 220,
+        "vehicleNo": "HP-12-KL-8833",
+        "aiMatchScore": 99.4
+      }
+    },
+    {
+      "id": "act_1790526737246_3nfsp",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-27T16:32:17.246Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790552860326_7igdz",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into buyer portal.",
+      "timestamp": "2026-09-27T23:47:40.326Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1790554474950_leoh9",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T00:14:34.950Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790556545641_jd7tb",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "stage_update",
+      "title": "Order Stage Updated: COLLECTED AT HUB",
+      "description": "Order F2F-ORD-9374 advanced to stage collected at hub.",
+      "timestamp": "2026-09-28T00:49:05.641Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "newStage": "collected_at_hub"
+      }
+    },
+    {
+      "id": "act_1790576112283_d6jkn",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T06:15:12.283Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790576097597_8918x",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T06:14:57.597Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790552905971_rvitq",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-8209)",
+      "description": "Krish Bhardwaj ordered 10 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹48 delivery fee.",
+      "timestamp": "2026-09-27T23:48:25.971Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "orderNumber": "F2F-ORD-8209",
+        "totalAmount": 305,
+        "logisticsFee": 48,
+        "vehicleNo": "MH-15-DC-2290",
+        "aiMatchScore": 99.4
+      }
+    },
+    {
+      "id": "act_1790552905954_z98yk",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "add_produce",
+      "title": "Crop Listing Updated (#LST-841798-865)",
+      "description": "Listing LST-841798-865 was updated.",
+      "timestamp": "2026-09-27T23:48:25.954Z",
+      "metadata": {
+        "listingId": "LST-841798-865",
+        "updates": {
+          "quantity": 50
+        }
+      }
+    },
+    {
+      "id": "act_1790538703809_msqrx",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-108)",
+      "description": "Listing LST-108 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:43.809Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790453194258_j0adn",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-7721",
+      "description": "Order F2F-ORD-7721 confirmed delivered. Escrow payout of ₹84,710 instantly disbursed to Dnyaneshwar Shinde.",
+      "timestamp": "2026-09-26T20:06:34.258Z",
+      "metadata": {
+        "orderId": "ORD-INTRA-MH-2026",
+        "farmerPayout": 84710
+      }
+    },
+    {
+      "id": "act_1790556598208_mmepd",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into collection_centre portal.",
+      "timestamp": "2026-09-28T00:49:58.208Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "collection_centre"
+      }
+    },
+    {
+      "id": "act_1790538709549_2uvb7",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-107)",
+      "description": "Listing LST-107 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:49.549Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790574952264_uorh9",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T05:55:52.264Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790556604543_fwpgf",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "qc_certified",
+      "title": "QC Certificate Issued (Grade A+)",
+      "description": "Order F2F-ORD-8209 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
+      "timestamp": "2026-09-28T00:50:04.543Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "certificateId": "QC-CERT-MH-2828",
+        "grade": "Grade A+"
+      }
+    },
+    {
+      "id": "act_1790576764333_8t4r3",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T06:26:04.333Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790576836761_qau95",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "add_produce",
+      "title": "Produce Listed: Red Onion (Special Grade)",
+      "description": "Krish Bhardwaj posted 60 Kg of Red Onion (Special Grade) (Grade A Quality Harvest) at ₹10/K.",
+      "timestamp": "2026-09-28T06:27:16.761Z",
+      "metadata": {
+        "listingId": "LST-836661-621",
+        "quantity": 60,
+        "cropName": "Red Onion (Special Grade)"
+      }
+    },
+    {
+      "id": "act_1790576801590_1ievy",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T06:26:41.590Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
     },
     {
       "id": "act_1790557108085_j1fjb",
@@ -2188,6 +2526,17 @@
         "modelName": "Tata Ultra Sleek T.7",
         "routeHighway": "NH-19 & Mahatma Gandhi Setu Bridge (Patna–Hajipur, Bihar)"
       }
+    },
+    {
+      "id": "act_1790576742764_f9vym",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details & avatar permanently.",
+      "timestamp": "2026-09-28T06:25:42.765Z",
+      "metadata": {}
     },
     {
       "id": "act_1790449989555_jpbin",
@@ -7920,7 +8269,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-28T06:29:01.327Z",
+  "lastUpdated": "2026-09-28T06:36:35.642Z",
   "vehicles": [
     {
       "id": "veh_tn_1",
