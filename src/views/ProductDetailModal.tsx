@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAgri } from '../context/AgriContext';
+import { EditListingModal } from '../components/EditListingModal';
 import { calculateOrderFees } from '../utils/pricingUtils';
 import { calculateDistanceKm, geocodeLocation, getHyperlocalDispatchEstimate } from '../utils/geoUtils';
 import { getAILogisticsPreview } from '../utils/aiLogisticsEngine';
@@ -34,7 +35,8 @@ import {
   Landmark,
   Wallet,
   ExternalLink,
-  Store
+  Store,
+  Pencil
 } from 'lucide-react';
 
 // Synthesize pleasant SMS arrival chime via Web Audio API
@@ -81,9 +83,12 @@ export const ProductDetailModal: React.FC = () => {
     orders,
     placeOrder, 
     setActiveTab,
-    setActiveTrackingOrderId 
+    setActiveTrackingOrderId,
+    isFarmerListing,
+    language 
   } = useAgri();
 
+  const [isEditingListing, setIsEditingListing] = useState(false);
   const [orderQty, setOrderQty] = useState<number>(50);
   const [deliveryAddress, setDeliveryAddress] = useState(() => {
     if (currentUser?.location) {
@@ -420,12 +425,26 @@ export const ProductDetailModal: React.FC = () => {
             <h3 className="font-bold text-base">{item.cropName} ({item.variety})</h3>
           </div>
 
-          <button
-            onClick={() => setSelectedListingModal(null)}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {(isFarmerListing(item, currentUser) || currentUser?.role === 'admin') && !orderSuccess && (
+              <button
+                type="button"
+                onClick={() => setIsEditingListing(true)}
+                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 cursor-pointer"
+                title="Edit Listing Details"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>{language === 'hi' ? 'विवरण संपादित करें' : 'Edit Details'}</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => setSelectedListingModal(null)}
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Scrollable Body */}
@@ -1217,6 +1236,13 @@ export const ProductDetailModal: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Edit Listing Details Modal */}
+      <EditListingModal
+        isOpen={isEditingListing}
+        onClose={() => setIsEditingListing(false)}
+        listing={item}
+      />
     </div>
   );
 };

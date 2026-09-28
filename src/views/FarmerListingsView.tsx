@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAgri } from '../context/AgriContext';
+import { CropListing } from '../types';
+import { EditListingModal } from '../components/EditListingModal';
 import { 
   PlusCircle, 
   Layers, 
   Eye, 
+  Pencil,
   Calendar, 
   MapPin, 
   Trash2, 
-  ShieldCheck,
-  ArrowLeft,
-  Building2,
-  Store
+  ShieldCheck, 
+  ArrowLeft, 
+  Building2, 
+  Store 
 } from 'lucide-react';
 
 export const FarmerListingsView: React.FC = () => {
-  const { currentUser, listings, isFarmerListing, deleteListing, setActiveTab, setSelectedListingModal, navigateBack, addNotification } = useAgri();
+  const { currentUser, listings, isFarmerListing, deleteListing, setActiveTab, setSelectedListingModal, navigateBack, addNotification, language } = useAgri();
+
+  const [editingListing, setEditingListing] = useState<CropListing | null>(null);
 
   const myListings = listings.filter(l => isFarmerListing(l, currentUser));
 
@@ -164,11 +169,22 @@ export const FarmerListingsView: React.FC = () => {
 
               <div className="p-5 pt-0 border-t border-slate-50 flex items-center justify-between gap-2 mt-2">
                 <button
+                  type="button"
                   onClick={() => setSelectedListingModal(item)}
-                  className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Eye className="w-3.5 h-3.5" />
-                  <span>View Details</span>
+                  <span>{language === 'hi' ? 'विवरण' : 'View'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setEditingListing(item)}
+                  className="flex-1 py-2 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  title="Edit Listing Details"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'संपादित करें' : 'Edit'}</span>
                 </button>
 
                 <button
@@ -197,6 +213,13 @@ export const FarmerListingsView: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Edit Listing Details Modal */}
+      <EditListingModal
+        isOpen={!!editingListing}
+        onClose={() => setEditingListing(null)}
+        listing={editingListing}
+      />
     </div>
   );
 };
