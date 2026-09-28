@@ -61,7 +61,8 @@ export const FarmerDashboard: React.FC = () => {
     collectionHubs,
     addNotification,
     logActivity,
-    language
+    language,
+    openVoiceAssistant
   } = useAgri();
 
   const myListings = listings.filter(l => isFarmerListing(l, currentUser));
@@ -238,11 +239,7 @@ export const FarmerDashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* 🎙️ 1. Kisan AI Voice Assistant Banner */}
         <div 
-          onClick={() => {
-            const event = new MouseEvent('click', { bubbles: true });
-            document.querySelector('[title*="कृषि वाणी AI"]')?.dispatchEvent(event);
-            document.querySelector('[title*="Kisan AI Voice Assistant"]')?.dispatchEvent(event);
-          }}
+          onClick={() => openVoiceAssistant()}
           className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-emerald-500/40 group relative overflow-hidden"
         >
           <div className="flex items-center gap-3.5">

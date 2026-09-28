@@ -133,6 +133,13 @@ interface AgriContextType {
   setLanguage: (lang: 'en' | 'hi') => void;
   t: (text: string) => string;
 
+  // 🎙️ Voice Assistant
+  isVoiceAssistantOpen: boolean;
+  setIsVoiceAssistantOpen: (open: boolean) => void;
+  openVoiceAssistant: (initialQuery?: string) => void;
+  voiceInitialQuery: string | null;
+  setVoiceInitialQuery: (query: string | null) => void;
+
   // Welcome Gateway
   showWelcomeGateway: boolean;
   setShowWelcomeGateway: (show: boolean) => void;
@@ -850,6 +857,18 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
   }, []);
+
+  // 🎙️ Global Voice Assistant State
+  const [isVoiceAssistantOpen, setIsVoiceAssistantOpen] = useState<boolean>(false);
+  const [voiceInitialQuery, setVoiceInitialQuery] = useState<string | null>(null);
+
+  const openVoiceAssistant = useCallback((initialQuery?: string) => {
+    if (initialQuery) {
+      setVoiceInitialQuery(initialQuery);
+    }
+    setIsVoiceAssistantOpen(true);
+  }, []);
+
   const [language, setLanguageState] = useState<'en' | 'hi'>(() => {
     try {
       const saved = localStorage.getItem('agrixora_language');
@@ -3327,6 +3346,11 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       authModalMode,
       setAuthModalMode,
       openAuthModal,
+      isVoiceAssistantOpen,
+      setIsVoiceAssistantOpen,
+      openVoiceAssistant,
+      voiceInitialQuery,
+      setVoiceInitialQuery,
       language,
       setLanguage,
       t: (text: string) => translateHelper(text, language),

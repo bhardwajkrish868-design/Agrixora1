@@ -58,10 +58,14 @@ export const KisanAIVoiceAssistant: React.FC = () => {
     setActiveTab, 
     switchRole, 
     currentUser, 
-    listings 
+    listings,
+    isVoiceAssistantOpen,
+    setIsVoiceAssistantOpen,
+    voiceInitialQuery,
+    setVoiceInitialQuery
   } = useAgri();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(isVoiceAssistantOpen);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechMuted, setSpeechMuted] = useState(false);
@@ -73,6 +77,25 @@ export const KisanAIVoiceAssistant: React.FC = () => {
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const voicesLoadedRef = useRef<SpeechSynthesisVoice[]>([]);
+
+  // Sync isOpen with AgriContext
+  useEffect(() => {
+    setIsOpen(isVoiceAssistantOpen);
+  }, [isVoiceAssistantOpen]);
+
+  const handleCloseAssistant = () => {
+    if (synthRef.current) synthRef.current.cancel();
+    if (recognitionRef.current) try { recognitionRef.current.stop(); } catch (_) {}
+    setIsListening(false);
+    setIsSpeaking(false);
+    setIsVoiceAssistantOpen(false);
+    setIsOpen(false);
+  };
+
+  const handleOpenAssistant = () => {
+    setIsVoiceAssistantOpen(true);
+    setIsOpen(true);
+  };
 
   // Initial Welcome Messages with Interactive Buttons
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -124,6 +147,14 @@ export const KisanAIVoiceAssistant: React.FC = () => {
       chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen, transcriptLive]);
+
+  // Handle voiceInitialQuery from external components
+  useEffect(() => {
+    if (voiceInitialQuery) {
+      handleUserQuery(voiceInitialQuery);
+      setVoiceInitialQuery(null);
+    }
+  }, [voiceInitialQuery]);
 
   // Load Voices asynchronously for robust Indian Hindi Speech
   useEffect(() => {
@@ -678,7 +709,7 @@ export const KisanAIVoiceAssistant: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={handleOpenAssistant}
             className="relative group p-4 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-500 text-white shadow-2xl shadow-emerald-900/60 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-emerald-300/50 flex items-center justify-center cursor-pointer"
             title={activeLang === 'hi' ? 'कृषि वाणी AI सहायक खोलें' : 'Open Kisan AI Voice Assistant'}
           >
@@ -696,9 +727,17 @@ export const KisanAIVoiceAssistant: React.FC = () => {
         </div>
       )}
 
-      {/* 🎙️ EXPANDABLE KISAN AI ASSISTANT MODAL / DRAWER */}
+      {/* 🎙️ EXPANDABLE KISAN AI ASSISTANT MODAL / DRAWER WITH OVERLAY */}
       {isOpen && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[500px] sm:h-[700px] z-50 flex flex-col bg-slate-900 text-slate-100 rounded-none sm:rounded-3xl shadow-2xl border border-emerald-500/40 overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+        <>
+          {/* Backdrop Overlay */}
+          <div 
+            onClick={handleCloseAssistant}
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 transition-opacity animate-in fade-in cursor-pointer"
+            title="Click outside to close"
+          />
+
+          <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[500px] sm:h-[700px] z-50 flex flex-col bg-slate-900 text-slate-100 rounded-none sm:rounded-3xl shadow-2xl border border-emerald-500/40 overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
           
           {/* TOP HEADER */}
           <div className="p-3.5 sm:p-4 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-b border-emerald-800/50 flex items-center justify-between">
@@ -766,11 +805,7 @@ export const KisanAIVoiceAssistant: React.FC = () => {
               </button>
 
               <button
-                onClick={() => {
-                  if (synthRef.current) synthRef.current.cancel();
-                  if (recognitionRef.current) try { recognitionRef.current.stop(); } catch (_) {}
-                  setIsOpen(false);
-                }}
+                onClick={handleCloseAssistant}
                 className="p-2 rounded-xl bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-300 border border-slate-700 transition-colors cursor-pointer"
                 title="Close"
               >
@@ -978,19 +1013,49 @@ export const KisanAIVoiceAssistant: React.FC = () => {
               </div>
             ))}
 
-            {/* LIVE SPEECH TRANSCRIPTION INDICATOR */}
+            {/* 🎙️ LIVE ACOUSTIC VOICE WAVE OVERLAY */}
             {isListening && (
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs animate-pulse shadow-lg">
-                <Mic className="w-5 h-5 text-amber-400 animate-bounce" />
-                <div className="flex-1 font-medium">
-                  {transcriptLive 
-                    ? `"${transcriptLive}"...` 
-                    : (activeLang === 'hi' ? 'बोलिए किसान भाई, मैं सुन रहा हूँ...' : 'Listening, please speak...')}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/95 via-slate-900 to-teal-950 border-2 border-emerald-400/80 text-white shadow-2xl space-y-3 animate-in zoom-in-95">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                    <span className="text-xs font-black text-amber-400 tracking-wide uppercase">
+                      {activeLang === 'hi' ? '🔴 लाइव वॉइस रिकॉर्डिंग चालू है' : '🔴 Live Voice Recording'}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={toggleListening}
+                    className="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[10px] shadow-sm transition-colors cursor-pointer"
+                  >
+                    {activeLang === 'hi' ? 'पूरा हुआ (Stop)' : 'Done (Stop)'}
+                  </button>
                 </div>
-                <div className="flex gap-1 items-end h-5">
+
+                {/* Live Real-time Acoustic Waveform Bars */}
+                <div className="flex items-center justify-center gap-1.5 py-2 bg-slate-950/80 rounded-xl border border-emerald-500/30">
                   <span className="w-1.5 h-3 bg-emerald-400 rounded-full animate-pulse" />
-                  <span className="w-1.5 h-5 bg-teal-400 rounded-full animate-pulse delay-75" />
-                  <span className="w-1.5 h-4 bg-amber-400 rounded-full animate-pulse delay-150" />
+                  <span className="w-1.5 h-6 bg-teal-400 rounded-full animate-pulse delay-75" />
+                  <span className="w-1.5 h-8 bg-amber-400 rounded-full animate-pulse delay-150" />
+                  <span className="w-1.5 h-10 bg-emerald-300 rounded-full animate-pulse delay-300" />
+                  <span className="w-1.5 h-7 bg-teal-300 rounded-full animate-pulse delay-200" />
+                  <span className="w-1.5 h-9 bg-amber-300 rounded-full animate-pulse delay-100" />
+                  <span className="w-1.5 h-5 bg-emerald-400 rounded-full animate-pulse delay-75" />
+                  <span className="w-1.5 h-3 bg-teal-400 rounded-full animate-pulse" />
+                </div>
+
+                {/* Spoken Text Box */}
+                <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-700 text-xs text-slate-200 min-h-[36px] flex items-center">
+                  <span className="text-emerald-400 font-bold mr-1.5">🎙️</span>
+                  <span className="italic font-medium text-emerald-200">
+                    {transcriptLive 
+                      ? `"${transcriptLive}"` 
+                      : (activeLang === 'hi' ? 'स्पष्ट आवाज़ में अपना सवाल बोलिए (जैसे: आज का प्याज का भाव क्या है)...' : 'Speak clearly (e.g., What is today onion price)...')}
+                  </span>
                 </div>
               </div>
             )}
@@ -1045,7 +1110,8 @@ export const KisanAIVoiceAssistant: React.FC = () => {
             </form>
           </div>
         </div>
-      )}
-    </>
-  );
+      </>
+    )}
+  </>
+);
 };
