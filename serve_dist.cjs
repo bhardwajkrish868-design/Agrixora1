@@ -197,6 +197,47 @@ function sendTwilioSms(accountSid, authToken, fromNumber, phone, message) {
 
 
 
+// 📨 Telegram Bot Notification (Free alternate to WhatsApp/NTFY)
+function sendTelegramMessage(botToken, chatId, message) {
+  return new Promise((resolve) => {
+    try {
+      const text = encodeURIComponent(message);
+      const path = `/bot${botToken}/sendMessage?chat_id=${chatId}&text=${text}&parse_mode=HTML`;
+      const req = https.request({
+        hostname: 'api.telegram.org',
+        port: 443,
+        path,
+        method: 'GET'
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => { data += chunk; });
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.ok) {
+              resolve({ success: true, provider: 'telegram', messageId: parsed.result?.message_id });
+            } else {
+              resolve({ success: false, provider: 'telegram', error: parsed.description || 'Telegram error' });
+            }
+          } catch (e) {
+            resolve({ success: false, provider: 'telegram', error: 'Invalid response: ' + data.substring(0, 200) });
+          }
+        });
+      });
+      req.on('error', (e) => {
+        resolve({ success: false, provider: 'telegram', error: e.message });
+      });
+      req.setTimeout(8000, () => {
+        req.destroy();
+        resolve({ success: false, provider: 'telegram', error: 'Telegram API timed out' });
+      });
+      req.end();
+    } catch (err) {
+      resolve({ success: false, provider: 'telegram', error: err.message });
+    }
+  });
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost:3000'}`);
   const reqPath = parsedUrl.pathname;
@@ -989,6 +1030,8 @@ const server = http.createServer((req, res) => {
 
         const fast2smsKey = payload.apiKey || db.smsGateway?.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
         const twilioConfig = db.smsGateway?.twilio;
+        const telegramBotToken = db.smsGateway?.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN || '';
+        const telegramChatId = payload.telegramChatId || db.smsGateway?.telegramChatId || process.env.TELEGRAM_CHAT_ID || '';
 
         let result = null;
         if (fast2smsKey) {
@@ -1002,6 +1045,13 @@ const server = http.createServer((req, res) => {
             provider: 'simulation',
             message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key or use SMS link.'
           };
+        }
+
+        // 📨 Telegram Bot Notification (Free alternate to WhatsApp/NTFY)
+        if (telegramBotToken && telegramChatId) {
+          const tgMessage = `🌾 <b>Farm2Future Alert</b>\n${smsText}`;
+          const tgResult = await sendTelegramMessage(telegramBotToken, telegramChatId, tgMessage);
+          result.telegram = { success: tgResult.success, provider: 'telegram', details: tgResult };
         }
 
         // Record SMS in activity history

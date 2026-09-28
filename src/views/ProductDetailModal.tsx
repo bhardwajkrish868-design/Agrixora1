@@ -367,14 +367,24 @@ export const ProductDetailModal: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Phone SMS & Push Buttons */}
-                <div className="grid grid-cols-1 gap-2 pt-1">
+                {/* Phone SMS & Telegram Buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
                   <a
                     href={nativeSmsUrl}
                     className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
                   >
                     <Smartphone className="w-3.5 h-3.5" />
-                    <span>Open Phone SMS App</span>
+                    <span>SMS App</span>
+                  </a>
+                  {/* 📨 Telegram Share */}
+                  <a
+                    href={`https://t.me/share/url?url=${encodeURIComponent('https://farm2future.in')}&text=${encodeURIComponent(`Order ${smsNotification.orderNumber} Confirmed! ${smsNotification.quantity} ${smsNotification.cropName}. Vehicle: ${smsNotification.vehicleNo}, Driver: ${smsNotification.driverName} (${smsNotification.driverPhone}).`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                  >
+                    <span>✈️</span>
+                    <span>Telegram</span>
                   </a>
                 </div>
               </div>
@@ -464,8 +474,8 @@ export const ProductDetailModal: React.FC = () => {
                   </p>
                 </div>
 
-                {/* SMS & Push Buttons */}
-                <div className="grid grid-cols-1 gap-2 pt-1">
+                {/* SMS & Telegram Buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
                   <a
                     href={`sms:+91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
                       `Order ${createdOrderRef} Confirmed & Transport Booked! Vehicle: ${lastCreatedOrder?.dispatchDetails?.vehicleNo}, Driver: ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone}). Total: Rs ${totalPayable}. Delivery to: ${deliveryAddress}`
@@ -473,7 +483,17 @@ export const ProductDetailModal: React.FC = () => {
                     className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
                   >
                     <Smartphone className="w-3.5 h-3.5 text-sky-200" />
-                    <span>Open in Phone SMS App</span>
+                    <span>SMS App</span>
+                  </a>
+                  {/* 📨 Telegram Share */}
+                  <a
+                    href={`https://t.me/share/url?url=${encodeURIComponent('https://farm2future.in')}&text=${encodeURIComponent(`Order ${createdOrderRef} Confirmed & Transport Booked! Vehicle: ${lastCreatedOrder?.dispatchDetails?.vehicleNo}, Driver: ${lastCreatedOrder?.dispatchDetails?.driverName}. Total: Rs ${totalPayable}.`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  >
+                    <span>✈️</span>
+                    <span>Telegram</span>
                   </a>
                 </div>
               </div>

@@ -174,6 +174,49 @@ function databasePlugin() {
 
 
 
+
+
+  // 📨 Telegram Bot Notification (Free alternate to WhatsApp/NTFY)
+  const sendTelegramMessage = (botToken: string, chatId: string, message: string): Promise<any> => {
+    return new Promise((resolve) => {
+      try {
+        const text = encodeURIComponent(message);
+        const path = `/bot${botToken}/sendMessage?chat_id=${chatId}&text=${text}&parse_mode=HTML`;
+        const req = https.request({
+          hostname: 'api.telegram.org',
+          port: 443,
+          path,
+          method: 'GET'
+        }, (res: any) => {
+          let data = '';
+          res.on('data', (chunk: any) => { data += chunk; });
+          res.on('end', () => {
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.ok) {
+                resolve({ success: true, provider: 'telegram', messageId: parsed.result?.message_id });
+              } else {
+                resolve({ success: false, provider: 'telegram', error: parsed.description || 'Telegram error' });
+              }
+            } catch (e: any) {
+              resolve({ success: false, provider: 'telegram', error: 'Invalid response: ' + data.substring(0, 200) });
+            }
+          });
+        });
+        req.on('error', (e: any) => {
+          resolve({ success: false, provider: 'telegram', error: e.message });
+        });
+        req.setTimeout(8000, () => {
+          req.destroy();
+          resolve({ success: false, provider: 'telegram', error: 'Telegram API timed out' });
+        });
+        req.end();
+      } catch (err: any) {
+        resolve({ success: false, provider: 'telegram', error: err.message });
+      }
+    });
+  };
+
   return {
     name: 'farm2future-database-api',
     configureServer(server: any) {
@@ -842,6 +885,8 @@ function databasePlugin() {
 
               const fast2smsKey = payload.apiKey || db.smsGateway?.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
               const twilioConfig = db.smsGateway?.twilio;
+              const telegramBotToken = db.smsGateway?.telegramBotToken || process.env.TELEGRAM_BOT_TOKEN || '';
+              const telegramChatId = payload.telegramChatId || db.smsGateway?.telegramChatId || process.env.TELEGRAM_CHAT_ID || '';
 
               let result: any = null;
               if (fast2smsKey) {
@@ -855,6 +900,13 @@ function databasePlugin() {
                   provider: 'simulation',
                   message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key.'
                 };
+              }
+
+              // 📨 Telegram Bot Notification
+              if (telegramBotToken && telegramChatId) {
+                const tgMessage = `🌾 <b>Farm2Future Alert</b>\n${smsText}`;
+                const tgResult = await sendTelegramMessage(telegramBotToken, telegramChatId, tgMessage);
+                result.telegram = { success: tgResult.success, provider: 'telegram', details: tgResult };
               }
 
               if (!db.activityHistory) db.activityHistory = [];
