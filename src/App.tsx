@@ -27,6 +27,7 @@ import { NotificationsView } from './views/NotificationsView';
 import { StateTransportDirectoryView } from './views/StateTransportDirectoryView';
 import { BulkDemandPoolView } from './views/BulkDemandPoolView';
 import { NotificationToast } from './components/NotificationToast';
+import { KisanAIVoiceAssistant } from './components/KisanAIVoiceAssistant';
 
 // Entry Gateway
 import { WelcomeGatewayView } from './views/WelcomeGatewayView';
@@ -133,6 +134,9 @@ const MainLayout: React.FC = () => {
 
       {/* Real-Time Floating Notification Toast */}
       <NotificationToast />
+
+      {/* 🎙️ Kisan AI Voice Assistant (कृषि वाणी) */}
+      <KisanAIVoiceAssistant />
     </div>
   );
 };

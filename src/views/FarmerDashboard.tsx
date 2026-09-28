@@ -18,6 +18,7 @@ import {
   Truck,
   Boxes,
   ArrowRight,
+  Mic,
   Store,
   SendHorizontal,
   CheckCircle2,
@@ -230,35 +231,78 @@ export const FarmerDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 🚛 Live GPS Reefer Radar Banner */}
-      <div 
-        onClick={() => setActiveTab('tracker')}
-        className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-emerald-500/30 group"
-      >
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-md">
-            🚚
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-extrabold text-sm sm:text-base text-white">
-                {language === 'hi' ? 'लाइव जीपीएस रीफर फ्लीट ट्रैकर' : 'Live GPS Reefer Logistics Fleet'}
-              </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950 animate-pulse">
-                LIVE RADAR
+      {/* 🌟 DUAL HERO FEATURE BANNERS (Kisan Voice AI + Live GPS Reefer) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* 🎙️ 1. Kisan AI Voice Assistant Banner */}
+        <div 
+          onClick={() => {
+            const event = new MouseEvent('click', { bubbles: true });
+            document.querySelector('[title*="कृषि वाणी AI"]')?.dispatchEvent(event);
+            document.querySelector('[title*="Kisan AI Voice Assistant"]')?.dispatchEvent(event);
+          }}
+          className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-emerald-500/40 group relative overflow-hidden"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 border border-emerald-300/40 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-lg shadow-emerald-900/50">
+              <Mic className="w-6 h-6 animate-pulse" />
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">
-              {language === 'hi'
-                ? '4.1°C कोल्ड-चेन तापमान, राजमार्ग चेकपॉइंट और ई-वे बिल लाइव देखें'
-                : 'Monitor 4.1°C cold-chain sensors, toll checkpoints & e-Way bill in real-time'}
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-sm sm:text-base text-white flex items-center gap-1.5">
+                  {language === 'hi' ? '🎙️ कृषि वाणी AI सहायक' : '🎙️ Kisan AI Voice Assistant'}
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950">
+                  VOICE AI
+                </span>
+              </div>
+              <p className="text-xs text-emerald-300/90 mt-0.5">
+                {language === 'hi'
+                  ? 'बोलकर पूछें: आज का मंडी भाव, 3-दिन का मौसम, फसल रोग व सरकारी योजनाएं'
+                  : 'Speak to ask: Live Mandi rates, 3-day weather, crop remedies & PM-Kisan'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-900/60 px-4 py-2 rounded-xl border border-emerald-500/40 group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
+            <span>{language === 'hi' ? 'बोलकर पूछें' : 'Start Voice'}</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-950/60 px-4 py-2 rounded-xl border border-emerald-600/40 group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
-          <span>{language === 'hi' ? 'मैप खोलें' : 'Open GPS Radar'}</span>
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        {/* 🚛 2. Live GPS Reefer Radar Banner */}
+        <div 
+          onClick={() => setActiveTab('tracker')}
+          className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-cyan-500/30 group"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-md">
+              🚚
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-sm sm:text-base text-white">
+                  {language === 'hi' ? 'लाइव जीपीएस रीफर फ्लीट' : 'Live GPS Reefer Fleet'}
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-400 text-slate-950 animate-pulse">
+                  LIVE RADAR
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                {language === 'hi'
+                  ? '4.1°C कोल्ड-चेन तापमान, राजमार्ग चेकपॉइंट और ई-वे बिल लाइव देखें'
+                  : 'Monitor 4.1°C cold-chain sensors, toll checkpoints & e-Way bill in real-time'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 bg-cyan-950/60 px-4 py-2 rounded-xl border border-cyan-600/40 group-hover:bg-cyan-600 group-hover:text-white transition-all shrink-0">
+            <span>{language === 'hi' ? 'मैप खोलें' : 'Open GPS Radar'}</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
         </div>
       </div>
 

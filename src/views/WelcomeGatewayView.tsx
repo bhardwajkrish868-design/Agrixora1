@@ -3,6 +3,7 @@ import { useAgri } from '../context/AgriContext';
 import { UserRole } from '../types';
 import { RegistrationModal } from '../components/RegistrationModal';
 import { CloudDatabaseModal } from '../components/CloudDatabaseModal';
+import { KisanAIVoiceAssistant } from '../components/KisanAIVoiceAssistant';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -515,6 +516,9 @@ export const WelcomeGatewayView: React.FC = () => {
         isOpen={isCloudDbOpen}
         onClose={() => setIsCloudDbOpen(false)}
       />
+
+      {/* 🎙️ Kisan AI Voice Assistant (कृषि वाणी) */}
+      <KisanAIVoiceAssistant />
 
     </div>
   );
