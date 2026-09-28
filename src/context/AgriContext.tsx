@@ -1408,6 +1408,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updated = [newUser, ...filtered];
       const sanitized = updated.map(sanitizeUserForStorage);
       safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitized));
+      dbService.saveUser(newUser);
       dbService.syncDatabase({ users: updated });
       return updated;
     });
@@ -1443,6 +1444,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteUser = (userId: string) => {
     recordLocalDeletedId(userId);
+    dbService.deleteUser(userId);
     setRegisteredUsers(prev => {
       const updated = prev.filter(u => u && u.id !== userId);
       try {
