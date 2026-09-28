@@ -700,33 +700,6 @@ export const KisanAIVoiceAssistant: React.FC = () => {
 
   return (
     <>
-      {/* 🟢 FLOATING VOICE LAUNCHER BUTTON */}
-      {!isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 bg-emerald-950/95 text-emerald-300 backdrop-blur-md px-4 py-2 rounded-2xl border border-emerald-500/40 shadow-2xl text-xs font-bold animate-pulse">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>{activeLang === 'hi' ? '🌾 कृषि वाणी: बोलकर पूछें' : '🌾 Krishi Vani: Speak here'}</span>
-          </div>
-
-          <button
-            onClick={handleOpenAssistant}
-            className="relative group p-4 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-500 text-white shadow-2xl shadow-emerald-900/60 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-emerald-300/50 flex items-center justify-center cursor-pointer"
-            title={activeLang === 'hi' ? 'कृषि वाणी AI सहायक खोलें' : 'Open Kisan AI Voice Assistant'}
-          >
-            <span className="absolute -inset-1 rounded-full bg-emerald-400/40 animate-ping opacity-75" />
-            <span className="absolute -inset-2.5 rounded-full bg-teal-500/25 blur-sm" />
-            
-            <div className="relative flex items-center justify-center">
-              <Mic className="w-7 h-7 text-white drop-shadow-md group-hover:rotate-12 transition-transform" />
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-              </span>
-            </div>
-          </button>
-        </div>
-      )}
-
       {/* 🎙️ EXPANDABLE KISAN AI ASSISTANT MODAL / DRAWER WITH OVERLAY */}
       {isOpen && (
         <>
