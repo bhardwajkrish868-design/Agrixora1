@@ -1807,6 +1807,20 @@
   ],
   "activityHistory": [
     {
+      "id": "act_1790601102412_bg9n6",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T13:11:42.412Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
       "id": "act_1790597486439_oy7dt",
       "userId": "usr_buyer_1790370389880",
       "userName": "Krish Bhardwaj",
@@ -8380,21 +8394,10 @@
       "description": "Krish Bhardwaj signed out.",
       "timestamp": "2026-09-18T16:02:03.990Z",
       "metadata": {}
-    },
-    {
-      "id": "act_1790361249320_pxbae",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "Bulk Demand Removed (#BLK-2026-500WHT)",
-      "description": "Bulk pooled order BLK-2026-500WHT for Sharbati Wheat (500T) was permanently deleted from database.",
-      "timestamp": "2026-09-25T18:34:09.320Z",
-      "metadata": {}
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-28T12:19:10.647Z",
+  "lastUpdated": "2026-09-28T13:11:43.433Z",
   "vehicles": [
     {
       "id": "veh_br_1",
