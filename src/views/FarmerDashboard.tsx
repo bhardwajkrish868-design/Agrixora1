@@ -230,6 +230,38 @@ export const FarmerDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* 🚛 Live GPS Reefer Radar Banner */}
+      <div 
+        onClick={() => setActiveTab('tracker')}
+        className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-emerald-500/30 group"
+      >
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-md">
+            🚚
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-extrabold text-sm sm:text-base text-white">
+                {language === 'hi' ? 'लाइव जीपीएस रीफर फ्लीट ट्रैकर' : 'Live GPS Reefer Logistics Fleet'}
+              </h3>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950 animate-pulse">
+                LIVE RADAR
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-0.5">
+              {language === 'hi'
+                ? '4.1°C कोल्ड-चेन तापमान, राजमार्ग चेकपॉइंट और ई-वे बिल लाइव देखें'
+                : 'Monitor 4.1°C cold-chain sensors, toll checkpoints & e-Way bill in real-time'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-950/60 px-4 py-2 rounded-xl border border-emerald-600/40 group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
+          <span>{language === 'hi' ? 'मैप खोलें' : 'Open GPS Radar'}</span>
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Produce Listed"

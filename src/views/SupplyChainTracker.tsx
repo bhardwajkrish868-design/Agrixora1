@@ -2,6 +2,7 @@ import React from 'react';
 import { useAgri } from '../context/AgriContext';
 import { OrderStage } from '../types';
 import { RouteTripTracker } from '../components/RouteTripTracker';
+import { LiveReeferGPSMap } from '../components/LiveReeferGPSMap';
 import { 
   Truck, 
   Sprout, 
@@ -230,11 +231,23 @@ export const SupplyChainTracker: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Route Trip Tracker with Animated Truck Symbol & Covered Km */}
-      <RouteTripTracker
-        order={selectedOrder}
-        onUpdateTripProgress={(km) => updateTripProgress(selectedOrder.id, km)}
-        showControls={true}
+      {/* 🚛 Ultra-Premium Live GPS Reefer Logistics Map with Highway Radar */}
+      <LiveReeferGPSMap
+        orderNumber={selectedOrder.orderNumber}
+        cropName={`${selectedOrder.cropName} (${selectedOrder.quantity} ${selectedOrder.unit})`}
+        driverName={selectedOrder.dispatchDetails?.driverName || 'Rajeshwar Yadav'}
+        driverPhone={selectedOrder.dispatchDetails?.driverPhone || '+91 98350 44219'}
+        vehicleNo={selectedOrder.dispatchDetails?.vehicleNo || 'BR-01-GB-4412'}
+        transporterName={selectedOrder.dispatchDetails?.transporterName || 'Bihar State Green Cold-Fleet Logistics'}
+        initialRouteKey={
+          (selectedOrder.farmerLocation || '').toLowerCase().includes('patna') || (selectedOrder.deliveryAddress || '').toLowerCase().includes('hajipur')
+            ? 'patna_hajipur'
+            : (selectedOrder.farmerLocation || '').toLowerCase().includes('nashik') || (selectedOrder.deliveryAddress || '').toLowerCase().includes('mumbai')
+              ? 'nashik_mumbai'
+              : (selectedOrder.farmerLocation || '').toLowerCase().includes('punjab') || (selectedOrder.farmerLocation || '').toLowerCase().includes('ludhiana')
+                ? 'punjab_delhi'
+                : 'patna_hajipur'
+        }
       />
 
       {/* Verified Event Timestamp Log, Vehicle Specs & QC Lab Certificate */}
