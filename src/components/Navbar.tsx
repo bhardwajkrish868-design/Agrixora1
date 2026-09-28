@@ -130,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <span className="text-xl font-extrabold tracking-tight text-slate-900 font-display">
-                      Farm<span className="text-emerald-700">2Future</span>
+                      Agri<span className="text-emerald-700">xora</span>
                     </span>
                     <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wider">
                       v2.0

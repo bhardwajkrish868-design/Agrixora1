@@ -226,7 +226,7 @@ export const WelcomeGatewayView: React.FC = () => {
           </div>
           <div>
             <span className="font-extrabold text-base sm:text-lg tracking-tight font-display text-slate-900">
-              Farm<span className="text-emerald-600">2Future</span>
+              Agri<span className="text-emerald-600">xora</span>
             </span>
           </div>
         </div>
