@@ -1,6 +1,24 @@
 {
   "users": [
     {
+      "id": "usr_farmer_1790532496880",
+      "name": "captain",
+      "phone": "+91 9431369829",
+      "email": "captain@farm2future.in",
+      "role": "farmer",
+      "password": "prashant001",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "2165 6468 4686",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 100
+    },
+    {
       "id": "usr_farmer_1790342308428",
       "name": "pkd",
       "phone": "+91 5665561658",
@@ -19,10 +37,101 @@
       "farmSizeAcres": 5
     },
     {
-      "id": "usr_buyer_1790448537989",
-      "name": "KRISH BHARDWAJ",
-      "phone": "+91 8809845947",
-      "email": "bhardwajkrish621@gmail.com",
+      "id": "usr_farmer_1790344413892",
+      "name": "guguyguf",
+      "phone": "+91 1234567891",
+      "email": "guguyguf@farm2future.in",
+      "role": "farmer",
+      "password": "prashnat100",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "5465 4654 6566",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 1
+    },
+    {
+      "id": "usr_buyer_1790449303210",
+      "name": "KIT KAT",
+      "phone": "+91 7894561236",
+      "email": "ankit123@gmail.com",
+      "role": "buyer",
+      "password": "Ankit@123",
+      "location": "Buxar, Bihar",
+      "district": "Buxar",
+      "state": "Bihar",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "5465 4546 5454",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "HOTEL HILLTOWN",
+      "gstin": "44564BJDCBJB4146"
+    },
+    {
+      "id": "usr_farmer_1790199790561",
+      "name": "Krish Bhardwaj",
+      "phone": "+91 9631359486",
+      "email": "bhardwajkrish868@gmail.com",
+      "role": "farmer",
+      "password": "2007",
+      "location": "Vaishali, Bihar",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1234 5678 9012",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 20
+    },
+    {
+      "id": "usr_admin_1790445864656",
+      "name": "prashant kumar",
+      "phone": "+91 9431369829",
+      "email": "prashant12345@gmail.com",
+      "role": "admin",
+      "password": "prashant001",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1234 5678 9123",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "usr_buyer_1790346334955",
+      "name": "prashnat",
+      "phone": "+91 9431369829",
+      "email": "prashnat@farm2future.in",
+      "role": "buyer",
+      "password": "2006",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1515 4998 4949",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "how will you order this",
+      "gstin": "646ghguy"
+    },
+    {
+      "id": "usr_buyer_1790370389880",
+      "name": "Krish Bhardwaj",
+      "phone": "+91 9631359486",
+      "email": "bhardwajkrish868@gmail.com",
       "role": "buyer",
       "password": "2007",
       "location": "Vaishali, Bihar",
@@ -30,11 +139,49 @@
       "state": "Bihar",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1541 4165 4868",
+      "aadhaarNumber": "4126 5895 9965",
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "KRISH BHARDWAJ AGRO BUYER"
+      "businessName": "Krish General Store",
+      "gstin": ""
+    },
+    {
+      "id": "usr_buyer_1790344074689",
+      "name": "cutm",
+      "phone": "+91 6564654684",
+      "email": "cutm@farm2future.in",
+      "role": "buyer",
+      "password": "prashnat100",
+      "location": "Nashik, Maharashtra",
+      "district": "Nashik",
+      "state": "Maharashtra",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1156 4846 5454",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "gdfddy",
+      "gstin": "hgfft546"
+    },
+    {
+      "id": "usr_farmer_1790343170363",
+      "name": "Riten",
+      "phone": "+91 9861782579",
+      "email": "riten@farm2future.in",
+      "role": "farmer",
+      "password": "2007",
+      "location": "Jagatsinghpur, Odisha",
+      "district": "Jagatsinghpur",
+      "state": "Odisha",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "8796 5432 1568",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 10
     },
     {
       "id": "usr_collection_centre_1789738899022",
@@ -71,115 +218,6 @@
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
       "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_buyer_1790344615960",
-      "name": "rahul",
-      "phone": "+91 1234567891",
-      "email": "rahul@farm2future.in",
-      "role": "buyer",
-      "password": "prashnat100",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "5464 6646 4646",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "ghhgfhg",
-      "gstin": "gfg4"
-    },
-    {
-      "id": "usr_farmer_1790348392240",
-      "name": "Ankit",
-      "phone": "+91 62002320921",
-      "email": "ankit@farm2future.in",
-      "role": "farmer",
-      "password": "Ankit@123",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "5988 4655 4444",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_farmer_1790344684960",
-      "name": "fafuyfua",
-      "phone": "+91 5465464885",
-      "email": "fafuyfua@farm2future.in",
-      "role": "farmer",
-      "password": "prashnat100",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "4654 6546 4654",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_buyer_1790370389880",
-      "name": "Krish Bhardwaj",
-      "phone": "+91 9631359486",
-      "email": "bhardwajkrish868@gmail.com",
-      "role": "buyer",
-      "password": "2007",
-      "location": "Vaishali, Bihar",
-      "district": "Vaishali",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "4126 5895 9965",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "Krish General Store",
-      "gstin": ""
-    },
-    {
-      "id": "usr_farmer_1790344413892",
-      "name": "guguyguf",
-      "phone": "+91 1234567891",
-      "email": "guguyguf@farm2future.in",
-      "role": "farmer",
-      "password": "prashnat100",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "5465 4654 6566",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 1
-    },
-    {
-      "id": "usr_admin_1790345133665",
-      "name": "Krish Bhardwaj",
-      "phone": "+91 9631359486",
-      "email": "bhardwajkrish868@gmail.com",
-      "role": "admin",
-      "password": "2007",
-      "location": "Vaishali, Bihar",
-      "district": "Vaishali",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1234 5678 9012",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80"
     },
     {
       "id": "usr_farmer_1790345709190",
@@ -237,77 +275,76 @@
       "gstin": "46ghhghhvh"
     },
     {
-      "id": "usr_buyer_1790344074689",
-      "name": "cutm",
-      "phone": "+91 6564654684",
-      "email": "cutm@farm2future.in",
+      "id": "usr_buyer_1790448537989",
+      "name": "KRISH BHARDWAJ",
+      "phone": "+91 8809845947",
+      "email": "bhardwajkrish621@gmail.com",
       "role": "buyer",
-      "password": "prashnat100",
-      "location": "Nashik, Maharashtra",
-      "district": "Nashik",
-      "state": "Maharashtra",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1156 4846 5454",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "gdfddy",
-      "gstin": "hgfft546"
-    },
-    {
-      "id": "usr_buyer_1790449303210",
-      "name": "KIT KAT",
-      "phone": "+91 7894561236",
-      "email": "ankit123@gmail.com",
-      "role": "buyer",
-      "password": "Ankit@123",
-      "location": "Buxar, Bihar",
-      "district": "Buxar",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "5465 4546 5454",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "HOTEL HILLTOWN",
-      "gstin": "44564BJDCBJB4146"
-    },
-    {
-      "id": "usr_farmer_1790199790561",
-      "name": "Krish Bhardwaj",
-      "phone": "+91 9631359486",
-      "email": "bhardwajkrish868@gmail.com",
-      "role": "farmer",
       "password": "2007",
       "location": "Vaishali, Bihar",
       "district": "Vaishali",
       "state": "Bihar",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1234 5678 9012",
+      "aadhaarNumber": "1541 4165 4868",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 20
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "KRISH BHARDWAJ AGRO BUYER"
     },
     {
-      "id": "usr_admin_1790445864656",
-      "name": "prashant kumar",
-      "phone": "+91 9431369829",
-      "email": "prashant12345@gmail.com",
-      "role": "admin",
-      "password": "prashant001",
+      "id": "usr_buyer_1790344615960",
+      "name": "rahul",
+      "phone": "+91 1234567891",
+      "email": "rahul@farm2future.in",
+      "role": "buyer",
+      "password": "prashnat100",
       "location": "Bokaro, Jharkhand",
       "district": "Bokaro",
       "state": "Jharkhand",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1234 5678 9123",
+      "aadhaarNumber": "5464 6646 4646",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80"
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "ghhgfhg",
+      "gstin": "gfg4"
+    },
+    {
+      "id": "usr_farmer_1790348392240",
+      "name": "Ankit",
+      "phone": "+91 62002320921",
+      "email": "ankit@farm2future.in",
+      "role": "farmer",
+      "password": "Ankit@123",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "5988 4655 4444",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 5
+    },
+    {
+      "id": "usr_admin_1790489016351",
+      "name": "Ankit Kumar Mahato",
+      "phone": "+91 9631289876",
+      "email": "ankit9631289876@gmail.com",
+      "role": "admin",
+      "password": "Ankit@123",
+      "location": "Seraikela Kharsawan, Jharkhand",
+      "district": "Seraikela Kharsawan",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1656 5444 5555",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80"
     },
     {
       "id": "usr_buyer_1790446127421",
@@ -329,76 +366,39 @@
       "gstin": "kjakhk46546"
     },
     {
-      "id": "usr_admin_1790489016351",
-      "name": "Ankit Kumar Mahato",
-      "phone": "+91 9631289876",
-      "email": "ankit9631289876@gmail.com",
+      "id": "usr_admin_1790557419802",
+      "name": "Krish Bhardwaj",
+      "phone": "+91 96313594886",
+      "email": "bhardwajkrish868@gmail.com",
       "role": "admin",
-      "password": "Ankit@123",
-      "location": "Seraikela Kharsawan, Jharkhand",
-      "district": "Seraikela Kharsawan",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1656 5444 5555",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80"
-    },
-    {
-      "id": "usr_farmer_1790532496880",
-      "name": "captain",
-      "phone": "+91 9431369829",
-      "email": "captain@farm2future.in",
-      "role": "farmer",
-      "password": "prashant001",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "2165 6468 4686",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 100
-    },
-    {
-      "id": "usr_farmer_1790343170363",
-      "name": "Riten",
-      "phone": "+91 9861782579",
-      "email": "riten@farm2future.in",
-      "role": "farmer",
       "password": "2007",
-      "location": "Jagatsinghpur, Odisha",
-      "district": "Jagatsinghpur",
-      "state": "Odisha",
+      "location": "Vaishali, Bihar",
+      "district": "Vaishali",
+      "state": "Bihar",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "8796 5432 1568",
+      "aadhaarNumber": "1234 5678 9012",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 10
+      "avatar": "data:image/jpeg;base64,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"
     },
     {
-      "id": "usr_buyer_1790346334955",
-      "name": "prashnat",
-      "phone": "+91 9431369829",
-      "email": "prashnat@farm2future.in",
-      "role": "buyer",
-      "password": "2006",
+      "id": "usr_farmer_1790344684960",
+      "name": "fafuyfua",
+      "phone": "+91 5465464885",
+      "email": "fafuyfua@farm2future.in",
+      "role": "farmer",
+      "password": "prashnat100",
       "location": "Bokaro, Jharkhand",
       "district": "Bokaro",
       "state": "Jharkhand",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1515 4998 4949",
+      "aadhaarNumber": "4654 6546 4654",
       "rating": 4.9,
       "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "how will you order this",
-      "gstin": "646ghguy"
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 5
     }
   ],
   "listings": [
@@ -487,8 +487,8 @@
       "collectionHubAddress": "Patna, Bihar",
       "orderDate": "2026-09-27T23:48:25.953Z",
       "expectedDelivery": "2026-09-30T23:48:25.953Z",
-      "currentStage": "quality_verified",
-      "paymentStatus": "escrow_locked",
+      "currentStage": "delivered",
+      "paymentStatus": "disbursed_to_farmer",
       "transactionId": "TXN-F2F-52905953-ESCROW",
       "paymentMethod": "Instant UPI QR (krishbhardwaj326@naviaxis)",
       "aiAllocation": {
@@ -512,72 +512,69 @@
         "transitType": "Hyperlocal EV Express"
       },
       "dispatchDetails": {
-        "transporterName": "Maha Kisan Direct Freight",
-        "driverName": "Sanjay Bhamre",
-        "driverPhone": "+91 98223 77889",
-        "driverLicenseNo": "MH-1520180022314",
-        "vehicleNo": "MH-15-DC-2290",
-        "vehicleType": "1.2-Ton Mini Cargo LCV",
-        "modelName": "Tata Ace Gold Diesel Plus",
-        "capacityTons": 1.2,
-        "rcNumber": "RC-MH-15-2023-002290",
-        "gpsDeviceId": "GPS-TA-2290",
-        "eWayBillNo": "EWB-2026-7992156746",
-        "dispatchedAt": "2026-09-27T23:48:25.953Z",
-        "estimatedArrival": "06:18 AM, 9/28/2026",
-        "temperatureCelsius": 20,
-        "gpsLiveLat": 25.7008,
-        "gpsLiveLng": 85.2266,
-        "originHub": "FCI Digha Ghat Food Storage Depot - Patna",
+        "transporterName": "Brahmaputra Organic Express Cargo",
+        "driverName": "Bikash Gogoi",
+        "driverPhone": "+91 94350 22334",
+        "driverLicenseNo": "AS-0120190088192",
+        "vehicleNo": "AS-01-TY-4422",
+        "vehicleType": "6-Ton Organic Tea & Ginger Carrier",
+        "modelName": "Tata Ultra Sleek T.7",
+        "capacityTons": 6,
+        "rcNumber": "RC-AS-01-2023-004422",
+        "gpsDeviceId": "GPS-BO-4422",
+        "eWayBillNo": "EWB-2026-19222545",
+        "dispatchedAt": "2026-09-28T00:56:34.056Z",
+        "estimatedArrival": "2026-09-30T00:56:34.056Z",
+        "temperatureCelsius": 14,
+        "gpsLiveLat": 19.9975,
+        "gpsLiveLng": 73.7898,
+        "originHub": "FCI Central Modern Steel Silo Complex - Moga",
         "destinationWarehouse": "Krish General Store, Vaishali, Bihar, Bihar",
-        "routeHighway": "NH-19 Grand Trunk Eastern Corridor (Patna-Kolkata)",
-        "totalDistanceKm": 8,
-        "coveredDistanceKm": 1,
-        "currentSpeedKmph": 48,
-        "estimatedMinutesRemaining": 10,
+        "routeHighway": "NH-19 & Mahatma Gandhi Setu Bridge (Patna–Hajipur, Bihar)",
+        "totalDistanceKm": 20,
+        "coveredDistanceKm": 20,
+        "currentSpeedKmph": 0,
+        "estimatedMinutesRemaining": 0,
         "checkpoints": [
           {
             "id": "cp_1",
-            "name": "Patna Mithapur Agricultural Hub",
+            "name": "Pimpalgaon Baswant Hub Loading Gate",
             "distanceKm": 0,
-            "status": "passed",
+            "status": "current",
             "type": "origin",
-            "description": "Consignment sealed",
-            "passedAt": "Recorded"
+            "description": "Consignment Sealed & GPS Telemetry Online"
           },
           {
             "id": "cp_2",
-            "name": "Bakhtiyarpur Toll Plaza",
-            "distanceKm": 104,
-            "status": "passed",
+            "name": "Kasara Ghat Summit Fastag Toll Plaza",
+            "distanceKm": 5,
+            "status": "upcoming",
             "type": "toll",
-            "description": "Fastag clearance",
-            "passedAt": "Recorded"
+            "description": "Toll Clearance & Sensor Check 14.2°C"
           },
           {
             "id": "cp_3",
-            "name": "Dhanbad-Asansol Coal & Agro Belt",
-            "distanceKm": 302,
-            "status": "passed",
+            "name": "Shahapur Agri-Transit Inspection Post",
+            "distanceKm": 11,
+            "status": "upcoming",
             "type": "checkpoint",
-            "description": "Bengal Border check",
-            "passedAt": "Recorded"
+            "description": "Weight & Seal Integrity Verified"
           },
           {
             "id": "cp_4",
-            "name": "Durgapur Expressway Toll",
-            "distanceKm": 452,
-            "status": "current",
-            "type": "toll",
-            "description": "Approaching Kolkata ring"
+            "name": "Bhiwandi-Kalyan Logistics Bypass Ring",
+            "distanceKm": 16,
+            "status": "upcoming",
+            "type": "junction",
+            "description": "Approaching Mumbai Metropolitan Boundary"
           },
           {
             "id": "cp_5",
-            "name": "Kolkata Posta Mandi Terminal",
-            "distanceKm": 580,
+            "name": "Vashi APMC Mega Mandi Terminal",
+            "distanceKm": 20,
             "status": "upcoming",
             "type": "destination",
-            "description": "Destination dock"
+            "description": "Inbound Receiving Dock & Unloading Gate"
           }
         ]
       },
@@ -589,7 +586,7 @@
           "subtitle": "₹305 locked (Includes ₹48 Buyer Delivery Fee)",
           "timestamp": "Just now",
           "completed": true,
-          "current": true,
+          "current": false,
           "location": "Farm2Future Smart Escrow Contract",
           "details": {
             "verifiedWeight": "10 Kg (Booked)",
@@ -616,7 +613,7 @@
           "subtitle": "Digital moisture & spectral grading inspection",
           "timestamp": "Verified 06:20 AM",
           "completed": true,
-          "current": true,
+          "current": false,
           "location": "Quality Lab",
           "details": {
             "agentName": "Krish Bhardwaj",
@@ -630,10 +627,18 @@
           "stage": "in_transit",
           "title": "Cold & GPS-Tracked Transit",
           "subtitle": "MH-15-DC-2290 with live telematics (20°C)",
-          "timestamp": "Pending Dispatch",
-          "completed": false,
+          "timestamp": "Dispatched 06:26 AM",
+          "completed": true,
           "current": false,
-          "location": "Highway Corridor"
+          "location": "Highway Corridor",
+          "details": {
+            "vehicleNumber": "AS-01-TY-4422",
+            "driverName": "Bikash Gogoi",
+            "driverPhone": "+91 94350 22334",
+            "temperatureCelsius": 14,
+            "humidityPercent": 52,
+            "gpsCoordinates": "19.9975 N, 73.7898 E"
+          }
         },
         {
           "id": "step-5",
@@ -641,7 +646,7 @@
           "title": "Delivery & Escrow Settlement",
           "subtitle": "Instant settlement: ₹246 to Farmer + ₹48 to Transporter",
           "timestamp": "Pending Delivery",
-          "completed": false,
+          "completed": true,
           "current": false,
           "location": "Krish General Store, Vaishali, Bihar, Bihar"
         }
@@ -659,7 +664,8 @@
         "notes": "Clean lot, uniform size, zero pest infestation. Certified for immediate distribution.",
         "certificateId": "QC-CERT-MH-2828",
         "passed": true
-      }
+      },
+      "actualDeliveryDate": "2026-09-28T00:58:28.086Z"
     },
     {
       "id": "ORD-2026-8098",
@@ -700,7 +706,7 @@
       "collectionHubAddress": "Patna, Bihar",
       "orderDate": "2026-09-28T00:36:37.546Z",
       "expectedDelivery": "2026-10-01T00:36:37.546Z",
-      "currentStage": "quality_verified",
+      "currentStage": "delivered",
       "paymentStatus": "disbursed_to_farmer",
       "transactionId": "TXN-F2F-55797546-ESCROW",
       "paymentMethod": "Instant UPI QR (krishbhardwaj326@naviaxis)",
@@ -725,29 +731,29 @@
         "transitType": "Hyperlocal EV Express"
       },
       "dispatchDetails": {
-        "transporterName": "Majha-Doaba Express Agri Fleet",
-        "driverName": "Balwinder Singh",
-        "driverPhone": "+91 98140 66778",
-        "driverLicenseNo": "PB-1020180055412",
-        "vehicleNo": "PB-10-CZ-4521",
-        "vehicleType": "14-Ton Multi-Temp Fresh Produce Carrier",
-        "modelName": "Tata Signa 3523.TK",
-        "capacityTons": 14,
-        "rcNumber": "RC-PB-10-2022-004521",
-        "gpsDeviceId": "GPS-MD-5541",
-        "eWayBillNo": "EWB-2026-67703003",
-        "dispatchedAt": "2026-09-28T00:51:39.079Z",
-        "estimatedArrival": "2026-09-30T00:51:39.079Z",
-        "temperatureCelsius": 10,
+        "transporterName": "Brahmaputra Organic Express Cargo",
+        "driverName": "Bikash Gogoi",
+        "driverPhone": "+91 94350 22334",
+        "driverLicenseNo": "AS-0120190088192",
+        "vehicleNo": "AS-01-TY-4422",
+        "vehicleType": "6-Ton Organic Tea & Ginger Carrier",
+        "modelName": "Tata Ultra Sleek T.7",
+        "capacityTons": 6,
+        "rcNumber": "RC-AS-01-2023-004422",
+        "gpsDeviceId": "GPS-BO-4422",
+        "eWayBillNo": "EWB-2026-72893123",
+        "dispatchedAt": "2026-09-28T00:56:22.854Z",
+        "estimatedArrival": "2026-09-30T00:56:22.854Z",
+        "temperatureCelsius": 14,
         "gpsLiveLat": 19.9975,
         "gpsLiveLng": 73.7898,
         "originHub": "FCI Central Modern Steel Silo Complex - Moga",
         "destinationWarehouse": "Krish General Store, Vaishali, Bihar, Bihar",
         "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
         "totalDistanceKm": 165,
-        "coveredDistanceKm": 0,
-        "currentSpeedKmph": 48,
-        "estimatedMinutesRemaining": 206,
+        "coveredDistanceKm": 165,
+        "currentSpeedKmph": 0,
+        "estimatedMinutesRemaining": 0,
         "checkpoints": [
           {
             "id": "cp_1",
@@ -826,7 +832,7 @@
           "subtitle": "Digital moisture & spectral grading inspection",
           "timestamp": "Verified 06:21 AM",
           "completed": true,
-          "current": true,
+          "current": false,
           "location": "Quality Lab",
           "details": {
             "agentName": "Krish Bhardwaj",
@@ -840,15 +846,15 @@
           "stage": "in_transit",
           "title": "Cold & GPS-Tracked Transit",
           "subtitle": "MH-15-DC-2290 with live telematics (20°C)",
-          "timestamp": "Dispatched 06:21 AM",
-          "completed": false,
-          "current": true,
+          "timestamp": "Dispatched 06:26 AM",
+          "completed": true,
+          "current": false,
           "location": "Highway Corridor",
           "details": {
-            "vehicleNumber": "PB-10-CZ-4521",
-            "driverName": "Balwinder Singh",
-            "driverPhone": "+91 98140 66778",
-            "temperatureCelsius": 10,
+            "vehicleNumber": "AS-01-TY-4422",
+            "driverName": "Bikash Gogoi",
+            "driverPhone": "+91 94350 22334",
+            "temperatureCelsius": 14,
             "humidityPercent": 52,
             "gpsCoordinates": "19.9975 N, 73.7898 E"
           }
@@ -864,7 +870,7 @@
           "location": "Krish General Store, Vaishali, Bihar, Bihar"
         }
       ],
-      "actualDeliveryDate": "2026-09-28T00:50:45.451Z",
+      "actualDeliveryDate": "2026-09-28T00:58:21.174Z",
       "qualityInspection": {
         "inspectorName": "Krish Bhardwaj",
         "hubId": "fci_pb_moga",
@@ -882,6 +888,240 @@
     }
   ],
   "notifications": [
+    {
+      "recipientRole": "collection_centre",
+      "title": "AI Fleet Dispatched: MH-15-DC-2290",
+      "message": "AI auto-assigned Tata Ace Gold Diesel Plus (Driver: Sanjay Bhamre) for order F2F-ORD-9374.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "linkTab": "incoming",
+      "id": "notif_1790555797549_xglw",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1790199790561",
+      "title": "New Order Received for Yellow Maize (Makka)!",
+      "message": "Krish Bhardwaj ordered 50 Kg. Net farmer payout ₹1,231 secured. Buyer paid ₹148 for transport.",
+      "type": "order",
+      "orderId": "ORD-2026-8098",
+      "linkTab": "orders",
+      "id": "notif_1790555797549_1nft",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790525841819_274r",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790370389880",
+      "title": "Delivery Completed: F2F-ORD-8209",
+      "message": "Order marked as received. Thank you for using Farm2Future Direct Supply Chain!",
+      "type": "delivery",
+      "orderId": "ORD-2026-7962",
+      "id": "notif_1790557108085_84p3",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1790199790561",
+      "title": "Payment Disbursed: ₹246",
+      "message": "Order F2F-ORD-8209 delivered successfully. Escrow funds transferred to your bank account.",
+      "type": "payment",
+      "orderId": "ORD-2026-7962",
+      "id": "notif_1790557108085_j128",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790507334567_0mc4",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790507311620_vuli",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790507304006_tvam",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-2026-5890",
+      "id": "notif_1790492788502_62nq",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-2026-5592",
+      "id": "notif_1790492794997_o2gu",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "New Crop Available on Marketplace",
+      "message": "Ankit Kumar Mahato listed 60 Quintals of Wheat (Grade A) (Grade A Quality Harvest).",
+      "type": "market",
+      "id": "notif_1790488552280_3elt",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Quality Certificate Issued!",
+      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
+      "type": "quality",
+      "orderId": "ORD-INTRA-MH-2026",
+      "id": "notif_1790492791709_j075",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Harvest Consignment Dispatched!",
+      "message": "Your crop consignment (Order #F2F-ORD-9374) has been loaded onto truck PB-10-CZ-4521 and is en route to the buyer.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556695856_2u8y",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle PB-10-CZ-4521 (Balwinder Singh) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556695856_vdc9",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790446127421",
+      "title": "Supply Confirmed: 10 Tons for mango",
+      "message": "captain (Jharkhand) confirmed 10 Tons towards your BLK-2026-100MAN order. Total committed: 35/100T.",
+      "type": "order",
+      "id": "notif_1790532580356_tys0",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "recipientId": "usr_farmer_1790532496880",
+      "title": "Supply Confirmed: 25 Tons (mango)",
+      "message": "Your produce batch of 25 Tons for BLK-2026-100MAN (mango) is confirmed! Guaranteed Payout: ₹66,250.",
+      "type": "order",
+      "id": "notif_1790532540038_gres",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790446127421",
+      "title": "Supply Confirmed: 25 Tons for mango",
+      "message": "captain (Jharkhand) confirmed 25 Tons towards your BLK-2026-100MAN order. Total committed: 25/100T.",
+      "type": "order",
+      "id": "notif_1790532539858_5btm",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "collection_centre",
+      "recipientId": "usr_collection_centre_1789738899022",
+      "title": "Supply Confirmed: 50 Tons (wow momos)",
+      "message": "Your produce batch of 50 Tons for BLK-2026-50WOW (wow momos) is confirmed! Guaranteed Payout: ₹1,32,500.",
+      "type": "order",
+      "id": "notif_1790494860190_eko9",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "buyer",
+      "recipientId": "usr_buyer_1790493224601",
+      "title": "Supply Confirmed: 50 Tons for wow momos",
+      "message": "Krish Bhardwaj (Maharashtra) confirmed 50 Tons towards your BLK-2026-50WOW order. Total committed: 50/50T.",
+      "type": "order",
+      "id": "notif_1790494860190_qnpf",
+      "timestamp": "Just now",
+      "read": true
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Harvest Consignment Dispatched!",
+      "message": "Your crop consignment (Order #F2F-ORD-9374) has been loaded onto truck AS-01-TY-4422 and is en route to the buyer.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556982855_4bti",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-60 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-8098",
+      "id": "notif_1790556982855_tae2",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "farmer",
+      "title": "Harvest Consignment Dispatched!",
+      "message": "Your crop consignment (Order #F2F-ORD-8209) has been loaded onto truck AS-01-TY-4422 and is en route to the buyer.",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7962",
+      "id": "notif_1790556994057_aje2",
+      "timestamp": "Just now",
+      "read": false
+    },
+    {
+      "recipientRole": "buyer",
+      "title": "Consignment Dispatched & Live Tracking Active!",
+      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-19 .",
+      "type": "dispatch",
+      "orderId": "ORD-2026-7962",
+      "id": "notif_1790556994057_ubdm",
+      "timestamp": "Just now",
+      "read": false
+    },
     {
       "recipientRole": "farmer",
       "title": "Produce Quality Verified at Hub",
@@ -1192,606 +1432,151 @@
       "id": "notif_1790555797549_var7",
       "timestamp": "Just now",
       "read": true
-    },
-    {
-      "recipientRole": "collection_centre",
-      "title": "AI Fleet Dispatched: MH-15-DC-2290",
-      "message": "AI auto-assigned Tata Ace Gold Diesel Plus (Driver: Sanjay Bhamre) for order F2F-ORD-9374.",
-      "type": "dispatch",
-      "orderId": "ORD-2026-8098",
-      "linkTab": "incoming",
-      "id": "notif_1790555797549_xglw",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "farmer",
-      "recipientId": "usr_farmer_1790199790561",
-      "title": "New Order Received for Yellow Maize (Makka)!",
-      "message": "Krish Bhardwaj ordered 50 Kg. Net farmer payout ₹1,231 secured. Buyer paid ₹148 for transport.",
-      "type": "order",
-      "orderId": "ORD-2026-8098",
-      "linkTab": "orders",
-      "id": "notif_1790555797549_1nft",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Quality Certificate Issued!",
-      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
-      "type": "quality",
-      "orderId": "ORD-INTRA-MH-2026",
-      "id": "notif_1790525841819_274r",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Quality Certificate Issued!",
-      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
-      "type": "quality",
-      "orderId": "ORD-INTRA-MH-2026",
-      "id": "notif_1790507334567_0mc4",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Consignment Dispatched & Live Tracking Active!",
-      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-60 .",
-      "type": "dispatch",
-      "orderId": "ORD-INTRA-MH-2026",
-      "id": "notif_1790507311620_vuli",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Consignment Dispatched & Live Tracking Active!",
-      "message": "Vehicle AS-01-TY-4422 (Bikash Gogoi) has left the hub for your warehouse via NH-60 .",
-      "type": "dispatch",
-      "orderId": "ORD-INTRA-MH-2026",
-      "id": "notif_1790507304006_tvam",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Quality Certificate Issued!",
-      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
-      "type": "quality",
-      "orderId": "ORD-2026-5890",
-      "id": "notif_1790492788502_62nq",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Quality Certificate Issued!",
-      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
-      "type": "quality",
-      "orderId": "ORD-2026-5592",
-      "id": "notif_1790492794997_o2gu",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "New Crop Available on Marketplace",
-      "message": "Ankit Kumar Mahato listed 60 Quintals of Wheat (Grade A) (Grade A Quality Harvest).",
-      "type": "market",
-      "id": "notif_1790488552280_3elt",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Quality Certificate Issued!",
-      "message": "Order produce passed lab quality screening. Certified as Grade A+ (Score: 96/100).",
-      "type": "quality",
-      "orderId": "ORD-INTRA-MH-2026",
-      "id": "notif_1790492791709_j075",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "farmer",
-      "title": "Harvest Consignment Dispatched!",
-      "message": "Your crop consignment (Order #F2F-ORD-9374) has been loaded onto truck PB-10-CZ-4521 and is en route to the buyer.",
-      "type": "dispatch",
-      "orderId": "ORD-2026-8098",
-      "id": "notif_1790556695856_2u8y",
-      "timestamp": "Just now",
-      "read": false
-    },
-    {
-      "recipientRole": "buyer",
-      "title": "Consignment Dispatched & Live Tracking Active!",
-      "message": "Vehicle PB-10-CZ-4521 (Balwinder Singh) has left the hub for your warehouse via NH-60 .",
-      "type": "dispatch",
-      "orderId": "ORD-2026-8098",
-      "id": "notif_1790556695856_vdc9",
-      "timestamp": "Just now",
-      "read": false
-    },
-    {
-      "recipientRole": "buyer",
-      "recipientId": "usr_buyer_1790446127421",
-      "title": "Supply Confirmed: 10 Tons for mango",
-      "message": "captain (Jharkhand) confirmed 10 Tons towards your BLK-2026-100MAN order. Total committed: 35/100T.",
-      "type": "order",
-      "id": "notif_1790532580356_tys0",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "farmer",
-      "recipientId": "usr_farmer_1790532496880",
-      "title": "Supply Confirmed: 25 Tons (mango)",
-      "message": "Your produce batch of 25 Tons for BLK-2026-100MAN (mango) is confirmed! Guaranteed Payout: ₹66,250.",
-      "type": "order",
-      "id": "notif_1790532540038_gres",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "recipientId": "usr_buyer_1790446127421",
-      "title": "Supply Confirmed: 25 Tons for mango",
-      "message": "captain (Jharkhand) confirmed 25 Tons towards your BLK-2026-100MAN order. Total committed: 25/100T.",
-      "type": "order",
-      "id": "notif_1790532539858_5btm",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "collection_centre",
-      "recipientId": "usr_collection_centre_1789738899022",
-      "title": "Supply Confirmed: 50 Tons (wow momos)",
-      "message": "Your produce batch of 50 Tons for BLK-2026-50WOW (wow momos) is confirmed! Guaranteed Payout: ₹1,32,500.",
-      "type": "order",
-      "id": "notif_1790494860190_eko9",
-      "timestamp": "Just now",
-      "read": true
-    },
-    {
-      "recipientRole": "buyer",
-      "recipientId": "usr_buyer_1790493224601",
-      "title": "Supply Confirmed: 50 Tons for wow momos",
-      "message": "Krish Bhardwaj (Maharashtra) confirmed 50 Tons towards your BLK-2026-50WOW order. Total committed: 50/50T.",
-      "type": "order",
-      "id": "notif_1790494860190_qnpf",
-      "timestamp": "Just now",
-      "read": true
     }
   ],
   "activityHistory": [
     {
-      "id": "act_1790556707307_23pei",
+      "id": "act_1790557321162_3o944",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T01:02:01.162Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790557108085_j1fjb",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-8209",
+      "description": "Order F2F-ORD-8209 confirmed delivered. Escrow payout of ₹246 instantly disbursed to Krish Bhardwaj.",
+      "timestamp": "2026-09-28T00:58:28.085Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "farmerPayout": 246
+      }
+    },
+    {
+      "id": "act_1790557101173_jlem6",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-9374",
+      "description": "Order F2F-ORD-9374 confirmed delivered. Escrow payout of ₹1,231 instantly disbursed to Krish Bhardwaj.",
+      "timestamp": "2026-09-28T00:58:21.173Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "farmerPayout": 1231
+      }
+    },
+    {
+      "id": "act_1790556994057_cvqhu",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Bikash Gogoi",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: AS-01-TY-4422",
+      "description": "Order F2F-ORD-8209 dispatched via Brahmaputra Organic Express Cargo (AS-01-TY-4422, Driver: Bikash Gogoi) on NH-19 & Mahatma Gandhi Setu Bridge (Patna–Hajipur, Bihar). Total: 20 km.",
+      "timestamp": "2026-09-28T00:56:34.057Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "vehicleNo": "AS-01-TY-4422",
+        "eWayBillNo": "EWB-2026-19222545",
+        "modelName": "Tata Ultra Sleek T.7",
+        "routeHighway": "NH-19 & Mahatma Gandhi Setu Bridge (Patna–Hajipur, Bihar)"
+      }
+    },
+    {
+      "id": "act_1790556984057_2s86t",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Bikash Gogoi",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: AS-01-TY-4422",
+      "description": "Order F2F-ORD-9374 dispatched via Brahmaputra Organic Express Cargo (AS-01-TY-4422, Driver: Bikash Gogoi) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:56:24.057Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "AS-01-TY-4422",
+        "eWayBillNo": "EWB-2026-84466636",
+        "modelName": "Tata Ultra Sleek T.7",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556982855_w9vbj",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Bikash Gogoi",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: AS-01-TY-4422",
+      "description": "Order F2F-ORD-9374 dispatched via Brahmaputra Organic Express Cargo (AS-01-TY-4422, Driver: Bikash Gogoi) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:56:22.855Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "AS-01-TY-4422",
+        "eWayBillNo": "EWB-2026-72893123",
+        "modelName": "Tata Ultra Sleek T.7",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556976681_uewan",
       "userId": "usr_collection_centre_1789738899022",
       "userName": "Krish Bhardwaj",
       "userRole": "collection_centre",
       "actionType": "qc_certified",
       "title": "QC Certificate Issued (Grade A+)",
       "description": "Order F2F-ORD-9374 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
-      "timestamp": "2026-09-28T00:51:47.307Z",
+      "timestamp": "2026-09-28T00:56:16.681Z",
       "metadata": {
         "orderId": "ORD-2026-8098",
-        "certificateId": "QC-CERT-MH-5237",
+        "certificateId": "QC-CERT-MH-6310",
         "grade": "Grade A+"
       }
     },
     {
-      "id": "act_1790432776424_w3wpc",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "admin_action",
-      "title": "Bulk Demand Removed (#BLK-ITC-WHT-500)",
-      "description": "Bulk pooled order BLK-ITC-WHT-500 for Wheat (गेहूं) (500T) was permanently deleted from database.",
-      "timestamp": "2026-09-26T14:26:16.424Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790526722339_z2lgg",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-27T16:32:02.339Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790526693689_gt5bo",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "George Varghese",
-      "userRole": "collection_centre",
-      "actionType": "dispatched",
-      "title": "Consignment Dispatched: KL-07-CP-3211",
-      "description": "Order F2F-ORD-1489 dispatched via Malabar Spice & Plantation Logistics (KL-07-CP-3211, Driver: George Varghese) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
-      "timestamp": "2026-09-27T16:31:33.689Z",
-      "metadata": {
-        "orderId": "ORD-2026-5592",
-        "vehicleNo": "KL-07-CP-3211",
-        "eWayBillNo": "EWB-2026-87346282",
-        "modelName": "Isuzu S-CAB Insulated Spice Van",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
-      }
-    },
-    {
-      "id": "act_1790526686823_wwn47",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Trilok Rawat",
-      "userRole": "collection_centre",
-      "actionType": "dispatched",
-      "title": "Consignment Dispatched: UK-07-BC-1122",
-      "description": "Order F2F-ORD-9139 dispatched via Devbhoomi Fresh Mountain Logistics (UK-07-BC-1122, Driver: Trilok Rawat) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
-      "timestamp": "2026-09-27T16:31:26.823Z",
-      "metadata": {
-        "orderId": "ORD-2026-5890",
-        "vehicleNo": "UK-07-BC-1122",
-        "eWayBillNo": "EWB-2026-24939711",
-        "modelName": "Ashok Leyland Boss 1215",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
-      }
-    },
-    {
-      "id": "act_1790494899541_ts7yt",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "profile_update",
-      "title": "Profile Updated",
-      "description": "Krish Bhardwaj updated profile details (Nashik, Maharashtra, Maharashtra).",
-      "timestamp": "2026-09-27T07:41:39.541Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790556562423_0yyzv",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T00:49:22.423Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790556545641_jd7tb",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "stage_update",
-      "title": "Order Stage Updated: COLLECTED AT HUB",
-      "description": "Order F2F-ORD-9374 advanced to stage collected at hub.",
-      "timestamp": "2026-09-28T00:49:05.641Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "newStage": "collected_at_hub"
-      }
-    },
-    {
-      "id": "act_1790552860326_7igdz",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into buyer portal.",
-      "timestamp": "2026-09-27T23:47:40.326Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "buyer"
-      }
-    },
-    {
-      "id": "act_1790552841826_qp7xx",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "add_produce",
-      "title": "Produce Listed: Yellow Maize (Makka)",
-      "description": "Krish Bhardwaj posted 60 Kg of Yellow Maize (Makka) (Grade A Quality Harvest) at ₹25/K.",
-      "timestamp": "2026-09-27T23:47:21.826Z",
-      "metadata": {
-        "listingId": "LST-841798-865",
-        "quantity": 60,
-        "cropName": "Yellow Maize (Makka)"
-      }
-    },
-    {
-      "id": "act_1790490784876_ltrzo",
-      "userId": "usr_farmer_1790345709190",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into farmer portal.",
-      "timestamp": "2026-09-27T06:33:04.876Z",
-      "metadata": {
-        "phone": "+91 9631289876",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790526737246_3nfsp",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-27T16:32:17.246Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790538714385_or473",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-109)",
-      "description": "Listing LST-109 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:54.385Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538709549_2uvb7",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-107)",
-      "description": "Listing LST-107 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:49.549Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538703809_msqrx",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-108)",
-      "description": "Listing LST-108 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:43.809Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790555089875_2qjyw",
+      "id": "act_1790554473743_60l8i",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "profile_update",
-      "title": "Profile Photo Updated",
-      "description": "Krish Bhardwaj uploaded a new profile photo.",
-      "timestamp": "2026-09-28T00:24:49.875Z",
+      "title": "Password Reset Successful",
+      "description": "Krish Bhardwaj (farmer) reset their account password successfully.",
+      "timestamp": "2026-09-28T00:14:33.743Z",
       "metadata": {}
     },
     {
-      "id": "act_1790555023027_zuzuj",
-      "userId": "usr_farmer_1790199790561",
+      "id": "act_1790542462730_a1cqo",
+      "userId": "usr_collection_centre_1789738899022",
       "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
+      "userRole": "collection_centre",
       "actionType": "login",
       "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T00:23:43.027Z",
+      "description": "Krish Bhardwaj logged into collection_centre portal.",
+      "timestamp": "2026-09-27T20:54:22.730Z",
       "metadata": {
         "phone": "+91 9631359486",
-        "role": "farmer"
+        "role": "collection_centre"
       }
     },
     {
-      "id": "act_1790555009717_4gkmx",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T00:23:29.717Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790450739490_1ukpc",
+      "id": "act_1790449989555_jpbin",
       "userId": "usr_buyer_1790449303210",
       "userName": "KIT KAT",
       "userRole": "buyer",
-      "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9139)",
-      "description": "KIT KAT ordered 1 Quintals of Cauliflower & Green Peas. AI auto-assigned HP-12-KL-8833 (Surinder Thakur, 99.4% match). Buyer paid ₹220 delivery fee.",
-      "timestamp": "2026-09-26T19:25:39.490Z",
-      "metadata": {
-        "orderId": "ORD-2026-5890",
-        "orderNumber": "F2F-ORD-9139",
-        "totalAmount": 1912,
-        "logisticsFee": 220,
-        "vehicleNo": "HP-12-KL-8833",
-        "aiMatchScore": 99.4
-      }
-    },
-    {
-      "id": "act_1790555797567_96wzr",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9374)",
-      "description": "Krish Bhardwaj ordered 50 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹148 delivery fee.",
-      "timestamp": "2026-09-28T00:36:37.567Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "orderNumber": "F2F-ORD-9374",
-        "totalAmount": 1430,
-        "logisticsFee": 148,
-        "vehicleNo": "MH-15-DC-2290",
-        "aiMatchScore": 99.4
-      }
-    },
-    {
-      "id": "act_1790555797548_3gpsm",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "add_produce",
-      "title": "Crop Listing Updated (#LST-841798-865)",
-      "description": "Listing LST-841798-865 was updated.",
-      "timestamp": "2026-09-28T00:36:37.548Z",
-      "metadata": {
-        "listingId": "LST-841798-865",
-        "updates": {
-          "quantity": 0,
-          "status": "Sold"
-        }
-      }
-    },
-    {
-      "id": "act_1790534660863_x6cnx",
-      "userId": "usr_buyer_1790534660861",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into buyer portal.",
-      "timestamp": "2026-09-27T18:44:20.863Z",
+      "description": "KIT KAT logged into buyer portal.",
+      "timestamp": "2026-09-26T19:13:09.555Z",
       "metadata": {
-        "phone": "+91 9631289876",
+        "phone": "+91 7894561236",
         "role": "buyer"
-      }
-    },
-    {
-      "id": "act_1790507334565_iyeyy",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "qc_certified",
-      "title": "QC Certificate Issued (Grade A+)",
-      "description": "Order F2F-ORD-7721 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
-      "timestamp": "2026-09-27T11:08:54.565Z",
-      "metadata": {
-        "orderId": "ORD-INTRA-MH-2026",
-        "certificateId": "QC-CERT-MH-6716",
-        "grade": "Grade A+"
-      }
-    },
-    {
-      "id": "act_1790357612484_wex8c",
-      "userId": "usr_farmer_1790345709190",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into farmer portal.",
-      "timestamp": "2026-09-25T17:33:32.484Z",
-      "metadata": {
-        "phone": "+91 9631289876",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790453194258_j0adn",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "delivered",
-      "title": "Order Delivered & Escrow Released: F2F-ORD-7721",
-      "description": "Order F2F-ORD-7721 confirmed delivered. Escrow payout of ₹84,710 instantly disbursed to Dnyaneshwar Shinde.",
-      "timestamp": "2026-09-26T20:06:34.258Z",
-      "metadata": {
-        "orderId": "ORD-INTRA-MH-2026",
-        "farmerPayout": 84710
-      }
-    },
-    {
-      "id": "act_1790515632567_pchey",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-27T13:27:12.567Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1789556053599_nlzkz",
-      "userId": "usr_farmer_1789482597768",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "delivered",
-      "title": "Order Delivered & Escrow Released: F2F-ORD-4000",
-      "description": "Order F2F-ORD-4000 confirmed delivered. Escrow payout of ₹2,068 instantly disbursed to Krish Bhardwaj.",
-      "timestamp": "2026-09-16T10:54:13.599Z",
-      "metadata": {
-        "orderId": "ORD-2026-2989",
-        "farmerPayout": 2068
-      }
-    },
-    {
-      "id": "act_1790492458316_1epgx",
-      "userId": "usr_farmer_1790345709190",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "Admin Master Console Unlocked",
-      "description": "Administrator verified passkey and gained high-privilege oversight access.",
-      "timestamp": "2026-09-27T07:00:58.317Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790532580367_jc5xa",
-      "userId": "usr_farmer_1790532496880",
-      "userName": "captain",
-      "userRole": "farmer",
-      "actionType": "bulk_supply_sent",
-      "title": "Sent 10T for mango (BLK-2026-100MAN)",
-      "description": "captain committed to send 10 Tons (₹26,500) from Bokaro, Jharkhand, Jharkhand.",
-      "timestamp": "2026-09-27T18:09:40.367Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790552905971_rvitq",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-8209)",
-      "description": "Krish Bhardwaj ordered 10 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹48 delivery fee.",
-      "timestamp": "2026-09-27T23:48:25.971Z",
-      "metadata": {
-        "orderId": "ORD-2026-7962",
-        "orderNumber": "F2F-ORD-8209",
-        "totalAmount": 305,
-        "logisticsFee": 48,
-        "vehicleNo": "MH-15-DC-2290",
-        "aiMatchScore": 99.4
-      }
-    },
-    {
-      "id": "act_1790552905954_z98yk",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "add_produce",
-      "title": "Crop Listing Updated (#LST-841798-865)",
-      "description": "Listing LST-841798-865 was updated.",
-      "timestamp": "2026-09-27T23:48:25.954Z",
-      "metadata": {
-        "listingId": "LST-841798-865",
-        "updates": {
-          "quantity": 50
-        }
       }
     },
     {
@@ -1912,33 +1697,40 @@
       }
     },
     {
-      "id": "act_1790556604543_fwpgf",
-      "userId": "usr_collection_centre_1789738899022",
+      "id": "act_1790557440805_x1tbn",
+      "userId": "usr_admin_1790557419802",
       "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "qc_certified",
-      "title": "QC Certificate Issued (Grade A+)",
-      "description": "Order F2F-ORD-8209 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
-      "timestamp": "2026-09-28T00:50:04.543Z",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "User Profile Deleted",
+      "description": "Admin deleted user profile ID usr_admin_1790345133665 from database.",
+      "timestamp": "2026-09-28T01:04:00.805Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790557419805_psdct",
+      "userId": "usr_admin_1790557419802",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "register",
+      "title": "New Account Registered",
+      "description": "Krish Bhardwaj created a new admin account from Vaishali, Bihar.",
+      "timestamp": "2026-09-28T01:03:39.805Z",
       "metadata": {
-        "orderId": "ORD-2026-7962",
-        "certificateId": "QC-CERT-MH-2828",
-        "grade": "Grade A+"
+        "phone": "+91 96313594886",
+        "role": "admin"
       }
     },
     {
-      "id": "act_1790556598208_mmepd",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into collection_centre portal.",
-      "timestamp": "2026-09-28T00:49:58.208Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "collection_centre"
-      }
+      "id": "act_1790557416958_eo5iq",
+      "userId": "admin_usr",
+      "userName": "Govt Administrator",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "Admin Master Console Unlocked",
+      "description": "Administrator verified passkey and gained high-privilege oversight access.",
+      "timestamp": "2026-09-28T01:03:36.958Z",
+      "metadata": {}
     },
     {
       "id": "act_1790556586294_1oxbc",
@@ -1991,6 +1783,116 @@
       "metadata": {}
     },
     {
+      "id": "act_1790450739490_1ukpc",
+      "userId": "usr_buyer_1790449303210",
+      "userName": "KIT KAT",
+      "userRole": "buyer",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9139)",
+      "description": "KIT KAT ordered 1 Quintals of Cauliflower & Green Peas. AI auto-assigned HP-12-KL-8833 (Surinder Thakur, 99.4% match). Buyer paid ₹220 delivery fee.",
+      "timestamp": "2026-09-26T19:25:39.490Z",
+      "metadata": {
+        "orderId": "ORD-2026-5890",
+        "orderNumber": "F2F-ORD-9139",
+        "totalAmount": 1912,
+        "logisticsFee": 220,
+        "vehicleNo": "HP-12-KL-8833",
+        "aiMatchScore": 99.4
+      }
+    },
+    {
+      "id": "act_1790555797567_96wzr",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9374)",
+      "description": "Krish Bhardwaj ordered 50 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹148 delivery fee.",
+      "timestamp": "2026-09-28T00:36:37.567Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "orderNumber": "F2F-ORD-9374",
+        "totalAmount": 1430,
+        "logisticsFee": 148,
+        "vehicleNo": "MH-15-DC-2290",
+        "aiMatchScore": 99.4
+      }
+    },
+    {
+      "id": "act_1790555797548_3gpsm",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "add_produce",
+      "title": "Crop Listing Updated (#LST-841798-865)",
+      "description": "Listing LST-841798-865 was updated.",
+      "timestamp": "2026-09-28T00:36:37.548Z",
+      "metadata": {
+        "listingId": "LST-841798-865",
+        "updates": {
+          "quantity": 0,
+          "status": "Sold"
+        }
+      }
+    },
+    {
+      "id": "act_1790534660863_x6cnx",
+      "userId": "usr_buyer_1790534660861",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Ankit Kumar Mahato logged into buyer portal.",
+      "timestamp": "2026-09-27T18:44:20.863Z",
+      "metadata": {
+        "phone": "+91 9631289876",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1790507334565_iyeyy",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "qc_certified",
+      "title": "QC Certificate Issued (Grade A+)",
+      "description": "Order F2F-ORD-7721 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
+      "timestamp": "2026-09-27T11:08:54.565Z",
+      "metadata": {
+        "orderId": "ORD-INTRA-MH-2026",
+        "certificateId": "QC-CERT-MH-6716",
+        "grade": "Grade A+"
+      }
+    },
+    {
+      "id": "act_1790357612484_wex8c",
+      "userId": "usr_farmer_1790345709190",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Ankit Kumar Mahato logged into farmer portal.",
+      "timestamp": "2026-09-25T17:33:32.484Z",
+      "metadata": {
+        "phone": "+91 9631289876",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790453194258_j0adn",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-7721",
+      "description": "Order F2F-ORD-7721 confirmed delivered. Escrow payout of ₹84,710 instantly disbursed to Dnyaneshwar Shinde.",
+      "timestamp": "2026-09-26T20:06:34.258Z",
+      "metadata": {
+        "orderId": "ORD-INTRA-MH-2026",
+        "farmerPayout": 84710
+      }
+    },
+    {
       "id": "act_1790554518710_cdfgh",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
@@ -2019,42 +1921,282 @@
       }
     },
     {
-      "id": "act_1790554473743_60l8i",
-      "userId": "usr_farmer_1790199790561",
+      "id": "act_1790515632567_pchey",
+      "userId": "usr_admin_1790345133665",
       "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "profile_update",
-      "title": "Password Reset Successful",
-      "description": "Krish Bhardwaj (farmer) reset their account password successfully.",
-      "timestamp": "2026-09-28T00:14:33.743Z",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-27T13:27:12.567Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1789556053599_nlzkz",
+      "userId": "usr_farmer_1789482597768",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "delivered",
+      "title": "Order Delivered & Escrow Released: F2F-ORD-4000",
+      "description": "Order F2F-ORD-4000 confirmed delivered. Escrow payout of ₹2,068 instantly disbursed to Krish Bhardwaj.",
+      "timestamp": "2026-09-16T10:54:13.599Z",
+      "metadata": {
+        "orderId": "ORD-2026-2989",
+        "farmerPayout": 2068
+      }
+    },
+    {
+      "id": "act_1790492458316_1epgx",
+      "userId": "usr_farmer_1790345709190",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "Admin Master Console Unlocked",
+      "description": "Administrator verified passkey and gained high-privilege oversight access.",
+      "timestamp": "2026-09-27T07:00:58.317Z",
       "metadata": {}
     },
     {
-      "id": "act_1790542462730_a1cqo",
+      "id": "act_1790532580367_jc5xa",
+      "userId": "usr_farmer_1790532496880",
+      "userName": "captain",
+      "userRole": "farmer",
+      "actionType": "bulk_supply_sent",
+      "title": "Sent 10T for mango (BLK-2026-100MAN)",
+      "description": "captain committed to send 10 Tons (₹26,500) from Bokaro, Jharkhand, Jharkhand.",
+      "timestamp": "2026-09-27T18:09:40.367Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790552905971_rvitq",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-8209)",
+      "description": "Krish Bhardwaj ordered 10 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹48 delivery fee.",
+      "timestamp": "2026-09-27T23:48:25.971Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "orderNumber": "F2F-ORD-8209",
+        "totalAmount": 305,
+        "logisticsFee": 48,
+        "vehicleNo": "MH-15-DC-2290",
+        "aiMatchScore": 99.4
+      }
+    },
+    {
+      "id": "act_1790552905954_z98yk",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "add_produce",
+      "title": "Crop Listing Updated (#LST-841798-865)",
+      "description": "Listing LST-841798-865 was updated.",
+      "timestamp": "2026-09-27T23:48:25.954Z",
+      "metadata": {
+        "listingId": "LST-841798-865",
+        "updates": {
+          "quantity": 50
+        }
+      }
+    },
+    {
+      "id": "act_1790556545641_jd7tb",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "stage_update",
+      "title": "Order Stage Updated: COLLECTED AT HUB",
+      "description": "Order F2F-ORD-9374 advanced to stage collected at hub.",
+      "timestamp": "2026-09-28T00:49:05.641Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "newStage": "collected_at_hub"
+      }
+    },
+    {
+      "id": "act_1790552860326_7igdz",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into buyer portal.",
+      "timestamp": "2026-09-27T23:47:40.326Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1790552841826_qp7xx",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "add_produce",
+      "title": "Produce Listed: Yellow Maize (Makka)",
+      "description": "Krish Bhardwaj posted 60 Kg of Yellow Maize (Makka) (Grade A Quality Harvest) at ₹25/K.",
+      "timestamp": "2026-09-27T23:47:21.826Z",
+      "metadata": {
+        "listingId": "LST-841798-865",
+        "quantity": 60,
+        "cropName": "Yellow Maize (Makka)"
+      }
+    },
+    {
+      "id": "act_1790490784876_ltrzo",
+      "userId": "usr_farmer_1790345709190",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Ankit Kumar Mahato logged into farmer portal.",
+      "timestamp": "2026-09-27T06:33:04.876Z",
+      "metadata": {
+        "phone": "+91 9631289876",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790526737246_3nfsp",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-27T16:32:17.246Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790538714385_or473",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-109)",
+      "description": "Listing LST-109 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:54.385Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790556604543_fwpgf",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "qc_certified",
+      "title": "QC Certificate Issued (Grade A+)",
+      "description": "Order F2F-ORD-8209 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
+      "timestamp": "2026-09-28T00:50:04.543Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "certificateId": "QC-CERT-MH-2828",
+        "grade": "Grade A+"
+      }
+    },
+    {
+      "id": "act_1790556598208_mmepd",
       "userId": "usr_collection_centre_1789738899022",
       "userName": "Krish Bhardwaj",
       "userRole": "collection_centre",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into collection_centre portal.",
-      "timestamp": "2026-09-27T20:54:22.730Z",
+      "timestamp": "2026-09-28T00:49:58.208Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "collection_centre"
       }
     },
     {
-      "id": "act_1790449989555_jpbin",
-      "userId": "usr_buyer_1790449303210",
-      "userName": "KIT KAT",
-      "userRole": "buyer",
+      "id": "act_1790538709549_2uvb7",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-107)",
+      "description": "Listing LST-107 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:49.549Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790538703809_msqrx",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-108)",
+      "description": "Listing LST-108 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:43.809Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790557676942_5v80l",
+      "userId": "usr_admin_1790557419802",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T01:07:56.942Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555089875_2qjyw",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Photo Updated",
+      "description": "Krish Bhardwaj uploaded a new profile photo.",
+      "timestamp": "2026-09-28T00:24:49.875Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555023027_zuzuj",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged In",
-      "description": "KIT KAT logged into buyer portal.",
-      "timestamp": "2026-09-26T19:13:09.555Z",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T00:23:43.027Z",
       "metadata": {
-        "phone": "+91 7894561236",
-        "role": "buyer"
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790555009717_4gkmx",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T00:23:29.717Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790556707307_23pei",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "qc_certified",
+      "title": "QC Certificate Issued (Grade A+)",
+      "description": "Order F2F-ORD-9374 tested and certified Grade A+ (Score: 96/100, Moisture: 11.8%).",
+      "timestamp": "2026-09-28T00:51:47.307Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "certificateId": "QC-CERT-MH-5237",
+        "grade": "Grade A+"
       }
     },
     {
@@ -2075,6 +2217,84 @@
       }
     },
     {
+      "id": "act_1790432776424_w3wpc",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "admin_action",
+      "title": "Bulk Demand Removed (#BLK-ITC-WHT-500)",
+      "description": "Bulk pooled order BLK-ITC-WHT-500 for Wheat (गेहूं) (500T) was permanently deleted from database.",
+      "timestamp": "2026-09-26T14:26:16.424Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790526693689_gt5bo",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "George Varghese",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: KL-07-CP-3211",
+      "description": "Order F2F-ORD-1489 dispatched via Malabar Spice & Plantation Logistics (KL-07-CP-3211, Driver: George Varghese) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-27T16:31:33.689Z",
+      "metadata": {
+        "orderId": "ORD-2026-5592",
+        "vehicleNo": "KL-07-CP-3211",
+        "eWayBillNo": "EWB-2026-87346282",
+        "modelName": "Isuzu S-CAB Insulated Spice Van",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790526722339_z2lgg",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-27T16:32:02.339Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790526686823_wwn47",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Trilok Rawat",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: UK-07-BC-1122",
+      "description": "Order F2F-ORD-9139 dispatched via Devbhoomi Fresh Mountain Logistics (UK-07-BC-1122, Driver: Trilok Rawat) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-27T16:31:26.823Z",
+      "metadata": {
+        "orderId": "ORD-2026-5890",
+        "vehicleNo": "UK-07-BC-1122",
+        "eWayBillNo": "EWB-2026-24939711",
+        "modelName": "Ashok Leyland Boss 1215",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790494899541_ts7yt",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Nashik, Maharashtra, Maharashtra).",
+      "timestamp": "2026-09-27T07:41:39.541Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790556562423_0yyzv",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T00:49:22.423Z",
+      "metadata": {}
+    },
+    {
       "id": "act_1790524755576_c77fu",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
@@ -2084,6 +2304,108 @@
       "description": "Krish Bhardwaj signed out.",
       "timestamp": "2026-09-27T15:59:15.576Z",
       "metadata": {}
+    },
+    {
+      "id": "act_1790556699079_q6cfc",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Balwinder Singh",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: PB-10-CZ-4521",
+      "description": "Order F2F-ORD-9374 dispatched via Majha-Doaba Express Agri Fleet (PB-10-CZ-4521, Driver: Balwinder Singh) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:51:39.079Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "PB-10-CZ-4521",
+        "eWayBillNo": "EWB-2026-67703003",
+        "modelName": "Tata Signa 3523.TK",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556698849_jkjx0",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Balwinder Singh",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: PB-10-CZ-4521",
+      "description": "Order F2F-ORD-9374 dispatched via Majha-Doaba Express Agri Fleet (PB-10-CZ-4521, Driver: Balwinder Singh) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:51:38.849Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "PB-10-CZ-4521",
+        "eWayBillNo": "EWB-2026-23145191",
+        "modelName": "Tata Signa 3523.TK",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556698330_e64dz",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Balwinder Singh",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: PB-10-CZ-4521",
+      "description": "Order F2F-ORD-9374 dispatched via Majha-Doaba Express Agri Fleet (PB-10-CZ-4521, Driver: Balwinder Singh) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:51:38.330Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "PB-10-CZ-4521",
+        "eWayBillNo": "EWB-2026-50183196",
+        "modelName": "Tata Signa 3523.TK",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556697662_rdnxa",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Balwinder Singh",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: PB-10-CZ-4521",
+      "description": "Order F2F-ORD-9374 dispatched via Majha-Doaba Express Agri Fleet (PB-10-CZ-4521, Driver: Balwinder Singh) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:51:37.662Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "PB-10-CZ-4521",
+        "eWayBillNo": "EWB-2026-81795895",
+        "modelName": "Tata Signa 3523.TK",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556696711_jjw1a",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Balwinder Singh",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: PB-10-CZ-4521",
+      "description": "Order F2F-ORD-9374 dispatched via Majha-Doaba Express Agri Fleet (PB-10-CZ-4521, Driver: Balwinder Singh) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:51:36.711Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "PB-10-CZ-4521",
+        "eWayBillNo": "EWB-2026-48036211",
+        "modelName": "Tata Signa 3523.TK",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790556695856_z71fs",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Balwinder Singh",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: PB-10-CZ-4521",
+      "description": "Order F2F-ORD-9374 dispatched via Majha-Doaba Express Agri Fleet (PB-10-CZ-4521, Driver: Balwinder Singh) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-28T00:51:35.856Z",
+      "metadata": {
+        "orderId": "ORD-2026-8098",
+        "vehicleNo": "PB-10-CZ-4521",
+        "eWayBillNo": "EWB-2026-83266757",
+        "modelName": "Tata Signa 3523.TK",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
     },
     {
       "id": "act_1790556681165_q283n",
@@ -7405,8 +7727,223 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-28T00:52:01.544Z",
+  "lastUpdated": "2026-09-28T01:11:24.607Z",
   "vehicles": [
+    {
+      "id": "veh_tn_1",
+      "vehicleNo": "TN-09-XY-3421",
+      "vehicleType": "22-Ton Heavy Multi-Axle Agri Carrier",
+      "modelName": "Ashok Leyland 3520 Multi-Axle",
+      "transporterName": "Uzhavar Express Logistics Fleet",
+      "driverName": "Murugan Subramanian",
+      "driverPhone": "+91 98400 33445",
+      "driverLicenseNo": "TN-0920160088123",
+      "capacityTons": 22,
+      "temperatureCelsius": 16,
+      "humidityPercent": 62,
+      "gpsDeviceId": "GPS-UE-3421",
+      "rcNumber": "RC-TN-09-2021-003421",
+      "insuranceValidity": "14 Oct 2027",
+      "pucCertificateNo": "PUC-TN-2026-4490",
+      "currentStatus": "Available",
+      "originHub": "Koyambedu Wholesale Agro Hub Chennai",
+      "destinationWarehouse": "Southern Supply Grid",
+      "state": "Tamil Nadu",
+      "cityHub": "Chennai",
+      "serviceType": "Heavy Multi-Axle",
+      "ratePerKm": 35,
+      "rating": 4.9,
+      "operatingRoutes": [
+        "Chennai - Coimbatore",
+        "Chennai - Madurai",
+        "Chennai - Bengaluru"
+      ],
+      "verifiedTransporter": true
+    },
+    {
+      "id": "veh_mh_0_ace",
+      "vehicleNo": "MH-15-DC-2290",
+      "vehicleType": "1.2-Ton Mini Cargo LCV",
+      "modelName": "Tata Ace Gold Diesel Plus",
+      "transporterName": "Maha Kisan Direct Freight",
+      "driverName": "Sanjay Bhamre",
+      "driverPhone": "+91 98223 77889",
+      "driverLicenseNo": "MH-1520180022314",
+      "capacityTons": 1.2,
+      "temperatureCelsius": 20,
+      "humidityPercent": 55,
+      "gpsDeviceId": "GPS-TA-2290",
+      "rcNumber": "RC-MH-15-2023-002290",
+      "insuranceValidity": "15 Aug 2027",
+      "pucCertificateNo": "PUC-MH-2026-7788",
+      "currentStatus": "On Trip",
+      "originHub": "FCI Central Modern Steel Silo Complex - Moga",
+      "destinationWarehouse": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+      "state": "Maharashtra",
+      "cityHub": "Nashik",
+      "serviceType": "Mini Cargo Express",
+      "ratePerKm": 18,
+      "rating": 4.9,
+      "operatingRoutes": [
+        "Nashik - Sinnar",
+        "Nashik - Igatpuri",
+        "Nashik - Trimbak"
+      ],
+      "verifiedTransporter": true,
+      "activeTrip": {
+        "orderId": "ORD-2026-8098",
+        "routeHighway": "NH-19 Grand Trunk Eastern Corridor (Patna-Kolkata)",
+        "origin": "FCI Digha Ghat Food Storage Depot - Patna",
+        "destination": "Krish General Store, Vaishali, Bihar, Bihar",
+        "totalDistanceKm": 8,
+        "coveredDistanceKm": 1,
+        "currentSpeedKmph": 48,
+        "estimatedMinutesRemaining": 10
+      }
+    },
+    {
+      "id": "veh_hp_1",
+      "vehicleNo": "HP-12-KL-8833",
+      "vehicleType": "12-Ton Sub-Zero Apple & Cold Crop Reefer",
+      "modelName": "Eicher Pro 3015 Reefer Sub-Zero",
+      "transporterName": "Apple Valley Cold Reefer Transit",
+      "driverName": "Surinder Thakur",
+      "driverPhone": "+91 94180 66778",
+      "driverLicenseNo": "HP-1220180011942",
+      "capacityTons": 12,
+      "temperatureCelsius": 2,
+      "humidityPercent": 85,
+      "gpsDeviceId": "GPS-AV-8833",
+      "rcNumber": "RC-HP-12-2022-008833",
+      "insuranceValidity": "21 Oct 2028",
+      "pucCertificateNo": "PUC-HP-2026-7722",
+      "currentStatus": "On Trip",
+      "originHub": "Shimla-Theog Apple Consolidation Hub",
+      "destinationWarehouse": "Azadpur Delhi Mega Cold Terminal",
+      "state": "Himachal Pradesh",
+      "cityHub": "Shimla",
+      "serviceType": "Reefer Cold Chain",
+      "ratePerKm": 32,
+      "rating": 5,
+      "operatingRoutes": [
+        "Shimla - Delhi",
+        "Kullu - Chandigarh",
+        "Solan - Ambala"
+      ],
+      "verifiedTransporter": true,
+      "activeTrip": {
+        "orderId": "ORD-2026-5890",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
+        "origin": "Nashik North Agri Aggregation Hub #04",
+        "destination": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
+        "totalDistanceKm": 1329,
+        "coveredDistanceKm": 199,
+        "currentSpeedKmph": 48,
+        "estimatedMinutesRemaining": 1728
+      }
+    },
+    {
+      "id": "veh_ap_1",
+      "vehicleNo": "AP-07-LK-5541",
+      "vehicleType": "28-Ton Articulated Chilli & Grain Trailer",
+      "modelName": "Tata Signa 4018.S Articulated",
+      "transporterName": "Andhra Annapurna Agri Freight",
+      "driverName": "Venkateswara Rao",
+      "driverPhone": "+91 98480 22331",
+      "driverLicenseNo": "AP-0720150044192",
+      "capacityTons": 28,
+      "temperatureCelsius": 22,
+      "humidityPercent": 50,
+      "gpsDeviceId": "GPS-AA-5541",
+      "rcNumber": "RC-AP-07-2021-005541",
+      "insuranceValidity": "19 May 2027",
+      "pucCertificateNo": "PUC-AP-2026-8822",
+      "currentStatus": "Available",
+      "originHub": "Guntur Asia Largest Chilli Yard Hub",
+      "destinationWarehouse": "Pan-India Export & National Corridor",
+      "state": "Andhra Pradesh",
+      "cityHub": "Guntur",
+      "serviceType": "Heavy Multi-Axle",
+      "ratePerKm": 40,
+      "rating": 5,
+      "operatingRoutes": [
+        "Guntur - Hyderabad",
+        "Guntur - Chennai",
+        "Guntur - Mumbai"
+      ],
+      "verifiedTransporter": true
+    },
+    {
+      "id": "veh_hr_1",
+      "vehicleNo": "HR-05-AB-7821",
+      "vehicleType": "16-Ton Multi-Axle Grain Reefer",
+      "modelName": "Tata Signa 2823.K Multi-Axle",
+      "transporterName": "National Cold Agri Express",
+      "driverName": "Gurmukh Singh",
+      "driverPhone": "+91 98112 77889",
+      "driverLicenseNo": "HR-0520160089234",
+      "capacityTons": 16,
+      "temperatureCelsius": 18,
+      "humidityPercent": 48,
+      "gpsDeviceId": "GPS-NC-5502",
+      "rcNumber": "RC-HR-05-2021-007821",
+      "insuranceValidity": "15 Oct 2027",
+      "pucCertificateNo": "PUC-HR-2026-5541",
+      "currentStatus": "On Trip",
+      "originHub": "Karnal Grain Consolidation Terminal #01",
+      "destinationWarehouse": "Delhi-NCR Central Food Depots",
+      "state": "Haryana",
+      "cityHub": "Karnal",
+      "serviceType": "Heavy Multi-Axle",
+      "ratePerKm": 29,
+      "rating": 4.9,
+      "operatingRoutes": [
+        "Karnal - Delhi",
+        "Panipat - Gurugram",
+        "Ambala - Chandigarh"
+      ],
+      "verifiedTransporter": true,
+      "activeTrip": {
+        "routeHighway": "NH-44 North-South Agri Freight Corridor",
+        "origin": "Karnal Grain Consolidation Terminal #01",
+        "destination": "Delhi-NCR Central Food Depots",
+        "totalDistanceKm": 128,
+        "coveredDistanceKm": 88,
+        "currentSpeedKmph": 52,
+        "estimatedMinutesRemaining": 45
+      }
+    },
+    {
+      "id": "veh_jk_1",
+      "vehicleNo": "JK-02-AZ-4512",
+      "vehicleType": "14-Ton Sub-Zero Apple & Saffron Carrier",
+      "modelName": "BharatBenz 1617R Cold Climate Reefer",
+      "transporterName": "Kashmir Valley Fruit Cold Transit",
+      "driverName": "Ghulam Mohammad Dar",
+      "driverPhone": "+91 94190 22331",
+      "driverLicenseNo": "JK-0220170066129",
+      "capacityTons": 14,
+      "temperatureCelsius": 1.5,
+      "humidityPercent": 88,
+      "gpsDeviceId": "GPS-KV-4512",
+      "rcNumber": "RC-JK-02-2022-004512",
+      "insuranceValidity": "18 Nov 2028",
+      "pucCertificateNo": "PUC-JK-2026-8811",
+      "currentStatus": "Available",
+      "originHub": "Sopore Apple & Fruit Terminal",
+      "destinationWarehouse": "National Cold Chain Grid Delhi-NCR",
+      "state": "Jammu & Kashmir",
+      "cityHub": "Srinagar",
+      "serviceType": "Reefer Cold Chain",
+      "ratePerKm": 34,
+      "rating": 5,
+      "operatingRoutes": [
+        "Srinagar - Jammu",
+        "Jammu - Delhi",
+        "Srinagar - Amritsar"
+      ],
+      "verifiedTransporter": true
+    },
     {
       "id": "veh_as_1",
       "vehicleNo": "AS-01-TY-4422",
@@ -7425,7 +7962,7 @@
       "pucCertificateNo": "PUC-AS-2026-1199",
       "currentStatus": "On Trip",
       "originHub": "FCI Central Modern Steel Silo Complex - Moga",
-      "destinationWarehouse": "AgroFresh Central Fulfilment Hub, Sector 19, Vashi, Navi Mumbai, Maharashtra",
+      "destinationWarehouse": "Krish General Store, Vaishali, Bihar, Bihar",
       "state": "Assam",
       "cityHub": "Guwahati",
       "serviceType": "Express Mandi Link",
@@ -7438,14 +7975,14 @@
       ],
       "verifiedTransporter": true,
       "activeTrip": {
-        "orderId": "ORD-INTRA-MH-2026",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
+        "orderId": "ORD-2026-7962",
+        "routeHighway": "NH-19 & Mahatma Gandhi Setu Bridge (Patna–Hajipur, Bihar)",
         "origin": "FCI Central Modern Steel Silo Complex - Moga",
-        "destination": "AgroFresh Central Fulfilment Hub, Sector 19, Vashi, Navi Mumbai, Maharashtra",
-        "totalDistanceKm": 165,
+        "destination": "Krish General Store, Vaishali, Bihar, Bihar",
+        "totalDistanceKm": 20,
         "coveredDistanceKm": 0,
         "currentSpeedKmph": 48,
-        "estimatedMinutesRemaining": 206
+        "estimatedMinutesRemaining": 25
       }
     },
     {
@@ -8353,221 +8890,6 @@
         "Jaipur - Delhi",
         "Jaipur - Jodhpur",
         "Kota - Jaipur"
-      ],
-      "verifiedTransporter": true
-    },
-    {
-      "id": "veh_tn_1",
-      "vehicleNo": "TN-09-XY-3421",
-      "vehicleType": "22-Ton Heavy Multi-Axle Agri Carrier",
-      "modelName": "Ashok Leyland 3520 Multi-Axle",
-      "transporterName": "Uzhavar Express Logistics Fleet",
-      "driverName": "Murugan Subramanian",
-      "driverPhone": "+91 98400 33445",
-      "driverLicenseNo": "TN-0920160088123",
-      "capacityTons": 22,
-      "temperatureCelsius": 16,
-      "humidityPercent": 62,
-      "gpsDeviceId": "GPS-UE-3421",
-      "rcNumber": "RC-TN-09-2021-003421",
-      "insuranceValidity": "14 Oct 2027",
-      "pucCertificateNo": "PUC-TN-2026-4490",
-      "currentStatus": "Available",
-      "originHub": "Koyambedu Wholesale Agro Hub Chennai",
-      "destinationWarehouse": "Southern Supply Grid",
-      "state": "Tamil Nadu",
-      "cityHub": "Chennai",
-      "serviceType": "Heavy Multi-Axle",
-      "ratePerKm": 35,
-      "rating": 4.9,
-      "operatingRoutes": [
-        "Chennai - Coimbatore",
-        "Chennai - Madurai",
-        "Chennai - Bengaluru"
-      ],
-      "verifiedTransporter": true
-    },
-    {
-      "id": "veh_mh_0_ace",
-      "vehicleNo": "MH-15-DC-2290",
-      "vehicleType": "1.2-Ton Mini Cargo LCV",
-      "modelName": "Tata Ace Gold Diesel Plus",
-      "transporterName": "Maha Kisan Direct Freight",
-      "driverName": "Sanjay Bhamre",
-      "driverPhone": "+91 98223 77889",
-      "driverLicenseNo": "MH-1520180022314",
-      "capacityTons": 1.2,
-      "temperatureCelsius": 20,
-      "humidityPercent": 55,
-      "gpsDeviceId": "GPS-TA-2290",
-      "rcNumber": "RC-MH-15-2023-002290",
-      "insuranceValidity": "15 Aug 2027",
-      "pucCertificateNo": "PUC-MH-2026-7788",
-      "currentStatus": "On Trip",
-      "originHub": "FCI Central Modern Steel Silo Complex - Moga",
-      "destinationWarehouse": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
-      "state": "Maharashtra",
-      "cityHub": "Nashik",
-      "serviceType": "Mini Cargo Express",
-      "ratePerKm": 18,
-      "rating": 4.9,
-      "operatingRoutes": [
-        "Nashik - Sinnar",
-        "Nashik - Igatpuri",
-        "Nashik - Trimbak"
-      ],
-      "verifiedTransporter": true,
-      "activeTrip": {
-        "orderId": "ORD-2026-8098",
-        "routeHighway": "NH-19 Grand Trunk Eastern Corridor (Patna-Kolkata)",
-        "origin": "FCI Digha Ghat Food Storage Depot - Patna",
-        "destination": "Krish General Store, Vaishali, Bihar, Bihar",
-        "totalDistanceKm": 8,
-        "coveredDistanceKm": 1,
-        "currentSpeedKmph": 48,
-        "estimatedMinutesRemaining": 10
-      }
-    },
-    {
-      "id": "veh_hp_1",
-      "vehicleNo": "HP-12-KL-8833",
-      "vehicleType": "12-Ton Sub-Zero Apple & Cold Crop Reefer",
-      "modelName": "Eicher Pro 3015 Reefer Sub-Zero",
-      "transporterName": "Apple Valley Cold Reefer Transit",
-      "driverName": "Surinder Thakur",
-      "driverPhone": "+91 94180 66778",
-      "driverLicenseNo": "HP-1220180011942",
-      "capacityTons": 12,
-      "temperatureCelsius": 2,
-      "humidityPercent": 85,
-      "gpsDeviceId": "GPS-AV-8833",
-      "rcNumber": "RC-HP-12-2022-008833",
-      "insuranceValidity": "21 Oct 2028",
-      "pucCertificateNo": "PUC-HP-2026-7722",
-      "currentStatus": "On Trip",
-      "originHub": "Shimla-Theog Apple Consolidation Hub",
-      "destinationWarehouse": "Azadpur Delhi Mega Cold Terminal",
-      "state": "Himachal Pradesh",
-      "cityHub": "Shimla",
-      "serviceType": "Reefer Cold Chain",
-      "ratePerKm": 32,
-      "rating": 5,
-      "operatingRoutes": [
-        "Shimla - Delhi",
-        "Kullu - Chandigarh",
-        "Solan - Ambala"
-      ],
-      "verifiedTransporter": true,
-      "activeTrip": {
-        "orderId": "ORD-2026-5890",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor",
-        "origin": "Nashik North Agri Aggregation Hub #04",
-        "destination": "AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra",
-        "totalDistanceKm": 1329,
-        "coveredDistanceKm": 199,
-        "currentSpeedKmph": 48,
-        "estimatedMinutesRemaining": 1728
-      }
-    },
-    {
-      "id": "veh_ap_1",
-      "vehicleNo": "AP-07-LK-5541",
-      "vehicleType": "28-Ton Articulated Chilli & Grain Trailer",
-      "modelName": "Tata Signa 4018.S Articulated",
-      "transporterName": "Andhra Annapurna Agri Freight",
-      "driverName": "Venkateswara Rao",
-      "driverPhone": "+91 98480 22331",
-      "driverLicenseNo": "AP-0720150044192",
-      "capacityTons": 28,
-      "temperatureCelsius": 22,
-      "humidityPercent": 50,
-      "gpsDeviceId": "GPS-AA-5541",
-      "rcNumber": "RC-AP-07-2021-005541",
-      "insuranceValidity": "19 May 2027",
-      "pucCertificateNo": "PUC-AP-2026-8822",
-      "currentStatus": "Available",
-      "originHub": "Guntur Asia Largest Chilli Yard Hub",
-      "destinationWarehouse": "Pan-India Export & National Corridor",
-      "state": "Andhra Pradesh",
-      "cityHub": "Guntur",
-      "serviceType": "Heavy Multi-Axle",
-      "ratePerKm": 40,
-      "rating": 5,
-      "operatingRoutes": [
-        "Guntur - Hyderabad",
-        "Guntur - Chennai",
-        "Guntur - Mumbai"
-      ],
-      "verifiedTransporter": true
-    },
-    {
-      "id": "veh_hr_1",
-      "vehicleNo": "HR-05-AB-7821",
-      "vehicleType": "16-Ton Multi-Axle Grain Reefer",
-      "modelName": "Tata Signa 2823.K Multi-Axle",
-      "transporterName": "National Cold Agri Express",
-      "driverName": "Gurmukh Singh",
-      "driverPhone": "+91 98112 77889",
-      "driverLicenseNo": "HR-0520160089234",
-      "capacityTons": 16,
-      "temperatureCelsius": 18,
-      "humidityPercent": 48,
-      "gpsDeviceId": "GPS-NC-5502",
-      "rcNumber": "RC-HR-05-2021-007821",
-      "insuranceValidity": "15 Oct 2027",
-      "pucCertificateNo": "PUC-HR-2026-5541",
-      "currentStatus": "On Trip",
-      "originHub": "Karnal Grain Consolidation Terminal #01",
-      "destinationWarehouse": "Delhi-NCR Central Food Depots",
-      "state": "Haryana",
-      "cityHub": "Karnal",
-      "serviceType": "Heavy Multi-Axle",
-      "ratePerKm": 29,
-      "rating": 4.9,
-      "operatingRoutes": [
-        "Karnal - Delhi",
-        "Panipat - Gurugram",
-        "Ambala - Chandigarh"
-      ],
-      "verifiedTransporter": true,
-      "activeTrip": {
-        "routeHighway": "NH-44 North-South Agri Freight Corridor",
-        "origin": "Karnal Grain Consolidation Terminal #01",
-        "destination": "Delhi-NCR Central Food Depots",
-        "totalDistanceKm": 128,
-        "coveredDistanceKm": 88,
-        "currentSpeedKmph": 52,
-        "estimatedMinutesRemaining": 45
-      }
-    },
-    {
-      "id": "veh_jk_1",
-      "vehicleNo": "JK-02-AZ-4512",
-      "vehicleType": "14-Ton Sub-Zero Apple & Saffron Carrier",
-      "modelName": "BharatBenz 1617R Cold Climate Reefer",
-      "transporterName": "Kashmir Valley Fruit Cold Transit",
-      "driverName": "Ghulam Mohammad Dar",
-      "driverPhone": "+91 94190 22331",
-      "driverLicenseNo": "JK-0220170066129",
-      "capacityTons": 14,
-      "temperatureCelsius": 1.5,
-      "humidityPercent": 88,
-      "gpsDeviceId": "GPS-KV-4512",
-      "rcNumber": "RC-JK-02-2022-004512",
-      "insuranceValidity": "18 Nov 2028",
-      "pucCertificateNo": "PUC-JK-2026-8811",
-      "currentStatus": "Available",
-      "originHub": "Sopore Apple & Fruit Terminal",
-      "destinationWarehouse": "National Cold Chain Grid Delhi-NCR",
-      "state": "Jammu & Kashmir",
-      "cityHub": "Srinagar",
-      "serviceType": "Reefer Cold Chain",
-      "ratePerKm": 34,
-      "rating": 5,
-      "operatingRoutes": [
-        "Srinagar - Jammu",
-        "Jammu - Delhi",
-        "Srinagar - Amritsar"
       ],
       "verifiedTransporter": true
     }

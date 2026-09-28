@@ -46,6 +46,7 @@ export type StakeholderCohortMode = 'registered_now' | 'upcoming';
 interface AgriContextType {
   currentUser: User;
   setCurrentUser: (u: User | null) => void;
+  updateUserProfile: (updates: Partial<User>) => void;
   isAuthenticated: boolean;
   registeredUsers: User[];
   loginUser: (userData: Partial<User> & { role: UserRole; password?: string }) => { success: boolean; message?: string };
@@ -433,7 +434,9 @@ export const recordLocalReadNotifIds = (ids: string[]): void => {
 
 export const sanitizeUserForStorage = (u: any): any => {
   if (!u) return u;
-  if (u.avatar && typeof u.avatar === 'string' && u.avatar.length > 50000) {
+  // Preserve canvas compressed avatar strings (typically 3KB-15KB)
+  // Only fallback if payload is an uncompressed raw file exceeding 250,000 chars
+  if (u.avatar && typeof u.avatar === 'string' && u.avatar.length > 250000) {
     return {
       ...u,
       avatar: u.role === 'buyer' 
@@ -1707,6 +1710,38 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         : 'Password has been reset successfully!',
       user: updatedUser
     };
+  };
+
+  const updateUserProfile = (updates: Partial<User>) => {
+    if (!currentUser) return;
+    const updatedUser: User = {
+      ...currentUser,
+      ...updates
+    };
+    setCurrentUser(updatedUser);
+    safeLocalStorage.setItem('farm2future_user', JSON.stringify(updatedUser));
+    
+    setRegisteredUsers(prev => {
+      const idx = prev.findIndex(u => u.id === currentUser.id || (u.phone && u.phone === currentUser.phone));
+      let updatedList: User[];
+      if (idx >= 0) {
+        updatedList = prev.map((u, i) => i === idx ? { ...u, ...updates } : u);
+      } else {
+        updatedList = [...prev, updatedUser];
+      }
+      safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updatedList));
+      dbService.syncDatabase({ users: updatedList });
+      return updatedList;
+    });
+
+    logActivity({
+      userId: currentUser.id,
+      userName: updatedUser.name,
+      userRole: updatedUser.role,
+      actionType: 'profile_update',
+      title: 'Profile Updated',
+      description: `${updatedUser.name} updated profile details permanently.`
+    });
   };
 
   const verifyAdminPasskey = (inputKey: string): boolean => {
@@ -3107,6 +3142,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AgriContext.Provider value={{
       currentUser: currentUser || registeredUsers[0] || anonymousGuestUser,
       setCurrentUser,
+      updateUserProfile,
       isAuthenticated,
       registeredUsers,
       stakeholderCohortMode,
