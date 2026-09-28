@@ -432,11 +432,55 @@ export const recordLocalReadNotifIds = (ids: string[]): void => {
   } catch (_) {}
 };
 
+export const getSavedAvatarsMap = (): Record<string, string> => {
+  try {
+    const saved = localStorage.getItem('farm2future_user_avatars');
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+};
+
+export const persistUserAvatar = (user: { id?: string; phone?: string; aadhaarNumber?: string; name?: string }, avatar: string) => {
+  if (!avatar) return;
+  try {
+    const map = getSavedAvatarsMap();
+    if (user.id) map[user.id] = avatar;
+    const cleanPhone = (user.phone || '').replace(/\D/g, '').slice(-10);
+    if (cleanPhone) map[`phone_${cleanPhone}`] = avatar;
+    const cleanAadhaar = (user.aadhaarNumber || '').replace(/\D/g, '');
+    if (cleanAadhaar.length >= 10) map[`aadhaar_${cleanAadhaar}`] = avatar;
+    if (user.name) map[`name_${user.name.trim().toLowerCase()}`] = avatar;
+    safeLocalStorage.setItem('farm2future_user_avatars', JSON.stringify(map));
+  } catch (_) {}
+};
+
+export const getPermanentAvatarForUser = (user: { id?: string; phone?: string; aadhaarNumber?: string; name?: string; role?: string; avatar?: string }): string | undefined => {
+  if (!user) return undefined;
+  const map = getSavedAvatarsMap();
+  const cleanPhone = (user.phone || '').replace(/\D/g, '').slice(-10);
+  const cleanAadhaar = (user.aadhaarNumber || '').replace(/\D/g, '');
+  const cleanName = (user.name || '').trim().toLowerCase();
+
+  const savedFromRegistry = 
+    (cleanPhone && map[`phone_${cleanPhone}`]) ||
+    (user.id && map[user.id]) ||
+    (cleanAadhaar.length >= 10 && map[`aadhaar_${cleanAadhaar}`]) ||
+    (cleanName && map[`name_${cleanName}`]);
+
+  if (savedFromRegistry) return savedFromRegistry;
+  return user.avatar;
+};
+
 export const sanitizeUserForStorage = (u: any): any => {
   if (!u) return u;
   // Preserve canvas compressed avatar strings (typically 3KB-15KB)
   // Only fallback if payload is an uncompressed raw file exceeding 250,000 chars
   if (u.avatar && typeof u.avatar === 'string' && u.avatar.length > 250000) {
+    const fallback = getPermanentAvatarForUser(u);
+    if (fallback && fallback.length <= 250000) {
+      return { ...u, avatar: fallback };
+    }
     return {
       ...u,
       avatar: u.role === 'buyer' 
@@ -483,7 +527,12 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const saved = localStorage.getItem('farm2future_registered_users');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed.filter((u: any) => !delSet.has(u.id));
+        if (Array.isArray(parsed)) {
+          return parsed.filter((u: any) => !delSet.has(u.id)).map(u => {
+            const perm = getPermanentAvatarForUser(u);
+            return perm ? { ...u, avatar: perm } : u;
+          });
+        }
       }
       return [];
     } catch {
@@ -496,7 +545,12 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedAuth = localStorage.getItem('farm2future_auth');
       const saved = localStorage.getItem('farm2future_user');
       if (savedAuth === 'true' && saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        const permAvatar = getPermanentAvatarForUser(parsed);
+        if (permAvatar && permAvatar !== parsed.avatar) {
+          return { ...parsed, avatar: permAvatar };
+        }
+        return parsed;
       }
       return null;
     } catch {
@@ -1255,18 +1309,22 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       : null;
 
     if (!matching && currentUser) {
-      // Auto-provision this user for target role
+      // Auto-provision this user for target role with their permanent avatar
+      const userPermanentAvatar = getPermanentAvatarForUser(currentUser) || currentUser.avatar;
       const autoUser: User = {
         ...currentUser,
         id: `usr_${role}_${Date.now()}`,
         role: role,
-        avatar: currentUser.avatar || (role === 'buyer' 
+        avatar: userPermanentAvatar || (role === 'buyer' 
           ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
           : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'),
         businessName: role === 'buyer' ? (currentUser.businessName || `${currentUser.name} Agro Buyer`) : undefined,
         farmSizeAcres: role === 'farmer' ? (currentUser.farmSizeAcres || 5) : undefined,
         hubName: role === 'collection_centre' ? (currentUser.hubName || `${currentUser.district || 'Regional'} Hub`) : undefined
       };
+      if (userPermanentAvatar) {
+        persistUserAvatar(autoUser, userPermanentAvatar);
+      }
       setRegisteredUsers(prev => {
         const updated = [autoUser, ...prev.filter(u => u.id !== autoUser.id)];
         safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
@@ -1280,6 +1338,11 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!matching || !currentUser) {
       openAuthModal(role, 'login');
       return;
+    }
+
+    const matchingPermanentAvatar = getPermanentAvatarForUser(matching) || matching.avatar;
+    if (matchingPermanentAvatar && matchingPermanentAvatar !== matching.avatar) {
+      matching = { ...matching, avatar: matchingPermanentAvatar };
     }
 
     setCurrentUser(matching);
@@ -1307,6 +1370,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const registerUser = (userData: Partial<User> & { role: UserRole; password?: string }) => {
+    const permAvatar = userData.avatar || getPermanentAvatarForUser(userData);
     const newUser: User = {
       id: userData.id || `usr_${userData.role}_${Date.now()}`,
       name: userData.name || (userData.role === 'farmer' ? 'Kisan Member' : userData.role === 'buyer' ? 'Retail Buyer' : userData.role === 'collection_centre' ? 'Hub Officer' : 'Govt Administrator'),
@@ -1322,7 +1386,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       aadhaarNumber: userData.aadhaarNumber || (userData.role === 'farmer' ? '5432 8765 1098' : userData.role === 'buyer' ? '9876 5432 1098' : undefined),
       rating: 4.9,
       memberSince: '2026',
-      avatar: userData.avatar || (userData.role === 'farmer' 
+      avatar: permAvatar || (userData.role === 'farmer' 
         ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'
         : userData.role === 'buyer'
           ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
@@ -1334,6 +1398,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       gstin: userData.gstin,
       hubName: userData.hubName
     };
+
+    if (newUser.avatar) {
+      persistUserAvatar(newUser, newUser.avatar);
+    }
 
     setRegisteredUsers(prev => {
       const filtered = prev.filter(u => u && u.id !== newUser.id && !((u.phone || '') === newUser.phone && u.role === newUser.role));
@@ -1572,13 +1640,20 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       }
 
-      // If user had no password recorded, persist the entered valid password
-      const loggedInUser: User = userToLogin;
-      if (!loggedInUser.password && inputPassword) {
-        const withPass: User = { ...loggedInUser, password: inputPassword };
-        setRegisteredUsers(prev => prev.map(u => (u && u.id === withPass.id ? withPass : u)));
-        userToLogin = withPass;
+      // Ensure user avatar is permanently hydrated from registry
+      const permAvatar = getPermanentAvatarForUser(userToLogin) || userToLogin.avatar;
+      if (permAvatar) {
+        persistUserAvatar(userToLogin, permAvatar);
       }
+
+      // If user had no password recorded, persist the entered valid password
+      let loggedInUser: User = permAvatar ? { ...userToLogin, avatar: permAvatar } : userToLogin;
+      if (!loggedInUser.password && inputPassword) {
+        loggedInUser = { ...loggedInUser, password: inputPassword };
+      }
+      
+      setRegisteredUsers(prev => prev.map(u => (u && u.id === loggedInUser.id ? loggedInUser : u)));
+      userToLogin = loggedInUser;
 
       setCurrentUser(userToLogin);
       setIsAuthenticated(true);
@@ -1714,22 +1789,57 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateUserProfile = (updates: Partial<User>) => {
     if (!currentUser) return;
+    const targetAvatar = updates.avatar || currentUser.avatar;
+    if (targetAvatar) {
+      persistUserAvatar(currentUser, targetAvatar);
+      if (updates.phone || currentUser.phone) {
+        persistUserAvatar({ ...currentUser, ...updates }, targetAvatar);
+      }
+    }
+
     const updatedUser: User = {
       ...currentUser,
-      ...updates
+      ...updates,
+      avatar: targetAvatar
     };
     setCurrentUser(updatedUser);
     safeLocalStorage.setItem('farm2future_user', JSON.stringify(updatedUser));
     
+    const cleanPhone = (currentUser.phone || updates.phone || '').replace(/\D/g, '').slice(-10);
+    const cleanAadhaar = (currentUser.aadhaarNumber || updates.aadhaarNumber || '').replace(/\D/g, '');
+
     setRegisteredUsers(prev => {
-      const idx = prev.findIndex(u => u.id === currentUser.id || (u.phone && u.phone === currentUser.phone));
-      let updatedList: User[];
-      if (idx >= 0) {
-        updatedList = prev.map((u, i) => i === idx ? { ...u, ...updates } : u);
-      } else {
-        updatedList = [...prev, updatedUser];
+      // Update ALL accounts for this user (same id, or same phone, or same aadhaar)
+      let found = false;
+      const updatedList = prev.map(u => {
+        const uPhone = (u.phone || '').replace(/\D/g, '').slice(-10);
+        const uAadhaar = (u.aadhaarNumber || '').replace(/\D/g, '');
+        const isSelf = u.id === currentUser.id;
+        const isSamePhone = Boolean(cleanPhone && uPhone && cleanPhone === uPhone);
+        const isSameAadhaar = Boolean(cleanAadhaar.length >= 10 && uAadhaar && cleanAadhaar === uAadhaar);
+
+        if (isSelf) {
+          found = true;
+          return { ...u, ...updates, avatar: targetAvatar };
+        } else if (isSamePhone || isSameAadhaar) {
+          // Propagate photo & shared credentials to other role profiles
+          return {
+            ...u,
+            name: updates.name || u.name,
+            phone: updates.phone || u.phone,
+            aadhaarNumber: updates.aadhaarNumber || u.aadhaarNumber,
+            avatar: targetAvatar || u.avatar,
+            password: updates.password || u.password
+          };
+        }
+        return u;
+      });
+
+      if (!found) {
+        updatedList.unshift(updatedUser);
       }
-      safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updatedList));
+
+      safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updatedList.map(sanitizeUserForStorage)));
       dbService.syncDatabase({ users: updatedList });
       return updatedList;
     });
@@ -1740,7 +1850,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       userRole: updatedUser.role,
       actionType: 'profile_update',
       title: 'Profile Updated',
-      description: `${updatedUser.name} updated profile details permanently.`
+      description: `${updatedUser.name} updated profile details & avatar permanently.`
     });
   };
 
@@ -1834,19 +1944,25 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ? registeredUsers.find(u => u && u.role === role && (u.phone || '').replace(/\D/g, '').slice(-10) === currentPhoneLast10) 
       : null;
     
+    const userPermanentAvatar = getPermanentAvatarForUser(currentUser || {}) || currentUser?.avatar;
+
     if (!existingSameUser && currentUser) {
       // Auto-provision this user under target role
       const autoUser: User = {
         ...currentUser,
         id: `usr_${role}_${Date.now()}`,
         role: role,
-        avatar: currentUser.avatar || (role === 'buyer' 
+        avatar: userPermanentAvatar || (role === 'buyer' 
           ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
           : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'),
         businessName: role === 'buyer' ? (currentUser.businessName || `${currentUser.name} Agro Buyer`) : undefined,
         farmSizeAcres: role === 'farmer' ? (currentUser.farmSizeAcres || 5) : undefined,
         hubName: role === 'collection_centre' ? (currentUser.hubName || `${currentUser.district || 'Regional'} Hub`) : undefined
       };
+
+      if (userPermanentAvatar) {
+        persistUserAvatar(autoUser, userPermanentAvatar);
+      }
 
       setRegisteredUsers(prev => {
         const updated = [autoUser, ...prev.filter(u => u.id !== autoUser.id)];
@@ -1859,6 +1975,9 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     if (existingSameUser) {
+      if (userPermanentAvatar && (!existingSameUser.avatar || existingSameUser.avatar.includes('unsplash'))) {
+        existingSameUser = { ...existingSameUser, avatar: userPermanentAvatar };
+      }
       setCurrentUser(existingSameUser);
       setIsAuthenticated(true);
       if (role === 'admin') {
