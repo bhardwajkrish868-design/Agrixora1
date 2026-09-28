@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
-  const { currentUser, setCurrentUser, activeRole, navigateBack, activityHistory, logActivity } = useAgri();
+  const { currentUser, setCurrentUser, activeRole, navigateBack, logActivity } = useAgri();
 
   const [name, setName] = useState(currentUser.name);
   const [phone, setPhone] = useState(currentUser.phone);
@@ -115,35 +115,6 @@ export const ProfileView: React.FC = () => {
     });
 
     setTimeout(() => setIsSaved(false), 3000);
-  };
-
-  // User-isolated activity history (non-admin stakeholders see their own events)
-  const userHistory = (activityHistory || []).filter(item => {
-    if (!currentUser) return false;
-    return item.userId === currentUser.id || item.userName === currentUser.name;
-  });
-
-  const getBadgeClass = (type: string) => {
-    switch (type) {
-      case 'register':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      case 'login':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'add_produce':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'order_placed':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'stage_update':
-        return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      case 'qc_certified':
-        return 'bg-teal-100 text-teal-800 border-teal-200';
-      case 'dispatched':
-        return 'bg-sky-100 text-sky-800 border-sky-200';
-      case 'delivered':
-        return 'bg-green-100 text-green-800 border-green-200';
-      default:
-        return 'bg-slate-100 text-slate-800 border-slate-200';
-    }
   };
 
   return (
@@ -417,53 +388,6 @@ export const ProfileView: React.FC = () => {
           <span>Save Profile Updates</span>
         </button>
       </form>
-
-      {/* User Isolated Personal History & Audit Log (Admin manages audit logs on Admin Dashboard, not on personal Profile & KYC) */}
-      {currentUser.role !== 'farmer' && activeRole !== 'farmer' && currentUser.role !== 'admin' && activeRole !== 'admin' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <History className="w-5 h-5 text-emerald-600" />
-              <h2 className="text-base font-bold text-slate-900">
-                My Activity & History Audit Trail
-              </h2>
-            </div>
-            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-              {userHistory.length} Recorded Events
-            </span>
-          </div>
-          <p className="text-xs text-slate-500">
-            This chronological history tracks your account events, logins, crop lots, orders, and state changes securely saved in the database.
-          </p>
-
-          <div className="space-y-3 pt-2">
-            {userHistory.length === 0 ? (
-              <div className="text-center py-8 text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl">
-                <Clock className="w-6 h-6 text-slate-300 mx-auto mb-2" />
-                <span>No recorded activities yet. Your logins, crop postings, and orders will appear here automatically.</span>
-              </div>
-            ) : (
-              userHistory.map(item => (
-                <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getBadgeClass(item.actionType)}`}>
-                        {item.actionType.replace('_', ' ').toUpperCase()}
-                      </span>
-                      <strong className="text-slate-900 font-bold">{item.title}</strong>
-                    </div>
-                    <p className="text-slate-600 text-[11px]">{item.description}</p>
-                  </div>
-
-                  <div className="text-[10px] font-mono text-slate-400 whitespace-nowrap self-start sm:self-center">
-                    {new Date(item.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,102 +1,30 @@
 {
   "users": [
     {
-      "id": "usr_buyer_1790446127421",
-      "name": "captain",
-      "phone": "+91 9431369829",
-      "email": "captain@farm2future.in",
+      "id": "usr_buyer_1790344615960",
+      "name": "rahul",
+      "phone": "+91 1234567891",
+      "email": "rahul@farm2future.in",
       "role": "buyer",
-      "password": "prashant001",
+      "password": "prashnat100",
       "location": "Bokaro, Jharkhand",
       "district": "Bokaro",
       "state": "Jharkhand",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "1234 5678 4568",
+      "aadhaarNumber": "5464 6646 4646",
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "krishindustry",
-      "gstin": "kjakhk46546"
+      "businessName": "ghhgfhg",
+      "gstin": "gfg4"
     },
     {
-      "id": "usr_admin_1790489016351",
+      "id": "usr_farmer_1790345709190",
       "name": "Ankit Kumar Mahato",
       "phone": "+91 9631289876",
       "email": "ankit9631289876@gmail.com",
-      "role": "admin",
-      "password": "Ankit@123",
-      "location": "Seraikela Kharsawan, Jharkhand",
-      "district": "Seraikela Kharsawan",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1656 5444 5555",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80"
-    },
-    {
-      "id": "usr_farmer_1790448537989",
-      "name": "KRISH BHARDWAJ",
-      "phone": "+91 8809845947",
-      "email": "bhardwajkrish621@gmail.com",
       "role": "farmer",
-      "password": "2007",
-      "location": "Vaishali, Bihar",
-      "district": "Vaishali",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1541 4165 4868",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_buyer_1790346334955",
-      "name": "prashnat",
-      "phone": "+91 9431369829",
-      "email": "prashnat@farm2future.in",
-      "role": "buyer",
-      "password": "2006",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1515 4998 4949",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "how will you order this",
-      "gstin": "646ghguy"
-    },
-    {
-      "id": "usr_buyer_1790448537989",
-      "name": "KRISH BHARDWAJ",
-      "phone": "+91 8809845947",
-      "email": "bhardwajkrish621@gmail.com",
-      "role": "buyer",
-      "password": "2007",
-      "location": "Vaishali, Bihar",
-      "district": "Vaishali",
-      "state": "Bihar",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1541 4165 4868",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "KRISH BHARDWAJ AGRO BUYER"
-    },
-    {
-      "id": "usr_buyer_1790534660861",
-      "name": "Ankit Kumar Mahato",
-      "phone": "+91 9631289876",
-      "email": "ankit9631289876@gmail.com",
-      "role": "buyer",
       "password": "Ankit@123",
       "location": "Ranchi, Jharkhand",
       "district": "Ranchi",
@@ -107,7 +35,44 @@
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "businessName": "Ankit Kumar Mahato Agro Buyer"
+      "farmSizeAcres": 5
+    },
+    {
+      "id": "usr_farmer_1790342308428",
+      "name": "pkd",
+      "phone": "+91 5665561658",
+      "email": "pkd@gmail.com",
+      "role": "farmer",
+      "password": "prashnat100",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1215 4446 6112",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 5
+    },
+    {
+      "id": "usr_buyer_1790493224601",
+      "name": "cap01",
+      "phone": "+91 9431369829",
+      "email": "cap01@farm2future.in",
+      "role": "buyer",
+      "password": "2006",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "2159 8498 4546",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "krishkbc",
+      "gstin": "46ghhghhvh"
     },
     {
       "id": "usr_farmer_1790532496880",
@@ -327,30 +292,102 @@
       "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80"
     },
     {
-      "id": "usr_buyer_1790344615960",
-      "name": "rahul",
-      "phone": "+91 1234567891",
-      "email": "rahul@farm2future.in",
+      "id": "usr_buyer_1790446127421",
+      "name": "captain",
+      "phone": "+91 9431369829",
+      "email": "captain@farm2future.in",
       "role": "buyer",
-      "password": "prashnat100",
+      "password": "prashant001",
       "location": "Bokaro, Jharkhand",
       "district": "Bokaro",
       "state": "Jharkhand",
       "verified": true,
       "aadhaarVerified": true,
-      "aadhaarNumber": "5464 6646 4646",
+      "aadhaarNumber": "1234 5678 4568",
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "ghhgfhg",
-      "gstin": "gfg4"
+      "businessName": "krishindustry",
+      "gstin": "kjakhk46546"
     },
     {
-      "id": "usr_farmer_1790345709190",
+      "id": "usr_admin_1790489016351",
       "name": "Ankit Kumar Mahato",
       "phone": "+91 9631289876",
       "email": "ankit9631289876@gmail.com",
+      "role": "admin",
+      "password": "Ankit@123",
+      "location": "Seraikela Kharsawan, Jharkhand",
+      "district": "Seraikela Kharsawan",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1656 5444 5555",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "usr_farmer_1790448537989",
+      "name": "KRISH BHARDWAJ",
+      "phone": "+91 8809845947",
+      "email": "bhardwajkrish621@gmail.com",
       "role": "farmer",
+      "password": "2007",
+      "location": "Vaishali, Bihar",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1541 4165 4868",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+      "farmSizeAcres": 5
+    },
+    {
+      "id": "usr_buyer_1790346334955",
+      "name": "prashnat",
+      "phone": "+91 9431369829",
+      "email": "prashnat@farm2future.in",
+      "role": "buyer",
+      "password": "2006",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1515 4998 4949",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "how will you order this",
+      "gstin": "646ghguy"
+    },
+    {
+      "id": "usr_buyer_1790448537989",
+      "name": "KRISH BHARDWAJ",
+      "phone": "+91 8809845947",
+      "email": "bhardwajkrish621@gmail.com",
+      "role": "buyer",
+      "password": "2007",
+      "location": "Vaishali, Bihar",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "1541 4165 4868",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+      "businessName": "KRISH BHARDWAJ AGRO BUYER"
+    },
+    {
+      "id": "usr_buyer_1790534660861",
+      "name": "Ankit Kumar Mahato",
+      "phone": "+91 9631289876",
+      "email": "ankit9631289876@gmail.com",
+      "role": "buyer",
       "password": "Ankit@123",
       "location": "Ranchi, Jharkhand",
       "district": "Ranchi",
@@ -361,44 +398,7 @@
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_farmer_1790342308428",
-      "name": "pkd",
-      "phone": "+91 5665561658",
-      "email": "pkd@gmail.com",
-      "role": "farmer",
-      "password": "prashnat100",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "1215 4446 6112",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
-    },
-    {
-      "id": "usr_buyer_1790493224601",
-      "name": "cap01",
-      "phone": "+91 9431369829",
-      "email": "cap01@farm2future.in",
-      "role": "buyer",
-      "password": "2006",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "2159 8498 4546",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-      "businessName": "krishkbc",
-      "gstin": "46ghhghhvh"
+      "businessName": "Ankit Kumar Mahato Agro Buyer"
     }
   ],
   "listings": [
@@ -1200,167 +1200,317 @@
   ],
   "activityHistory": [
     {
-      "id": "act_1790555797567_96wzr",
-      "userId": "usr_buyer_1790370389880",
+      "id": "act_1790494899541_ts7yt",
+      "userId": "usr_collection_centre_1789738899022",
       "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9374)",
-      "description": "Krish Bhardwaj ordered 50 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹148 delivery fee.",
-      "timestamp": "2026-09-28T00:36:37.567Z",
-      "metadata": {
-        "orderId": "ORD-2026-8098",
-        "orderNumber": "F2F-ORD-9374",
-        "totalAmount": 1430,
-        "logisticsFee": 148,
-        "vehicleNo": "MH-15-DC-2290",
-        "aiMatchScore": 99.4
-      }
+      "userRole": "collection_centre",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Nashik, Maharashtra, Maharashtra).",
+      "timestamp": "2026-09-27T07:41:39.541Z",
+      "metadata": {}
     },
     {
-      "id": "act_1790555797548_3gpsm",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "add_produce",
-      "title": "Crop Listing Updated (#LST-841798-865)",
-      "description": "Listing LST-841798-865 was updated.",
-      "timestamp": "2026-09-28T00:36:37.548Z",
-      "metadata": {
-        "listingId": "LST-841798-865",
-        "updates": {
-          "quantity": 0,
-          "status": "Sold"
-        }
-      }
-    },
-    {
-      "id": "act_1790555779613_f8cgu",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
+      "id": "act_1790534660863_x6cnx",
+      "userId": "usr_buyer_1790534660861",
+      "userName": "Ankit Kumar Mahato",
       "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into buyer portal.",
-      "timestamp": "2026-09-28T00:36:19.613Z",
+      "description": "Ankit Kumar Mahato logged into buyer portal.",
+      "timestamp": "2026-09-27T18:44:20.863Z",
       "metadata": {
-        "phone": "+91 9631359486",
+        "phone": "+91 9631289876",
         "role": "buyer"
       }
     },
     {
-      "id": "act_1790555768895_3ygn2",
+      "id": "act_1790554518710_cdfgh",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "stage_update",
+      "title": "Order Stage Updated: COLLECTED AT HUB",
+      "description": "Order F2F-ORD-8209 advanced to stage collected at hub.",
+      "timestamp": "2026-09-28T00:15:18.710Z",
+      "metadata": {
+        "orderId": "ORD-2026-7962",
+        "newStage": "collected_at_hub"
+      }
+    },
+    {
+      "id": "act_1790554474950_leoh9",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T00:36:08.895Z",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T00:14:34.950Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790554473743_60l8i",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Password Reset Successful",
+      "description": "Krish Bhardwaj (farmer) reset their account password successfully.",
+      "timestamp": "2026-09-28T00:14:33.743Z",
       "metadata": {}
     },
     {
-      "id": "act_1790507311618_uqb0l",
+      "id": "act_1790542462730_a1cqo",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into collection_centre portal.",
+      "timestamp": "2026-09-27T20:54:22.730Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "collection_centre"
+      }
+    },
+    {
+      "id": "act_1790449989555_jpbin",
+      "userId": "usr_buyer_1790449303210",
+      "userName": "KIT KAT",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "KIT KAT logged into buyer portal.",
+      "timestamp": "2026-09-26T19:13:09.555Z",
+      "metadata": {
+        "phone": "+91 7894561236",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1790507306926_hsbnj",
       "userId": "usr_collection_centre_1789738899022",
       "userName": "Bikash Gogoi",
       "userRole": "collection_centre",
       "actionType": "dispatched",
       "title": "Consignment Dispatched: AS-01-TY-4422",
       "description": "Order F2F-ORD-7721 dispatched via Brahmaputra Organic Express Cargo (AS-01-TY-4422, Driver: Bikash Gogoi) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
-      "timestamp": "2026-09-27T11:08:31.618Z",
+      "timestamp": "2026-09-27T11:08:26.926Z",
       "metadata": {
         "orderId": "ORD-INTRA-MH-2026",
         "vehicleNo": "AS-01-TY-4422",
-        "eWayBillNo": "EWB-2026-22185373",
+        "eWayBillNo": "EWB-2026-56235202",
         "modelName": "Tata Ultra Sleek T.7",
         "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
       }
     },
     {
-      "id": "act_1790489216146_06f3q",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-27T06:06:56.146Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790542156892_e416i",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-27T20:49:16.892Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538687534_jebeg",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-27T19:51:27.534Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790538662956_b5uca",
-      "userId": "usr_buyer_1790534660861",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Ankit Kumar Mahato signed out.",
-      "timestamp": "2026-09-27T19:51:02.956Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790492458528_r0ov5",
-      "userId": "usr_admin_1790489016351",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into admin portal.",
-      "timestamp": "2026-09-27T07:00:58.528Z",
-      "metadata": {
-        "phone": "+91 9631289876",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790361176968_cddsi",
+      "id": "act_1790524755576_c77fu",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged Out",
       "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-25T18:32:56.968Z",
+      "timestamp": "2026-09-27T15:59:15.576Z",
       "metadata": {}
     },
     {
-      "id": "act_1790534621049_sxd1x",
+      "id": "act_1790526737246_3nfsp",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-27T16:32:17.246Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790490784876_ltrzo",
       "userId": "usr_farmer_1790345709190",
       "userName": "Ankit Kumar Mahato",
       "userRole": "farmer",
       "actionType": "login",
+      "title": "User Logged In",
+      "description": "Ankit Kumar Mahato logged into farmer portal.",
+      "timestamp": "2026-09-27T06:33:04.876Z",
+      "metadata": {
+        "phone": "+91 9631289876",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790490727221_8wjy2",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
       "title": "User Logged Out",
-      "description": "Ankit Kumar Mahato signed out.",
-      "timestamp": "2026-09-27T18:43:41.049Z",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-27T06:32:07.221Z",
       "metadata": {}
+    },
+    {
+      "id": "act_1790538719054_za5sc",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "Bulk Demand Removed (#BLK-2026-100MAN)",
+      "description": "Bulk pooled order BLK-2026-100MAN for mango (100T) was permanently deleted from database.",
+      "timestamp": "2026-09-27T19:51:59.054Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790538714385_or473",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-109)",
+      "description": "Listing LST-109 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:54.385Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790538709549_2uvb7",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-107)",
+      "description": "Listing LST-107 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:49.549Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790538703809_msqrx",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "add_produce",
+      "title": "Crop Listing Removed (#LST-108)",
+      "description": "Listing LST-108 was delisted from active marketplace.",
+      "timestamp": "2026-09-27T19:51:43.809Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555089875_2qjyw",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Photo Updated",
+      "description": "Krish Bhardwaj uploaded a new profile photo.",
+      "timestamp": "2026-09-28T00:24:49.875Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555023027_zuzuj",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T00:23:43.027Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790555009717_4gkmx",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T00:23:29.717Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790450739490_1ukpc",
+      "userId": "usr_buyer_1790449303210",
+      "userName": "KIT KAT",
+      "userRole": "buyer",
+      "actionType": "order_placed",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9139)",
+      "description": "KIT KAT ordered 1 Quintals of Cauliflower & Green Peas. AI auto-assigned HP-12-KL-8833 (Surinder Thakur, 99.4% match). Buyer paid ₹220 delivery fee.",
+      "timestamp": "2026-09-26T19:25:39.490Z",
+      "metadata": {
+        "orderId": "ORD-2026-5890",
+        "orderNumber": "F2F-ORD-9139",
+        "totalAmount": 1912,
+        "logisticsFee": 220,
+        "vehicleNo": "HP-12-KL-8833",
+        "aiMatchScore": 99.4
+      }
+    },
+    {
+      "id": "act_1790432776424_w3wpc",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "admin_action",
+      "title": "Bulk Demand Removed (#BLK-ITC-WHT-500)",
+      "description": "Bulk pooled order BLK-ITC-WHT-500 for Wheat (गेहूं) (500T) was permanently deleted from database.",
+      "timestamp": "2026-09-26T14:26:16.424Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790526722339_z2lgg",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-27T16:32:02.339Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790526693689_gt5bo",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "George Varghese",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: KL-07-CP-3211",
+      "description": "Order F2F-ORD-1489 dispatched via Malabar Spice & Plantation Logistics (KL-07-CP-3211, Driver: George Varghese) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-27T16:31:33.689Z",
+      "metadata": {
+        "orderId": "ORD-2026-5592",
+        "vehicleNo": "KL-07-CP-3211",
+        "eWayBillNo": "EWB-2026-87346282",
+        "modelName": "Isuzu S-CAB Insulated Spice Van",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
+    },
+    {
+      "id": "act_1790526686823_wwn47",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Trilok Rawat",
+      "userRole": "collection_centre",
+      "actionType": "dispatched",
+      "title": "Consignment Dispatched: UK-07-BC-1122",
+      "description": "Order F2F-ORD-9139 dispatched via Devbhoomi Fresh Mountain Logistics (UK-07-BC-1122, Driver: Trilok Rawat) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
+      "timestamp": "2026-09-27T16:31:26.823Z",
+      "metadata": {
+        "orderId": "ORD-2026-5890",
+        "vehicleNo": "UK-07-BC-1122",
+        "eWayBillNo": "EWB-2026-24939711",
+        "modelName": "Ashok Leyland Boss 1215",
+        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
+      }
     },
     {
       "id": "act_1790507307147_08rbl",
@@ -1561,317 +1711,167 @@
       "metadata": {}
     },
     {
-      "id": "act_1790490727221_8wjy2",
-      "userId": "usr_admin_1790345133665",
+      "id": "act_1790555797567_96wzr",
+      "userId": "usr_buyer_1790370389880",
       "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-27T06:32:07.221Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538719054_za5sc",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "Bulk Demand Removed (#BLK-2026-100MAN)",
-      "description": "Bulk pooled order BLK-2026-100MAN for mango (100T) was permanently deleted from database.",
-      "timestamp": "2026-09-27T19:51:59.054Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538714385_or473",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-109)",
-      "description": "Listing LST-109 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:54.385Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538709549_2uvb7",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-107)",
-      "description": "Listing LST-107 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:49.549Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790538703809_msqrx",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "add_produce",
-      "title": "Crop Listing Removed (#LST-108)",
-      "description": "Listing LST-108 was delisted from active marketplace.",
-      "timestamp": "2026-09-27T19:51:43.809Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790555089875_2qjyw",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "profile_update",
-      "title": "Profile Photo Updated",
-      "description": "Krish Bhardwaj uploaded a new profile photo.",
-      "timestamp": "2026-09-28T00:24:49.875Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790555023027_zuzuj",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T00:23:43.027Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790555009717_4gkmx",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T00:23:29.717Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790450739490_1ukpc",
-      "userId": "usr_buyer_1790449303210",
-      "userName": "KIT KAT",
       "userRole": "buyer",
       "actionType": "order_placed",
-      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9139)",
-      "description": "KIT KAT ordered 1 Quintals of Cauliflower & Green Peas. AI auto-assigned HP-12-KL-8833 (Surinder Thakur, 99.4% match). Buyer paid ₹220 delivery fee.",
-      "timestamp": "2026-09-26T19:25:39.490Z",
+      "title": "Order Placed & AI Truck Assigned (F2F-ORD-9374)",
+      "description": "Krish Bhardwaj ordered 50 Kg of Yellow Maize (Makka). AI auto-assigned MH-15-DC-2290 (Sanjay Bhamre, 99.4% match). Buyer paid ₹148 delivery fee.",
+      "timestamp": "2026-09-28T00:36:37.567Z",
       "metadata": {
-        "orderId": "ORD-2026-5890",
-        "orderNumber": "F2F-ORD-9139",
-        "totalAmount": 1912,
-        "logisticsFee": 220,
-        "vehicleNo": "HP-12-KL-8833",
+        "orderId": "ORD-2026-8098",
+        "orderNumber": "F2F-ORD-9374",
+        "totalAmount": 1430,
+        "logisticsFee": 148,
+        "vehicleNo": "MH-15-DC-2290",
         "aiMatchScore": 99.4
       }
     },
     {
-      "id": "act_1790432776424_w3wpc",
+      "id": "act_1790555797548_3gpsm",
       "userId": "usr_buyer_1790370389880",
       "userName": "Krish Bhardwaj",
       "userRole": "buyer",
-      "actionType": "admin_action",
-      "title": "Bulk Demand Removed (#BLK-ITC-WHT-500)",
-      "description": "Bulk pooled order BLK-ITC-WHT-500 for Wheat (गेहूं) (500T) was permanently deleted from database.",
-      "timestamp": "2026-09-26T14:26:16.424Z",
-      "metadata": {}
+      "actionType": "add_produce",
+      "title": "Crop Listing Updated (#LST-841798-865)",
+      "description": "Listing LST-841798-865 was updated.",
+      "timestamp": "2026-09-28T00:36:37.548Z",
+      "metadata": {
+        "listingId": "LST-841798-865",
+        "updates": {
+          "quantity": 0,
+          "status": "Sold"
+        }
+      }
     },
     {
-      "id": "act_1790526722339_z2lgg",
-      "userId": "usr_collection_centre_1789738899022",
+      "id": "act_1790555779613_f8cgu",
+      "userId": "usr_buyer_1790370389880",
       "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into buyer portal.",
+      "timestamp": "2026-09-28T00:36:19.613Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1790555768895_3ygn2",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged Out",
       "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-27T16:32:02.339Z",
+      "timestamp": "2026-09-28T00:36:08.895Z",
       "metadata": {}
     },
     {
-      "id": "act_1790526693689_gt5bo",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "George Varghese",
-      "userRole": "collection_centre",
-      "actionType": "dispatched",
-      "title": "Consignment Dispatched: KL-07-CP-3211",
-      "description": "Order F2F-ORD-1489 dispatched via Malabar Spice & Plantation Logistics (KL-07-CP-3211, Driver: George Varghese) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
-      "timestamp": "2026-09-27T16:31:33.689Z",
-      "metadata": {
-        "orderId": "ORD-2026-5592",
-        "vehicleNo": "KL-07-CP-3211",
-        "eWayBillNo": "EWB-2026-87346282",
-        "modelName": "Isuzu S-CAB Insulated Spice Van",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
-      }
-    },
-    {
-      "id": "act_1790526686823_wwn47",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Trilok Rawat",
-      "userRole": "collection_centre",
-      "actionType": "dispatched",
-      "title": "Consignment Dispatched: UK-07-BC-1122",
-      "description": "Order F2F-ORD-9139 dispatched via Devbhoomi Fresh Mountain Logistics (UK-07-BC-1122, Driver: Trilok Rawat) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
-      "timestamp": "2026-09-27T16:31:26.823Z",
-      "metadata": {
-        "orderId": "ORD-2026-5890",
-        "vehicleNo": "UK-07-BC-1122",
-        "eWayBillNo": "EWB-2026-24939711",
-        "modelName": "Ashok Leyland Boss 1215",
-        "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
-      }
-    },
-    {
-      "id": "act_1790494899541_ts7yt",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "profile_update",
-      "title": "Profile Updated",
-      "description": "Krish Bhardwaj updated profile details (Nashik, Maharashtra, Maharashtra).",
-      "timestamp": "2026-09-27T07:41:39.541Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790534660863_x6cnx",
-      "userId": "usr_buyer_1790534660861",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into buyer portal.",
-      "timestamp": "2026-09-27T18:44:20.863Z",
-      "metadata": {
-        "phone": "+91 9631289876",
-        "role": "buyer"
-      }
-    },
-    {
-      "id": "act_1790554518710_cdfgh",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "stage_update",
-      "title": "Order Stage Updated: COLLECTED AT HUB",
-      "description": "Order F2F-ORD-8209 advanced to stage collected at hub.",
-      "timestamp": "2026-09-28T00:15:18.710Z",
-      "metadata": {
-        "orderId": "ORD-2026-7962",
-        "newStage": "collected_at_hub"
-      }
-    },
-    {
-      "id": "act_1790554474950_leoh9",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T00:14:34.950Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790554473743_60l8i",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "profile_update",
-      "title": "Password Reset Successful",
-      "description": "Krish Bhardwaj (farmer) reset their account password successfully.",
-      "timestamp": "2026-09-28T00:14:33.743Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790542462730_a1cqo",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into collection_centre portal.",
-      "timestamp": "2026-09-27T20:54:22.730Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "collection_centre"
-      }
-    },
-    {
-      "id": "act_1790449989555_jpbin",
-      "userId": "usr_buyer_1790449303210",
-      "userName": "KIT KAT",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "KIT KAT logged into buyer portal.",
-      "timestamp": "2026-09-26T19:13:09.555Z",
-      "metadata": {
-        "phone": "+91 7894561236",
-        "role": "buyer"
-      }
-    },
-    {
-      "id": "act_1790507306926_hsbnj",
+      "id": "act_1790507311618_uqb0l",
       "userId": "usr_collection_centre_1789738899022",
       "userName": "Bikash Gogoi",
       "userRole": "collection_centre",
       "actionType": "dispatched",
       "title": "Consignment Dispatched: AS-01-TY-4422",
       "description": "Order F2F-ORD-7721 dispatched via Brahmaputra Organic Express Cargo (AS-01-TY-4422, Driver: Bikash Gogoi) on NH-60 & NH-160 Mumbai-Nashik Express Corridor. Total: 165 km.",
-      "timestamp": "2026-09-27T11:08:26.926Z",
+      "timestamp": "2026-09-27T11:08:31.618Z",
       "metadata": {
         "orderId": "ORD-INTRA-MH-2026",
         "vehicleNo": "AS-01-TY-4422",
-        "eWayBillNo": "EWB-2026-56235202",
+        "eWayBillNo": "EWB-2026-22185373",
         "modelName": "Tata Ultra Sleek T.7",
         "routeHighway": "NH-60 & NH-160 Mumbai-Nashik Express Corridor"
       }
     },
     {
-      "id": "act_1790524755576_c77fu",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-27T15:59:15.576Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790526737246_3nfsp",
+      "id": "act_1790489216146_06f3q",
       "userId": "usr_admin_1790345133665",
       "userName": "Krish Bhardwaj",
       "userRole": "admin",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-27T16:32:17.246Z",
+      "timestamp": "2026-09-27T06:06:56.146Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "admin"
       }
     },
     {
-      "id": "act_1790490784876_ltrzo",
+      "id": "act_1790542156892_e416i",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-27T20:49:16.892Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790538687534_jebeg",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-27T19:51:27.534Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790538662956_b5uca",
+      "userId": "usr_buyer_1790534660861",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Ankit Kumar Mahato signed out.",
+      "timestamp": "2026-09-27T19:51:02.956Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790492458528_r0ov5",
+      "userId": "usr_admin_1790489016351",
+      "userName": "Ankit Kumar Mahato",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Ankit Kumar Mahato logged into admin portal.",
+      "timestamp": "2026-09-27T07:00:58.528Z",
+      "metadata": {
+        "phone": "+91 9631289876",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790361176968_cddsi",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-25T18:32:56.968Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790534621049_sxd1x",
       "userId": "usr_farmer_1790345709190",
       "userName": "Ankit Kumar Mahato",
       "userRole": "farmer",
       "actionType": "login",
-      "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into farmer portal.",
-      "timestamp": "2026-09-27T06:33:04.876Z",
-      "metadata": {
-        "phone": "+91 9631289876",
-        "role": "farmer"
-      }
+      "title": "User Logged Out",
+      "description": "Ankit Kumar Mahato signed out.",
+      "timestamp": "2026-09-27T18:43:41.049Z",
+      "metadata": {}
     },
     {
       "id": "act_1790540997465_18g1b",
@@ -1921,6 +1921,83 @@
       "metadata": {}
     },
     {
+      "id": "act_1790555095206_9koeh",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:55.206Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555094977_s6eby",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:54.977Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555093763_3ors9",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:53.763Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555096782_gvulp",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:56.782Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555096553_dz2wc",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:56.553Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555096317_1pbkc",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:56.317Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555096094_7snpb",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:56.094Z",
+      "metadata": {}
+    },
+    {
       "id": "act_1790361252535_duk27",
       "userId": "usr_admin_1790345133665",
       "userName": "Krish Bhardwaj",
@@ -1929,6 +2006,39 @@
       "title": "Bulk Demand Removed (#BLK-2026-50MER)",
       "description": "Bulk pooled order BLK-2026-50MER for mere see leelo koi (50T) was permanently deleted from database.",
       "timestamp": "2026-09-25T18:34:12.535Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555095873_i6u18",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:55.873Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555095627_d8t9e",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:55.627Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790555095412_4akul",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "Krish Bhardwaj updated profile details (Vaishali, Bihar, Bihar).",
+      "timestamp": "2026-09-28T00:24:55.412Z",
       "metadata": {}
     },
     {
@@ -6794,7 +6904,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-28T00:36:49.986Z",
+  "lastUpdated": "2026-09-28T00:43:15.194Z",
   "vehicles": [
     {
       "id": "veh_gj_2",
