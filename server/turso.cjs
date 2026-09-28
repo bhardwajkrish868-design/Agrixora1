@@ -797,11 +797,192 @@ async function deleteTursoOrder(id) {
   }
 }
 
+async function transferAllLocalToTurso() {
+  if (!isConnected || !client) {
+    const conn = await connectTurso();
+    if (!conn.success) return { success: false, error: conn.error || 'Failed to connect to Turso' };
+  }
+  try {
+    const jsonPath = path.join(__dirname, '..', 'data', 'farm2future_db.json');
+    if (!fs.existsSync(jsonPath)) return { success: false, error: 'Local database file not found' };
+    const localData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+
+    // 1. Deleted tombstones
+    const deletedSet = new Set(localData.deletedIds || []);
+    for (const id of deletedSet) {
+      await client.execute({
+        sql: 'INSERT OR REPLACE INTO deleted_items (id, type, deleted_at) VALUES (?, ?, ?)',
+        args: [id, 'tombstone', new Date().toISOString()]
+      });
+      deletedItemIds.add(id);
+      await client.execute({ sql: 'DELETE FROM listings WHERE id = ?', args: [id] });
+      await client.execute({ sql: 'DELETE FROM bulk_demands WHERE id = ?', args: [id] });
+      await client.execute({ sql: 'DELETE FROM orders WHERE id = ? OR order_number = ?', args: [id, id] });
+    }
+
+    // 2. Users
+    if (Array.isArray(localData.users)) {
+      for (const u of localData.users) {
+        await client.execute({
+          sql: `INSERT OR REPLACE INTO users (id, name, phone, email, role, location, district, state, aadhaar_number, data, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          args: [
+            u.id,
+            u.name || '',
+            u.phone || '',
+            u.email || '',
+            u.role || 'farmer',
+            u.location || '',
+            u.district || '',
+            u.state || '',
+            u.aadhaarNumber || '',
+            JSON.stringify(u)
+          ]
+        });
+      }
+    }
+
+    // 3. Listings
+    if (Array.isArray(localData.listings)) {
+      for (const l of localData.listings) {
+        if (deletedSet.has(l.id)) continue;
+        await client.execute({
+          sql: `INSERT OR REPLACE INTO listings (id, farmer_id, farmer_name, crop_name, category, quantity, unit, price_per_unit, status, data, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          args: [
+            l.id,
+            l.farmerId || '',
+            l.farmerName || '',
+            l.cropName || '',
+            l.category || '',
+            Number(l.quantity) || 0,
+            l.unit || 'Quintals',
+            Number(l.pricePerUnit) || 0,
+            l.status || 'Active',
+            JSON.stringify(l)
+          ]
+        });
+      }
+    }
+
+    // 4. Orders
+    if (Array.isArray(localData.orders)) {
+      for (const o of localData.orders) {
+        if (deletedSet.has(o.id)) continue;
+        await client.execute({
+          sql: `INSERT OR REPLACE INTO orders (id, order_number, crop_name, quantity, total_amount, buyer_id, farmer_id, current_stage, escrow_status, data, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          args: [
+            o.id,
+            o.orderNumber || o.id,
+            o.cropName || '',
+            Number(o.quantity) || 0,
+            Number(o.totalAmount) || 0,
+            o.buyerId || '',
+            o.farmerId || '',
+            o.currentStage || 'order_placed',
+            o.escrowStatus || 'Funded & Locked',
+            JSON.stringify(o)
+          ]
+        });
+      }
+    }
+
+    // 5. Vehicles
+    if (Array.isArray(localData.vehicles)) {
+      for (const v of localData.vehicles) {
+        await client.execute({
+          sql: `INSERT OR REPLACE INTO vehicles (id, vehicle_number, driver_name, driver_phone, data)
+                VALUES (?, ?, ?, ?, ?)`,
+          args: [
+            v.id || v.vehicleNo,
+            v.vehicleNo || v.vehicle_number || '',
+            v.driverName || '',
+            v.driverPhone || '',
+            JSON.stringify(v)
+          ]
+        });
+      }
+    }
+
+    // 6. Notifications
+    if (Array.isArray(localData.notifications)) {
+      for (const n of localData.notifications) {
+        await client.execute({
+          sql: `INSERT OR REPLACE INTO notifications (id, title, message, type, is_read, timestamp, role, data)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            n.id,
+            n.title || '',
+            n.message || '',
+            n.type || 'info',
+            n.read || n.is_read ? 1 : 0,
+            n.timestamp || new Date().toISOString(),
+            n.recipientRole || n.role || 'all',
+            JSON.stringify(n)
+          ]
+        });
+      }
+    }
+
+    // 7. Activities
+    if (Array.isArray(localData.activityHistory)) {
+      for (const a of localData.activityHistory) {
+        await client.execute({
+          sql: `INSERT OR REPLACE INTO activities (id, user_id, user_name, action_type, title, description, timestamp, data, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          args: [
+            a.id,
+            a.userId || '',
+            a.userName || '',
+            a.actionType || '',
+            a.title || '',
+            a.description || '',
+            a.timestamp || new Date().toISOString(),
+            JSON.stringify(a)
+          ]
+        });
+      }
+    }
+
+    // 8. Settings
+    if (localData.adminPasskey) {
+      await client.execute({
+        sql: `INSERT OR REPLACE INTO settings (key, value) VALUES ('adminPasskey', ?)`,
+        args: [String(localData.adminPasskey)]
+      });
+    }
+
+    // 9. Bulk Demands
+    if (Array.isArray(localData.bulkDemands)) {
+      for (const b of localData.bulkDemands) {
+        if (deletedSet.has(b.id)) continue;
+        await saveTursoBulkDemand(b);
+      }
+    }
+
+    await client.execute({
+      sql: `INSERT OR REPLACE INTO settings (key, value) VALUES ('lastCloudTransfer', ?)`,
+      args: [new Date().toISOString()]
+    });
+
+    return {
+      success: true,
+      message: 'All local data transferred to Turso Cloud (9 GB) successfully!',
+      timestamp: new Date().toISOString()
+    };
+  } catch (err) {
+    console.error('Error during transferAllLocalToTurso:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
 module.exports = {
   connectTurso,
   getIsConnected: () => isConnected,
   getTursoUrl: () => currentUrl ? currentUrl.replace(/:\/\/([^@]+)@/, '://****@') : '',
   getAllTursoData,
+  transferAllLocalToTurso,
   isDeletedId: (id) => deletedItemIds.has(id),
   getDeletedIds: () => Array.from(deletedItemIds),
   saveTursoOrder,

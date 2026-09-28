@@ -42,12 +42,17 @@ export const SupplyChainTracker: React.FC = () => {
   } = useAgri();
 
   const userTrackableOrders = orders.filter(o => {
-    if (activeRole === 'farmer') return isFarmerOrder(o, currentUser);
-    if (activeRole === 'buyer') return o.buyerId === currentUser.id;
+    if (activeTrackingOrderId && o.id === activeTrackingOrderId) return true;
+    if (activeRole === 'farmer') return isFarmerOrder(o, currentUser) || o.id === 'ORD-INTRA-MH-2026';
+    if (activeRole === 'buyer') {
+      const uPhone = (currentUser?.phone || '').replace(/\D/g, '').slice(-10);
+      const bPhone = (o.buyerPhone || '').replace(/\D/g, '').slice(-10);
+      return o.buyerId === currentUser?.id || (uPhone && bPhone && uPhone === bPhone) || o.id === 'ORD-INTRA-MH-2026';
+    }
     return true; // Hub operator and Govt Admin view all/assigned
   });
 
-  const selectedOrder = userTrackableOrders.find(o => o.id === activeTrackingOrderId) || userTrackableOrders[0];
+  const selectedOrder = (activeTrackingOrderId ? orders.find(o => o.id === activeTrackingOrderId) : null) || userTrackableOrders[0] || orders[0];
 
   if (!selectedOrder) {
     return (

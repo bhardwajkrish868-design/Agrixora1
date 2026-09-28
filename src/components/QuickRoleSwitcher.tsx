@@ -24,6 +24,7 @@ export const QuickRoleSwitcher: React.FC = () => {
     switchRole, 
     currentUser, 
     setIsAuthModalOpen, 
+    openAuthModal,
     logoutUser,
     isAdminAuthenticated,
     verifyAdminPasskey,
@@ -106,7 +107,7 @@ export const QuickRoleSwitcher: React.FC = () => {
             </div>
             
             <button
-              onClick={() => setIsAuthModalOpen(true)}
+              onClick={() => openAuthModal(activeRole, 'login')}
               className="px-2.5 py-0.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 text-[11px] font-bold flex items-center gap-1 transition-colors border border-white/10 cursor-pointer"
               title="Enter your custom name, location, and details"
             >

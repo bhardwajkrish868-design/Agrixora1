@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAgri } from '../context/AgriContext';
+import { useAgri, filterNotificationsForUser } from '../context/AgriContext';
 import { UserRole } from '../types';
 import { 
   LayoutDashboard, 
@@ -34,64 +34,74 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { activeRole, activeTab, setActiveTab, listings, orders, notifications, currentUser, isFarmerOrder, isFarmerListing, activityHistory, vehicles, bulkDemands } = useAgri();
+  const { activeRole, activeTab, setActiveTab, listings, orders, notifications, currentUser, isFarmerOrder, isFarmerListing, isBuyerOrder, activityHistory, vehicles, bulkDemands, collectionHubs, language } = useAgri();
 
   // Role based navigation configuration
   const getNavItems = (role: UserRole) => {
+    const roleUnreadNotifs = filterNotificationsForUser(notifications, currentUser, role).filter(n => !n.read).length;
+
     switch (role) {
       case 'farmer':
         return [
-          { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-          { id: 'bulk_pooling', label: '📥 Receive Bulk Orders', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
-          { id: 'add_produce', label: 'Add Produce', icon: PlusCircle },
-          { id: 'my_listings', label: 'My Listings', icon: Layers, badge: listings.filter(l => isFarmerListing(l, currentUser)).length },
-          { id: 'orders', label: 'Orders Received', icon: ShoppingBag, badge: orders.filter(o => isFarmerOrder(o, currentUser)).length, highlight: orders.some(o => isFarmerOrder(o, currentUser) && o.currentStage === 'order_placed') },
-          { id: 'transport_services', label: 'State Transport', icon: Truck, badge: vehicles?.length || 0 },
-          { id: 'market_prices', label: 'Market Prices', icon: TrendingUp },
-          { id: 'earnings', label: 'Earnings', icon: Wallet },
-          { id: 'notifications', label: 'Notifications', icon: Bell, badge: notifications.filter(n => !n.read && (n.recipientRole === 'farmer' || n.recipientRole === 'all')).length },
-          { id: 'profile', label: 'Profile', icon: User }
+          { id: 'overview', label: language === 'hi' ? 'डैशबोर्ड' : 'Overview', icon: LayoutDashboard },
+          { id: 'bulk_pooling', label: language === 'hi' ? '📥 थोक खरीद मांग' : '📥 Receive Bulk Orders', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
+          { id: 'add_produce', label: language === 'hi' ? 'फसल जोड़ें' : 'Add Produce', icon: PlusCircle },
+          { id: 'my_listings', label: language === 'hi' ? 'मेरी फसलें' : 'My Listings', icon: Layers, badge: listings.filter(l => isFarmerListing(l, currentUser)).length },
+          { id: 'orders', label: language === 'hi' ? 'प्राप्त ऑर्डर' : 'Orders Received', icon: ShoppingBag, badge: orders.filter(o => isFarmerOrder(o, currentUser)).length, highlight: orders.some(o => isFarmerOrder(o, currentUser) && o.currentStage === 'order_placed') },
+          { id: 'transport_services', label: language === 'hi' ? 'राज्य परिवहन' : 'State Transport', icon: Truck, badge: vehicles?.length || 0 },
+          { id: 'market_prices', label: language === 'hi' ? 'मंडी भाव' : 'Market Prices', icon: TrendingUp },
+          { id: 'earnings', label: language === 'hi' ? 'मेरी कमाई' : 'Earnings', icon: Wallet },
+          { id: 'notifications', label: language === 'hi' ? 'सूचनाएं' : 'Notifications', icon: Bell, badge: roleUnreadNotifs },
+          { id: 'profile', label: language === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: User }
         ];
 
       case 'buyer':
+        const buyerOrdersCount = orders.filter(o => isBuyerOrder(o, currentUser)).length;
         return [
-          { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-          { id: 'bulk_pooling', label: '⚡ 4-Mo Bulk Orders', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
-          { id: 'marketplace', label: 'Marketplace', icon: Store, badge: listings.filter(l => l.status === 'Active').length },
-          { id: 'my_orders', label: 'My Orders', icon: ShoppingBag, badge: orders.length },
-          { id: 'track_delivery', label: 'Track Delivery', icon: Truck, highlight: true },
-          { id: 'transport_services', label: 'State Transport Fleet', icon: Truck, badge: vehicles?.length || 0 },
-          { id: 'payments', label: 'Payments', icon: CreditCard },
-          { id: 'profile', label: 'Profile', icon: User }
+          { id: 'overview', label: language === 'hi' ? 'डैशबोर्ड' : 'Dashboard', icon: LayoutDashboard },
+          { id: 'bulk_pooling', label: language === 'hi' ? '⚡ 4-माह थोक खरीद' : '⚡ 4-Mo Bulk Orders', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
+          { id: 'marketplace', label: language === 'hi' ? 'फसल मार्केटप्लेस' : 'Marketplace', icon: Store, badge: listings.filter(l => l.status === 'Active').length },
+          { id: 'my_orders', label: language === 'hi' ? 'मेरे ऑर्डर' : 'My Orders', icon: ShoppingBag, badge: buyerOrdersCount, highlight: orders.some(o => isBuyerOrder(o, currentUser) && o.currentStage === 'in_transit') },
+          { id: 'track_delivery', label: language === 'hi' ? 'डिलीवरी ट्रैक करें' : 'Track Delivery', icon: Truck, highlight: true },
+          { id: 'transport_services', label: language === 'hi' ? 'राज्य परिवहन बेड़ा' : 'State Transport Fleet', icon: Truck, badge: vehicles?.length || 0 },
+          { id: 'market_prices', label: language === 'hi' ? 'मंडी भाव व विश्लेषण' : 'Market Prices', icon: TrendingUp },
+          { id: 'payments', label: language === 'hi' ? 'भुगतान व एस्क्रो' : 'Payments', icon: CreditCard },
+          { id: 'notifications', label: language === 'hi' ? 'सूचनाएं' : 'Notifications', icon: Bell, badge: roleUnreadNotifs },
+          { id: 'profile', label: language === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: User }
         ];
 
       case 'collection_centre':
+        const hubIncomingCount = orders.filter(o => o.currentStage === 'order_placed' || o.currentStage === 'collected_at_hub').length;
+        const hubReadyDispatchCount = orders.filter(o => o.currentStage === 'quality_verified').length;
         return [
-          { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-          { id: 'bulk_pooling', label: 'Bulk Hub Aggregation', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
-          { id: 'incoming', label: 'Incoming Produce', icon: PackageSearch, badge: orders.filter(o => o.currentStage === 'order_placed' || o.currentStage === 'collected_at_hub').length },
-          { id: 'verification', label: 'Verification & QC', icon: ShieldCheck },
-          { id: 'storage', label: 'Storage Status', icon: Warehouse },
-          { id: 'dispatch', label: 'Dispatch Fleet', icon: SendHorizontal },
-          { id: 'fleet', label: 'Vehicle Registry', icon: Truck, badge: vehicles?.length || 0 },
-          { id: 'transport_services', label: 'State Transport Directory', icon: Truck },
-          { id: 'profile', label: 'Profile', icon: User }
+          { id: 'overview', label: language === 'hi' ? 'हब कमांड डैशबोर्ड' : 'Hub Command Dashboard', icon: LayoutDashboard },
+          { id: 'incoming', label: language === 'hi' ? 'आवक फसल (धर्मकांटा)' : 'Incoming Harvest Intake', icon: PackageSearch, badge: hubIncomingCount },
+          { id: 'verification', label: language === 'hi' ? 'NABL लैब व ग्रेडिंग' : 'QC Lab & Grading', icon: ShieldCheck },
+          { id: 'storage', label: language === 'hi' ? 'साइलो व कोल्ड स्टोरेज' : 'Cold Storage & Silos', icon: Warehouse },
+          { id: 'dispatch', label: language === 'hi' ? 'फ्लीट डिस्पैच व रवानगी' : 'Fleet Dispatch Manager', icon: SendHorizontal, badge: hubReadyDispatchCount },
+          { id: 'fleet', label: language === 'hi' ? 'वाहन व चालक रजिस्ट्री' : 'Fleet & Drivers Registry', icon: Truck, badge: vehicles?.length || 0 },
+          { id: 'collection_centres', label: language === 'hi' ? 'अखिल भारतीय FCI केंद्र' : 'All-India FCI Centres', icon: Building2, badge: collectionHubs.length },
+          { id: 'bulk_pooling', label: language === 'hi' ? '⚡ थोक मांग एकत्रीकरण' : '⚡ Bulk Hub Pooling', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
+          { id: 'transport_services', label: language === 'hi' ? 'राज्य परिवहन नेटवर्क' : 'State Transport Network', icon: Truck },
+          { id: 'notifications', label: language === 'hi' ? 'सूचनाएं एवं अलर्ट' : 'Notifications & Alerts', icon: Bell, badge: roleUnreadNotifs },
+          { id: 'profile', label: language === 'hi' ? 'हब प्रोफ़ाइल' : 'Hub Profile', icon: User }
         ];
 
       case 'admin':
         return [
-          { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-          { id: 'users', label: 'Users & Stakeholders', icon: Users },
-          { id: 'listings', label: 'All Listings', icon: Boxes, badge: listings.length },
-          { id: 'bulk_pooling', label: '500T+ Bulk Demand Pools', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
-          { id: 'orders', label: 'Orders Monitoring', icon: ShoppingBag, badge: orders.length },
-          { id: 'collection_centres', label: 'Collection Hubs', icon: Building2 },
-          { id: 'vehicles', label: 'Fleet & Vehicles', icon: Truck, badge: vehicles?.length || 0 },
-          { id: 'transport_services', label: 'State Transport Network', icon: Truck },
-          { id: 'transactions', label: 'Escrow & Txns', icon: Receipt },
-          { id: 'database', label: 'Database & Audit Logs', icon: Database, badge: activityHistory?.length || 0 },
-          { id: 'analytics', label: 'Supply Analytics', icon: BarChart3 },
-          { id: 'profile', label: 'Admin Profile & KYC', icon: User }
+          { id: 'overview', label: language === 'hi' ? 'डैशबोर्ड' : 'Dashboard', icon: LayoutDashboard },
+          { id: 'users', label: language === 'hi' ? 'उपयोगकर्ता व हितधारक' : 'Users & Stakeholders', icon: Users },
+          { id: 'listings', label: language === 'hi' ? 'सभी फसल लिस्टिंग' : 'All Listings', icon: Boxes, badge: listings.length },
+          { id: 'bulk_pooling', label: language === 'hi' ? '500T+ थोक मांग पूल' : '500T+ Bulk Demand Pools', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
+          { id: 'orders', label: language === 'hi' ? 'ऑर्डर निगरानी' : 'Orders Monitoring', icon: ShoppingBag, badge: orders.length },
+          { id: 'collection_centres', label: language === 'hi' ? 'कलेक्शन हब केंद्र' : 'Collection Hubs', icon: Building2 },
+          { id: 'vehicles', label: language === 'hi' ? 'फ्लीट व वाहन' : 'Fleet & Vehicles', icon: Truck, badge: vehicles?.length || 0 },
+          { id: 'transport_services', label: language === 'hi' ? 'राज्य परिवहन नेटवर्क' : 'State Transport Network', icon: Truck },
+          { id: 'transactions', label: language === 'hi' ? 'एस्क्रो एवं लेनदेन' : 'Escrow & Txns', icon: Receipt },
+          { id: 'database', label: language === 'hi' ? 'डेटाबेस व ऑडिट लॉग' : 'Database & Audit Logs', icon: Database, badge: activityHistory?.length || 0 },
+          { id: 'analytics', label: language === 'hi' ? 'आपूर्ति विश्लेषण' : 'Supply Analytics', icon: BarChart3 },
+          { id: 'notifications', label: language === 'hi' ? 'सिस्टम अलर्ट व सूचनाएं' : 'Notifications & Logs', icon: Bell, badge: roleUnreadNotifs },
+          { id: 'profile', label: language === 'hi' ? 'एडमिन प्रोफ़ाइल' : 'Admin Profile & KYC', icon: User }
         ];
     }
   };
@@ -99,10 +109,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const navItems = getNavItems(activeRole);
 
   const roleThemeBadge = {
-    farmer: { text: 'Farmer Portal', bg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
-    buyer: { text: 'Buyer Portal', bg: 'bg-blue-50 text-blue-800 border-blue-200' },
-    collection_centre: { text: 'Collection Hub Bay', bg: 'bg-amber-50 text-amber-800 border-amber-200' },
-    admin: { text: 'Admin Console', bg: 'bg-slate-100 text-slate-800 border-slate-300' }
+    farmer: { text: language === 'hi' ? 'किसान पोर्टल' : 'Farmer Portal', bg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+    buyer: { text: language === 'hi' ? 'खरीदार पोर्टल' : 'Buyer Portal', bg: 'bg-blue-50 text-blue-800 border-blue-200' },
+    collection_centre: { text: language === 'hi' ? 'कलेक्शन हब केंद्र' : 'Collection Hub Bay', bg: 'bg-amber-50 text-amber-800 border-amber-200' },
+    admin: { text: language === 'hi' ? 'एडमिन कंसोल' : 'Admin Console', bg: 'bg-slate-100 text-slate-800 border-slate-300' }
   }[activeRole];
 
   return (
@@ -126,14 +136,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="p-4 overflow-y-auto flex-1 space-y-6">
           {/* Active Role Indicator */}
           <div className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Active Workspace</span>
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{language === 'hi' ? 'सक्रिय वर्कस्पेस' : 'Active Workspace'}</span>
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${roleThemeBadge.bg}`}>
               {roleThemeBadge.text}
             </span>
           </div>
 
           <div className="space-y-1">
-            <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Navigation</p>
+            <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">{language === 'hi' ? 'नेविगेशन' : 'Navigation'}</p>
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -182,14 +192,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <div className="bg-emerald-50/90 rounded-2xl p-3 border border-emerald-200 text-emerald-950">
             <div className="flex items-center gap-2 mb-1">
               <Lock className="w-3.5 h-3.5 text-emerald-700" />
-              <span className="text-[11px] font-bold">Escrow Guarantee</span>
+              <span className="text-[11px] font-bold">{language === 'hi' ? 'एस्क्रो सुरक्षा गारंटी' : 'Escrow Guarantee'}</span>
             </div>
             <p className="text-[10px] text-emerald-800 leading-tight">
-              100% payout security. Funds released only upon delivery verification.
+              {language === 'hi'
+                ? '100% भुगतान सुरक्षा। डिलीवरी सत्यापन के बाद ही राशि सीधे बैंक खाते में भेजी जाती है।'
+                : '100% payout security. Funds released only upon delivery verification.'}
             </p>
             <div className="mt-2 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[10px] font-semibold text-emerald-900">
               <span className="flex items-center gap-1">
-                <PhoneCall className="w-3 h-3 text-emerald-600" /> Kisan Helpline
+                <PhoneCall className="w-3 h-3 text-emerald-600" /> {language === 'hi' ? 'किसान हेल्पलाइन' : 'Kisan Helpline'}
               </span>
               <span>1800-180-1551</span>
             </div>

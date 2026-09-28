@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { 
   ShieldCheck, 
@@ -31,7 +31,10 @@ import {
   FileJson,
   Phone,
   Train,
-  Clock
+  Clock,
+  UserPlus,
+  Layers,
+  Globe2
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { 
@@ -54,6 +57,8 @@ export const AdminDashboard: React.FC = () => {
   const { 
     listings, 
     orders, 
+    deleteOrder,
+    clearAllOrders,
     collectionHubs, 
     vehicles,
     bulkDemands,
@@ -72,8 +77,182 @@ export const AdminDashboard: React.FC = () => {
     deleteUser,
     clearAllUsers,
     activityHistory,
-    clearActivityHistory
+    clearActivityHistory,
+    setCurrentUser,
+    switchRole,
+    stakeholderCohortMode,
+    setStakeholderCohortMode,
+    registerUser,
+    language
   } = useAgri();
+
+  const isHindi = language === 'hi';
+
+  // Sub-view mode for stakeholders tab: 'live_db' (registered accounts in DB) vs 'upcoming_pipeline' (upcoming pre-registrations)
+  const [userViewMode, setUserViewMode] = useState<'live_db' | 'upcoming_pipeline'>('live_db');
+  const [onboardingSuccessId, setOnboardingSuccessId] = useState<string | null>(null);
+
+  // Pre-configured seasonal upcoming clusters (FPOs & Institutional Buyers)
+  const upcomingClusters = [
+    {
+      id: 'cluster-nashik-onion',
+      name: 'Nashik Onion & Grape Producers FPO',
+      type: 'fpo' as const,
+      role: 'farmer' as const,
+      commodity: 'Nashik Red Onion (Export Grade)',
+      membersOrOutlets: 2450,
+      projectedTons: 12500,
+      location: 'Lasalgaon Mandi Road, Niphad',
+      district: 'Nashik',
+      state: 'Maharashtra',
+      phone: '+91 98231 44550',
+      targetSeason: 'Rabi Harvest (Oct 2026)',
+      kycStatus: '100% Aadhaar & 7/12 Land Record Pre-verified',
+      escrowReadiness: 'DBT Bank Auto-Disbursal Configured',
+      representativeName: 'Dnyaneshwar Shinde (FPO Director)',
+      farmSizeAcres: 12
+    },
+    {
+      id: 'cluster-malwa-wheat',
+      name: 'Malwa Sharbati Wheat Organic Collective',
+      type: 'fpo' as const,
+      role: 'farmer' as const,
+      commodity: 'Sehore Golden Sharbati Wheat',
+      membersOrOutlets: 3800,
+      projectedTons: 18200,
+      location: 'Sehore Agricultural Corridor',
+      district: 'Sehore',
+      state: 'Madhya Pradesh',
+      phone: '+91 94250 88912',
+      targetSeason: 'Rabi Harvest (Nov 2026)',
+      kycStatus: 'NCOF Organic Certified & Land Record Synced',
+      escrowReadiness: 'Mandatory MSP Benchmark Locked',
+      representativeName: 'Babulal Patidar (Lead Farmer)',
+      farmSizeAcres: 18
+    },
+    {
+      id: 'cluster-punjab-basmati',
+      name: 'Amritsar Progressive Basmati Producers Association',
+      type: 'fpo' as const,
+      role: 'farmer' as const,
+      commodity: '1121 Pusa Super Basmati Rice',
+      membersOrOutlets: 4600,
+      projectedTons: 22000,
+      location: 'GT Road Agricultural Bay',
+      district: 'Amritsar',
+      state: 'Punjab',
+      phone: '+91 98140 33441',
+      targetSeason: 'Kharif / Post-Monsoon 2026',
+      kycStatus: 'APEDA Export Certification Cleared',
+      escrowReadiness: 'Escrow Multi-Sig Bank Vault Active',
+      representativeName: 'Sukhwinder Singh (Cluster Head)',
+      farmSizeAcres: 25
+    },
+    {
+      id: 'cluster-shimla-apple',
+      name: 'Shimla High-Altitude Apple Growers Cooperative',
+      type: 'fpo' as const,
+      role: 'farmer' as const,
+      commodity: 'Royal Delicious Apple & Cherry',
+      membersOrOutlets: 4000,
+      projectedTons: 9800,
+      location: 'Kotkhai Valley Orchards',
+      district: 'Shimla',
+      state: 'Himachal Pradesh',
+      phone: '+91 94180 55662',
+      targetSeason: 'Autumn Flush (Oct 2026)',
+      kycStatus: 'Horticulture Board Certified',
+      escrowReadiness: 'Reefer Cold Chain Guaranteed',
+      representativeName: 'Rajesh Chauhan (Cooperative Secy)',
+      farmSizeAcres: 8
+    },
+    {
+      id: 'buyer-reliance-fresh',
+      name: 'Reliance Retail Agri Sourcing Division',
+      type: 'corporate_buyer' as const,
+      role: 'buyer' as const,
+      commodity: 'Bulk Vegetables, Onions & Potatoes',
+      membersOrOutlets: 650,
+      projectedTons: 35000,
+      location: 'National Procurement Hub, Ghansoli',
+      district: 'Navi Mumbai',
+      state: 'Maharashtra',
+      phone: '+91 98200 99887',
+      targetSeason: 'Annual Standing Contract 2026-27',
+      kycStatus: 'Corporate GST & Trade License Verified',
+      escrowReadiness: '₹10.0 Cr Bank Escrow Line Pre-funded',
+      representativeName: 'Kunal Singhania (VP Procurement)',
+      gstin: '27AAACR1234F1Z8'
+    },
+    {
+      id: 'buyer-itc-choupal',
+      name: 'ITC Choupal Saagar Institutional Supply',
+      type: 'corporate_buyer' as const,
+      role: 'buyer' as const,
+      commodity: 'Wheat, Mustard, Soya & Pulses',
+      membersOrOutlets: 980,
+      projectedTons: 48000,
+      location: 'Choupal Rural Hub #08',
+      district: 'Indore',
+      state: 'Madhya Pradesh',
+      phone: '+91 97550 11223',
+      targetSeason: 'Rabi Bulk Sourcing 2026',
+      kycStatus: 'Ministry of Corporate Affairs Verified',
+      escrowReadiness: 'Same-Day T+0 RTGS Release Facility',
+      representativeName: 'Prashant Verma (Regional Supply Lead)',
+      gstin: '23AAACI5678K1ZQ'
+    },
+    {
+      id: 'buyer-bigbasket-instafresh',
+      name: 'BigBasket Fresh Farm Direct Division',
+      type: 'corporate_buyer' as const,
+      role: 'buyer' as const,
+      commodity: 'Farm-Fresh Green Vegetables & Exotic Produce',
+      membersOrOutlets: 710,
+      projectedTons: 19500,
+      location: 'Whitefield Agri Tech Logistics Park',
+      district: 'Bengaluru',
+      state: 'Karnataka',
+      phone: '+91 99000 66778',
+      targetSeason: 'Daily Hyperlocal Intake (2026)',
+      kycStatus: 'FSSAI Central Wholesale License Active',
+      escrowReadiness: 'Automated 2-Hour Escrow Settlement',
+      representativeName: 'Aditi Sundaram (Chief Merchandising)',
+      gstin: '29AABCI9012M1Z4'
+    }
+  ];
+
+  const handleOnboardCluster = (cluster: typeof upcomingClusters[0]) => {
+    const isFarmer = cluster.role === 'farmer';
+    registerUser({
+      name: cluster.representativeName,
+      role: cluster.role,
+      phone: cluster.phone,
+      district: cluster.district,
+      state: cluster.state,
+      location: `${cluster.location}, ${cluster.district}`,
+      avatar: isFarmer
+        ? 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200&auto=format&fit=crop&q=80'
+        : 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&auto=format&fit=crop&q=80',
+      farmSizeAcres: cluster.farmSizeAcres || 10,
+      businessName: !isFarmer ? cluster.name : undefined,
+      gstin: cluster.gstin
+    });
+
+    setOnboardingSuccessId(cluster.id);
+    setTimeout(() => setOnboardingSuccessId(null), 3500);
+
+    addNotification({
+      title: isHindi 
+        ? `✅ नया हितधारक ऑनबोर्ड: ${cluster.name}`
+        : `✅ New Stakeholder Onboarded: ${cluster.name}`,
+      message: isHindi
+        ? `${cluster.representativeName} को लाइव डेटाबेस में पंजीकृत किया गया। (${cluster.commodity})`
+        : `Successfully registered ${cluster.representativeName} (${cluster.name}) to live database for ${cluster.commodity}.`,
+      type: 'alert',
+      recipientRole: 'admin'
+    });
+  };
 
   const [broadcastTitle, setBroadcastTitle] = useState('Govt MSP Revision & Rabi Procurement Advisory');
   const [broadcastMsg, setBroadcastMsg] = useState('Government has approved a 12% MSP floor price enhancement on Wheat and Mustard. Direct DBT Escrow payments active at all 48 Collection Hubs.');
@@ -167,25 +346,39 @@ export const AdminDashboard: React.FC = () => {
     { month: 'Aug 26', gmv: 9850000, fee: 147750 },
   ];
 
-  const userGrowthData = [
-    { month: 'Apr', farmers: 8200, buyers: 1100 },
-    { month: 'May', farmers: 9900, buyers: 1450 },
-    { month: 'Jun', farmers: 11400, buyers: 1780 },
-    { month: 'Jul', farmers: 13100, buyers: 2050 },
-    { month: 'Aug', farmers: 14850, buyers: 2340 },
-  ];
+  const userGrowthData = useMemo(() => {
+    if (stakeholderCohortMode === 'registered_now') {
+      const liveF = stats.registeredFarmersNow;
+      const liveB = stats.registeredBuyersNow;
+      return [
+        { month: 'Apr', farmers: Math.max(1, Math.round(liveF * 0.2)), buyers: Math.max(1, Math.round(liveB * 0.2)) },
+        { month: 'May', farmers: Math.max(2, Math.round(liveF * 0.45)), buyers: Math.max(1, Math.round(liveB * 0.35)) },
+        { month: 'Jun', farmers: Math.max(3, Math.round(liveF * 0.65)), buyers: Math.max(2, Math.round(liveB * 0.6)) },
+        { month: 'Jul', farmers: Math.max(4, Math.round(liveF * 0.85)), buyers: Math.max(3, Math.round(liveB * 0.8)) },
+        { month: isHindi ? 'वर्तमान (Live)' : 'Current (Live)', farmers: liveF, buyers: liveB },
+      ];
+    }
+    return [
+      { month: 'Apr', farmers: 8200, buyers: 1100 },
+      { month: 'May', farmers: 9900, buyers: 1450 },
+      { month: 'Jun', farmers: 11400, buyers: 1780 },
+      { month: 'Jul', farmers: 13100, buyers: 2050 },
+      { month: isHindi ? 'आगामी लक्ष्य' : 'Target / Upcoming', farmers: 14850, buyers: 2340 },
+    ];
+  }, [stakeholderCohortMode, stats.registeredFarmersNow, stats.registeredBuyersNow, isHindi]);
 
   const filteredHistory = (activityHistory || []).filter(item => {
+    if (!item) return false;
     const matchesFilter = auditActionFilter === 'all' || item.actionType === auditActionFilter;
     const q = auditSearchQuery.toLowerCase().trim();
     if (!q) return matchesFilter;
     const matchesSearch = 
-      item.title.toLowerCase().includes(q) ||
-      item.description.toLowerCase().includes(q) ||
+      (item.title && item.title.toLowerCase().includes(q)) ||
+      (item.description && item.description.toLowerCase().includes(q)) ||
       (item.userName && item.userName.toLowerCase().includes(q)) ||
       (item.userRole && item.userRole.toLowerCase().includes(q)) ||
       (item.metadata && JSON.stringify(item.metadata).toLowerCase().includes(q));
-    return matchesFilter && matchesSearch;
+    return Boolean(matchesFilter && matchesSearch);
   });
 
   const filteredVehicles = (vehicles || []).filter(v => {
@@ -250,7 +443,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
             <span className="text-[10px] text-slate-500 block uppercase font-bold">In Escrow Vault</span>
-            <span className="font-extrabold text-amber-600 text-sm">₹{stats.escrowLockedValue.toLocaleString('en-IN')}</span>
+            <span className="font-extrabold text-amber-600 text-sm">₹{(stats?.escrowLockedValue || 0).toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>
@@ -404,41 +597,151 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Dynamic Stakeholder Cohort Selector: Registered Now vs Upcoming */}
+      <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl transition-all shadow-xs ${
+            stakeholderCohortMode === 'registered_now'
+              ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-emerald-200'
+              : 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-blue-200'
+          }`}>
+            {stakeholderCohortMode === 'registered_now' ? '🌾' : '🚀'}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black uppercase tracking-wider text-slate-500">
+                {isHindi ? 'हितधारक डेटा दायरा' : 'Stakeholder Verification Scope'}
+              </span>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border flex items-center gap-1.5 transition-all ${
+                stakeholderCohortMode === 'registered_now'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-blue-50 text-blue-700 border-blue-300'
+              }`}>
+                {stakeholderCohortMode === 'registered_now' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                )}
+                {stakeholderCohortMode === 'registered_now'
+                  ? (isHindi ? 'वर्तमान में पंजीकृत (Live DB)' : 'Registered Now (Live DB)')
+                  : (isHindi ? 'आगामी / अनुमानित नेटवर्क' : 'Upcoming / Projected Network')}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 font-medium mt-1">
+              {stakeholderCohortMode === 'registered_now'
+                ? (isHindi
+                    ? `डेटाबेस में वास्तविक लाइव खाते: ${stats.registeredFarmersNow} किसान एवं ${stats.registeredBuyersNow} खरीदार (KYC सत्यापित)`
+                    : `Live accounts verified in database: ${stats.registeredFarmersNow} Farmers & ${stats.registeredBuyersNow} Buyers registered now`)
+                : (isHindi
+                    ? `आगामी कटाई सीजन नेटवर्क: 14,850 किसान (एफपीओ क्लस्टर) एवं 2,340 संस्थागत खरीदार`
+                    : `Projected seasonal harvest pipeline: 14,850 Farmers (FPO clusters) & 2,340 Buyers queued for onboarding`)}
+            </p>
+          </div>
+        </div>
+
+        {/* Cohort Switch Buttons */}
+        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shrink-0 self-start md:self-auto">
+          <button
+            type="button"
+            onClick={() => setStakeholderCohortMode('registered_now')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              stakeholderCohortMode === 'registered_now'
+                ? 'bg-white text-emerald-800 shadow-sm border border-emerald-200 ring-1 ring-emerald-500/20'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>{isHindi ? 'वर्तमान पंजीकृत' : 'Registered Now'}</span>
+            <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-mono text-[11px] font-extrabold border border-emerald-200">
+              {stats.registeredFarmersNow + stats.registeredBuyersNow}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setStakeholderCohortMode('upcoming')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              stakeholderCohortMode === 'upcoming'
+                ? 'bg-white text-blue-800 shadow-sm border border-blue-200 ring-1 ring-blue-500/20'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>🚀</span>
+            <span>{isHindi ? 'आगामी / अनुमानित' : 'Upcoming / Projected'}</span>
+            <span className="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 font-mono text-[11px] font-extrabold border border-blue-200">
+              17,190+
+            </span>
+          </button>
+        </div>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Verified Farmers"
-          value={stats.verifiedFarmersCount.toLocaleString('en-IN')}
-          subtitle="100% Aadhaar & Land Record KYC"
+          title={isHindi ? "सत्यापित किसान" : "Verified Farmers"}
+          value={
+            stakeholderCohortMode === 'registered_now'
+              ? `${stats.registeredFarmersNow} ${isHindi ? 'पंजीकृत' : 'Accounts'}`
+              : (stats?.verifiedFarmersCount || 0).toLocaleString('en-IN')
+          }
+          subtitle={
+            stakeholderCohortMode === 'registered_now'
+              ? (isHindi 
+                  ? `${stats.registeredFarmersNow} डेटाबेस में सत्यापित • 14,850 आगामी सीजन`
+                  : `${stats.registeredFarmersNow} live in DB • 14,850 upcoming season`)
+              : (isHindi 
+                  ? `14,850 आगामी सीजन नेटवर्क • ${stats.registeredFarmersNow} वर्तमान लाइव`
+                  : `14,850 seasonal pipeline • ${stats.registeredFarmersNow} live in DB`)
+          }
           icon={Users}
-          trend={{ value: '14.2%', isPositive: true }}
+          trend={{ 
+            value: stakeholderCohortMode === 'registered_now' 
+              ? `${stats.registeredFarmersNow} Live` 
+              : '14.2%', 
+            isPositive: true 
+          }}
           colorScheme="emerald"
           onClick={() => setActiveTab('users')}
         />
 
         <StatCard
-          title="Verified Buyers"
-          value={stats.verifiedBuyersCount.toLocaleString('en-IN')}
-          subtitle="Retailers, Exporters & Processors"
+          title={isHindi ? "सत्यापित खरीदार" : "Verified Buyers"}
+          value={
+            stakeholderCohortMode === 'registered_now'
+              ? `${stats.registeredBuyersNow} ${isHindi ? 'पंजीकृत' : 'Accounts'}`
+              : (stats?.verifiedBuyersCount || 0).toLocaleString('en-IN')
+          }
+          subtitle={
+            stakeholderCohortMode === 'registered_now'
+              ? (isHindi 
+                  ? `${stats.registeredBuyersNow} डेटाबेस में सत्यापित • 2,340 आगामी अनुबंध`
+                  : `${stats.registeredBuyersNow} live in DB • 2,340 upcoming corporate`)
+              : (isHindi 
+                  ? `2,340 आगामी कॉर्पोरेट मांग • ${stats.registeredBuyersNow} वर्तमान लाइव`
+                  : `2,340 institutional buyers • ${stats.registeredBuyersNow} live in DB`)
+          }
           icon={ShoppingBag}
-          trend={{ value: '18.5%', isPositive: true }}
+          trend={{ 
+            value: stakeholderCohortMode === 'registered_now' 
+              ? `${stats.registeredBuyersNow} Live` 
+              : '18.5%', 
+            isPositive: true 
+          }}
           colorScheme="blue"
           onClick={() => setActiveTab('users')}
         />
 
         <StatCard
-          title="Fleet Vehicles"
+          title={isHindi ? "फ्लीट वाहन (कोल्ड चेन)" : "Fleet Vehicles"}
           value={`${vehicles?.length || 0} Assets`}
-          subtitle="GPS Linked Cold Vans"
+          subtitle={isHindi ? "जीपीएस युक्त तापमान नियंत्रित वैन" : "GPS Linked Cold Vans"}
           icon={Truck}
           colorScheme="purple"
           onClick={() => setActiveTab('vehicles')}
         />
 
         <StatCard
-          title="Collection Hubs"
-          value="48 Active"
-          subtitle="Zero SLA/Cold Chain Breaches"
+          title={isHindi ? "कलेक्शन व एग्रीगेशन हब" : "Collection Hubs"}
+          value={`${collectionHubs?.length || 48} ${isHindi ? 'सक्रिय' : 'Active'}`}
+          subtitle={isHindi ? "शून्य कोल्ड चेन खराबी दर" : "Zero SLA/Cold Chain Breaches"}
           icon={Building2}
           colorScheme="amber"
           onClick={() => setActiveTab('collection_centres')}
@@ -667,7 +970,7 @@ export const AdminDashboard: React.FC = () => {
                   filteredHistory.map(log => (
                     <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-3.5 px-4 font-mono text-[11px] text-slate-500 whitespace-nowrap">
-                        {new Date(log.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'medium' })}
+                        {log.timestamp ? new Date(log.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'medium' }) : 'Recent'}
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getActionBadgeColor(log.actionType)}`}>
@@ -704,36 +1007,84 @@ export const AdminDashboard: React.FC = () => {
       {/* Stakeholders Sub-View */}
       {activeTab === 'users' && (
         <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
             <div>
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Users className="w-5 h-5 text-emerald-600" />
-                Verified Registered Stakeholders ({registeredUsers.length} in Database)
-              </h2>
-              <p className="text-xs text-slate-500">Persistent database of registered farmers, buyers, collection hubs, and administrators</p>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-emerald-600" />
+                  {isHindi ? 'सत्यापित हितधारक व आगामी ऑनबोर्डिंग नेटवर्क' : 'Verified Stakeholders & Seasonal Pipeline'}
+                </h2>
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  {userViewMode === 'live_db' 
+                    ? `${registeredUsers.length} in DB` 
+                    : `${upcomingClusters.length} Clusters / 17,190 Total`}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isHindi 
+                  ? 'लाइव डेटाबेस खाते देखें या आगामी फसल सीजन के एफपीओ एवं खरीदार ऑनबोर्डिंग पाइपलाइन का प्रबंधन करें' 
+                  : 'Manage live database verified accounts or review upcoming harvest season FPOs and institutional buyer pipeline'}
+              </p>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-                {registeredUsers.length} Stored Accounts
-              </span>
-              {registeredUsers.length > 0 && (
-                <button
-                  onClick={() => {
-                    if (confirm(`Are you sure you want to delete all ${registeredUsers.length} saved profiles? This will wipe user records from database.`)) {
-                      clearAllUsers();
-                    }
-                  }}
-                  className="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Delete All {registeredUsers.length} Profiles</span>
-                </button>
-              )}
+
+            {/* Sub-view toggle: Live DB Accounts vs Upcoming Pipeline */}
+            <div className="flex items-center gap-2 self-start md:self-auto bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setUserViewMode('live_db')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  userViewMode === 'live_db'
+                    ? 'bg-white text-emerald-800 shadow-xs border border-emerald-200'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>{isHindi ? 'लाइव खाते (DB)' : 'Live Accounts (DB)'}</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-700 font-mono font-bold">
+                  {registeredUsers.length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setUserViewMode('upcoming_pipeline')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  userViewMode === 'upcoming_pipeline'
+                    ? 'bg-white text-blue-800 shadow-xs border border-blue-200'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span>🚀</span>
+                <span>{isHindi ? 'आगामी पाइपलाइन' : 'Upcoming Pipeline'}</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-blue-50 text-blue-700 font-mono font-bold">
+                  17.1k+
+                </span>
+              </button>
             </div>
           </div>
 
-          {/* Role Filter Tabs & Search Bar */}
+          {userViewMode === 'live_db' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                  {registeredUsers.length} {isHindi ? 'सहेजे गए सक्रिय खाते' : 'Stored Accounts'}
+                </span>
+                {registeredUsers.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (confirm(`Are you sure you want to delete all ${registeredUsers.length} saved profiles? This will wipe user records from database.`)) {
+                        clearAllUsers();
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>{isHindi ? `सभी ${registeredUsers.length} प्रोफ़ाइल हटाएं` : `Delete All ${registeredUsers.length} Profiles`}</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Role Filter Tabs & Search Bar */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-1">
             <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl overflow-x-auto text-xs">
               <button
@@ -923,17 +1274,33 @@ export const AdminDashboard: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={() => {
-                            if (confirm(`Delete profile for ${u.name} (${u.role})?`)) {
-                              deleteUser(u.id);
-                            }
-                          }}
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
-                          title="Delete User"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCurrentUser(u);
+                              if (u.role === 'buyer') setActiveTab('marketplace');
+                              else if (u.role === 'collection_centre') setActiveTab('incoming');
+                              else setActiveTab('overview');
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
+                            title={`Switch session to ${u.name} (${u.role})`}
+                          >
+                            <span>⚡ Login</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm(`Delete profile for ${u.name} (${u.role})?`)) {
+                                deleteUser(u.id);
+                              }
+                            }}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
+                            title="Delete User"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ));
@@ -943,6 +1310,180 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Upcoming Seasonal Pipeline & Pre-registrations View */}
+      {userViewMode === 'upcoming_pipeline' && (
+        <div className="space-y-6">
+          {/* Pipeline summary cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase text-emerald-700 block">
+                  {isHindi ? 'आगामी पंजीकृत किसान' : 'Upcoming Farmers'}
+                </span>
+                <strong className="text-xl font-black text-emerald-950">14,850</strong>
+                <span className="text-[10px] text-emerald-600 block mt-0.5">4 FPO Clusters Ready</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg">
+                🌾
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase text-blue-700 block">
+                  {isHindi ? 'आगामी संस्थागत खरीदार' : 'Upcoming Buyers'}
+                </span>
+                <strong className="text-xl font-black text-blue-950">2,340</strong>
+                <span className="text-[10px] text-blue-600 block mt-0.5">3 Corporate Chains</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+                🏢
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase text-amber-700 block">
+                  {isHindi ? 'अनुमानित फसल आवक' : 'Projected Volume'}
+                </span>
+                <strong className="text-xl font-black text-amber-950">1,65,000 Qtl</strong>
+                <span className="text-[10px] text-amber-600 block mt-0.5">Rabi & Autumn Flush</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center font-bold text-lg">
+                📦
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase text-purple-700 block">
+                  {isHindi ? 'पूर्व-स्वीकृत एस्क्रो सुविधा' : 'Pre-Funded Escrow'}
+                </span>
+                <strong className="text-xl font-black text-purple-950">₹10.0+ Cr</strong>
+                <span className="text-[10px] text-purple-600 block mt-0.5">DBT Bank Guarantee</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg">
+                🛡️
+              </div>
+            </div>
+          </div>
+
+          {/* Cluster List */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-emerald-600" />
+                <span>{isHindi ? 'आगामी ऑनबोर्डिंग क्लस्टर व कॉर्पोरेट इकाइयाँ' : 'Upcoming Pre-registered Clusters & Corporate Demands'}</span>
+              </h3>
+              <span className="text-xs text-slate-500 font-medium">
+                {isHindi ? 'लाइव डेटाबेस में जोड़ने के लिए "ऑनबोर्ड" पर क्लिक करें' : 'Click "Onboard" to register cluster representative into live database'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {upcomingClusters.map(cluster => {
+                const isFarmer = cluster.role === 'farmer';
+                const isSuccess = onboardingSuccessId === cluster.id;
+                const alreadyOnboarded = registeredUsers.some(u => u.phone === cluster.phone);
+
+                return (
+                  <div 
+                    key={cluster.id} 
+                    className={`rounded-2xl p-5 border transition-all ${
+                      isFarmer ? 'bg-emerald-50/40 border-emerald-200/80' : 'bg-blue-50/40 border-blue-200/80'
+                    } hover:shadow-sm`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${
+                            isFarmer 
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                              : 'bg-blue-100 text-blue-800 border-blue-300'
+                          }`}>
+                            {isFarmer ? '🌾 FPO Cluster' : '🏢 Corporate Buyer'}
+                          </span>
+                          <span className="text-xs font-bold text-slate-500 font-mono">
+                            {cluster.targetSeason}
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-900">{cluster.name}</h4>
+                        <p className="text-xs text-slate-600 font-semibold">{cluster.commodity}</p>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-xs font-black text-slate-900 block">
+                          {cluster.membersOrOutlets.toLocaleString('en-IN')} {isFarmer ? 'Farmers' : 'Hubs'}
+                        </span>
+                        <span className="text-[11px] text-emerald-700 font-bold block">
+                          {cluster.projectedTons.toLocaleString('en-IN')} MT Projected
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-slate-200/60 grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold">Location</span>
+                        <span className="font-semibold text-slate-700">{cluster.location}, {cluster.district}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold">Representative</span>
+                        <span className="font-semibold text-slate-700">{cluster.representativeName}</span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold">KYC & Compliance</span>
+                        <span className="font-medium text-emerald-700 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> {cluster.kycStatus}
+                        </span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold">Escrow Guarantee</span>
+                        <span className="font-medium text-blue-700">{cluster.escrowReadiness}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between">
+                      <span className="text-[11px] font-mono text-slate-500">{cluster.phone}</span>
+                      <button
+                        type="button"
+                        disabled={alreadyOnboarded}
+                        onClick={() => handleOnboardCluster(cluster)}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                          alreadyOnboarded
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                            : isSuccess
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : 'bg-slate-900 hover:bg-emerald-700 text-white shadow-xs'
+                        }`}
+                      >
+                        {alreadyOnboarded ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>{isHindi ? 'डेटाबेस में सक्रिय' : 'Active in DB'}</span>
+                          </>
+                        ) : isSuccess ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>{isHindi ? 'सफल! ऑनबोर्ड हुआ' : 'Onboarded!'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="w-3.5 h-3.5" />
+                            <span>{isHindi ? '⚡ लाइव डेटाबेस में जोड़ें' : '⚡ Onboard to Live DB'}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )}
 
       {/* Listings Moderation Sub-View */}
       {activeTab === 'listings' && (
@@ -987,7 +1528,7 @@ export const AdminDashboard: React.FC = () => {
                       <td className="py-3.5 px-4 font-bold text-slate-900">{l.cropName}</td>
                       <td className="py-3.5 px-4 text-slate-500">{l.category}</td>
                       <td className="py-3.5 px-4 font-semibold">{l.quantity} {l.unit || 'Quintals'}</td>
-                      <td className="py-3.5 px-4 font-bold text-emerald-700">₹{l.pricePerUnit.toLocaleString('en-IN')}/{(l.unit || 'Quintals').slice(0, -1)}</td>
+                      <td className="py-3.5 px-4 font-bold text-emerald-700">₹{(l.pricePerUnit || 0).toLocaleString('en-IN')}/{(l.unit || 'Quintals').slice(0, -1)}</td>
                       <td className="py-3.5 px-4">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800">
                           {l.qualityGrade}
@@ -1037,10 +1578,37 @@ export const AdminDashboard: React.FC = () => {
       {/* Orders Sub-View */}
       {activeTab === 'orders' && (
         <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-blue-600" />
-            Active Supply Chain Consignments & Escrow Oversight
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-blue-600" />
+                {isHindi ? 'सप्लाई चेन कंसाइनमेंट्स व एस्क्रो प्रबंधन (Orders)' : 'Active Supply Chain Consignments & Escrow Oversight'}
+              </h2>
+              <p className="text-xs text-slate-500">
+                {isHindi ? 'Turso Cloud डेटाबेस में सुरक्षित सभी मार्केटप्लेस ऑर्डर्स' : 'Live marketplace orders saved in Turso Cloud database'}
+              </p>
+            </div>
+            {orders.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const confirmed = typeof window !== 'undefined' && window.confirm
+                    ? window.confirm(isHindi 
+                        ? 'क्या आप वाकई डेटाबेस से सभी ऑर्डर्स को स्थायी रूप से हटाना चाहते हैं? यह वापस नहीं लाया जा सकता।' 
+                        : 'Are you sure you want to permanently delete ALL orders from the database? This cannot be undone.')
+                    : true;
+                  if (confirmed) {
+                    clearAllOrders();
+                  }
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                title={isHindi ? 'सभी ऑर्डर्स हटाएं (Admin)' : 'Clear All Orders (Admin)'}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isHindi ? 'सभी ऑर्डर्स हटाएं (Admin)' : 'Clear All Orders'}</span>
+              </button>
+            )}
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
@@ -1053,7 +1621,7 @@ export const AdminDashboard: React.FC = () => {
                   <th className="py-3 px-4">Total Amount</th>
                   <th className="py-3 px-4">Current Stage</th>
                   <th className="py-3 px-4">Payment</th>
-                  <th className="py-3 px-4">Action</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -1070,7 +1638,7 @@ export const AdminDashboard: React.FC = () => {
                       <td className="py-3.5 px-4">{o.farmerName}</td>
                       <td className="py-3.5 px-4 font-semibold">{o.buyerOrg || o.buyerName}</td>
                       <td className="py-3.5 px-4">{o.cropName} ({o.quantity} {o.unit})</td>
-                      <td className="py-3.5 px-4 font-bold text-slate-900">₹{o.totalAmount.toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-900">₹{(o.totalAmount || 0).toLocaleString('en-IN')}</td>
                       <td className="py-3.5 px-4">
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
                           {o.currentStage.replace(/_/g, ' ').toUpperCase()}
@@ -1081,17 +1649,40 @@ export const AdminDashboard: React.FC = () => {
                           {o.paymentStatus.replace(/_/g, ' ').toUpperCase()}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4">
-                        <button
-                          onClick={() => {
-                            setActiveTrackingOrderId(o.id);
-                            setActiveTab('track_delivery');
-                          }}
-                          className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center gap-1"
-                        >
-                          <Truck className="w-3 h-3 text-emerald-400" />
-                          <span>Live Track</span>
-                        </button>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveTrackingOrderId(o.id);
+                              setActiveTab('track_delivery');
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                          >
+                            <Truck className="w-3 h-3 text-emerald-400" />
+                            <span>Live Track</span>
+                          </button>
+
+                          {/* 🔒 Admin Delete Order Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const confirmed = typeof window !== 'undefined' && window.confirm
+                                ? window.confirm(isHindi 
+                                    ? `क्या आप वाकई ऑर्डर #${o.orderNumber} (${o.cropName} - ${o.quantity} ${o.unit}) को डेटाबेस से स्थायी रूप से हटाना चाहते हैं? यह वापस नहीं लाया जा सकता।` 
+                                    : `Are you sure you want to permanently delete order #${o.orderNumber} (${o.cropName} - ${o.quantity} ${o.unit}) from the database? This cannot be undone.`)
+                                : true;
+                              if (confirmed) {
+                                deleteOrder(o.id);
+                              }
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                            title={isHindi ? "ऑर्डर हटाएं (Admin)" : "Delete Order (Admin)"}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>{isHindi ? 'हटाएं' : 'Delete'}</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -1158,8 +1749,8 @@ export const AdminDashboard: React.FC = () => {
                       <td className="py-3.5 px-4 font-semibold text-emerald-700">
                         {pool.committedQuantityTons} Tons ({Math.round((pool.committedQuantityTons / pool.targetQuantityTons) * 100)}%)
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-slate-700">₹{pool.pricePerTon.toLocaleString('en-IN')}</td>
-                      <td className="py-3.5 px-4 font-bold text-slate-900">₹{pool.totalBudget.toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4 font-mono text-slate-700">₹{(pool.pricePerTon || 0).toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-900">₹{(pool.totalBudget || 0).toLocaleString('en-IN')}</td>
                       <td className="py-3.5 px-4">
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                           {pool.status}
@@ -1293,7 +1884,7 @@ export const AdminDashboard: React.FC = () => {
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-xs">
                     <div>
                       <span className="text-slate-400 block text-[10px]">Occupancy:</span>
-                      <strong className="text-slate-900">{hub.currentOccupancyTons.toLocaleString('en-IN')}/{hub.capacityTons.toLocaleString('en-IN')} T</strong>
+                      <strong className="text-slate-900">{(hub.currentOccupancyTons || 0).toLocaleString('en-IN')}/{(hub.capacityTons || 0).toLocaleString('en-IN')} T</strong>
                     </div>
                     <div>
                       <span className="text-slate-400 block text-[10px]">Chamber Temp:</span>
@@ -1350,9 +1941,9 @@ export const AdminDashboard: React.FC = () => {
                       <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{o.transactionId}</td>
                       <td className="py-3.5 px-4 font-semibold">{o.orderNumber}</td>
                       <td className="py-3.5 px-4">{o.buyerOrg || o.buyerName}</td>
-                      <td className="py-3.5 px-4 font-bold text-slate-900">₹{o.totalAmount.toLocaleString('en-IN')}</td>
-                      <td className="py-3.5 px-4 text-emerald-700 font-semibold">+₹{o.platformFee.toLocaleString('en-IN')}</td>
-                      <td className="py-3.5 px-4 font-bold text-slate-800">₹{o.farmerPayout.toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-900">₹{(o.totalAmount || 0).toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4 text-emerald-700 font-semibold">+₹{(o.platformFee || 0).toLocaleString('en-IN')}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-800">₹{(o.farmerPayout || 0).toLocaleString('en-IN')}</td>
                       <td className="py-3.5 px-4">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
                           {o.paymentStatus === 'disbursed_to_farmer' ? 'SETTLED' : 'ESCROW LOCKED'}

@@ -3,16 +3,16 @@ import { useAgri } from '../context/AgriContext';
 import { RegistrationModal } from './RegistrationModal';
 
 export const AuthModal: React.FC = () => {
-  const { isAuthModalOpen, setIsAuthModalOpen, currentUser } = useAgri();
+  const { isAuthModalOpen, setIsAuthModalOpen, authModalRole, authModalMode, currentUser } = useAgri();
 
   if (!isAuthModalOpen) return null;
 
   return (
     <RegistrationModal
       isOpen={isAuthModalOpen}
-      role={currentUser?.role || 'buyer'}
+      role={authModalRole || currentUser?.role || 'buyer'}
       onClose={() => setIsAuthModalOpen(false)}
-      defaultMode="login"
+      defaultMode={authModalMode || 'login'}
     />
   );
 };

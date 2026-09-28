@@ -344,18 +344,6 @@ export const StateTransportDirectoryView: React.FC = () => {
 
     const callmebotKey = typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || undefined) : undefined;
 
-    // Direct WhatsApp message & Auto-launch
-    const whatsappText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
-      `🚚 *Vehicle:* ${bookingVehicle.vehicleNo}\n` +
-      `👤 *Driver:* ${bookingVehicle.driverName} (${bookingVehicle.driverPhone})\n` +
-      `📍 *Trip:* ${pickupLocation} ➔ ${dropLocation}\n` +
-      `🌾 *Produce:* ${cropName}\n` +
-      `💰 *Est Fare:* ₹${totalCost.toLocaleString('en-IN')}\n\n` +
-      `Thank you for booking through Farm2Future Agri-Transport.`;
-    const waUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappText)}`;
-    try {
-      window.open(waUrl, '_blank');
-    } catch (_) {}
 
     // Call real SMS Gateway API endpoint with CallMeBot support
     let apiDelivery: any = null;
@@ -434,15 +422,14 @@ export const StateTransportDirectoryView: React.FC = () => {
     <div className="space-y-6">
       {/* 📲 LIVE REAL & SIMULATED SMS PUSH NOTIFICATION TOAST */}
       {smsNotification && smsNotification.show && (() => {
-        const whatsappText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
+        const smsBodyText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
           `🚚 *Vehicle:* ${smsNotification.vehicleNo}\n` +
           `👤 *Driver:* ${smsNotification.driverName} (${smsNotification.driverPhone})\n` +
           `📍 *Trip:* ${smsNotification.origin} ➔ ${smsNotification.destination}\n` +
           `🌾 *Produce:* ${smsNotification.cropName}\n` +
           `💰 *Est Fare:* ₹${smsNotification.cost.toLocaleString('en-IN')}\n\n` +
           `Thank you for booking through Farm2Future Agri-Transport.`;
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=91${smsNotification.phone}&text=${encodeURIComponent(whatsappText)}`;
-        const nativeSmsUrl = `sms:+91${smsNotification.phone}?body=${encodeURIComponent(whatsappText.replace(/[*_]/g, ''))}`;
+        const nativeSmsUrl = `sms:+91${smsNotification.phone}?body=${encodeURIComponent(smsBodyText.replace(/[*_]/g, ''))}`;
 
         return (
           <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-lg w-[94vw] animate-in slide-in-from-top-4 duration-300 pointer-events-auto">
@@ -502,21 +489,11 @@ export const StateTransportDirectoryView: React.FC = () => {
                   </p>
                 </div>
 
-                {/* 1-Click WhatsApp & Phone SMS buttons */}
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      window.open(whatsappUrl, '_blank');
-                    }}
-                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer ring-2 ring-emerald-400/40"
-                  >
-                    <span>🟢</span>
-                    <span>Direct WhatsApp में खोलें</span>
-                  </button>
+                {/* Phone SMS Action Button */}
+                <div className="pt-1">
                   <a
                     href={nativeSmsUrl}
-                    className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                    className="w-full py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
                   >
                     <Smartphone className="w-3.5 h-3.5" />
                     <span>Open Phone SMS App</span>
@@ -987,15 +964,14 @@ export const StateTransportDirectoryView: React.FC = () => {
             {bookingSuccess ? (() => {
               const cleanPhone = userMobileNumber.replace(/\D/g, '').slice(-10);
               const estFare = Math.round(estimatedDistanceKm * (bookingVehicle.ratePerKm || 28));
-              const whatsappText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
+              const smsBodyText = `✅ *Successful Granted! (Farm2Future Agri-Transport)*\n\n` +
                 `🚚 *Vehicle:* ${bookingVehicle.vehicleNo}\n` +
                 `👤 *Driver:* ${bookingVehicle.driverName} (${bookingVehicle.driverPhone})\n` +
                 `📍 *Trip:* ${pickupLocation} ➔ ${dropLocation}\n` +
                 `🌾 *Produce:* ${cargoWeightTons}T ${cropName}\n` +
                 `💰 *Est Fare:* ₹${estFare.toLocaleString('en-IN')}\n\n` +
                 `Thank you for using Farm2Future Agri-Logistics.`;
-              const whatsappUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappText)}`;
-              const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(whatsappText.replace(/[*_]/g, ''))}`;
+              const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(smsBodyText.replace(/[*_]/g, ''))}`;
 
               return (
                 <div className="p-6 text-center space-y-4 bg-emerald-50 rounded-2xl border-2 border-emerald-300 shadow-sm animate-in fade-in">
@@ -1038,26 +1014,17 @@ export const StateTransportDirectoryView: React.FC = () => {
                           </button>
                         </div>
                         <p className="text-[11px] text-slate-500">
-                          अगर आप फोन पर तुरंत मैसेज चाहते हैं, तो नीचे <strong>WhatsApp</strong> या <strong>SMS App</strong> बटन दबाएं!
+                          अगर आप फोन पर तुरंत मैसेज चाहते हैं, तो नीचे <strong>Open Phone SMS App</strong> बटन दबाएं!
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {/* 1-Click WhatsApp & Native Mobile SMS Direct Action Buttons */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer hover:scale-[1.02]"
-                    >
-                      <span className="text-sm">🟢</span>
-                      <span>Send via WhatsApp (+91 {cleanPhone})</span>
-                    </a>
+                  {/* Native Mobile SMS Direct Action Button */}
+                  <div className="pt-0.5">
                     <a
                       href={nativeSmsUrl}
-                      className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer hover:scale-[1.02]"
+                      className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer hover:scale-[1.02] w-full"
                     >
                       <Smartphone className="w-4 h-4 text-sky-200" />
                       <span>Open Phone SMS App</span>
@@ -1333,7 +1300,7 @@ export const StateTransportDirectoryView: React.FC = () => {
                 <p className="text-[11px] mt-1 leading-relaxed">
                   {gatewayConfig.configured
                     ? 'जब भी आप या कोई किसान/खरीदार बुकिंग करेगा, Fast2SMS गेटवे सीधे उनके फोन के इनबॉक्स में असली SMS पहुंचाएगा।'
-                    : 'बिना API Key के केवल ऑन-स्क्रीन सिमुलेशन और 1-Click WhatsApp काम करता है। असली टेलीकॉम SMS पाने के लिए नीचे Fast2SMS API Key डालें।'}
+                    : 'बिना API Key के केवल ऑन-स्क्रीन सिमुलेशन काम करता है। असली टेलीकॉम SMS पाने के लिए नीचे Fast2SMS API Key डालें।'}
                 </p>
               </div>
 

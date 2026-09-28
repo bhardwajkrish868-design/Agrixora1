@@ -733,8 +733,12 @@ function databasePlugin() {
                   if (Array.isArray(payload.vehicles) && payload.vehicles.length > 0) {
                     for (const v of payload.vehicles) await turso.saveTursoVehicle(v);
                   }
-                  if (Array.isArray(payload.notifications) && payload.notifications.length > 0) {
-                    for (const n of payload.notifications) await turso.saveTursoNotification(n);
+                  if (Array.isArray(payload.notifications)) {
+                    if (payload.notifications.length === 0) {
+                      await turso.clearTursoNotifications();
+                    } else {
+                      for (const n of payload.notifications) await turso.saveTursoNotification(n);
+                    }
                   }
                   if (Array.isArray(payload.activityHistory) && payload.activityHistory.length > 0) {
                     for (const a of payload.activityHistory.slice(0, 50)) await turso.saveTursoActivity(a);
@@ -774,7 +778,7 @@ function databasePlugin() {
                 orders: ((Array.isArray(payload.orders) && payload.orders.length > 0) ? payload.orders : (currentDb.orders || [])).filter((o: any) => !deletedSet.has(o.id)),
                 vehicles: (Array.isArray(payload.vehicles) && payload.vehicles.length > 0) ? payload.vehicles : (currentDb.vehicles || []),
                 bulkDemands: ((Array.isArray(payload.bulkDemands) && payload.bulkDemands.length > 0) ? payload.bulkDemands : (currentDb.bulkDemands || [])).filter((b: any) => !deletedSet.has(b.id)),
-                notifications: (Array.isArray(payload.notifications) && payload.notifications.length > 0) ? payload.notifications : (currentDb.notifications || []),
+                notifications: Array.isArray(payload.notifications) ? payload.notifications : (currentDb.notifications || []),
                 activityHistory: (Array.isArray(payload.activityHistory) && payload.activityHistory.length > 0) ? payload.activityHistory : (currentDb.activityHistory || []),
                 adminPasskey: payload.adminPasskey || currentDb.adminPasskey || 'Krish0386',
                 deletedIds: Array.from(deletedSet)

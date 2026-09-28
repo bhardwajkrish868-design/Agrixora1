@@ -33,7 +33,8 @@ import {
   CheckCheck,
   Landmark,
   Wallet,
-  ExternalLink
+  ExternalLink,
+  Store
 } from 'lucide-react';
 
 // Synthesize pleasant SMS arrival chime via Web Audio API
@@ -84,8 +85,13 @@ export const ProductDetailModal: React.FC = () => {
   } = useAgri();
 
   const [orderQty, setOrderQty] = useState<number>(50);
-  const [deliveryAddress, setDeliveryAddress] = useState('AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra');
-  const [pincode, setPincode] = useState('400705');
+  const [deliveryAddress, setDeliveryAddress] = useState(() => {
+    if (currentUser?.location) {
+      return `${currentUser.businessName ? currentUser.businessName + ', ' : ''}${currentUser.location}, ${currentUser.state || 'Maharashtra'}`;
+    }
+    return 'AgroFresh Central Fulfilment Hub, Sector 18, Navi Mumbai, Maharashtra';
+  });
+  const [pincode, setPincode] = useState(() => currentUser?.pincode || '400705');
   const [paymentTab, setPaymentTab] = useState<'upi_qr' | 'neft_rtgs' | 'card' | 'credit'>('upi_qr');
   const [paymentMethod, setPaymentMethod] = useState('Instant UPI QR (krishbhardwaj326@naviaxis)');
   const [copiedUpi, setCopiedUpi] = useState(false);
@@ -100,6 +106,18 @@ export const ProductDetailModal: React.FC = () => {
   const [buyerMobileNumber, setBuyerMobileNumber] = useState<string>(() => {
     return currentUser?.phone ? currentUser.phone.replace(/\D/g, '').slice(-10) : '9631359486';
   });
+
+  useEffect(() => {
+    if (currentUser?.phone) {
+      setBuyerMobileNumber(currentUser.phone.replace(/\D/g, '').slice(-10));
+    }
+    if (currentUser?.location) {
+      setDeliveryAddress(`${currentUser.businessName ? currentUser.businessName + ', ' : ''}${currentUser.location}, ${currentUser.state || 'Maharashtra'}`);
+    }
+    if (currentUser?.pincode) {
+      setPincode(currentUser.pincode);
+    }
+  }, [currentUser]);
 
   // Floating SMS Notification State
   const [smsNotification, setSmsNotification] = useState<{
@@ -156,10 +174,14 @@ export const ProductDetailModal: React.FC = () => {
     effectiveKg
   } = calculateOrderFees(currentOrderQty, item.pricePerUnit, item.unit || 'Quintals');
 
-  const itemLat = item.latitude || geocodeLocation(item.farmerLocation || item.location || '', item.farmerState || item.state || '').lat;
-  const itemLng = item.longitude || geocodeLocation(item.farmerLocation || item.location || '', item.farmerState || item.state || '').lng;
+  const buyerState = currentUser?.state || userLocation.state || '';
+  const itemState = item.farmerState || item.state || '';
+  const isSameState = !buyerState || !itemState || buyerState.toLowerCase() === itemState.toLowerCase();
+
+  const itemLat = item.latitude || geocodeLocation(item.farmerLocation || item.location || '', itemState).lat;
+  const itemLng = item.longitude || geocodeLocation(item.farmerLocation || item.location || '', itemState).lng;
   const distanceKm = calculateDistanceKm(userLocation.lat, userLocation.lng, itemLat, itemLng);
-  const isHyperlocal = distanceKm <= 10;
+  const isHyperlocal = distanceKm <= 15;
   const dispatchEstimate = getHyperlocalDispatchEstimate(distanceKm);
 
   const isPerishable = 
@@ -200,21 +222,6 @@ export const ProductDetailModal: React.FC = () => {
 
     const callmebotKey = typeof window !== 'undefined' ? (localStorage.getItem('f2f_callmebot_api_key') || undefined) : undefined;
 
-    // Direct WhatsApp Message & URL
-    const whatsappOrderText = `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
-      `📦 *Order Ref:* ${newOrder.orderNumber}\n` +
-      `🌾 *Produce:* ${currentOrderQty} ${item.unit} ${item.cropName}\n` +
-      `💰 *Total Paid:* ₹${totalPayable.toLocaleString('en-IN')}\n\n` +
-      `🚚 *Transport Vehicle:* ${vNo}\n` +
-      `👤 *Driver:* ${dName} (${dPhone})\n` +
-      `📍 *Delivery Address:* ${deliveryAddress}\n\n` +
-      `Thank you for purchasing on Farm2Future!`;
-    const whatsappOrderUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappOrderText)}`;
-
-    // Auto-launch WhatsApp directly
-    try {
-      window.open(whatsappOrderUrl, '_blank');
-    } catch (_) {}
 
     // Call /api/send-sms with CallMeBot support
     let apiDelivery: any = null;
@@ -299,7 +306,7 @@ export const ProductDetailModal: React.FC = () => {
       {/* 📲 FLOATING BUYER SMS NOTIFICATION TOAST */}
       {smsNotification && smsNotification.show && (() => {
         const cleanPhone = smsNotification.phone;
-        const whatsappText = `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
+        const smsBodyText = `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
           `📦 *Order Ref:* ${smsNotification.orderNumber}\n` +
           `🌾 *Produce:* ${smsNotification.quantity} ${smsNotification.cropName}\n` +
           `💰 *Total Paid:* ₹${smsNotification.totalAmount.toLocaleString('en-IN')}\n\n` +
@@ -307,8 +314,7 @@ export const ProductDetailModal: React.FC = () => {
           `👤 *Driver:* ${smsNotification.driverName} (${smsNotification.driverPhone})\n` +
           `📍 *Delivery Address:* ${smsNotification.destination}\n\n` +
           `Thank you for purchasing on Farm2Future!`;
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(whatsappText)}`;
-        const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(whatsappText.replace(/[*_]/g, ''))}`;
+        const nativeSmsUrl = `sms:+91${cleanPhone}?body=${encodeURIComponent(smsBodyText.replace(/[*_]/g, ''))}`;
 
         return (
           <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] max-w-lg w-[94vw] animate-in slide-in-from-top-4 duration-300 pointer-events-auto">
@@ -363,18 +369,8 @@ export const ProductDetailModal: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 1-Click WhatsApp & Phone SMS buttons */}
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      window.open(whatsappUrl, '_blank');
-                    }}
-                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer ring-2 ring-emerald-400/40"
-                  >
-                    <span>🟢</span>
-                    <span>Direct WhatsApp में खोलें</span>
-                  </button>
+                {/* Phone SMS & Push Buttons */}
+                <div className="grid grid-cols-1 gap-2 pt-1">
                   <a
                     href={nativeSmsUrl}
                     className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
@@ -388,7 +384,7 @@ export const ProductDetailModal: React.FC = () => {
                     href={`https://ntfy.sh/farm2future_${smsNotification.phone.replace(/\D/g, '').slice(-10)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="col-span-2 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                    className="py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
                   >
                     <span>🔔</span>
                     <span>Live NTFY Mobile Push Alert (ntfy.sh/farm2future_{smsNotification.phone.slice(-10)})</span>
@@ -481,28 +477,8 @@ export const ProductDetailModal: React.FC = () => {
                   </p>
                 </div>
 
-                {/* 1-Click WhatsApp & Phone SMS buttons */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const waLink = `https://api.whatsapp.com/send?phone=91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}&text=${encodeURIComponent(
-                        `✅ *Order Successful & Transport Booked! (Farm2Future)*\n\n` +
-                        `📦 *Order Ref:* ${createdOrderRef}\n` +
-                        `🌾 *Produce:* ${currentOrderQty} ${item.unit} ${item.cropName}\n` +
-                        `💰 *Total Paid:* ₹${totalPayable.toLocaleString('en-IN')}\n\n` +
-                        `🚚 *Transport Vehicle:* ${lastCreatedOrder?.dispatchDetails?.vehicleNo}\n` +
-                        `👤 *Driver:* ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone})\n` +
-                        `📍 *Delivery Destination:* ${deliveryAddress}\n\n` +
-                        `Thank you for ordering on Farm2Future!`
-                      )}`;
-                      window.open(waLink, '_blank');
-                    }}
-                    className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer ring-2 ring-emerald-400/30"
-                  >
-                    <span>🟢</span>
-                    <span>Direct WhatsApp में खोलें (+91 {buyerMobileNumber.slice(-10)})</span>
-                  </button>
+                {/* SMS & Push Buttons */}
+                <div className="grid grid-cols-1 gap-2 pt-1">
                   <a
                     href={`sms:+91${buyerMobileNumber.replace(/\D/g, '').slice(-10)}?body=${encodeURIComponent(
                       `Order ${createdOrderRef} Confirmed & Transport Booked! Vehicle: ${lastCreatedOrder?.dispatchDetails?.vehicleNo}, Driver: ${lastCreatedOrder?.dispatchDetails?.driverName} (${lastCreatedOrder?.dispatchDetails?.driverPhone}). Total: Rs ${totalPayable}. Delivery to: ${deliveryAddress}`
@@ -518,7 +494,7 @@ export const ProductDetailModal: React.FC = () => {
                     href={`https://ntfy.sh/farm2future_${buyerMobileNumber.replace(/\D/g, '').slice(-10)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="sm:col-span-2 py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                    className="py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
                   >
                     <span>🔔</span>
                     <span>Live NTFY Mobile Push Alert (ntfy.sh/farm2future_{buyerMobileNumber.slice(-10)})</span>
@@ -608,13 +584,13 @@ export const ProductDetailModal: React.FC = () => {
                 <div className="space-y-3">
                   <div className="relative h-60 rounded-2xl overflow-hidden bg-slate-100 shadow-inner">
                     <img
-                      src={item.images[0]}
-                      alt={item.cropName}
+                      src={(item.images && item.images[0]) || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'}
+                      alt={item.cropName || 'Crop'}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                       <span className="px-2.5 py-1 rounded-full bg-slate-900/80 text-white text-[10px] font-bold backdrop-blur-xs">
-                        {item.qualityGrade}
+                        {item.qualityGrade || 'Grade A'}
                       </span>
                       {item.organicCertified && (
                         <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-xs">
@@ -682,6 +658,52 @@ export const ProductDetailModal: React.FC = () => {
                   <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
                     {item.description}
                   </p>
+                </div>
+              </div>
+
+              {/* 🏛️ Assigned FCI Procurement Centre & Modern Silo */}
+              <div className="p-4 bg-gradient-to-r from-sky-50 to-blue-50/70 rounded-2xl border border-sky-200 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sky-200/80 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-sky-700 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-extrabold text-slate-900 text-sm">
+                          {item.fciHubName || 'FCI Procurement & Grain Silo'}
+                        </h4>
+                        <span className="px-2 py-0.5 rounded bg-sky-200 text-sky-950 font-mono text-[10px] font-bold border border-sky-300">
+                          {item.fciHubCode || 'FCI Depot'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-sky-800 font-medium mt-0.5">
+                        {item.fciHubType || 'FCI Modern Steel Silo'} • 📍 {item.fciHubDistrict || item.district || ''}, {item.fciHubState || item.state || ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-sky-700 text-white font-extrabold text-xs shadow-xs">
+                    {item.fciHubDistanceKm !== undefined ? `📍 ${item.fciHubDistanceKm} km from Farmgate` : 'Assigned Depot'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-sky-100">
+                    <Store className="w-4 h-4 text-sky-700 shrink-0" />
+                    <div>
+                      <span className="text-[10px] text-slate-500 block">Target APMC Mandi</span>
+                      <strong className="text-slate-800 font-bold">{item.nearestMandi || 'District APMC Market Yard'}</strong>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-sky-100">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <span className="text-[10px] text-slate-500 block">Govt FCI Quality Benchmarks</span>
+                      <strong className="text-emerald-800 font-bold">Moisture Validated & Certified</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1124,23 +1146,27 @@ export const ProductDetailModal: React.FC = () => {
                   </div>
                 </div>
 
-                {/* ⚡ 10 KM Hyper-Local Advantage Callout */}
-                {isHyperlocal && (
-                  <div className="p-3 bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/5 rounded-2xl border border-emerald-300 flex items-center justify-between text-xs text-emerald-950 font-bold">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                        <Zap className="w-4 h-4 animate-pulse" />
-                      </div>
-                      <div>
-                        <span className="font-extrabold text-slate-900">10 KM Auto-Connected Farm ({distanceKm <= 0 ? '< 1' : distanceKm} km away)</span>
-                        <p className="text-[11px] text-emerald-800 font-medium">{dispatchEstimate.label} • Direct Farmgate Freshness</p>
-                      </div>
+                {/* 🏛️ State-Wide Farmgate Procurement Callout */}
+                <div className="p-3 bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/5 rounded-2xl border border-emerald-300 flex items-center justify-between text-xs text-emerald-950 font-bold">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      {isHyperlocal ? <Zap className="w-4 h-4 animate-pulse" /> : <Building2 className="w-4 h-4" />}
                     </div>
-                    <span className="text-[11px] bg-emerald-600 text-white px-2.5 py-1 rounded-xl font-extrabold shadow-xs shrink-0">
-                      ₹{logisticsFee} Delivery
-                    </span>
+                    <div>
+                      <span className="font-extrabold text-slate-900">
+                        {isSameState 
+                          ? `🏛️ State-Wide Delivery Ready: Farm in ${itemState || buyerState} (${distanceKm <= 0 ? '< 1' : distanceKm} km)` 
+                          : `🇮🇳 National Transit: Farm in ${itemState || 'Partner State'} (${distanceKm} km)`}
+                      </span>
+                      <p className="text-[11px] text-emerald-800 font-medium">
+                        {dispatchEstimate.label} • Direct Farmgate Procurement {isSameState ? `across all ${itemState || buyerState} districts` : ''}
+                      </p>
+                    </div>
                   </div>
-                )}
+                  <span className="text-[11px] bg-emerald-600 text-white px-2.5 py-1 rounded-xl font-extrabold shadow-xs shrink-0">
+                    ₹{logisticsFee} Delivery
+                  </span>
+                </div>
 
                 {/* Transparent Escrow Breakdown */}
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">

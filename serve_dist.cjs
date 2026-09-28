@@ -139,48 +139,6 @@ function sendFast2Sms(apiKey, phone, message) {
   });
 }
 
-function sendCallMeBotWhatsApp(phone, apiKey, message) {
-  return new Promise((resolve) => {
-    try {
-      const cleanPhone = (phone || '').replace(/\D/g, '').slice(-10);
-      const internationalPhone = '+91' + cleanPhone;
-      const encodedPhone = encodeURIComponent(internationalPhone);
-      const encodedMsg = encodeURIComponent(message);
-      const cleanApiKey = encodeURIComponent((apiKey || '').trim());
-      const url = `https://api.callmebot.com/whatsapp.php?phone=${encodedPhone}&text=${encodedMsg}&apikey=${cleanApiKey}`;
-
-      const req = https.get(url, (res) => {
-        let data = '';
-        res.on('data', (chunk) => { data += chunk; });
-        res.on('end', () => {
-          const lower = data.toLowerCase();
-          const isSuccess = (res.statusCode >= 200 && res.statusCode < 300) &&
-            !lower.includes('apikey is invalid') &&
-            !lower.includes('apikey can not be') &&
-            !lower.includes('error');
-          resolve({
-            success: isSuccess,
-            provider: 'callmebot',
-            statusCode: res.statusCode,
-            phone: internationalPhone,
-            rawResponse: data.substring(0, 300)
-          });
-        });
-      });
-
-      req.on('error', (e) => {
-        resolve({ success: false, provider: 'callmebot', error: e.message, phone: internationalPhone });
-      });
-
-      req.setTimeout(10000, () => {
-        req.destroy();
-        resolve({ success: false, provider: 'callmebot', error: 'CallMeBot WhatsApp gateway timed out', phone: internationalPhone });
-      });
-    } catch (err) {
-      resolve({ success: false, provider: 'callmebot', error: err.message });
-    }
-  });
-}
 
 function sendTwilioSms(accountSid, authToken, fromNumber, phone, message) {
   return new Promise((resolve) => {
@@ -436,6 +394,9 @@ const server = http.createServer((req, res) => {
         const db = readDb();
         orders = db.orders || [];
       }
+      const allDeleted = Array.from(new Set([...(readDb()?.deletedIds || []), ...turso.getDeletedIds()]));
+      const delSet = new Set(allDeleted);
+      orders = (orders || []).filter(o => !delSet.has(o.id));
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
@@ -511,6 +472,44 @@ const server = http.createServer((req, res) => {
           'Access-Control-Allow-Origin': '*'
         });
         res.end(JSON.stringify({ success: true, cloudSaved: turso.getIsConnected() || mongo.getIsConnected() }));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // POST /api/orders/delete
+  if (reqPath === '/api/orders/delete' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { id } = JSON.parse(body || '{}');
+        if (!id) throw new Error('Order ID required');
+
+        if (turso.getIsConnected()) {
+          try { await turso.deleteTursoOrder(id); } catch (_) {}
+        }
+        if (mongo.getIsConnected() && mongo.OrderModel) {
+          try { await mongo.OrderModel.deleteOne({ $or: [{ id }, { orderNumber: id }] }); } catch (_) {}
+        }
+
+        const currentDb = readDb();
+        if (!currentDb.deletedIds) currentDb.deletedIds = [];
+        if (!currentDb.deletedIds.includes(id)) currentDb.deletedIds.push(id);
+        currentDb.orders = (currentDb.orders || []).filter(o => o.id !== id && o.orderNumber !== id);
+        writeDb(currentDb);
+
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true, id, cloudDeleted: turso.getIsConnected() || mongo.getIsConnected() }));
       } catch (err) {
         res.writeHead(400, {
           'Content-Type': 'application/json',
@@ -674,6 +673,9 @@ const server = http.createServer((req, res) => {
         const db = readDb();
         bds = db.bulkDemands || [];
       }
+      const allDeleted = Array.from(new Set([...(readDb()?.deletedIds || []), ...turso.getDeletedIds()]));
+      const delSet = new Set(allDeleted);
+      bds = (bds || []).filter(b => !delSet.has(b.id));
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
@@ -820,8 +822,12 @@ const server = http.createServer((req, res) => {
             if (Array.isArray(payload.vehicles) && payload.vehicles.length > 0) {
               for (const v of payload.vehicles) await turso.saveTursoVehicle(v);
             }
-            if (Array.isArray(payload.notifications) && payload.notifications.length > 0) {
-              for (const n of payload.notifications) await turso.saveTursoNotification(n);
+            if (Array.isArray(payload.notifications)) {
+              if (payload.notifications.length === 0) {
+                await turso.clearTursoNotifications();
+              } else {
+                for (const n of payload.notifications) await turso.saveTursoNotification(n);
+              }
             }
             if (Array.isArray(payload.activityHistory) && payload.activityHistory.length > 0) {
               for (const a of payload.activityHistory.slice(0, 50)) await turso.saveTursoActivity(a);
@@ -861,7 +867,7 @@ const server = http.createServer((req, res) => {
           orders: ((Array.isArray(payload.orders) && payload.orders.length > 0) ? payload.orders : (currentDb.orders || [])).filter(o => !deletedSet.has(o.id)),
           vehicles: (Array.isArray(payload.vehicles) && payload.vehicles.length > 0) ? payload.vehicles : (currentDb.vehicles || []),
           bulkDemands: ((Array.isArray(payload.bulkDemands) && payload.bulkDemands.length > 0) ? payload.bulkDemands : (currentDb.bulkDemands || [])).filter(b => !deletedSet.has(b.id)),
-          notifications: (Array.isArray(payload.notifications) && payload.notifications.length > 0) ? payload.notifications : (currentDb.notifications || []),
+          notifications: Array.isArray(payload.notifications) ? payload.notifications : (currentDb.notifications || []),
           activityHistory: (Array.isArray(payload.activityHistory) && payload.activityHistory.length > 0) ? payload.activityHistory : (currentDb.activityHistory || []),
           adminPasskey: payload.adminPasskey || currentDb.adminPasskey || 'Krish0386',
           deletedIds: Array.from(deletedSet)
@@ -1001,48 +1007,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Direct WhatsApp Test Endpoint - POST
-  if (reqPath === '/api/whatsapp/test' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
-      try {
-        const payload = JSON.parse(body || '{}');
-        const db = readDb();
-        const cleanPhone = (payload.phone || '9631359486').replace(/\D/g, '').slice(-10);
-        const apiKey = (payload.apiKey || db.smsGateway?.callmebotApiKey || process.env.CALLMEBOT_API_KEY || '').trim();
-
-        if (!apiKey) {
-          res.writeHead(400, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-          res.end(JSON.stringify({ success: false, error: 'CallMeBot API Key required' }));
-          return;
-        }
-
-        const testMessage = payload.message || `🌾 Farm2Future: WhatsApp Bot Direct Connected!\n✅ Direct WhatsApp notification test successful for +91 ${cleanPhone}. Time: ${new Date().toLocaleTimeString('en-IN')}`;
-        const waResult = await sendCallMeBotWhatsApp(cleanPhone, apiKey, testMessage);
-
-        if (waResult.success && payload.saveKey) {
-          if (!db.smsGateway) db.smsGateway = {};
-          db.smsGateway.callmebotApiKey = apiKey;
-          writeDb(db);
-        }
-
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        res.end(JSON.stringify({
-          success: waResult.success,
-          phone: '+91 ' + cleanPhone,
-          provider: 'callmebot',
-          details: waResult
-        }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        res.end(JSON.stringify({ success: false, error: err.message }));
-      }
-    });
-    return;
-  }
-
-  // Send SMS / WhatsApp Endpoint - POST
+  // Send SMS Endpoint - POST
   if (reqPath === '/api/send-sms' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -1064,7 +1029,6 @@ const server = http.createServer((req, res) => {
         const smsText = payload.message || `Successful Granted! Farm2Future Agri-Transport confirmed for vehicle ${payload.vehicleNo || 'MH-15-EG-4412'}. Driver: ${payload.driverName || 'Rameshwar'} (${payload.driverPhone || '+91 98231 44512'}). Fare: Rs ${payload.cost || 4290}.`;
 
         const fast2smsKey = payload.apiKey || db.smsGateway?.fast2smsApiKey || process.env.FAST2SMS_API_KEY;
-        const callmebotKey = payload.callmebotApiKey || db.smsGateway?.callmebotApiKey || process.env.CALLMEBOT_API_KEY;
         const twilioConfig = db.smsGateway?.twilio;
 
         let result = null;
@@ -1077,24 +1041,9 @@ const server = http.createServer((req, res) => {
             success: true,
             simulated: true,
             provider: 'simulation',
-            message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key or use 1-Click WhatsApp/SMS link.'
+            message: 'Simulated SMS recorded. For real cellular delivery, provide a Fast2SMS API key or use SMS link.'
           };
         }
-
-        // 🟢 Direct Automated WhatsApp Delivery via CallMeBot Bot Gateway
-        let waResult = null;
-        if (callmebotKey) {
-          waResult = await sendCallMeBotWhatsApp(cleanPhone, callmebotKey, smsText);
-        }
-
-        result.whatsapp = {
-          success: Boolean(waResult && waResult.success),
-          delivered: Boolean(waResult && waResult.success),
-          provider: waResult ? 'callmebot' : 'client_direct',
-          phone: '+91 ' + cleanPhone,
-          url: `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(smsText)}`,
-          details: waResult
-        };
 
         // 🚀 Multi-Channel Mobile Push Alerts via NTFY (100% Free, Instant Phone Chime)
         const ntfyTitle = payload.title || (smsText.includes('OTP') ? '🔑 Farm2Future Verification OTP' : (smsText.includes('Order') ? '✅ Farm2Future Order Confirmed' : '🚚 Farm2Future Transport Booked'));

@@ -17,38 +17,80 @@ import {
   Building2,
   Store
 } from 'lucide-react';
-import { geocodeLocation, calculateDistanceKm } from '../utils/geoUtils';
+import { geocodeLocation, calculateDistanceKm, findNearestFciHub } from '../utils/geoUtils';
 
 export const AddProduceView: React.FC = () => {
-  const { currentUser, addListing, setActiveTab, navigateBack, userLocation, collectionHubs, detectLiveLocation } = useAgri();
+  const { currentUser, addListing, setActiveTab, navigateBack, userLocation, collectionHubs, detectLiveLocation, mandiPrices } = useAgri();
+
+  const getCropPhoto = (cropName: string, _category: CropCategory) => {
+    const lower = cropName.toLowerCase();
+    if (lower.includes('onion')) return 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('rice') || lower.includes('paddy') || lower.includes('dhan') || lower.includes('basmati')) return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('tomato')) return 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('potato') || lower.includes('aloo')) return 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('wheat') || lower.includes('gehu')) return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('soybean')) return 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('corn') || lower.includes('maize') || lower.includes('makka')) return 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('mustard') || lower.includes('sarson')) return 'https://images.unsplash.com/photo-1508747703725-719777637510?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('cotton') || lower.includes('kapas') || lower.includes('narma')) return 'https://images.unsplash.com/photo-1606041008023-472dfb5e530f?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('chilli') || lower.includes('mirch')) return 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('garlic') || lower.includes('lahsun')) return 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=600&auto=format&fit=crop&q=80';
+    if (lower.includes('turmeric') || lower.includes('haldi')) return 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=600&auto=format&fit=crop&q=80';
+    return 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80';
+  };
+
+  const predefinedCrops = useMemo(() => {
+    if (mandiPrices && mandiPrices.length > 0) {
+      return mandiPrices.map(m => ({
+        name: m.cropName,
+        category: m.category,
+        price: m.recommendedFarmerSellingPrice || m.currentPrice,
+        mandiPrice: m.currentPrice,
+        mandiName: m.mandiName,
+        img: getCropPhoto(m.cropName, m.category)
+      }));
+    }
+    return [
+      { name: 'Red Onion', category: 'Vegetables' as CropCategory, price: 2650, mandiPrice: 2580, mandiName: 'Lasalgaon APMC', img: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80' },
+      { name: 'Basmati Rice', category: 'Cereals & Grains' as CropCategory, price: 4850, mandiPrice: 4720, mandiName: 'Karnal APMC', img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80' },
+      { name: 'Tomato', category: 'Vegetables' as CropCategory, price: 1950, mandiPrice: 1850, mandiName: 'Kolar APMC', img: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80' },
+      { name: 'Potato', category: 'Vegetables' as CropCategory, price: 1420, mandiPrice: 1350, mandiName: 'Agra APMC', img: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80' },
+      { name: 'Wheat (Sharbati)', category: 'Cereals & Grains' as CropCategory, price: 3400, mandiPrice: 3200, mandiName: 'Sehore Mandi', img: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80' }
+    ];
+  }, [mandiPrices]);
+
+  const defaultCrop = predefinedCrops[0];
 
   const [form, setForm] = useState({
-    cropName: 'Tomato',
-    category: 'Vegetables' as CropCategory,
-    variety: 'Hybrid High-Lycopene Grade A',
+    cropName: defaultCrop?.name || 'Tomato',
+    category: (defaultCrop?.category || 'Vegetables') as CropCategory,
+    variety: 'Grade A Quality Harvest',
     quantity: 60,
     unit: 'Quintals' as 'Quintals' | 'Tons' | 'Kg' | 'Bags',
     qualityGrade: 'Grade A+' as QualityGrade,
-    pricePerUnit: 2100,
+    pricePerUnit: defaultCrop?.price || 2100,
     harvestDate: new Date().toISOString().split('T')[0],
-    location: currentUser.location || 'Dindori Farmgate, Nashik',
+    location: currentUser.location || 'Farmgate, India',
     state: currentUser.state || 'Maharashtra',
     district: currentUser.district || 'Nashik',
-    pincode: currentUser.pincode || '422202',
+    pincode: currentUser.pincode || '',
     moisturePercent: 12.0,
     organicCertified: false,
     description: 'Freshly harvested, uniformly graded, harvested under optimal weather. Stored in shaded farm warehouse.',
-    imagePreview: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'
+    imagePreview: defaultCrop?.img || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'
   });
 
   const availableDistricts = useMemo(() => getDistrictsForState(form.state), [form.state]);
 
   const handleStateChange = (newState: string) => {
     const def = getDefaultDistrictForState(newState);
+    setCustomSelectedHubId(null);
     setForm(prev => ({
       ...prev,
       state: newState,
-      district: def
+      district: def,
+      location: `${def} Farmgate, ${newState}`,
+      pincode: ''
     }));
   };
 
@@ -57,16 +99,28 @@ export const AddProduceView: React.FC = () => {
   const [isChangingHub, setIsChangingHub] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const predefinedCrops = [
-    { name: 'Red Onion', category: 'Vegetables' as CropCategory, price: 2650, img: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600&auto=format&fit=crop&q=80' },
-    { name: 'Basmati Rice', category: 'Cereals & Grains' as CropCategory, price: 4850, img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80' },
-    { name: 'Tomato', category: 'Vegetables' as CropCategory, price: 1950, img: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80' },
-    { name: 'Potato', category: 'Vegetables' as CropCategory, price: 1420, img: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=80' },
-    { name: 'Wheat (Sharbati)', category: 'Cereals & Grains' as CropCategory, price: 3400, img: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&auto=format&fit=crop&q=80' },
-    { name: 'Soybean', category: 'Oilseeds' as CropCategory, price: 4620, img: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=600&auto=format&fit=crop&q=80' },
-    { name: 'Sweet Corn / Maize', category: 'Cereals & Grains' as CropCategory, price: 2240, img: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&auto=format&fit=crop&q=80' },
-    { name: 'Mustard Seeds', category: 'Oilseeds' as CropCategory, price: 5850, img: 'https://images.unsplash.com/photo-1508747703725-719777637510?w=600&auto=format&fit=crop&q=80' },
-  ];
+  // ⚡ Auto-Detect Nearest FCI Hub based on current farm location & district
+  const nearestHubMatch = useMemo(() => {
+    return findNearestFciHub(form.location, form.state, form.district, form.pincode, collectionHubs);
+  }, [form.location, form.state, form.district, form.pincode, collectionHubs]);
+
+  const activeFciHub = useMemo(() => {
+    if (customSelectedHubId) {
+      const found = collectionHubs.find(h => h.id === customSelectedHubId);
+      if (found) return found;
+    }
+    return nearestHubMatch?.hub || collectionHubs[0];
+  }, [customSelectedHubId, nearestHubMatch, collectionHubs]);
+
+  const activeFciHubDistance = useMemo(() => {
+    const geo = geocodeLocation(form.location, form.state, form.district, form.pincode);
+    if (!activeFciHub) return 0;
+    return calculateDistanceKm(geo.lat, geo.lng, activeFciHub.latitude, activeFciHub.longitude);
+  }, [form.location, form.state, form.district, form.pincode, activeFciHub]);
+
+  const activeNearestMandi = useMemo(() => {
+    return nearestHubMatch?.nearestMandi || getNearestTargetMandi(form.state, form.district);
+  }, [nearestHubMatch, form.state, form.district]);
 
   const handleSelectPredefined = (crop: typeof predefinedCrops[0]) => {
     setForm(prev => ({
@@ -80,6 +134,7 @@ export const AddProduceView: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const geo = geocodeLocation(form.location, form.state, form.district, form.pincode);
     addListing({
       cropName: form.cropName,
       category: form.category,
@@ -93,10 +148,21 @@ export const AddProduceView: React.FC = () => {
       state: form.state,
       district: form.district,
       pincode: form.pincode,
+      latitude: geo.lat,
+      longitude: geo.lng,
       moisturePercent: Number(form.moisturePercent),
       organicCertified: form.organicCertified,
       description: form.description,
-      images: [form.imagePreview]
+      images: [form.imagePreview],
+      // 🏛️ Auto-Detected FCI Hub & Silo Assignment
+      collectionCentreId: activeFciHub?.id,
+      fciHubName: activeFciHub?.name,
+      fciHubCode: activeFciHub?.code,
+      fciHubDistanceKm: activeFciHubDistance,
+      fciHubType: activeFciHub?.hubType || 'FCI Modern Steel Silo',
+      fciHubDistrict: activeFciHub?.district,
+      fciHubState: activeFciHub?.state,
+      nearestMandi: activeNearestMandi
     });
 
     setIsSubmitted(true);
@@ -132,6 +198,26 @@ export const AddProduceView: React.FC = () => {
           <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-emerald-800 text-sm">
             <span>Guaranteed Farmer Net Payout:</span>
             <span>₹{netEstimatedFarmerPayout.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+
+        {/* 🏛️ Confirmed FCI Hub & Mandi Attachment */}
+        <div className="bg-emerald-50/90 rounded-2xl p-4 border border-emerald-200 max-w-md mx-auto text-left text-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-extrabold text-emerald-950 flex items-center gap-1.5">
+              <Building2 className="w-4 h-4 text-emerald-700" />
+              <span>Assigned FCI Hub: {activeFciHub.name}</span>
+            </span>
+            <span className="px-2 py-0.5 rounded bg-emerald-200 text-emerald-900 font-mono text-[10px] font-bold">
+              {activeFciHub.code}
+            </span>
+          </div>
+          <p className="text-[11px] text-emerald-800 font-medium">
+            📍 {activeFciHub.district}, {activeFciHub.state} • {activeFciHubDistance} km from farm • {activeFciHub.hubType || 'FCI Modern Silo'}
+          </p>
+          <div className="pt-1.5 border-t border-emerald-200/80 flex items-center gap-1 text-[11px] text-slate-700 font-semibold">
+            <Store className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+            <span>Target Mandi: <strong>{activeNearestMandi}</strong></span>
           </div>
         </div>
 
@@ -404,7 +490,15 @@ export const AddProduceView: React.FC = () => {
               </label>
               <select
                 value={form.district}
-                onChange={e => setForm(prev => ({ ...prev, district: e.target.value }))}
+                onChange={e => {
+                  const newDist = e.target.value;
+                  setCustomSelectedHubId(null);
+                  setForm(prev => ({
+                    ...prev,
+                    district: newDist,
+                    location: `${newDist} Farmgate, ${prev.state}`
+                  }));
+                }}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold bg-white text-slate-900 focus:ring-2 focus:ring-emerald-500 cursor-pointer"
               >
                 {availableDistricts.length > 0 ? (
@@ -419,93 +513,72 @@ export const AddProduceView: React.FC = () => {
           </div>
 
           {/* ⚡ Nearest Pan-India FCI Collection Hub Auto-Matched */}
-          {(() => {
-            const geo = geocodeLocation(form.location, '', form.pincode);
-            let calculatedNearestHub = collectionHubs[0];
-            let minDistance = 9999;
-            collectionHubs.forEach(hub => {
-              const d = calculateDistanceKm(geo.lat, geo.lng, hub.latitude, hub.longitude);
-              if (d < minDistance) {
-                minDistance = d;
-                calculatedNearestHub = hub;
-              }
-            });
-
-            const currentHub = customSelectedHubId
-              ? (collectionHubs.find(h => h.id === customSelectedHubId) || calculatedNearestHub)
-              : calculatedNearestHub;
-
-            const hubDistance = calculateDistanceKm(geo.lat, geo.lng, currentHub.latitude, currentHub.longitude);
-
-            return (
-              <div className="p-3.5 bg-emerald-50/90 rounded-2xl border border-emerald-200 space-y-2.5 text-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                      <Building2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-slate-900">
-                          {currentHub.name}
-                        </span>
-                        <span className="px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-950 font-mono text-[10px] font-bold">
-                          {currentHub.code}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-emerald-800 font-medium mt-0.5">
-                        📍 {currentHub.district}, {currentHub.state} • {hubDistance} km from farm • {currentHub.hubType || 'FCI Modern Silo'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                    <span className="text-[10px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-extrabold shadow-xs">
-                      {customSelectedHubId ? 'Selected FCI Hub' : (hubDistance <= 25 ? '⚡ Nearest FCI Hub' : 'Regional Hub')}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsChangingHub(!isChangingHub)}
-                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 underline cursor-pointer"
-                    >
-                      {isChangingHub ? 'Done' : 'Change FCI Hub ▾'}
-                    </button>
-                  </div>
+          <div className="p-3.5 bg-emerald-50/90 rounded-2xl border border-emerald-200 space-y-2.5 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Building2 className="w-4 h-4" />
                 </div>
-
-                {isChangingHub && (
-                  <div className="p-2.5 bg-white rounded-xl border border-emerald-200 space-y-1.5 animate-in fade-in">
-                    <label className="block text-[11px] font-bold text-slate-700">
-                      Choose from {collectionHubs.length} FCI Centres across India:
-                    </label>
-                    <select
-                      value={currentHub.id}
-                      onChange={e => setCustomSelectedHubId(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 bg-slate-50"
-                    >
-                      {collectionHubs.map(h => (
-                        <option key={h.id} value={h.id}>
-                          {h.state} • {h.name} ({h.code})
-                        </option>
-                      ))}
-                    </select>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-slate-900">
+                      {activeFciHub.name}
+                    </span>
+                    <span className="px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-950 font-mono text-[10px] font-bold">
+                      {activeFciHub.code}
+                    </span>
                   </div>
-                )}
-
-                {/* 🎯 Nearest Target APMC Mandi according to location */}
-                <div className="pt-2 border-t border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
-                  <div className="flex items-center gap-1.5 text-slate-800">
-                    <Store className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                    <span className="font-semibold text-slate-600">Nearest Target APMC Mandi:</span>
-                    <strong className="font-extrabold text-slate-900">{getNearestTargetMandi(form.state, form.district)}</strong>
-                  </div>
-                  <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-300 self-start sm:self-auto">
-                    📍 Target Mandi for {form.district}, {form.state}
-                  </span>
+                  <p className="text-[11px] text-emerald-800 font-medium mt-0.5">
+                    📍 {activeFciHub.district}, {activeFciHub.state} • {activeFciHubDistance} km from farm • {activeFciHub.hubType || 'FCI Modern Silo'}
+                  </p>
                 </div>
               </div>
-            );
-          })()}
+
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                <span className="text-[10px] bg-emerald-600 text-white px-2.5 py-1 rounded-full font-extrabold shadow-xs">
+                  {customSelectedHubId ? 'Selected FCI Hub' : (activeFciHubDistance <= 25 ? '⚡ Nearest FCI Hub' : 'Regional Hub')}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsChangingHub(!isChangingHub)}
+                  className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 underline cursor-pointer"
+                >
+                  {isChangingHub ? 'Done' : 'Change FCI Hub ▾'}
+                </button>
+              </div>
+            </div>
+
+            {isChangingHub && (
+              <div className="p-2.5 bg-white rounded-xl border border-emerald-200 space-y-1.5 animate-in fade-in">
+                <label className="block text-[11px] font-bold text-slate-700">
+                  Choose from {collectionHubs.length} FCI Centres across India:
+                </label>
+                <select
+                  value={activeFciHub.id}
+                  onChange={e => setCustomSelectedHubId(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 bg-slate-50"
+                >
+                  {collectionHubs.map(h => (
+                    <option key={h.id} value={h.id}>
+                      {h.state} • {h.name} ({h.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* 🎯 Nearest Target APMC Mandi according to location */}
+            <div className="pt-2 border-t border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+              <div className="flex items-center gap-1.5 text-slate-800">
+                <Store className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                <span className="font-semibold text-slate-600">Nearest Target APMC Mandi:</span>
+                <strong className="font-extrabold text-slate-900">{activeNearestMandi}</strong>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-300 self-start sm:self-auto">
+                📍 Target Mandi for {form.district}, {form.state}
+              </span>
+            </div>
+          </div>
         </div>
 
         <div>

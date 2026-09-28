@@ -23,7 +23,9 @@ import {
   CreditCard,
   Eye,
   EyeOff,
-  Store
+  Store,
+  Camera,
+  Upload
 } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
@@ -50,6 +52,31 @@ export const ProfileView: React.FC = () => {
   const [password, setPassword] = useState(currentUser.password || '');
   const [showPassword, setShowPassword] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [avatar, setAvatar] = useState(currentUser.avatar || '');
+  const profilePhotoInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        const newAvatar = reader.result;
+        setAvatar(newAvatar);
+        const updated = { ...currentUser, avatar: newAvatar };
+        setCurrentUser(updated);
+        logActivity({
+          userId: currentUser.id,
+          userName: name,
+          userRole: currentUser.role,
+          actionType: 'profile_update',
+          title: 'Profile Photo Updated',
+          description: `${name} uploaded a new profile photo.`
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAadhaarChange = (val: string) => {
     const rawDigits = val.replace(/\D/g, '').slice(0, 12);
@@ -67,6 +94,7 @@ export const ProfileView: React.FC = () => {
       aadhaarNumber: aadhaarNumber.trim(),
       aadhaarVerified: true,
       email,
+      avatar: avatar || currentUser.avatar,
       location,
       district,
       state,
@@ -89,10 +117,9 @@ export const ProfileView: React.FC = () => {
     setTimeout(() => setIsSaved(false), 3000);
   };
 
-  // User-isolated activity history (admins see all events, other users see their own)
+  // User-isolated activity history (non-admin stakeholders see their own events)
   const userHistory = (activityHistory || []).filter(item => {
     if (!currentUser) return false;
-    if (currentUser.role === 'admin' || activeRole === 'admin') return true;
     return item.userId === currentUser.id || item.userName === currentUser.name;
   });
 
@@ -132,15 +159,30 @@ export const ProfileView: React.FC = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="relative">
+        <div className="relative group">
           <img
-            src={currentUser.avatar}
+            src={avatar || currentUser.avatar}
             alt={currentUser.name}
-            className="w-24 h-24 rounded-3xl object-cover ring-4 ring-emerald-500/20 shadow-md"
+            className="w-24 h-24 rounded-3xl object-cover ring-4 ring-emerald-500/20 shadow-md border-2 border-emerald-400"
           />
+          <input
+            ref={profilePhotoInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => profilePhotoInputRef.current?.click()}
+            className="absolute -bottom-1 -right-1 p-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-transform hover:scale-110 cursor-pointer"
+            title="Change Profile Photo / फ़ोटो बदलें"
+          >
+            <Camera className="w-4 h-4" />
+          </button>
           {currentUser.verified && (
-            <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-emerald-500 text-white shadow-md">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="absolute -top-1 -right-1 p-1.5 rounded-full bg-emerald-500 text-white shadow-md border-2 border-white" title="Verified User">
+              <ShieldCheck className="w-3.5 h-3.5" />
             </div>
           )}
         </div>
@@ -376,14 +418,14 @@ export const ProfileView: React.FC = () => {
         </button>
       </form>
 
-      {/* User Isolated Personal History & Audit Log */}
-      {currentUser.role !== 'farmer' && activeRole !== 'farmer' && (
+      {/* User Isolated Personal History & Audit Log (Admin manages audit logs on Admin Dashboard, not on personal Profile & KYC) */}
+      {currentUser.role !== 'farmer' && activeRole !== 'farmer' && currentUser.role !== 'admin' && activeRole !== 'admin' && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <History className="w-5 h-5 text-emerald-600" />
               <h2 className="text-base font-bold text-slate-900">
-                {currentUser.role === 'admin' || activeRole === 'admin' ? 'Platform Activity & History Audit Trail' : 'My Activity & History Audit Trail'}
+                My Activity & History Audit Trail
               </h2>
             </div>
             <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
@@ -391,9 +433,7 @@ export const ProfileView: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500">
-            {currentUser.role === 'admin' || activeRole === 'admin'
-              ? 'This chronological history tracks all platform events, logins, crop lots, orders, and state changes securely saved in the database.'
-              : 'This chronological history tracks your account events, logins, crop lots, orders, and state changes securely saved in the database.'}
+            This chronological history tracks your account events, logins, crop lots, orders, and state changes securely saved in the database.
           </p>
 
           <div className="space-y-3 pt-2">

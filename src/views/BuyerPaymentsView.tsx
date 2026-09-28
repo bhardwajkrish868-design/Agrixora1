@@ -19,11 +19,16 @@ import {
 import { StatCard } from '../components/StatCard';
 
 export const BuyerPaymentsView: React.FC = () => {
-  const { currentUser, orders, navigateBack } = useAgri();
+  const { currentUser, orders, navigateBack, language, isBuyerOrder } = useAgri();
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState<any>(null);
   const [copiedTxn, setCopiedTxn] = useState(false);
 
-  const myOrders = orders.filter(o => o.buyerId === currentUser.id);
+  const isHindi = language === 'hi';
+
+  let myOrders = orders.filter(o => isBuyerOrder(o, currentUser));
+  if (myOrders.length === 0 && orders.length > 0 && (!currentUser?.phone || currentUser.id === 'usr_guest' || currentUser.id === 'usr_buyer')) {
+    myOrders = orders;
+  }
 
   const totalSpent = myOrders.reduce((sum, o) => sum + o.totalAmount, 0);
   const inEscrow = myOrders.filter(o => o.paymentStatus === 'escrow_locked').reduce((sum, o) => sum + o.totalAmount, 0);
@@ -41,7 +46,7 @@ export const BuyerPaymentsView: React.FC = () => {
       "Status"
     ];
 
-    const rows = orders.map(order => [
+    const rows = myOrders.map(order => [
       order.transactionId || `TXN-F2F-${order.id}`,
       order.orderNumber,
       order.farmerPayout,
@@ -80,48 +85,50 @@ export const BuyerPaymentsView: React.FC = () => {
             type="button"
             onClick={navigateBack}
             className="p-2 rounded-2xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
-            title="Go Back"
+            title={isHindi ? "पीछे जाएं" : "Go Back"}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
               <CreditCard className="w-6 h-6 text-emerald-600" />
-              Buyer Payments & Escrow Ledger
+              {isHindi ? 'क्रेता भुगतान एवं एस्क्रो बहीखाता' : 'Buyer Payments & Escrow Ledger'}
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Complete transaction breakdown, platform fee receipts, and escrow settlement status.
+              {isHindi 
+                ? 'सम्पूर्ण लेनदेन विवरण, प्लेटफॉर्म शुल्क रसीदें और एस्क्रो निपटान स्थिति।' 
+                : 'Complete transaction breakdown, platform fee receipts, and escrow settlement status.'}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Multi-Tier Escrow Vault</span>
+          <span>{isHindi ? 'बहु-स्तरीय एस्क्रो सुरक्षा' : 'Multi-Tier Escrow Vault'}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          title="Total Procurement"
+          title={isHindi ? 'कुल खरीद व्यय' : 'Total Procurement'}
           value={`₹${totalSpent.toLocaleString('en-IN')}`}
-          subtitle="All Orders"
+          subtitle={isHindi ? 'सभी ऑर्डर्स' : 'All Orders'}
           icon={CreditCard}
           colorScheme="blue"
         />
 
         <StatCard
-          title="Locked in Escrow"
+          title={isHindi ? 'एस्क्रो में सुरक्षित' : 'Locked in Escrow'}
           value={`₹${inEscrow.toLocaleString('en-IN')}`}
-          subtitle="Awaiting Delivery Verification"
+          subtitle={isHindi ? 'डिलीवरी सत्यापन प्रतीक्षारत' : 'Awaiting Delivery Verification'}
           icon={Lock}
           colorScheme="amber"
         />
 
         <StatCard
-          title="Settled to Farmers"
+          title={isHindi ? 'किसानों को भुगतान' : 'Settled to Farmers'}
           value={`₹${settled.toLocaleString('en-IN')}`}
-          subtitle="Completed Deliveries"
+          subtitle={isHindi ? 'सफल डिलीवरी' : 'Completed Deliveries'}
           icon={CheckCircle2}
           colorScheme="emerald"
         />
@@ -131,7 +138,7 @@ export const BuyerPaymentsView: React.FC = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Receipt className="w-4 h-4 text-emerald-600" />
-            Payment Transactions & Transparent Invoices
+            {isHindi ? 'भुगतान लेनदेन व पारदर्शी रसीदें' : 'Payment Transactions & Transparent Invoices'}
           </h2>
 
           <button
@@ -140,7 +147,7 @@ export const BuyerPaymentsView: React.FC = () => {
             className="px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-emerald-50 hover:text-emerald-800 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
           >
             <Download className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Download All Invoices (CSV)</span>
+            <span>{isHindi ? 'सभी रसीदें डाउनलोड करें (CSV)' : 'Download All Invoices (CSV)'}</span>
           </button>
         </div>
 
@@ -148,22 +155,24 @@ export const BuyerPaymentsView: React.FC = () => {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-y border-slate-100">
               <tr>
-                <th className="py-3 px-4">Transaction ID</th>
-                <th className="py-3 px-4">Order Ref</th>
-                <th className="py-3 px-4">Farmer Base Amount</th>
-                <th className="py-3 px-4">QC & Hub Fee</th>
-                <th className="py-3 px-4">Logistics Fee</th>
-                <th className="py-3 px-4">Total Paid (Escrow)</th>
-                <th className="py-3 px-4">Payment Method</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-center">Escrow QR</th>
+                <th className="py-3 px-4">{isHindi ? 'लेनदेन संख्या (Txn ID)' : 'Transaction ID'}</th>
+                <th className="py-3 px-4">{isHindi ? 'ऑर्डर संदर्भ' : 'Order Ref'}</th>
+                <th className="py-3 px-4">{isHindi ? 'किसान मूल्य' : 'Farmer Base Amount'}</th>
+                <th className="py-3 px-4">{isHindi ? 'QC व हब शुल्क' : 'QC & Hub Fee'}</th>
+                <th className="py-3 px-4">{isHindi ? 'परिवहन शुल्क' : 'Logistics Fee'}</th>
+                <th className="py-3 px-4">{isHindi ? 'कुल भुगतान (एस्क्रो)' : 'Total Paid (Escrow)'}</th>
+                <th className="py-3 px-4">{isHindi ? 'भुगतान माध्यम' : 'Payment Method'}</th>
+                <th className="py-3 px-4">{isHindi ? 'स्थिति' : 'Status'}</th>
+                <th className="py-3 px-4 text-center">{isHindi ? 'एस्क्रो QR' : 'Escrow QR'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {myOrders.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="py-8 text-center text-slate-400">
-                    No payment transactions yet. When you place orders on the marketplace, your payments and escrow ledger will appear here.
+                    {isHindi 
+                      ? 'अभी कोई भुगतान लेनदेन उपलब्ध नहीं है। जब आप मंडी में ऑर्डर देंगे, तो आपका भुगतान और एस्क्रो रिकॉर्ड यहाँ दिखेगा।' 
+                      : 'No payment transactions yet. When you place orders on the marketplace, your payments and escrow ledger will appear here.'}
                   </td>
                 </tr>
               ) : (
@@ -193,7 +202,9 @@ export const BuyerPaymentsView: React.FC = () => {
                           ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-amber-100 text-amber-800'
                       }`}>
-                        {order.paymentStatus === 'disbursed_to_farmer' ? 'SETTLED' : 'ESCROW LOCKED'}
+                        {order.paymentStatus === 'disbursed_to_farmer' 
+                          ? (isHindi ? 'भुगतान संपन्न' : 'SETTLED') 
+                          : (isHindi ? 'एस्क्रो सुरक्षित' : 'ESCROW LOCKED')}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-center">
@@ -201,10 +212,10 @@ export const BuyerPaymentsView: React.FC = () => {
                         type="button"
                         onClick={() => setSelectedReceiptOrder(order)}
                         className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-bold text-[11px] inline-flex items-center gap-1 border border-slate-200 transition-colors cursor-pointer"
-                        title="View Escrow QR Receipt"
+                        title={isHindi ? "एस्क्रो QR रसीद देखें" : "View Escrow QR Receipt"}
                       >
                         <QrCode className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>QR Pass</span>
+                        <span>{isHindi ? 'QR रसीद' : 'QR Pass'}</span>
                       </button>
                     </td>
                   </tr>
@@ -225,7 +236,9 @@ export const BuyerPaymentsView: React.FC = () => {
                   <Receipt className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm">Official Escrow Payment Receipt</h3>
+                  <h3 className="font-extrabold text-slate-900 text-sm">
+                    {isHindi ? 'आधिकारिक एस्क्रो भुगतान रसीद' : 'Official Escrow Payment Receipt'}
+                  </h3>
                   <span className="text-[10px] text-slate-400 font-mono">Ref: {selectedReceiptOrder.orderNumber}</span>
                 </div>
               </div>
@@ -243,12 +256,18 @@ export const BuyerPaymentsView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-emerald-700" />
                 <div>
-                  <span className="font-extrabold text-emerald-950 block">ICICI Bank Smart Escrow Vault</span>
-                  <span className="text-[10px] text-emerald-800">Funds 100% Protected & Segregated</span>
+                  <span className="font-extrabold text-emerald-950 block">
+                    {isHindi ? 'ICICI बैंक स्मार्ट एस्क्रो तिजोरी' : 'ICICI Bank Smart Escrow Vault'}
+                  </span>
+                  <span className="text-[10px] text-emerald-800">
+                    {isHindi ? 'धनराशि 100% सुरक्षित और पृथक' : 'Funds 100% Protected & Segregated'}
+                  </span>
                 </div>
               </div>
               <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white font-mono font-extrabold text-[10px]">
-                {selectedReceiptOrder.paymentStatus === 'disbursed_to_farmer' ? 'SETTLED' : 'LOCKED'}
+                {selectedReceiptOrder.paymentStatus === 'disbursed_to_farmer' 
+                  ? (isHindi ? 'भुगतान संपन्न' : 'SETTLED') 
+                  : (isHindi ? 'सुरक्षित बंद' : 'LOCKED')}
               </span>
             </div>
 
@@ -263,10 +282,12 @@ export const BuyerPaymentsView: React.FC = () => {
               />
               <div>
                 <span className="text-xs font-bold text-slate-900 block">
-                  Digital Escrow Payment Pass
+                  {isHindi ? 'डिजिटल एस्क्रो भुगतान पास' : 'Digital Escrow Payment Pass'}
                 </span>
                 <span className="text-[10px] text-slate-500">
-                  Scan to verify authentic escrow lock & GST invoice on Govt Nodal Gateway
+                  {isHindi 
+                    ? 'सरकारी नोडल गेटवे पर एस्क्रो लॉक एवं जीएसटी इनवॉइस सत्यापित करने हेतु स्कैन करें' 
+                    : 'Scan to verify authentic escrow lock & GST invoice on Govt Nodal Gateway'}
                 </span>
               </div>
             </div>
@@ -274,7 +295,7 @@ export const BuyerPaymentsView: React.FC = () => {
             {/* Itemized Breakdown */}
             <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1.5">
               <div className="flex justify-between text-slate-600">
-                <span>Transaction ID:</span>
+                <span>{isHindi ? 'लेनदेन संख्या:' : 'Transaction ID:'}</span>
                 <div className="flex items-center gap-1 font-mono font-bold text-slate-800">
                   <span>{selectedReceiptOrder.transactionId}</span>
                   <button
@@ -291,19 +312,19 @@ export const BuyerPaymentsView: React.FC = () => {
                 </div>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>Payment Method:</span>
+                <span>{isHindi ? 'भुगतान माध्यम:' : 'Payment Method:'}</span>
                 <span className="font-semibold text-slate-800">{selectedReceiptOrder.paymentMethod || 'UPI QR'}</span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>Produce Cost:</span>
+                <span>{isHindi ? 'उपज लागत:' : 'Produce Cost:'}</span>
                 <span className="font-semibold text-slate-800">₹{(selectedReceiptOrder.produceAmount || (selectedReceiptOrder.quantity * selectedReceiptOrder.pricePerUnit)).toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>Buyer Delivery Fee:</span>
+                <span>{isHindi ? 'डिलीवरी शुल्क:' : 'Buyer Delivery Fee:'}</span>
                 <span className="font-semibold text-emerald-700">₹{selectedReceiptOrder.logisticsFee || 35}</span>
               </div>
               <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-slate-900 text-sm">
-                <span>Total Escrow Locked:</span>
+                <span>{isHindi ? 'कुल एस्क्रो राशि:' : 'Total Escrow Locked:'}</span>
                 <span className="text-emerald-700 font-extrabold">₹{selectedReceiptOrder.totalAmount.toLocaleString('en-IN')}</span>
               </div>
             </div>
@@ -315,14 +336,14 @@ export const BuyerPaymentsView: React.FC = () => {
                 className="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>Print Receipt</span>
+                <span>{isHindi ? 'रसीद प्रिंट करें' : 'Print Receipt'}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedReceiptOrder(null)}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer"
               >
-                Close
+                {isHindi ? 'बंद करें' : 'Close'}
               </button>
             </div>
           </div>

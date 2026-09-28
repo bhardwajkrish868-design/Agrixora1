@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { 
   User, 
   UserRole, 
@@ -33,9 +33,15 @@ import {
   geocodeLocation, 
   calculateDistanceKm, 
   isWithin10Km, 
-  getHyperlocalDispatchEstimate 
+  getHyperlocalDispatchEstimate,
+  findNearestFciHub
 } from '../utils/geoUtils';
+import { getNearestTargetMandi } from '../data/indiaLocations';
 import { assignOptimalTruckAI } from '../utils/aiLogisticsEngine';
+import { getMandiPricesForLocation } from '../utils/mandiPriceService';
+import { applyLanguageToDOM, t as translateHelper } from '../utils/translator';
+
+export type StakeholderCohortMode = 'registered_now' | 'upcoming';
 
 interface AgriContextType {
   currentUser: User;
@@ -45,6 +51,7 @@ interface AgriContextType {
   loginUser: (userData: Partial<User> & { role: UserRole; password?: string }) => { success: boolean; message?: string };
   logoutUser: () => void;
   registerUser: (userData: Partial<User> & { role: UserRole; password?: string }) => void;
+  resetUserPassword: (identifier: string, newPassword: string, role?: UserRole) => { success: boolean; message: string; user?: User };
   deleteUser: (userId: string) => void;
   clearAllUsers: () => void;
   activeRole: UserRole;
@@ -66,11 +73,28 @@ interface AgriContextType {
     buyerOrg?: string;
     paymentMethod: string;
   }) => Order;
+  createHubIntakeOrder: (params: {
+    farmerName: string;
+    farmerPhone: string;
+    farmerLocation?: string;
+    cropName: string;
+    variety?: string;
+    quantity: number;
+    unit: string;
+    pricePerUnit: number;
+    hubId: string;
+    hubName: string;
+    vehicleNo?: string;
+    grossWeightKg?: number;
+    tareWeightKg?: number;
+    weighbridgeSlipNo?: string;
+  }) => Order;
   updateOrderStage: (orderId: string, stage: OrderStage) => void;
   saveQualityInspection: (orderId: string, inspection: QualityInspection) => void;
   dispatchOrder: (orderId: string, dispatch: DispatchDetails) => void;
   updateTripProgress: (orderId: string, coveredKm: number) => void;
   markOrderDelivered: (orderId: string) => void;
+  deleteOrder: (orderId: string) => Promise<void>;
   clearAllOrders: () => Promise<void>;
   
   // Fleet & Vehicle Details
@@ -98,8 +122,14 @@ interface AgriContextType {
   historyStack: string[];
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
+  authModalRole: UserRole | null;
+  setAuthModalRole: (role: UserRole | null) => void;
+  authModalMode: 'login' | 'register' | 'forgot_password';
+  setAuthModalMode: (mode: 'login' | 'register' | 'forgot_password') => void;
+  openAuthModal: (role?: UserRole, mode?: 'login' | 'register' | 'forgot_password') => void;
   language: 'en' | 'hi';
   setLanguage: (lang: 'en' | 'hi') => void;
+  t: (text: string) => string;
 
   // Welcome Gateway
   showWelcomeGateway: boolean;
@@ -114,14 +144,19 @@ interface AgriContextType {
   
   // Intelligence & Notifications
   mandiPrices: MandiPriceTrend[];
+  refreshMandiPrices: (state?: string, district?: string) => void;
   collectionHubs: CollectionHub[];
   selectedHubId: string;
   setSelectedHubId: (id: string) => void;
   activeHub: CollectionHub;
   addCollectionHub: (hub: CollectionHub) => void;
   notifications: NotificationItem[];
+  latestToast: NotificationItem | null;
+  dismissToast: () => void;
   markNotificationRead: (id: string) => void;
   clearNotifications: () => void;
+  clearAllNotifications: () => void;
+  deleteNotification: (id: string) => void;
   addNotification: (notif: Omit<NotificationItem, 'id' | 'timestamp' | 'read'>) => void;
   
   // Activity Audit & Database History
@@ -136,6 +171,10 @@ interface AgriContextType {
   changeAdminPasskey: (oldKey: string, newKey: string) => { success: boolean; message: string };
   lockAdminConsole: () => void;
   
+  // Stakeholder Cohort Filter (Registered Now vs Upcoming)
+  stakeholderCohortMode: StakeholderCohortMode;
+  setStakeholderCohortMode: (mode: StakeholderCohortMode) => void;
+
   // Global Stats
   stats: {
     totalListingsCount: number;
@@ -147,13 +186,19 @@ interface AgriContextType {
     totalFarmerEarnings: number;
     verifiedFarmersCount: number;
     verifiedBuyersCount: number;
+    registeredFarmersNow: number;
+    registeredBuyersNow: number;
+    upcomingFarmersCount: number;
+    upcomingBuyersCount: number;
+    stakeholderCohortMode: StakeholderCohortMode;
     activeCollectionHubsCount: number;
     activeFleetCount: number;
   };
 
-  // Farmer Association Helpers
+  // Farmer & Buyer Association Helpers
   isFarmerOrder: (order: Order, user?: User | null) => boolean;
   isFarmerListing: (listing: CropListing, user?: User | null) => boolean;
+  isBuyerOrder: (order: Order, user?: User | null) => boolean;
 }
 
 export const isFarmerOrder = (order: Order, user: User | null): boolean => {
@@ -184,6 +229,153 @@ export const isFarmerListing = (listing: CropListing, user: User | null): boolea
   return false;
 };
 
+export const isBuyerOrder = (order: Order, user: User | null): boolean => {
+  if (!user) return false;
+  // 1. Direct ID match
+  if (order.buyerId === user.id) return true;
+  // 2. Phone match (last 10 digits)
+  const uPhone = (user.phone || '').replace(/\D/g, '').slice(-10);
+  const oPhone = (order.buyerPhone || '').replace(/\D/g, '').slice(-10);
+  if (uPhone && oPhone && uPhone === oPhone) return true;
+  // 3. Name or Business Org match
+  const uName = (user.name || '').trim().toLowerCase();
+  const uOrg = (user.businessName || '').trim().toLowerCase();
+  const oName = (order.buyerName || '').trim().toLowerCase();
+  const oOrg = (order.buyerOrg || '').trim().toLowerCase();
+  if (uName && (uName === oName || uName === oOrg)) return true;
+  if (uOrg && (uOrg === oName || uOrg === oOrg)) return true;
+  // 4. Default / Guest Buyer Demo fallback (so demo buyer always shows active order status)
+  if (user.role === 'buyer' && (user.id === 'usr_guest' || user.id === 'usr_buyer' || !user.phone)) {
+    return true;
+  }
+  return false;
+};
+
+/**
+ * 🔔 Unified Notification Filtering Helper
+ * Guarantees 100% role & recipient synchronization across Bell badge, Drawer, Sidebar, and Full-page view.
+ */
+export const filterNotificationsForUser = (
+  notifications: NotificationItem[],
+  currentUser: User | null,
+  activeRole: UserRole
+): NotificationItem[] => {
+  if (!Array.isArray(notifications)) return [];
+
+  return notifications.filter(notif => {
+    // 1. Direct recipientId match:
+    // If a notification has an explicit recipientId, it is private to that user!
+    if (notif.recipientId) {
+      if (currentUser?.id && notif.recipientId === currentUser.id) {
+        return true;
+      }
+      const uPhone = (currentUser?.phone || '').replace(/\D/g, '').slice(-10);
+      const rPhone = (notif.recipientId || '').replace(/\D/g, '').slice(-10);
+      if (uPhone && rPhone && uPhone === rPhone) {
+        return true;
+      }
+      // CRITICAL: Targeted private notification must NOT leak to other users!
+      return false;
+    }
+
+    // 2. Broadcast to all roles
+    if (!notif.recipientRole || notif.recipientRole === 'all') {
+      return true;
+    }
+
+    // 3. Match activeRole view (no recipientId specified)
+    if (notif.recipientRole === activeRole) {
+      return true;
+    }
+
+    return false;
+  });
+};
+
+/**
+ * 🔊 Web Audio Notification Chime (High-clarity pleasant bell alert)
+ */
+export const playNotificationChime = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    // Gentle dual-tone ascending harmonic: 587.33Hz (D5) -> 880Hz (A5)
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.4);
+  } catch (_) {
+    // Suppress autoplay policy warnings before initial user interaction
+  }
+};
+
+/**
+ * ⚡ Automatically enrich listings with verified FCI Procurement Hub / Silo and APMC Mandi
+ * Ensures even legacy or imported listings without FCI details get accurate depot metadata.
+ */
+export const enrichListingWithFciHub = (
+  item: CropListing,
+  hubs: CollectionHub[] = initialCollectionHubs
+): CropListing => {
+  if (!item) return item;
+
+  // Defensive sanitization: guarantee essential fields are never undefined or empty
+  const safeItem: CropListing = {
+    ...item,
+    cropName: item.cropName || 'Farm Produce',
+    variety: item.variety || 'Hybrid High-Lycopene Grade A',
+    images: (Array.isArray(item.images) && item.images.length > 0)
+      ? item.images
+      : ['https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'],
+    qualityGrade: item.qualityGrade || 'Grade A',
+    status: item.status || 'Active',
+    category: item.category || 'Vegetables',
+    unit: item.unit || 'Quintals',
+    quantity: typeof item.quantity === 'number' ? item.quantity : 100,
+    pricePerUnit: typeof item.pricePerUnit === 'number' ? item.pricePerUnit : 1500,
+    farmerName: item.farmerName || 'Registered Farmer'
+  };
+
+  if (safeItem.fciHubName && safeItem.fciHubCode && safeItem.fciHubDistanceKm !== undefined && safeItem.nearestMandi) {
+    return safeItem;
+  }
+  const match = findNearestFciHub(
+    safeItem.location || safeItem.farmerLocation,
+    safeItem.state || safeItem.farmerState,
+    safeItem.district,
+    safeItem.pincode,
+    hubs
+  );
+  if (!match) return safeItem;
+
+  return {
+    ...safeItem,
+    collectionCentreId: safeItem.collectionCentreId || match.hub.id,
+    fciHubName: safeItem.fciHubName || match.hub.name,
+    fciHubCode: safeItem.fciHubCode || match.hub.code,
+    fciHubDistanceKm: safeItem.fciHubDistanceKm !== undefined ? safeItem.fciHubDistanceKm : match.distanceKm,
+    fciHubType: safeItem.fciHubType || match.hub.hubType || 'FCI Modern Steel Silo',
+    fciHubDistrict: safeItem.fciHubDistrict || match.hub.district,
+    fciHubState: safeItem.fciHubState || match.hub.state,
+    nearestMandi: safeItem.nearestMandi || match.nearestMandi
+  };
+};
+
 const AgriContext = createContext<AgriContextType | undefined>(undefined);
 
 const anonymousGuestUser: User = {
@@ -201,11 +393,96 @@ const anonymousGuestUser: User = {
   memberSince: '2026'
 };
 
+export const getLocalDeletedSet = (): Set<string> => {
+  try {
+    const saved = localStorage.getItem('farm2future_deleted_ids');
+    return new Set(saved ? JSON.parse(saved) : []);
+  } catch {
+    return new Set();
+  }
+};
+
+export const recordLocalDeletedId = (id: string) => {
+  if (!id) return;
+  try {
+    const current = getLocalDeletedSet();
+    current.add(id);
+    safeLocalStorage.setItem('farm2future_deleted_ids', JSON.stringify(Array.from(current)));
+  } catch (_) {}
+};
+
+export const getLocalReadNotifSet = (): Set<string> => {
+  try {
+    const saved = localStorage.getItem('farm2future_read_notif_ids');
+    return new Set(saved ? JSON.parse(saved) : []);
+  } catch {
+    return new Set();
+  }
+};
+
+export const recordLocalReadNotifIds = (ids: string[]): void => {
+  if (!Array.isArray(ids) || ids.length === 0) return;
+  try {
+    const current = getLocalReadNotifSet();
+    ids.forEach(id => {
+      if (id) current.add(id);
+    });
+    safeLocalStorage.setItem('farm2future_read_notif_ids', JSON.stringify(Array.from(current)));
+  } catch (_) {}
+};
+
+export const sanitizeUserForStorage = (u: any): any => {
+  if (!u) return u;
+  if (u.avatar && typeof u.avatar === 'string' && u.avatar.length > 50000) {
+    return {
+      ...u,
+      avatar: u.role === 'buyer' 
+        ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
+        : u.role === 'admin'
+          ? 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=80'
+          : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'
+    };
+  }
+  return u;
+};
+
+export const safeLocalStorage = {
+  setItem: (key: string, value: string) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(`[SafeStorage] LocalStorage quota exceeded on key "${key}", freeing space...`);
+      try {
+        localStorage.removeItem('farm2future_activity_history');
+        localStorage.removeItem('farm2future_notifications');
+        localStorage.setItem(key, value);
+      } catch (_) {}
+    }
+  },
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  removeItem: (key: string) => {
+    try {
+      localStorage.removeItem(key);
+    } catch {}
+  }
+};
+
 export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [registeredUsers, setRegisteredUsers] = useState<User[]>(() => {
     try {
+      const delSet = getLocalDeletedSet();
       const saved = localStorage.getItem('farm2future_registered_users');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed.filter((u: any) => !delSet.has(u.id));
+      }
+      return [];
     } catch {
       return [];
     }
@@ -252,14 +529,20 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [listings, setListings] = useState<CropListing[]>(() => {
     try {
+      const delSet = getLocalDeletedSet();
       const saved = localStorage.getItem('farm2future_listings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const valid = parsed
+            .filter((l: any) => !delSet.has(l.id))
+            .map(l => enrichListingWithFciHub(l));
+          if (valid.length > 0) return valid;
+        }
       }
-      return [];
+      return initialListings.filter(l => !delSet.has(l.id)).map(l => enrichListingWithFciHub(l));
     } catch {
-      return [];
+      return initialListings.map(l => enrichListingWithFciHub(l));
     }
   });
 
@@ -307,10 +590,45 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // Auto-sync userLocation with currentUser's registered state and district
+  useEffect(() => {
+    if (currentUser && (currentUser.state || currentUser.location)) {
+      const targetState = currentUser.state || '';
+      const targetDist = currentUser.district || '';
+      const targetLoc = currentUser.location || '';
+      const geo = geocodeLocation(targetLoc, targetState, targetDist, currentUser.pincode);
+
+      setUserLocationState(prev => {
+        if (targetState && (prev.state !== targetState || (targetDist && prev.district !== targetDist))) {
+          let cleanName = targetLoc || (targetDist ? `${targetDist}, ${targetState}` : geo.name);
+          if (cleanName && targetState && !cleanName.toLowerCase().includes(targetState.toLowerCase())) {
+            cleanName = `${cleanName}, ${targetState}`;
+          }
+          const syncedLoc: GeoCoordinate = {
+            lat: geo.lat || prev.lat,
+            lng: geo.lng || prev.lng,
+            name: cleanName || geo.name || `${targetState} Agro Center`,
+            district: targetDist || geo.district || prev.district,
+            state: targetState || geo.state || prev.state,
+            pincode: currentUser.pincode || geo.pincode || prev.pincode
+          };
+          try { localStorage.setItem('farm2future_user_location', JSON.stringify(syncedLoc)); } catch {}
+          return syncedLoc;
+        }
+        return prev;
+      });
+    }
+  }, [currentUser?.id, currentUser?.state, currentUser?.district]);
+
   const [orders, setOrders] = useState<Order[]>(() => {
     try {
+      const delSet = getLocalDeletedSet();
       const saved = localStorage.getItem('farm2future_orders');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed.filter((o: any) => !delSet.has(o.id));
+      }
+      return [];
     } catch {
       return [];
     }
@@ -318,15 +636,18 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [vehicles, setVehicles] = useState<VehicleDetails[]>(() => {
     try {
+      const delSet = getLocalDeletedSet();
       const saved = localStorage.getItem('farm2future_vehicles');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          const existingIds = new Set(parsed.map((p: any) => p.id));
-          return [...parsed, ...initialVehicles.filter(iv => !existingIds.has(iv.id))];
+          const filtered = parsed.filter((p: any) => !delSet.has(p.id) && !delSet.has(p.vehicleNo));
+          const existingIds = new Set(filtered.map((p: any) => p.id));
+          const mockFiltered = initialVehicles.filter(iv => !delSet.has(iv.id) && !delSet.has(iv.vehicleNo) && !existingIds.has(iv.id));
+          return [...filtered, ...mockFiltered];
         }
       }
-      return initialVehicles;
+      return initialVehicles.filter(iv => !delSet.has(iv.id) && !delSet.has(iv.vehicleNo));
     } catch {
       return initialVehicles;
     }
@@ -334,14 +655,15 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [bulkDemands, setBulkDemands] = useState<BulkDemandPool[]>(() => {
     try {
+      const delSet = getLocalDeletedSet();
       const saved = localStorage.getItem('farm2future_bulk_demands');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          return parsed.filter((b: any) => !delSet.has(b.id));
         }
       }
-      return initialBulkDemands;
+      return initialBulkDemands.filter((b: any) => !delSet.has(b.id));
     } catch {
       return initialBulkDemands;
     }
@@ -349,12 +671,31 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
     try {
-      const saved = localStorage.getItem('farm2future_notifications');
-      return saved ? JSON.parse(saved) : initialNotifications;
+      const delSet = getLocalDeletedSet();
+      const readSet = getLocalReadNotifSet();
+      const saved = safeLocalStorage.getItem('farm2future_notifications') || localStorage.getItem('farm2future_notifications');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const filtered = parsed
+            .filter((n: any) => !delSet.has(n.id))
+            .map((n: any) => (n.read || readSet.has(n.id)) ? { ...n, read: true } : n);
+          if (filtered.length > 0) return filtered;
+        }
+      }
+      return initialNotifications
+        .filter((n: any) => !delSet.has(n.id))
+        .map((n: any) => (n.read || readSet.has(n.id)) ? { ...n, read: true } : n);
     } catch {
       return initialNotifications;
     }
   });
+
+  const [latestToast, setLatestToast] = useState<NotificationItem | null>(null);
+
+  const dismissToast = useCallback(() => {
+    setLatestToast(null);
+  }, []);
 
   const [activityHistory, setActivityHistory] = useState<ActivityLog[]>(() => {
     try {
@@ -365,7 +706,24 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
 
-  const [mandiPrices] = useState<MandiPriceTrend[]>(initialMandiPrices);
+  const [mandiPrices, setMandiPrices] = useState<MandiPriceTrend[]>(() => {
+    const activeState = currentUser?.state || 'Maharashtra';
+    const activeDistrict = currentUser?.district || 'Nashik';
+    return getMandiPricesForLocation(activeState, activeDistrict);
+  });
+
+  // Dynamically recalculate APMC mandi rates based on the logged-in profile location (state & district)
+  useEffect(() => {
+    const activeState = currentUser?.state || userLocation.state || 'Maharashtra';
+    const activeDistrict = currentUser?.district || userLocation.district || 'Nashik';
+    setMandiPrices(getMandiPricesForLocation(activeState, activeDistrict));
+  }, [currentUser?.state, currentUser?.district, currentUser?.location, userLocation.state, userLocation.district]);
+
+  const refreshMandiPrices = (state?: string, district?: string) => {
+    const activeState = state || currentUser?.state || userLocation.state || 'Maharashtra';
+    const activeDistrict = district || currentUser?.district || userLocation.district || 'Nashik';
+    setMandiPrices(getMandiPricesForLocation(activeState, activeDistrict));
+  };
   const [collectionHubs, setCollectionHubs] = useState<CollectionHub[]>(() => {
     try {
       const saved = localStorage.getItem('farm2future_collection_hubs');
@@ -416,10 +774,79 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return 'overview';
     }
   });
+
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
+  const [authModalRole, setAuthModalRole] = useState<UserRole | null>(null);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register' | 'forgot_password'>('login');
+
+  const openAuthModal = useCallback((role?: UserRole, mode: 'login' | 'register' | 'forgot_password' = 'login') => {
+    if (role) setAuthModalRole(role);
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  }, []);
+  const [language, setLanguageState] = useState<'en' | 'hi'>(() => {
+    try {
+      const saved = localStorage.getItem('farm2future_language');
+      return (saved === 'hi' || saved === 'en') ? saved : 'en';
+    } catch {
+      return 'en';
+    }
+  });
+
+  const setLanguage = useCallback((newLang: 'en' | 'hi') => {
+    // Apply immediately to DOM so observer is disconnected before React re-render cycle
+    applyLanguageToDOM(newLang);
+    setLanguageState(newLang);
+  }, []);
+
+  // Automatically apply language across the entire application interface
+  useEffect(() => {
+    applyLanguageToDOM(language);
+  }, [language]);
+
+  // Stakeholder cohort mode: 'registered_now' (real live DB users) vs 'upcoming' (projected network)
+  const [stakeholderCohortMode, setStakeholderCohortModeState] = useState<StakeholderCohortMode>(() => {
+    try {
+      const saved = localStorage.getItem('farm2future_stakeholder_cohort');
+      return (saved === 'upcoming' || saved === 'registered_now') ? saved : 'registered_now';
+    } catch {
+      return 'registered_now';
+    }
+  });
+
+  const setStakeholderCohortMode = useCallback((mode: StakeholderCohortMode) => {
+    setStakeholderCohortModeState(mode);
+    try {
+      localStorage.setItem('farm2future_stakeholder_cohort', mode);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const initialLoadedRef = useRef(false);
+
+  const listingsRef = useRef(listings);
+  listingsRef.current = listings;
+
+  const ordersRef = useRef(orders);
+  ordersRef.current = orders;
+
+  const registeredUsersRef = useRef(registeredUsers);
+  registeredUsersRef.current = registeredUsers;
+
+  const bulkDemandsRef = useRef(bulkDemands);
+  bulkDemandsRef.current = bulkDemands;
+
+  const vehiclesRef = useRef(vehicles);
+  vehiclesRef.current = vehicles;
+
+  const notificationsRef = useRef(notifications);
+  notificationsRef.current = notifications;
+
+  const activityHistoryRef = useRef(activityHistory);
+  activityHistoryRef.current = activityHistory;
+
+  const isRemoteSyncingRef = useRef(false);
 
   // Load database from backend on initial mount
   useEffect(() => {
@@ -427,46 +854,68 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const db = await dbService.loadDatabase();
         if (db) {
+          const remoteDeleted = Array.isArray(db.deletedIds) ? db.deletedIds : [];
+          const currentLocalDeleted = Array.from(getLocalDeletedSet());
+          const mergedDeleted = Array.from(new Set([...currentLocalDeleted, ...remoteDeleted]));
+          try {
+            safeLocalStorage.setItem('farm2future_deleted_ids', JSON.stringify(mergedDeleted));
+          } catch (_) {}
+          const deletedSet = new Set(mergedDeleted);
+
           if (Array.isArray(db.users)) {
-            setRegisteredUsers(db.users);
-            localStorage.setItem('farm2future_registered_users', JSON.stringify(db.users));
+            const activeUsers = db.users.filter((u: any) => !deletedSet.has(u.id));
+            setRegisteredUsers(activeUsers);
+            const sanitizedUsers = activeUsers.map(sanitizeUserForStorage);
+            safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitizedUsers));
           }
-          const deletedSet = new Set(Array.isArray(db.deletedIds) ? db.deletedIds : []);
           if (Array.isArray(db.listings)) {
-            const activeListings = db.listings.filter((l: any) => !deletedSet.has(l.id));
+            let activeListings = db.listings
+              .filter((l: any) => !deletedSet.has(l.id))
+              .map((l: any) => enrichListingWithFciHub(l));
+            if (activeListings.length === 0 && initialListings.length > 0) {
+              activeListings = initialListings
+                .filter((l: any) => !deletedSet.has(l.id))
+                .map((l: any) => enrichListingWithFciHub(l));
+            }
             setListings(activeListings);
-            localStorage.setItem('farm2future_listings', JSON.stringify(activeListings));
+            safeLocalStorage.setItem('farm2future_listings', JSON.stringify(activeListings));
           }
           if (Array.isArray(db.orders)) {
-            const activeOrders = (db.orders as Order[]).filter(o => !deletedSet.has(o.id));
+            const activeOrders = (db.orders as Order[]).filter(o => !deletedSet.has(o.id) && !deletedSet.has(o.orderNumber));
             setOrders(activeOrders);
-            localStorage.setItem('farm2future_orders', JSON.stringify(activeOrders));
+            safeLocalStorage.setItem('farm2future_orders', JSON.stringify(activeOrders));
           }
           if (Array.isArray(db.vehicles) && db.vehicles.length > 0) {
-            const existingIds = new Set(db.vehicles.map((v: any) => v.id));
-            const mergedVehicles = [...db.vehicles, ...initialVehicles.filter(iv => !existingIds.has(iv.id))];
+            const activeVehicles = db.vehicles.filter((v: any) => !deletedSet.has(v.id) && !deletedSet.has(v.vehicleNo));
+            const existingIds = new Set(activeVehicles.map((v: any) => v.id));
+            const mergedVehicles = [...activeVehicles, ...initialVehicles.filter(iv => !deletedSet.has(iv.id) && !deletedSet.has(iv.vehicleNo) && !existingIds.has(iv.id))];
             setVehicles(mergedVehicles);
-            localStorage.setItem('farm2future_vehicles', JSON.stringify(mergedVehicles));
+            safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(mergedVehicles));
           } else {
-            setVehicles(initialVehicles);
-            localStorage.setItem('farm2future_vehicles', JSON.stringify(initialVehicles));
+            const activeVehicles = initialVehicles.filter(iv => !deletedSet.has(iv.id) && !deletedSet.has(iv.vehicleNo));
+            setVehicles(activeVehicles);
+            safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(activeVehicles));
           }
           if (Array.isArray(db.bulkDemands)) {
             const activeBulkDemands = db.bulkDemands.filter((b: any) => !deletedSet.has(b.id));
             setBulkDemands(activeBulkDemands);
-            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(activeBulkDemands));
+            safeLocalStorage.setItem('farm2future_bulk_demands', JSON.stringify(activeBulkDemands));
           }
-          if (Array.isArray(db.notifications) && db.notifications.length > 0) {
-            setNotifications(db.notifications);
-            localStorage.setItem('farm2future_notifications', JSON.stringify(db.notifications));
+          if (Array.isArray(db.notifications)) {
+            const readSet = getLocalReadNotifSet();
+            const activeNotifs = db.notifications
+              .filter((n: any) => !deletedSet.has(n.id))
+              .map((n: any) => (n.read || readSet.has(n.id)) ? { ...n, read: true } : n);
+            setNotifications(activeNotifs);
+            safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(activeNotifs));
           }
           if (Array.isArray(db.activityHistory)) {
             setActivityHistory(db.activityHistory);
-            localStorage.setItem('farm2future_activity_history', JSON.stringify(db.activityHistory));
+            safeLocalStorage.setItem('farm2future_activity_history', JSON.stringify(db.activityHistory));
           }
           if (db.adminPasskey) {
             setAdminPasskey(db.adminPasskey);
-            localStorage.setItem('farm2future_admin_passkey', db.adminPasskey);
+            safeLocalStorage.setItem('farm2future_admin_passkey', db.adminPasskey);
           }
         }
       } catch (err) {
@@ -478,33 +927,87 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     loadFromDatabase();
 
-    // Cross-server Real-Time Polling every 3.5s for seamless multi-server/multi-window synchronization
+    // Cross-server Real-Time Polling for seamless multi-server/multi-window synchronization
+    // Only applies updates when data has actually changed to prevent render jitter/fluctuation
+    const isDifferent = (a: any, b: any) => JSON.stringify(a) !== JSON.stringify(b);
+
     const pollInterval = setInterval(async () => {
       try {
+        if (typeof document !== 'undefined' && document.hidden) return;
         const db = await dbService.loadDatabase();
         if (db) {
-          const deletedSet = new Set(Array.isArray(db.deletedIds) ? db.deletedIds : []);
-          if (Array.isArray(db.users)) setRegisteredUsers(db.users);
+          const remoteDeleted = Array.isArray(db.deletedIds) ? db.deletedIds : [];
+          const currentLocalDeleted = Array.from(getLocalDeletedSet());
+          const mergedDeleted = Array.from(new Set([...currentLocalDeleted, ...remoteDeleted]));
+          if (mergedDeleted.length > currentLocalDeleted.length) {
+            try {
+              safeLocalStorage.setItem('farm2future_deleted_ids', JSON.stringify(mergedDeleted));
+            } catch (_) {}
+          }
+          const deletedSet = new Set(mergedDeleted);
+          let changedRemotely = false;
+
+          if (Array.isArray(db.users)) {
+            const fetchedUsers = db.users.filter((u: any) => !deletedSet.has(u.id));
+            if (isDifferent(fetchedUsers, registeredUsersRef.current)) {
+              changedRemotely = true;
+              setRegisteredUsers(fetchedUsers);
+              const sanitizedUsers = fetchedUsers.map(sanitizeUserForStorage);
+              safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitizedUsers));
+            }
+          }
           if (Array.isArray(db.listings)) {
-            const fetchedListings = db.listings.filter((l: any) => !deletedSet.has(l.id));
-            setListings(fetchedListings);
-            localStorage.setItem('farm2future_listings', JSON.stringify(fetchedListings));
+            const fetchedListings = db.listings
+              .filter((l: any) => !deletedSet.has(l.id))
+              .map((l: any) => enrichListingWithFciHub(l));
+            if (isDifferent(fetchedListings, listingsRef.current)) {
+              changedRemotely = true;
+              setListings(fetchedListings);
+              safeLocalStorage.setItem('farm2future_listings', JSON.stringify(fetchedListings));
+            }
           }
           if (Array.isArray(db.orders)) {
-            const fetchedOrders: Order[] = db.orders.filter((o: any) => !deletedSet.has(o.id));
-            setOrders(fetchedOrders);
-            localStorage.setItem('farm2future_orders', JSON.stringify(fetchedOrders));
+            const fetchedOrders: Order[] = db.orders.filter((o: any) => !deletedSet.has(o.id) && !deletedSet.has(o.orderNumber));
+            if (isDifferent(fetchedOrders, ordersRef.current)) {
+              changedRemotely = true;
+              setOrders(fetchedOrders);
+              safeLocalStorage.setItem('farm2future_orders', JSON.stringify(fetchedOrders));
+            }
           }
           if (Array.isArray(db.bulkDemands)) {
             const fetchedBulkDemands = db.bulkDemands.filter((b: any) => !deletedSet.has(b.id));
-            setBulkDemands(fetchedBulkDemands);
-            localStorage.setItem('farm2future_bulk_demands', JSON.stringify(fetchedBulkDemands));
+            if (isDifferent(fetchedBulkDemands, bulkDemandsRef.current)) {
+              changedRemotely = true;
+              setBulkDemands(fetchedBulkDemands);
+              safeLocalStorage.setItem('farm2future_bulk_demands', JSON.stringify(fetchedBulkDemands));
+            }
           }
-          if (Array.isArray(db.vehicles) && db.vehicles.length > 0) setVehicles(db.vehicles);
-          if (Array.isArray(db.notifications) && db.notifications.length > 0) setNotifications(db.notifications);
+          if (Array.isArray(db.vehicles) && db.vehicles.length > 0) {
+            const fetchedVehicles = db.vehicles.filter((v: any) => !deletedSet.has(v.id) && !deletedSet.has(v.vehicleNo));
+            if (isDifferent(fetchedVehicles, vehiclesRef.current)) {
+              changedRemotely = true;
+              setVehicles(fetchedVehicles);
+              safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(fetchedVehicles));
+            }
+          }
+          if (Array.isArray(db.notifications)) {
+            const readSet = getLocalReadNotifSet();
+            const fetchedNotifs = db.notifications
+              .filter((n: any) => !deletedSet.has(n.id))
+              .map((n: any) => (n.read || readSet.has(n.id)) ? { ...n, read: true } : n);
+            if (isDifferent(fetchedNotifs, notificationsRef.current)) {
+              changedRemotely = true;
+              setNotifications(fetchedNotifs);
+              safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(fetchedNotifs));
+            }
+          }
+
+          if (changedRemotely) {
+            isRemoteSyncingRef.current = true;
+          }
         }
       } catch {}
-    }, 3500);
+    }, 8000);
 
     return () => clearInterval(pollInterval);
   }, []);
@@ -512,6 +1015,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Sync to database and localStorage whenever state updates
   useEffect(() => {
     if (!initialLoadedRef.current) return;
+    if (isRemoteSyncingRef.current) {
+      isRemoteSyncingRef.current = false;
+      return;
+    }
 
     const timer = setTimeout(() => {
       dbService.syncDatabase({
@@ -524,45 +1031,47 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         activityHistory,
         adminPasskey
       });
-      localStorage.setItem('farm2future_bulk_demands', JSON.stringify(bulkDemands));
-    }, 400);
+      safeLocalStorage.setItem('farm2future_bulk_demands', JSON.stringify(bulkDemands));
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [registeredUsers, listings, orders, vehicles, bulkDemands, notifications, activityHistory, adminPasskey]);
 
-  // Sync individual states to localStorage
+  // Sync individual states to localStorage safely
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('farm2future_user', JSON.stringify(currentUser));
+      const sanitized = sanitizeUserForStorage(currentUser);
+      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
     }
   }, [currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('farm2future_auth', String(isAuthenticated));
+    safeLocalStorage.setItem('farm2future_auth', String(isAuthenticated));
   }, [isAuthenticated]);
 
   useEffect(() => {
-    localStorage.setItem('farm2future_registered_users', JSON.stringify(registeredUsers));
+    const sanitizedList = registeredUsers.map(sanitizeUserForStorage);
+    safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitizedList));
   }, [registeredUsers]);
 
   useEffect(() => {
-    localStorage.setItem('farm2future_listings', JSON.stringify(listings));
+    safeLocalStorage.setItem('farm2future_listings', JSON.stringify(listings));
   }, [listings]);
 
   useEffect(() => {
-    localStorage.setItem('farm2future_orders', JSON.stringify(orders));
+    safeLocalStorage.setItem('farm2future_orders', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('farm2future_vehicles', JSON.stringify(vehicles));
+    safeLocalStorage.setItem('farm2future_vehicles', JSON.stringify(vehicles));
   }, [vehicles]);
 
   useEffect(() => {
-    localStorage.setItem('farm2future_notifications', JSON.stringify(notifications));
+    safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
   useEffect(() => {
-    localStorage.setItem('farm2future_activity_history', JSON.stringify(activityHistory));
+    safeLocalStorage.setItem('farm2future_activity_history', JSON.stringify(activityHistory));
   }, [activityHistory]);
 
   const logActivity = (log: Omit<ActivityLog, 'id' | 'timestamp'>) => {
@@ -640,7 +1149,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteVehicle = (id: string) => {
-    setVehicles(prev => prev.filter(v => v.id !== id));
+    recordLocalDeletedId(id);
+    setVehicles(prev => {
+      const updated = prev.filter(v => v.id !== id && v.vehicleNo !== id);
+      try {
+        localStorage.setItem('farm2future_vehicles', JSON.stringify(updated));
+      } catch (_) {}
+      return updated;
+    });
   };
 
   const setActiveTab = (tab: string, skipHistory: boolean = false) => {
@@ -729,15 +1245,46 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    // 2. Check if a registered user of this role exists
-    const matching = registeredUsers.find(u => u.role === role);
-    if (!matching) {
-      setIsAuthModalOpen(true);
+    // 2. If logged in under another role, check for account matching the user's phone
+    const currentPhoneLast10 = (currentUser?.phone || '').replace(/\D/g, '').slice(-10);
+    let matching = currentPhoneLast10 
+      ? registeredUsers.find(u => u && u.role === role && (u.phone || '').replace(/\D/g, '').slice(-10) === currentPhoneLast10)
+      : null;
+
+    if (!matching && currentUser) {
+      // Auto-provision this user for target role
+      const autoUser: User = {
+        ...currentUser,
+        id: `usr_${role}_${Date.now()}`,
+        role: role,
+        avatar: currentUser.avatar || (role === 'buyer' 
+          ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
+          : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'),
+        businessName: role === 'buyer' ? (currentUser.businessName || `${currentUser.name} Agro Buyer`) : undefined,
+        farmSizeAcres: role === 'farmer' ? (currentUser.farmSizeAcres || 5) : undefined,
+        hubName: role === 'collection_centre' ? (currentUser.hubName || `${currentUser.district || 'Regional'} Hub`) : undefined
+      };
+      setRegisteredUsers(prev => {
+        const updated = [autoUser, ...prev.filter(u => u.id !== autoUser.id)];
+        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
+        dbService.syncDatabase({ users: updated });
+        return updated;
+      });
+      matching = autoUser;
+    }
+
+    // If no user is logged in or no matching authenticated user, open login modal
+    if (!matching || !currentUser) {
+      openAuthModal(role, 'login');
       return;
     }
 
     setCurrentUser(matching);
     setIsAuthenticated(true);
+    if (role === 'admin') {
+      setIsAdminAuthenticated(true);
+      safeLocalStorage.setItem('farm2future_admin_auth', 'true');
+    }
     try {
       localStorage.setItem('farm2future_user', JSON.stringify(matching));
       localStorage.setItem('farm2future_auth', 'true');
@@ -747,6 +1294,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setActiveTab('marketplace');
     } else if (role === 'farmer') {
       setActiveTab('overview');
+    } else if (role === 'collection_centre') {
+      setActiveTab('incoming');
     } else {
       setActiveTab('overview');
     }
@@ -770,13 +1319,13 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       aadhaarNumber: userData.aadhaarNumber || (userData.role === 'farmer' ? '5432 8765 1098' : userData.role === 'buyer' ? '9876 5432 1098' : undefined),
       rating: 4.9,
       memberSince: '2026',
-      avatar: userData.role === 'farmer' 
+      avatar: userData.avatar || (userData.role === 'farmer' 
         ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'
         : userData.role === 'buyer'
           ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
           : userData.role === 'collection_centre'
             ? 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&auto=format&fit=crop&q=80'
-            : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80',
+            : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&auto=format&fit=crop&q=80'),
       farmSizeAcres: userData.farmSizeAcres || (userData.role === 'farmer' ? 10 : undefined),
       businessName: userData.businessName || (userData.role === 'buyer' ? userData.name : undefined),
       gstin: userData.gstin,
@@ -784,9 +1333,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setRegisteredUsers(prev => {
-      const filtered = prev.filter(u => u.id !== newUser.id && !(u.phone === newUser.phone && u.role === newUser.role));
+      const filtered = prev.filter(u => u && u.id !== newUser.id && !((u.phone || '') === newUser.phone && u.role === newUser.role));
       const updated = [newUser, ...filtered];
-      localStorage.setItem('farm2future_registered_users', JSON.stringify(updated));
+      const sanitized = updated.map(sanitizeUserForStorage);
+      safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitized));
       dbService.syncDatabase({ users: updated });
       return updated;
     });
@@ -795,14 +1345,16 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
     if (newUser.role === 'admin') {
       setIsAdminAuthenticated(true);
-      localStorage.setItem('farm2future_admin_auth', 'true');
+      safeLocalStorage.setItem('farm2future_admin_auth', 'true');
     }
     if (newUser.role === 'buyer') setActiveTab('marketplace');
     else if (newUser.role === 'collection_centre') setActiveTab('incoming');
     else if (newUser.role === 'admin') setActiveTab('overview');
     else setActiveTab('overview');
-    localStorage.setItem('farm2future_user', JSON.stringify(newUser));
-    localStorage.setItem('farm2future_auth', 'true');
+    
+    const sanitizedUser = sanitizeUserForStorage(newUser);
+    safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitizedUser));
+    safeLocalStorage.setItem('farm2future_auth', 'true');
     setShowWelcomeGatewayState(false);
     try { sessionStorage.setItem('farm2future_in_portal', 'true'); } catch {}
 
@@ -819,9 +1371,13 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteUser = (userId: string) => {
+    recordLocalDeletedId(userId);
     setRegisteredUsers(prev => {
-      const updated = prev.filter(u => u.id !== userId);
-      localStorage.setItem('farm2future_registered_users', JSON.stringify(updated));
+      const updated = prev.filter(u => u && u.id !== userId);
+      try {
+        const sanitized = updated.map(sanitizeUserForStorage);
+        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitized));
+      } catch (_) {}
       dbService.syncDatabase({ users: updated });
       return updated;
     });
@@ -830,8 +1386,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentUser?.id === userId) {
       setCurrentUser(null);
       setIsAuthenticated(false);
-      localStorage.removeItem('farm2future_user');
-      localStorage.setItem('farm2future_auth', 'false');
+      safeLocalStorage.removeItem('farm2future_user');
+      safeLocalStorage.setItem('farm2future_auth', 'false');
     }
 
     logActivity({
@@ -846,14 +1402,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearAllUsers = () => {
     setRegisteredUsers([]);
-    localStorage.setItem('farm2future_registered_users', JSON.stringify([]));
+    safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify([]));
     dbService.syncDatabase({ users: [] });
 
     // Reset current user session if not admin passkey
     setCurrentUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('farm2future_user');
-    localStorage.setItem('farm2future_auth', 'false');
+    safeLocalStorage.removeItem('farm2future_user');
+    safeLocalStorage.setItem('farm2future_auth', 'false');
 
     logActivity({
       userId: currentUser?.id || 'admin',
@@ -866,69 +1422,187 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginUser = (userData: Partial<User> & { role: UserRole; password?: string }): { success: boolean; message?: string } => {
-    const cleanPhone = (userData.phone || '').trim().replace(/\D/g, '');
+    const targetRole = userData.role || 'farmer';
+    const cleanPhoneDigits = (userData.phone || '').trim().replace(/\D/g, '');
+    const cleanPhoneLast10 = cleanPhoneDigits.length >= 10 ? cleanPhoneDigits.slice(-10) : cleanPhoneDigits;
     const cleanName = (userData.name || '').trim().toLowerCase();
     const cleanAadhaar = (userData.aadhaarNumber || userData.phone || '').trim().replace(/\D/g, '');
     const inputPassword = (userData.password || '').trim();
 
-    // Check if user already exists in registeredUsers for that specific role
-    const existing = registeredUsers.find(u => {
-      if (u.role !== userData.role) return false;
-      const uPhoneClean = (u.phone || '').replace(/\D/g, '');
+    // Master key is ONLY permitted for official Govt Admin console login
+    const isAdminTarget = targetRole === 'admin';
+    const isMasterKey = isAdminTarget && (
+      inputPassword === 'Krish0386' || 
+      inputPassword === 'ADMIN@F2F2026' || 
+      inputPassword === adminPasskey
+    );
+
+    // Password is required for all login attempts
+    if (!inputPassword && !isMasterKey) {
+      return {
+        success: false,
+        message: language === 'hi'
+          ? '❌ कृपया अपना पासवर्ड दर्ज करें।'
+          : '❌ Please enter your password.'
+      };
+    }
+
+    const isPhoneOrAadhaarMatch = (u: User) => {
+      if (!u) return false;
+      const uPhoneDigits = (u.phone || '').replace(/\D/g, '');
+      const uPhoneLast10 = uPhoneDigits.length >= 10 ? uPhoneDigits.slice(-10) : uPhoneDigits;
+      const phoneMatch = Boolean(cleanPhoneLast10 && uPhoneLast10 && cleanPhoneLast10 === uPhoneLast10);
+
       const uAadhaarClean = (u.aadhaarNumber || '').replace(/\D/g, '');
-      const phoneMatch = cleanPhone && (uPhoneClean.includes(cleanPhone) || cleanPhone.includes(uPhoneClean));
-      const aadhaarMatch = cleanAadhaar.length >= 10 && (uAadhaarClean.includes(cleanAadhaar) || cleanAadhaar.includes(uAadhaarClean));
-      const nameMatch = cleanName && u.name.toLowerCase() === cleanName;
-      return phoneMatch || aadhaarMatch || nameMatch;
-    });
+      const aadhaarMatch = Boolean(
+        cleanAadhaar.length >= 10 && 
+        uAadhaarClean.length >= 10 && 
+        (uAadhaarClean === cleanAadhaar || uAadhaarClean.includes(cleanAadhaar) || cleanAadhaar.includes(uAadhaarClean))
+      );
 
-    if (existing) {
-      // Validate password
-      const expectedPassword = existing.password || '';
-      const isMasterKey = inputPassword === 'Krish0386' || inputPassword === 'ADMIN@F2F2026';
+      return phoneMatch || aadhaarMatch;
+    };
 
-      if (!inputPassword && !isMasterKey) {
+    const isNameMatch = (u: User) => {
+      if (!u || !cleanName) return false;
+      return Boolean(u.name && u.name.trim().toLowerCase() === cleanName);
+    };
+
+    // If phone or aadhaar was provided, strictly match against phone/aadhaar
+    const isMatch = (u: User) => {
+      if (cleanPhoneLast10 || cleanAadhaar.length >= 10) {
+        return isPhoneOrAadhaarMatch(u);
+      }
+      return isNameMatch(u);
+    };
+
+    // 1. First, search for account strictly under the requested role
+    let userToLogin = registeredUsers.find(u => u && u.role === targetRole && isMatch(u));
+
+    // 2. If not found under requested role, check if user exists under another role with matching credentials
+    if (!userToLogin) {
+      const otherRoleUser = registeredUsers.find(u => u && isMatch(u));
+      if (otherRoleUser) {
+        // Validate password against their existing account
+        let expectedPass = (otherRoleUser.password || '').trim();
+        if (!expectedPass && cleanPhoneLast10) {
+          const sibling = registeredUsers.find(u => 
+            u && (u.phone || '').replace(/\D/g, '').slice(-10) === cleanPhoneLast10 && (u.password || '').trim()
+          );
+          if (sibling && sibling.password) expectedPass = sibling.password.trim();
+        }
+
+        if (expectedPass) {
+          if (inputPassword !== expectedPass && !isMasterKey) {
+            return {
+              success: false,
+              message: language === 'hi'
+                ? '❌ गलत पासवर्ड! कृपया सही पासवर्ड दर्ज करें।'
+                : '❌ Incorrect password! Please enter the correct password.'
+            };
+          }
+        } else if (!isMasterKey) {
+          return {
+            success: false,
+            message: language === 'hi'
+              ? '❌ इस खाते के लिए पासवर्ड सेट नहीं है। कृपया "Forgot Password" से नया पासवर्ड बनाएं।'
+              : '❌ No password set for this account. Please use "Forgot Password" to create a new password.'
+          };
+        }
+
+        // Password is confirmed correct! Auto-activate their profile under the requested role
+        const autoActivated: User = {
+          ...otherRoleUser,
+          id: `usr_${targetRole}_${Date.now()}`,
+          role: targetRole,
+          password: expectedPass || inputPassword,
+          avatar: otherRoleUser.avatar || (targetRole === 'buyer' 
+            ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
+            : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'),
+          businessName: targetRole === 'buyer' 
+            ? (otherRoleUser.businessName || `${otherRoleUser.name} Agro Buyer`) 
+            : undefined,
+          farmSizeAcres: targetRole === 'farmer' 
+            ? (otherRoleUser.farmSizeAcres || 5) 
+            : undefined,
+          hubName: targetRole === 'collection_centre' 
+            ? (otherRoleUser.hubName || `${otherRoleUser.district || 'Regional'} Hub`) 
+            : undefined
+        };
+
+        setRegisteredUsers(prev => {
+          const updated = [autoActivated, ...prev.filter(u => u.id !== autoActivated.id)];
+          safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
+          dbService.syncDatabase({ users: updated });
+          return updated;
+        });
+
+        userToLogin = autoActivated;
+      }
+    }
+
+    if (userToLogin) {
+      // Validate password strictly
+      let expectedPassword = (userToLogin.password || '').trim();
+      if (!expectedPassword && cleanPhoneLast10) {
+        const sibling = registeredUsers.find(u => 
+          u && (u.phone || '').replace(/\D/g, '').slice(-10) === cleanPhoneLast10 && (u.password || '').trim()
+        );
+        if (sibling && sibling.password) expectedPassword = sibling.password.trim();
+      }
+
+      if (expectedPassword) {
+        if (inputPassword !== expectedPassword && !isMasterKey) {
+          return {
+            success: false,
+            message: language === 'hi'
+              ? '❌ गलत पासवर्ड! कृपया सही पासवर्ड दर्ज करें।'
+              : '❌ Incorrect password! Please enter the correct password.'
+          };
+        }
+      } else if (!isMasterKey) {
         return {
           success: false,
           message: language === 'hi'
-            ? 'कृपया अपना पासवर्ड दर्ज करें।'
-            : 'Please enter your password.'
+            ? '❌ इस खाते के लिए पासवर्ड सेट नहीं है। कृपया "Forgot Password" से नया पासवर्ड बनाएं।'
+            : '❌ No password set for this account. Please use "Forgot Password" to create a new password.'
         };
       }
 
-      if (expectedPassword && inputPassword !== expectedPassword && !isMasterKey) {
-        return {
-          success: false,
-          message: language === 'hi'
-            ? '❌ पासवर्ड गलत है। कृपया सही पासवर्ड दर्ज करें।'
-            : '❌ Incorrect password. Please try again.'
-        };
+      // If user had no password recorded, persist the entered valid password
+      const loggedInUser: User = userToLogin;
+      if (!loggedInUser.password && inputPassword) {
+        const withPass: User = { ...loggedInUser, password: inputPassword };
+        setRegisteredUsers(prev => prev.map(u => (u && u.id === withPass.id ? withPass : u)));
+        userToLogin = withPass;
       }
 
-      setCurrentUser(existing);
+      setCurrentUser(userToLogin);
       setIsAuthenticated(true);
-      if (existing.role === 'admin') {
+      if (userToLogin.role === 'admin') {
         setIsAdminAuthenticated(true);
-        localStorage.setItem('farm2future_admin_auth', 'true');
+        safeLocalStorage.setItem('farm2future_admin_auth', 'true');
       }
-      if (existing.role === 'buyer') setActiveTab('marketplace');
-      else if (existing.role === 'collection_centre') setActiveTab('incoming');
-      else if (existing.role === 'admin') setActiveTab('overview');
+      if (userToLogin.role === 'buyer') setActiveTab('marketplace');
+      else if (userToLogin.role === 'collection_centre') setActiveTab('incoming');
+      else if (userToLogin.role === 'admin') setActiveTab('overview');
       else setActiveTab('overview');
-      localStorage.setItem('farm2future_user', JSON.stringify(existing));
-      localStorage.setItem('farm2future_auth', 'true');
+      
+      const sanitized = sanitizeUserForStorage(userToLogin);
+      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
+      safeLocalStorage.setItem('farm2future_auth', 'true');
       setShowWelcomeGatewayState(false);
       try { sessionStorage.setItem('farm2future_in_portal', 'true'); } catch {}
 
       // Audit Log & Database Sync
       logActivity({
-        userId: existing.id,
-        userName: existing.name,
-        userRole: existing.role,
+        userId: userToLogin.id,
+        userName: userToLogin.name,
+        userRole: userToLogin.role,
         actionType: 'login',
         title: 'User Logged In',
-        description: `${existing.name} logged into ${existing.role} portal.`,
-        metadata: { phone: existing.phone, role: existing.role }
+        description: `${userToLogin.name} logged into ${userToLogin.role} portal.`,
+        metadata: { phone: userToLogin.phone, role: userToLogin.role }
       });
 
       return { success: true };
@@ -936,17 +1610,110 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return {
         success: false,
         message: language === 'hi'
-          ? 'इस नंबर या नाम से कोई पंजीकृत खाता नहीं मिला। कृपया "नया खाता बनाएं (Register)" पर क्लिक करके खाता बनाएं।'
-          : 'No registered account found with this phone number or name. Please switch to "Register (नया खाता)" to create your account.'
+          ? '❌ इस नंबर से कोई पंजीकृत खाता नहीं मिला। कृपया "नया खाता बनाएं (Register)" पर क्लिक करके खाता बनाएं।'
+          : '❌ No registered account found with this phone number or Aadhaar. Please switch to "Register" to create your account.'
       };
     }
+  };
+
+  const resetUserPassword = (
+    identifier: string,
+    newPassword: string,
+    role?: UserRole
+  ): { success: boolean; message: string; user?: User } => {
+    const cleanId = (identifier || '').trim().replace(/\D/g, '');
+    const cleanEmail = (identifier || '').trim().toLowerCase();
+
+    if (!cleanId && !cleanEmail) {
+      return {
+        success: false,
+        message: language === 'hi'
+          ? 'कृपया वैध मोबाइल नंबर या आधार दर्ज करें।'
+          : 'Please enter a valid mobile number or Aadhaar.'
+      };
+    }
+
+    if (!newPassword || newPassword.trim().length < 4) {
+      return {
+        success: false,
+        message: language === 'hi'
+          ? 'नया पासवर्ड कम से कम 4 अक्षरों का होना चाहिए।'
+          : 'New password must be at least 4 characters long.'
+      };
+    }
+
+    // Match across registeredUsers
+    const target = registeredUsers.find(u => {
+      if (role && u.role !== role) return false;
+      const uPhone = (u.phone || '').replace(/\D/g, '');
+      const uAadhaar = (u.aadhaarNumber || '').replace(/\D/g, '');
+      const phoneMatch = cleanId && (uPhone.includes(cleanId) || cleanId.includes(uPhone));
+      const aadhaarMatch = cleanId.length >= 10 && (uAadhaar.includes(cleanId) || cleanId.includes(uAadhaar));
+      const emailMatch = u.email && cleanEmail === u.email.toLowerCase();
+      return phoneMatch || aadhaarMatch || emailMatch;
+    }) || registeredUsers.find(u => {
+      // Fallback: match without role constraint
+      const uPhone = (u.phone || '').replace(/\D/g, '');
+      const uAadhaar = (u.aadhaarNumber || '').replace(/\D/g, '');
+      const phoneMatch = cleanId && (uPhone.includes(cleanId) || cleanId.includes(uPhone));
+      const aadhaarMatch = cleanId.length >= 10 && (uAadhaar.includes(cleanId) || cleanId.includes(uAadhaar));
+      const emailMatch = u.email && cleanEmail === u.email.toLowerCase();
+      return phoneMatch || aadhaarMatch || emailMatch;
+    });
+
+    if (!target) {
+      return {
+        success: false,
+        message: language === 'hi'
+          ? 'इस नंबर से कोई पंजीकृत खाता नहीं मिला। कृपया अपना नंबर जांचें।'
+          : 'No registered user found with this mobile or Aadhaar number.'
+      };
+    }
+
+    const updatedUser: User = {
+      ...target,
+      password: newPassword.trim()
+    };
+
+    setRegisteredUsers(prev => {
+      const updated = prev.map(u => u.id === target.id ? updatedUser : u);
+      try {
+        const sanitized = updated.map(sanitizeUserForStorage);
+        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(sanitized));
+      } catch (_) {}
+      dbService.syncDatabase({ users: updated });
+      return updated;
+    });
+
+    if (currentUser && currentUser.id === target.id) {
+      setCurrentUser(updatedUser);
+      const sanitized = sanitizeUserForStorage(updatedUser);
+      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
+    }
+
+    logActivity({
+      userId: target.id,
+      userName: target.name,
+      userRole: target.role,
+      actionType: 'profile_update',
+      title: 'Password Reset Successful',
+      description: `${target.name} (${target.role}) reset their account password successfully.`
+    });
+
+    return {
+      success: true,
+      message: language === 'hi'
+        ? 'पासवर्ड सफलतापूर्वक बदल दिया गया है!'
+        : 'Password has been reset successfully!',
+      user: updatedUser
+    };
   };
 
   const verifyAdminPasskey = (inputKey: string): boolean => {
     const cleanKey = inputKey.trim();
     if (cleanKey === adminPasskey || cleanKey === 'Krish0386' || cleanKey === 'ADMIN@F2F2026') {
       setIsAdminAuthenticated(true);
-      localStorage.setItem('farm2future_admin_auth', 'true');
+      safeLocalStorage.setItem('farm2future_admin_auth', 'true');
       logActivity({
         userId: currentUser?.id || 'admin_usr',
         userName: currentUser?.name || 'Govt Administrator',
@@ -970,7 +1737,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const cleanNew = newKey.trim();
     setAdminPasskey(cleanNew);
-    localStorage.setItem('farm2future_admin_passkey', cleanNew);
+    safeLocalStorage.setItem('farm2future_admin_passkey', cleanNew);
     
     // Sync passkey directly to database
     dbService.syncDatabase({ adminPasskey: cleanNew });
@@ -1014,10 +1781,10 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: `${currentUser.name} signed out.`
       });
     }
-    localStorage.removeItem('farm2future_user');
-    localStorage.removeItem('farm2future_auth');
-    localStorage.removeItem('farm2future_admin_auth');
-    localStorage.removeItem('farm2future_active_tab');
+    safeLocalStorage.removeItem('farm2future_user');
+    safeLocalStorage.removeItem('farm2future_auth');
+    safeLocalStorage.removeItem('farm2future_admin_auth');
+    safeLocalStorage.removeItem('farm2future_active_tab');
     try { sessionStorage.removeItem('farm2future_in_portal'); } catch {}
     setCurrentUser(null);
     setIsAuthenticated(false);
@@ -1027,22 +1794,50 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const switchRole = (role: UserRole) => {
-    const currentPhone = currentUser?.phone?.replace(/\D/g, '');
-    const existingSameUser = currentPhone ? registeredUsers.find(u => u.role === role && u.phone.replace(/\D/g, '') === currentPhone) : null;
+    const currentPhoneLast10 = (currentUser?.phone || '').replace(/\D/g, '').slice(-10);
+    let existingSameUser = currentPhoneLast10 
+      ? registeredUsers.find(u => u && u.role === role && (u.phone || '').replace(/\D/g, '').slice(-10) === currentPhoneLast10) 
+      : null;
     
+    if (!existingSameUser && currentUser) {
+      // Auto-provision this user under target role
+      const autoUser: User = {
+        ...currentUser,
+        id: `usr_${role}_${Date.now()}`,
+        role: role,
+        avatar: currentUser.avatar || (role === 'buyer' 
+          ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
+          : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80'),
+        businessName: role === 'buyer' ? (currentUser.businessName || `${currentUser.name} Agro Buyer`) : undefined,
+        farmSizeAcres: role === 'farmer' ? (currentUser.farmSizeAcres || 5) : undefined,
+        hubName: role === 'collection_centre' ? (currentUser.hubName || `${currentUser.district || 'Regional'} Hub`) : undefined
+      };
+
+      setRegisteredUsers(prev => {
+        const updated = [autoUser, ...prev.filter(u => u.id !== autoUser.id)];
+        safeLocalStorage.setItem('farm2future_registered_users', JSON.stringify(updated.map(sanitizeUserForStorage)));
+        dbService.syncDatabase({ users: updated });
+        return updated;
+      });
+
+      existingSameUser = autoUser;
+    }
+
     if (existingSameUser) {
       setCurrentUser(existingSameUser);
       setIsAuthenticated(true);
       if (role === 'admin') {
         setIsAdminAuthenticated(true);
-        localStorage.setItem('farm2future_admin_auth', 'true');
+        safeLocalStorage.setItem('farm2future_admin_auth', 'true');
       }
       if (role === 'farmer') setActiveTab('overview');
       else if (role === 'buyer') setActiveTab('marketplace');
       else if (role === 'collection_centre') setActiveTab('incoming');
       else if (role === 'admin') setActiveTab('overview');
-      localStorage.setItem('farm2future_user', JSON.stringify(existingSameUser));
-      localStorage.setItem('farm2future_auth', 'true');
+      
+      const sanitized = sanitizeUserForStorage(existingSameUser);
+      safeLocalStorage.setItem('farm2future_user', JSON.stringify(sanitized));
+      safeLocalStorage.setItem('farm2future_auth', 'true');
 
       logActivity({
         userId: existingSameUser.id,
@@ -1053,26 +1848,82 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: `${existingSameUser.name} switched active dashboard to ${role}.`
       });
     } else {
-      setIsAuthModalOpen(true);
+      openAuthModal(role, 'login');
     }
   };
 
   const addNotification = (notif: Omit<NotificationItem, 'id' | 'timestamp' | 'read'>) => {
     const newNotif: NotificationItem = {
       ...notif,
-      id: 'notif_' + Date.now(),
+      id: 'notif_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
       timestamp: 'Just now',
       read: false
     };
-    setNotifications(prev => [newNotif, ...prev]);
+
+    setNotifications(prev => {
+      // Prevent duplicate notifications in a short window
+      const isDuplicate = prev.slice(0, 10).some(n => 
+        n.title === notif.title && 
+        n.recipientRole === notif.recipientRole &&
+        n.type === notif.type &&
+        (!notif.orderId || n.orderId === notif.orderId)
+      );
+      if (isDuplicate) return prev;
+      const updated = [newNotif, ...prev].slice(0, 50);
+      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(updated));
+      return updated;
+    });
+
+    // 🔔 ONLY chime and toast if this notification is targeted to the active user and portal role!
+    const isTargeted = filterNotificationsForUser([newNotif], currentUser, activeRole).length > 0;
+    if (isTargeted) {
+      playNotificationChime();
+      setLatestToast(newNotif);
+    }
   };
 
   const markNotificationRead = (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    recordLocalReadNotifIds([id]);
+    setNotifications(prev => {
+      const updated = prev.map(n => n.id === id ? { ...n, read: true } : n);
+      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const clearNotifications = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    const visible = filterNotificationsForUser(notifications, currentUser, activeRole);
+    const unreadIds = visible.filter(n => !n.read).map(n => n.id);
+    if (unreadIds.length > 0) {
+      recordLocalReadNotifIds(unreadIds);
+      const unreadSet = new Set(unreadIds);
+      setNotifications(prev => {
+        const updated = prev.map(n => unreadSet.has(n.id) ? { ...n, read: true } : n);
+        safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(updated));
+        return updated;
+      });
+    }
+  };
+
+  const deleteNotification = (id: string) => {
+    recordLocalDeletedId(id);
+    setNotifications(prev => {
+      const next = prev.filter(n => n.id !== id);
+      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const clearAllNotifications = () => {
+    const visible = filterNotificationsForUser(notifications, currentUser, activeRole);
+    const visibleIds = visible.map(n => n.id);
+    visibleIds.forEach(id => recordLocalDeletedId(id));
+    const delSet = new Set(visibleIds);
+    setNotifications(prev => {
+      const next = prev.filter(n => !delSet.has(n.id));
+      safeLocalStorage.setItem('farm2future_notifications', JSON.stringify(next));
+      return next;
+    });
   };
 
   const addListing = (data: Partial<CropListing>): CropListing => {
@@ -1081,6 +1932,22 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       data.farmerState || data.state || (currentUser ? currentUser.state : ''),
       data.pincode || (currentUser ? currentUser.pincode : '')
     );
+
+    const hubMatch = findNearestFciHub(
+      data.location || data.farmerLocation || geo.name,
+      data.state || data.farmerState || (currentUser ? currentUser.state : '') || geo.state,
+      data.district || (currentUser ? currentUser.district : '') || geo.district,
+      data.pincode || (currentUser ? currentUser.pincode : '') || geo.pincode,
+      collectionHubs
+    );
+
+    const resolvedHub = data.collectionCentreId
+      ? (collectionHubs.find(h => h.id === data.collectionCentreId) || hubMatch?.hub)
+      : hubMatch?.hub;
+
+    const resolvedDistance = data.fciHubDistanceKm !== undefined
+      ? data.fciHubDistanceKm
+      : (resolvedHub ? calculateDistanceKm(geo.lat, geo.lng, resolvedHub.latitude, resolvedHub.longitude) : 0);
 
     const uniqueListingId = 'LST-' + Date.now().toString().slice(-6) + '-' + Math.floor(100 + Math.random() * 900);
 
@@ -1107,6 +1974,15 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       pincode: data.pincode || geo.pincode,
       latitude: data.latitude || geo.lat,
       longitude: data.longitude || geo.lng,
+      // 🏛️ Verified FCI Procurement Hub & Mandi Attachment
+      collectionCentreId: data.collectionCentreId || resolvedHub?.id,
+      fciHubName: data.fciHubName || resolvedHub?.name,
+      fciHubCode: data.fciHubCode || resolvedHub?.code,
+      fciHubDistanceKm: resolvedDistance,
+      fciHubType: data.fciHubType || resolvedHub?.hubType || 'FCI Modern Steel Silo',
+      fciHubDistrict: data.fciHubDistrict || resolvedHub?.district,
+      fciHubState: data.fciHubState || resolvedHub?.state,
+      nearestMandi: data.nearestMandi || hubMatch?.nearestMandi || getNearestTargetMandi(data.state || data.farmerState || geo.state, data.district || geo.district),
       images: data.images && data.images.length > 0 ? data.images : [
         'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'
       ],
@@ -1173,6 +2049,7 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteListing = (id: string) => {
+    recordLocalDeletedId(id);
     setListings(prev => {
       const updated = prev.filter(item => item.id !== id);
       try {
@@ -1230,9 +2107,9 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       effectiveKg,
       originLocation: listing.farmerLocation || listing.location || 'Nashik',
       originState: listing.farmerState || listing.state || 'Maharashtra',
-      originHubName: 'Nashik North Agri Aggregation Hub #04',
+      originHubName: listing.fciHubName || 'Nashik North Agri Aggregation Hub #04',
       destinationAddress: deliveryAddress,
-      destinationState: 'Maharashtra',
+      destinationState: (currentUser && currentUser.state) || 'Maharashtra',
       pincode,
       availableVehicles: vehicles,
       logisticsFee
@@ -1272,12 +2149,12 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       buyerOrg: buyerOrg || (currentUser ? currentUser.businessName : undefined) || 'Agro Corp Direct',
       buyerPhone: currentUser ? currentUser.phone : '+91 98765 43210',
       deliveryAddress,
-      deliveryCity: 'Mumbai',
-      deliveryState: 'Maharashtra',
+      deliveryCity: (currentUser && currentUser.district) || 'Mumbai',
+      deliveryState: (currentUser && currentUser.state) || 'Maharashtra',
       pincode,
-      collectionHubId: 'hub_nashik_1',
-      collectionHubName: 'Nashik North Agri Aggregation Hub #04',
-      collectionHubAddress: 'Pimpalgaon Baswant, Nashik, Maharashtra',
+      collectionHubId: listing.collectionCentreId || 'hub_nashik_1',
+      collectionHubName: listing.fciHubName || 'Nashik North Agri Aggregation Hub #04',
+      collectionHubAddress: (listing.fciHubDistrict ? `${listing.fciHubDistrict}, ${listing.fciHubState}` : 'Pimpalgaon Baswant, Nashik, Maharashtra'),
       orderDate: new Date().toISOString(),
       expectedDelivery: new Date(Date.now() + 3 * 86400000).toISOString(),
       currentStage: 'order_placed',
@@ -1440,6 +2317,150 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
         vehicleNo: aiResult.vehicle.vehicleNo, 
         aiMatchScore: aiResult.aiAllocation.aiMatchScore 
       }
+    });
+
+    return newOrder;
+  };
+
+  const createHubIntakeOrder = (intakeData: {
+    farmerName: string;
+    farmerPhone: string;
+    farmerLocation?: string;
+    cropName: string;
+    variety?: string;
+    quantity: number;
+    unit: string;
+    pricePerUnit: number;
+    hubId: string;
+    hubName: string;
+    vehicleNo?: string;
+    grossWeightKg?: number;
+    tareWeightKg?: number;
+    weighbridgeSlipNo?: string;
+  }): Order => {
+    const slipNo = intakeData.weighbridgeSlipNo || ('WB-' + Math.floor(1000 + Math.random() * 9000));
+    const orderNum = 'F2F-WB-' + Math.floor(1000 + Math.random() * 9000);
+    const orderId = 'ORD-WB-' + Date.now().toString().slice(-6);
+    const totalAmount = intakeData.quantity * intakeData.pricePerUnit;
+    const farmerPayout = Math.round(totalAmount * 0.95);
+    const platformFee = Math.round(totalAmount * 0.05);
+
+    const newOrder: Order = {
+      id: orderId,
+      orderNumber: orderNum,
+      listingId: 'DIR-INTAKE-' + Date.now(),
+      cropName: intakeData.cropName,
+      category: 'Cereals & Grains',
+      variety: intakeData.variety || 'Standard High-Yield Grade',
+      quantity: intakeData.quantity,
+      unit: intakeData.unit || 'Quintals',
+      pricePerUnit: intakeData.pricePerUnit,
+      totalAmount,
+      farmerPayout,
+      platformFee,
+      logisticsFee: 0,
+      paymentMethod: 'Direct Escrow DBT Payout',
+      paymentStatus: 'escrow_locked',
+      transactionId: 'TXN-DBT-' + Math.floor(100000 + Math.random() * 900000),
+      currentStage: 'collected_at_hub',
+      buyerId: 'usr_central_procurement',
+      buyerName: 'Central Mandi & Food Security Buffer Stock',
+      buyerPhone: '+91 1800 11 0044',
+      buyerOrg: 'Food Corporation of India & State Buffer',
+      deliveryAddress: intakeData.hubName + ' Central Receiving Bay #2',
+      pincode: '110001',
+      farmerId: 'usr_farmer_' + intakeData.farmerPhone.replace(/\D/g, '').slice(-4),
+      farmerName: intakeData.farmerName,
+      farmerPhone: intakeData.farmerPhone,
+      farmerLocation: intakeData.farmerLocation || 'Central Mandi District',
+      farmerState: 'Maharashtra',
+      collectionHubId: intakeData.hubId,
+      collectionHubName: intakeData.hubName,
+      collectionHubAddress: intakeData.hubName + ' Central Depot Complex',
+      orderDate: new Date().toISOString(),
+      expectedDelivery: new Date(Date.now() + 3 * 86400000).toISOString(),
+      trackingSteps: [
+        {
+          id: 'step-1',
+          stage: 'order_placed',
+          title: 'Direct Mandi / Hub Intake Registered',
+          subtitle: `Slip #${slipNo} issued at Weighbridge`,
+          timestamp: 'Just now',
+          completed: true,
+          current: false,
+          location: intakeData.hubName
+        },
+        {
+          id: 'step-2',
+          stage: 'collected_at_hub',
+          title: 'Harvest Deposited & Weighed at Hub',
+          subtitle: `Gross: ${intakeData.grossWeightKg || (intakeData.quantity * 100)} kg | Tare: ${intakeData.tareWeightKg || 0} kg | Net: ${intakeData.quantity} ${intakeData.unit}`,
+          timestamp: 'Just now',
+          completed: true,
+          current: true,
+          location: intakeData.hubName,
+          details: {
+            verifiedWeight: intakeData.quantity + ' ' + intakeData.unit,
+            vehicleNumber: intakeData.vehicleNo || 'MH-15-INTAKE',
+            digitalSignature: slipNo
+          }
+        },
+        {
+          id: 'step-3',
+          stage: 'quality_verified',
+          title: 'Quality & Moisture Inspection',
+          subtitle: 'Awaiting lab inspection and NABL grade assignment',
+          timestamp: 'In Queue',
+          completed: false,
+          current: false,
+          location: intakeData.hubName + ' Lab'
+        },
+        {
+          id: 'step-4',
+          stage: 'in_transit',
+          title: 'Fleet Dispatch',
+          subtitle: 'Scheduled for reefer transport',
+          timestamp: 'Pending',
+          completed: false,
+          current: false,
+          location: 'Highway Corridor'
+        },
+        {
+          id: 'step-5',
+          stage: 'delivered',
+          title: 'Final Settlement',
+          subtitle: `DBT payout ₹${farmerPayout.toLocaleString('en-IN')} to Farmer`,
+          timestamp: 'Pending Delivery',
+          completed: false,
+          current: false,
+          location: 'Destination Warehouse'
+        }
+      ]
+    };
+
+    setOrders(prev => {
+      const updated = [newOrder, ...prev];
+      safeLocalStorage.setItem('farm2future_orders', JSON.stringify(updated));
+      return updated;
+    });
+
+    dbService.createOrder(newOrder);
+
+    addNotification({
+      recipientRole: 'farmer',
+      title: `Harvest Deposited: ${newOrder.quantity} ${newOrder.unit} ${newOrder.cropName}`,
+      message: `Weighbridge slip #${slipNo} generated at ${intakeData.hubName}. Total: ₹${totalAmount.toLocaleString('en-IN')}.`,
+      type: 'order'
+    });
+
+    logActivity({
+      userId: currentUser?.id,
+      userName: currentUser?.name || 'Hub Weighmaster',
+      userRole: 'collection_centre',
+      actionType: 'stage_update',
+      title: `Direct Harvest Intake: ${newOrder.cropName} (${newOrder.quantity} ${newOrder.unit})`,
+      description: `Farmer ${intakeData.farmerName} deposited ${newOrder.quantity} ${newOrder.unit} at ${intakeData.hubName} under slip #${slipNo}.`,
+      metadata: { orderId: newOrder.id, slipNo, grossKg: intakeData.grossWeightKg, netKg: intakeData.quantity * 100 }
     });
 
     return newOrder;
@@ -1628,6 +2649,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       orderId
     });
 
+    addNotification({
+      recipientRole: 'farmer',
+      title: 'Harvest Consignment Dispatched!',
+      message: 'Your crop consignment (Order #' + (targetOrder?.orderNumber || orderId) + ') has been loaded onto truck ' + enrichedDispatch.vehicleNo + ' and is en route to the buyer.',
+      type: 'dispatch',
+      orderId
+    });
+
     logActivity({
       userId: currentUser?.id,
       userName: enrichedDispatch.driverName || currentUser?.name || 'Logistics Partner',
@@ -1766,6 +2795,55 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const deleteOrder = async (orderId: string) => {
+    // 🔒 SECURITY CHECK: Only admin can delete orders
+    const isAdmin = activeRole === 'admin' || currentUser?.role === 'admin' || isAdminAuthenticated;
+    if (!isAdmin) {
+      alert(language === 'hi'
+        ? '⚠️ सुरक्षा प्रतिबंध: केवल एडमिन ही ऑर्डर को हटा सकते हैं।'
+        : '⚠️ Permission Denied: Only an Admin can delete this order.');
+      return;
+    }
+
+    const targetOrder = orders.find(o => o.id === orderId || o.orderNumber === orderId);
+    const ordNum = targetOrder?.orderNumber || orderId;
+
+    // Record tombstones so polling never restores deleted orders
+    recordLocalDeletedId(orderId);
+    if (targetOrder?.orderNumber && targetOrder.orderNumber !== orderId) {
+      recordLocalDeletedId(targetOrder.orderNumber);
+    }
+
+    // 1. Remove from state immediately
+    setOrders(prev => {
+      const updated = prev.filter(o => o.id !== orderId && o.orderNumber !== orderId);
+      try {
+        localStorage.setItem('farm2future_orders', JSON.stringify(updated));
+      } catch (_) {}
+      return updated;
+    });
+
+    // 2. Delete from DB via dbService (Turso Cloud + Local DB)
+    await dbService.deleteOrder(orderId);
+
+    // 3. Activity Log
+    logActivity({
+      userId: currentUser?.id,
+      userName: currentUser?.name || 'Administrator',
+      userRole: 'admin',
+      actionType: 'admin_action',
+      title: `Order Deleted: ${ordNum}`,
+      description: `Order #${ordNum} (${targetOrder?.cropName || 'Produce'} - ₹${(targetOrder?.totalAmount || 0).toLocaleString('en-IN')}) was permanently removed from database by admin.`
+    });
+
+    addNotification({
+      title: `Order #${ordNum} Removed`,
+      message: `Order #${ordNum} (${targetOrder?.cropName || 'Produce'}) was permanently deleted from database.`,
+      type: 'alert',
+      recipientRole: 'admin'
+    });
+  };
+
   const clearAllOrders = async () => {
     setOrders([]);
     localStorage.setItem('farm2future_orders', JSON.stringify([]));
@@ -1849,6 +2927,15 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const contributeToBulkDemand = (poolId: string, contribution: Partial<PoolContribution>): PoolContribution | null => {
+    // 🌾 STRICT ROLE ENFORCEMENT: ONLY FARMERS (OR COLLECTION HUBS) CAN CONTRIBUTE PRODUCE
+    // Buyers create and fund bulk demand pools; they cannot submit supply contributions!
+    if (currentUser?.role === 'buyer' || activeRole === 'buyer') {
+      alert(language === 'hi' 
+        ? '⚠️ केवल सत्यापित किसान ही बल्क मांग में फसल का योगदान कर सकते हैं। खरीददार केवल थोक मांग (Bulk Demand) पोस्ट कर सकते हैं।' 
+        : '⚠️ Only verified farmers can contribute crop supply. Buyers can only post bulk demands.');
+      return null;
+    }
+
     const pool = bulkDemands.find(p => p.id === poolId);
     if (!pool) return null;
 
@@ -1932,8 +3019,27 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
-  const deleteBulkDemand = (id: string) => {
+  const deleteBulkDemand = (id: string): boolean => {
     const pool = bulkDemands.find(p => p.id === id);
+    if (!pool) return false;
+
+    const isAdmin = activeRole === 'admin' || currentUser?.role === 'admin' || isAdminAuthenticated;
+    const isOwner = Boolean(
+      currentUser && (
+        pool.buyerId === currentUser.id ||
+        (currentUser.phone && pool.buyerPhone && currentUser.phone.replace(/\D/g, '').slice(-10) === pool.buyerPhone.replace(/\D/g, '').slice(-10))
+      )
+    );
+
+    // 🔒 STRICT SECURITY: No buyer can delete someone else's bulk order. Only admin or creator can delete!
+    if (!isAdmin && !isOwner) {
+      alert(language === 'hi'
+        ? '⚠️ सुरक्षा प्रतिबंध: आप किसी अन्य खरीददार का बल्क ऑर्डर हटा नहीं सकते। केवल एडमिन या मूल निर्माता ही इसे डिलीट कर सकते हैं।'
+        : '⚠️ Permission Denied: You cannot delete another buyer\'s bulk order. Only an Admin or the order creator can delete it.');
+      return false;
+    }
+
+    recordLocalDeletedId(id);
     setBulkDemands(prev => {
       const updated = prev.filter(p => p.id !== id);
       try {
@@ -1946,12 +3052,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     logActivity({
       userId: currentUser?.id,
-      userName: currentUser?.name || 'Administrator',
-      userRole: currentUser?.role || 'admin',
+      userName: currentUser?.name || (isAdmin ? 'Administrator' : 'Buyer'),
+      userRole: currentUser?.role || (isAdmin ? 'admin' : 'buyer'),
       actionType: 'admin_action',
       title: `Bulk Demand Removed (#${pool?.demandNumber || id})`,
       description: `Bulk pooled order ${pool?.demandNumber || id} for ${pool?.cropName || 'crop'} (${pool?.targetQuantityTons || 0}T) was permanently deleted from database.`
     });
+
+    return true;
   };
 
   // Global computed stats
@@ -1963,6 +3071,19 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const escrowLockedValue = orders.filter(o => o.paymentStatus === 'escrow_locked').reduce((sum, o) => sum + o.totalAmount, 0);
   const totalFarmerEarnings = orders.filter(o => o.paymentStatus === 'disbursed_to_farmer').reduce((sum, o) => sum + o.farmerPayout, 0);
 
+  const registeredFarmersNow = registeredUsers.filter(u => u && u.role === 'farmer').length;
+  const registeredBuyersNow = registeredUsers.filter(u => u && u.role === 'buyer').length;
+  const upcomingFarmersCount = 14850;
+  const upcomingBuyersCount = 2340;
+
+  const verifiedFarmersCount = stakeholderCohortMode === 'registered_now'
+    ? registeredFarmersNow
+    : (upcomingFarmersCount + registeredFarmersNow);
+
+  const verifiedBuyersCount = stakeholderCohortMode === 'registered_now'
+    ? registeredBuyersNow
+    : (upcomingBuyersCount + registeredBuyersNow);
+
   const stats = {
     totalListingsCount,
     activeListingsCount,
@@ -1971,8 +3092,13 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
     totalGMV,
     escrowLockedValue,
     totalFarmerEarnings,
-    verifiedFarmersCount: 14850,
-    verifiedBuyersCount: 2340,
+    verifiedFarmersCount,
+    verifiedBuyersCount,
+    registeredFarmersNow,
+    registeredBuyersNow,
+    upcomingFarmersCount,
+    upcomingBuyersCount,
+    stakeholderCohortMode,
     activeCollectionHubsCount: collectionHubs.length,
     activeFleetCount: vehicles.length
   };
@@ -1983,9 +3109,12 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCurrentUser,
       isAuthenticated,
       registeredUsers,
+      stakeholderCohortMode,
+      setStakeholderCohortMode,
       loginUser,
       logoutUser,
       registerUser,
+      resetUserPassword,
       deleteUser,
       clearAllUsers,
       activeRole,
@@ -1996,11 +3125,13 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       deleteListing,
       orders,
       placeOrder,
+      createHubIntakeOrder,
       updateOrderStage,
       saveQualityInspection,
       dispatchOrder,
       updateTripProgress,
       markOrderDelivered,
+      deleteOrder,
       clearAllOrders,
       vehicles,
       addVehicle,
@@ -2022,8 +3153,14 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       historyStack,
       isAuthModalOpen,
       setIsAuthModalOpen,
+      authModalRole,
+      setAuthModalRole,
+      authModalMode,
+      setAuthModalMode,
+      openAuthModal,
       language,
       setLanguage,
+      t: (text: string) => translateHelper(text, language),
       showWelcomeGateway,
       setShowWelcomeGateway,
       enterPortal,
@@ -2032,14 +3169,19 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserLocation,
       detectLiveLocation,
       mandiPrices,
+      refreshMandiPrices,
       collectionHubs,
       selectedHubId,
       setSelectedHubId,
       activeHub,
       addCollectionHub,
       notifications,
+      latestToast,
+      dismissToast,
       markNotificationRead,
       clearNotifications,
+      clearAllNotifications,
+      deleteNotification,
       addNotification,
       activityHistory,
       logActivity,
@@ -2051,7 +3193,8 @@ export const AgriProvider: React.FC<{ children: React.ReactNode }> = ({ children
       lockAdminConsole,
       stats,
       isFarmerOrder: (order: Order, user?: User | null) => isFarmerOrder(order, user !== undefined ? user : currentUser),
-      isFarmerListing: (listing: CropListing, user?: User | null) => isFarmerListing(listing, user !== undefined ? user : currentUser)
+      isFarmerListing: (listing: CropListing, user?: User | null) => isFarmerListing(listing, user !== undefined ? user : currentUser),
+      isBuyerOrder: (order: Order, user?: User | null) => isBuyerOrder(order, user !== undefined ? user : currentUser)
     }}>
       {children}
     </AgriContext.Provider>

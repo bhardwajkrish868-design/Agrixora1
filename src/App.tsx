@@ -26,9 +26,12 @@ import { ProfileView } from './views/ProfileView';
 import { NotificationsView } from './views/NotificationsView';
 import { StateTransportDirectoryView } from './views/StateTransportDirectoryView';
 import { BulkDemandPoolView } from './views/BulkDemandPoolView';
+import { NotificationToast } from './components/NotificationToast';
 
 // Entry Gateway
 import { WelcomeGatewayView } from './views/WelcomeGatewayView';
+
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const MainLayout: React.FC = () => {
   const { activeRole, activeTab, isAuthenticated, currentUser, showWelcomeGateway } = useAgri();
@@ -110,31 +113,39 @@ const MainLayout: React.FC = () => {
       <Navbar onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
 
       {/* Main App Container */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
+      <div className="flex-1 flex max-w-7xl 2xl:max-w-[1600px] w-full mx-auto">
         {/* Sidebar */}
         <Sidebar 
           isOpen={isSidebarOpen} 
           onClose={() => setIsSidebarOpen(false)} 
         />
 
-        {/* Dynamic View Workspace */}
+        {/* Dynamic View Workspace with Error Boundary */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-full">
-          {renderCurrentView()}
+          <ErrorBoundary>
+            {renderCurrentView()}
+          </ErrorBoundary>
         </main>
       </div>
 
       {/* Global Role-Based Authentication & Registration Modal */}
       <AuthModal />
+
+      {/* Real-Time Floating Notification Toast */}
+      <NotificationToast />
     </div>
   );
 };
 
 export function App() {
   return (
-    <AgriProvider>
-      <MainLayout />
-    </AgriProvider>
+    <ErrorBoundary>
+      <AgriProvider>
+        <MainLayout />
+      </AgriProvider>
+    </ErrorBoundary>
   );
 }
 
 export default App;
+

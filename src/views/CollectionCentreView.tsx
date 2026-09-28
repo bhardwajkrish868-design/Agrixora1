@@ -33,12 +33,20 @@ import {
   ExternalLink,
   Check,
   Sparkles,
-  X
+  X,
+  Printer,
+  Download,
+  QrCode,
+  Award,
+  Eye,
+  ClipboardCheck,
+  ArrowUpRight
 } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { QualityInspection, DispatchDetails, VehicleDetails, CollectionHub } from '../types';
 import { RouteTripTracker } from '../components/RouteTripTracker';
 import { ROUTE_PRESETS } from '../utils/routeUtils';
+import { assignOptimalTruckAI } from '../utils/aiLogisticsEngine';
 
 export const CollectionCentreView: React.FC = () => {
   const { 
@@ -51,26 +59,30 @@ export const CollectionCentreView: React.FC = () => {
     addCollectionHub,
     saveQualityInspection, 
     dispatchOrder, 
+    updateTripProgress,
+    markOrderDelivered,
     updateOrderStage,
+    createHubIntakeOrder,
     vehicles,
     addVehicle,
     updateVehicle,
     activeTab,
     setActiveTab,
     setActiveTrackingOrderId,
-    navigateBack
+    navigateBack,
+    language
   } = useAgri();
 
-  const [activeSubTab, setActiveSubTab] = useState<'incoming' | 'verification' | 'storage' | 'dispatch' | 'fleet' | 'fci_network'>(() => {
-    if (['incoming', 'verification', 'storage', 'dispatch', 'fleet', 'fci_network', 'collection_centres'].includes(activeTab)) {
+  const [activeSubTab, setActiveSubTab] = useState<'overview' | 'incoming' | 'verification' | 'storage' | 'dispatch' | 'fleet' | 'fci_network'>(() => {
+    if (['overview', 'incoming', 'verification', 'storage', 'dispatch', 'fleet', 'fci_network', 'collection_centres'].includes(activeTab)) {
       if (activeTab === 'collection_centres' || activeTab === 'fci_network') return 'fci_network';
       return activeTab as any;
     }
-    return 'incoming';
+    return 'overview';
   });
 
   React.useEffect(() => {
-    if (['incoming', 'verification', 'storage', 'dispatch', 'fleet', 'fci_network', 'collection_centres'].includes(activeTab)) {
+    if (['overview', 'incoming', 'verification', 'storage', 'dispatch', 'fleet', 'fci_network', 'collection_centres'].includes(activeTab)) {
       if (activeTab === 'collection_centres' || activeTab === 'fci_network') {
         setActiveSubTab('fci_network');
       } else {
@@ -88,6 +100,24 @@ export const CollectionCentreView: React.FC = () => {
   const [isHubSwitcherModalOpen, setIsHubSwitcherModalOpen] = useState(false);
   const [switcherSearch, setSwitcherSearch] = useState('');
 
+  // Direct Farmer Weighbridge Intake Form State
+  const [isWeighbridgeModalOpen, setIsWeighbridgeModalOpen] = useState(false);
+  const [wbFarmerName, setWbFarmerName] = useState('Rajinder Singh');
+  const [wbFarmerPhone, setWbFarmerPhone] = useState('+91 98140 12345');
+  const [wbCropName, setWbCropName] = useState('Sharbati Wheat (शरबती गेहूं)');
+  const [wbVariety, setWbVariety] = useState('Sehore Golden Grain');
+  const [wbVehicleNo, setWbVehicleNo] = useState('PB-10-DF-7890');
+  const [wbGrossKg, setWbGrossKg] = useState<number>(8500);
+  const [wbTareKg, setWbTareKg] = useState<number>(2300);
+  const [wbPricePerQuintal, setWbPricePerQuintal] = useState<number>(2450);
+  const [wbMoisture, setWbMoisture] = useState<number>(11.5);
+  const [wbBayNumber, setWbBayNumber] = useState('Bay #2 (Automated Heavy Axle)');
+  const [activeWeighbridgeSlip, setActiveWeighbridgeSlip] = useState<any | null>(null);
+
+  // Certificate & Gate Pass Modals State
+  const [viewingCertificateOrder, setViewingCertificateOrder] = useState<any | null>(null);
+  const [viewingGatePassOrder, setViewingGatePassOrder] = useState<any | null>(null);
+
   const [selectedOrderId, setSelectedOrderId] = useState<string>(orders[1]?.id || orders[0]?.id || '');
 
   // Quality Inspection Form State
@@ -97,6 +127,58 @@ export const CollectionCentreView: React.FC = () => {
   const [qcVisualScore, setQcVisualScore] = useState(96);
   const [qcGrade, setQcGrade] = useState<'Grade A+' | 'Grade A' | 'Grade B' | 'Organic Certified' | 'Fair'>('Grade A+');
   const [qcNotes, setQcNotes] = useState('Clean lot, uniform size, zero pest infestation. Certified for immediate distribution.');
+
+  // Direct Farmer Weighbridge Intake Handler
+  const handleCreateWeighbridgeIntake = (e: React.FormEvent) => {
+    e.preventDefault();
+    const netKg = Math.max(10, wbGrossKg - wbTareKg);
+    const netQtl = Number((netKg / 100).toFixed(2));
+    const totalAmt = Math.round(netQtl * wbPricePerQuintal);
+    const slipNo = 'WB-' + Math.floor(100000 + Math.random() * 900000);
+
+    const newOrder = createHubIntakeOrder({
+      farmerName: wbFarmerName.trim() || 'Farmer Partner',
+      farmerPhone: wbFarmerPhone.trim() || '+91 98000 00000',
+      farmerLocation: `${activeHub.district}, ${activeHub.state}`,
+      cropName: wbCropName,
+      variety: wbVariety,
+      quantity: netQtl,
+      unit: 'Quintals',
+      pricePerUnit: Number(wbPricePerQuintal),
+      hubId: activeHub.id,
+      hubName: activeHub.name,
+      vehicleNo: wbVehicleNo.toUpperCase().trim(),
+      grossWeightKg: Number(wbGrossKg),
+      tareWeightKg: Number(wbTareKg),
+      weighbridgeSlipNo: slipNo
+    });
+
+    const slipData = {
+      slipNo,
+      date: new Date().toLocaleString('en-IN'),
+      farmerName: wbFarmerName.trim(),
+      farmerPhone: wbFarmerPhone.trim(),
+      cropName: wbCropName,
+      variety: wbVariety,
+      vehicleNo: wbVehicleNo.toUpperCase().trim(),
+      grossKg: wbGrossKg,
+      tareKg: wbTareKg,
+      netKg,
+      netQtl,
+      pricePerQuintal: wbPricePerQuintal,
+      totalAmount: totalAmt,
+      bayNumber: wbBayNumber,
+      moisturePercent: wbMoisture,
+      orderId: newOrder.id,
+      orderNumber: newOrder.orderNumber,
+      hubName: activeHub.name,
+      hubCode: activeHub.code,
+      operatorName: activeHub.operatorName
+    };
+
+    setActiveWeighbridgeSlip(slipData);
+    setIsWeighbridgeModalOpen(false);
+  };
 
   // Dispatch Form State
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>(vehicles[0]?.id || '');
@@ -168,6 +250,45 @@ export const CollectionCentreView: React.FC = () => {
       setRouteHighway(ROUTE_PRESETS[key].routeHighway);
       setTotalDistanceKm(ROUTE_PRESETS[key].totalDistanceKm);
     }
+  };
+
+  const [aiMatchedBadge, setAiMatchedBadge] = useState<string | null>(null);
+
+  const handleAiAutoAssignDispatch = () => {
+    if (!selectedOrder) return;
+    try {
+      const aiResult = assignOptimalTruckAI({
+        cropName: selectedOrder.cropName,
+        category: (selectedOrder.category as any) || 'Vegetables',
+        variety: selectedOrder.variety,
+        storageCondition: (selectedOrder as any).storageCondition || 'Ambient',
+        quantity: selectedOrder.quantity,
+        unit: selectedOrder.unit,
+        effectiveKg: selectedOrder.unit === 'Tons' ? selectedOrder.quantity * 1000 : selectedOrder.quantity * 100,
+        originLocation: activeHub.name,
+        originState: activeHub.state || 'Maharashtra',
+        originHubName: activeHub.name,
+        destinationAddress: selectedOrder.deliveryAddress,
+        destinationState: 'Maharashtra',
+        availableVehicles: vehicles,
+        logisticsFee: selectedOrder.logisticsFee || 2500
+      });
+
+      if (aiResult?.vehicle) {
+        handleSelectVehicleForDispatch(aiResult.vehicle.id);
+        if (aiResult.dispatchDetails?.temperatureCelsius !== undefined) {
+          setTempCelsius(aiResult.dispatchDetails.temperatureCelsius);
+        }
+        if (aiResult.dispatchDetails?.routeHighway) {
+          setRouteHighway(aiResult.dispatchDetails.routeHighway);
+        }
+        if (aiResult.dispatchDetails?.totalDistanceKm) {
+          setTotalDistanceKm(aiResult.dispatchDetails.totalDistanceKm);
+        }
+        setAiMatchedBadge(`${aiResult.vehicle.vehicleNo} (${aiResult.vehicle.modelName})`);
+        setTimeout(() => setAiMatchedBadge(null), 5000);
+      }
+    } catch (_) {}
   };
 
   const handleCreateVehicle = (e: React.FormEvent) => {
@@ -344,32 +465,43 @@ export const CollectionCentreView: React.FC = () => {
 
           {/* Quick Actions & Hub Metrics */}
           <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0 items-start lg:items-end">
-            <button
-              type="button"
-              onClick={() => setIsHubSwitcherModalOpen(true)}
-              className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition-all hover:scale-105 cursor-pointer"
-            >
-              <RefreshCw className="w-4 h-4 text-slate-950" />
-              <span>Switch FCI Depot (54 All-India Hubs)</span>
-            </button>
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => setIsWeighbridgeModalOpen(true)}
+                className="flex-1 sm:flex-initial px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/30 transition-all hover:scale-105 cursor-pointer"
+              >
+                <Scale className="w-4 h-4 text-white" />
+                <span>{language === 'hi' ? '+ धर्मकांटा आवक पर्ची' : '+ Direct Farmer Intake'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsHubSwitcherModalOpen(true)}
+                className="flex-1 sm:flex-initial px-4 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition-all hover:scale-105 cursor-pointer"
+              >
+                <RefreshCw className="w-4 h-4 text-slate-950" />
+                <span>{language === 'hi' ? 'डिपो बदलें (54 केंद्र)' : 'Switch FCI Depot (54 Hubs)'}</span>
+              </button>
+            </div>
 
             <div className="flex flex-wrap gap-2.5 bg-black/40 p-3 rounded-2xl backdrop-blur-md border border-white/10 text-xs w-full sm:w-auto">
               <div>
-                <span className="text-[10px] text-slate-400 block">Current Occupancy</span>
+                <span className="text-[10px] text-slate-400 block">{language === 'hi' ? 'कुल भंडारण अधिभोग' : 'Current Occupancy'}</span>
                 <span className="font-extrabold text-amber-300">
                   {activeHub.currentOccupancyTons.toLocaleString('en-IN')} / {activeHub.capacityTons.toLocaleString('en-IN')} MT
                 </span>
               </div>
               <div className="border-l border-white/10 pl-2.5">
-                <span className="text-[10px] text-slate-400 block">Silo Chamber Temp</span>
+                <span className="text-[10px] text-slate-400 block">{language === 'hi' ? 'साइलो तापमान' : 'Silo Chamber Temp'}</span>
                 <span className="font-extrabold text-emerald-300">{activeHub.temperatureCelsius}°C</span>
               </div>
               <div className="border-l border-white/10 pl-2.5">
-                <span className="text-[10px] text-slate-400 block">Humidity</span>
+                <span className="text-[10px] text-slate-400 block">{language === 'hi' ? 'आर्द्रता' : 'Humidity'}</span>
                 <span className="font-extrabold text-blue-300">{activeHub.humidityPercent}% RH</span>
               </div>
               <div className="border-l border-white/10 pl-2.5">
-                <span className="text-[10px] text-slate-400 block">Active Batches</span>
+                <span className="text-[10px] text-slate-400 block">{language === 'hi' ? 'सक्रिय लॉट' : 'Active Batches'}</span>
                 <span className="font-extrabold text-white">{activeHub.activeBatches} Lots</span>
               </div>
             </div>
@@ -380,36 +512,36 @@ export const CollectionCentreView: React.FC = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <StatCard
-          title="Incoming In Queue"
+          title={language === 'hi' ? 'आवक फसल कतार' : 'Incoming In Queue'}
           value={incomingOrders.length}
-          subtitle="Awaiting Hub Weighing & QA"
+          subtitle={language === 'hi' ? 'धर्मकांटा व लैब जांच हेतु' : 'Awaiting Hub Weighing & QA'}
           icon={PackageSearch}
           colorScheme="amber"
           onClick={() => setActiveSubTab('incoming')}
         />
 
         <StatCard
-          title="Ready For Dispatch"
+          title={language === 'hi' ? 'प्रेषण हेतु तैयार' : 'Ready For Dispatch'}
           value={readyForDispatch.length}
-          subtitle="QC Passed & Graded"
+          subtitle={language === 'hi' ? 'QC पास व ग्रेडिंग पूर्ण' : 'QC Passed & Graded'}
           icon={ShieldCheck}
           colorScheme="emerald"
           onClick={() => setActiveSubTab('verification')}
         />
 
         <StatCard
-          title="Cold Storage Temp"
-          value={`${activeHub.temperatureCelsius} C`}
-          subtitle={`Humidity: ${activeHub.humidityPercent}%`}
+          title={language === 'hi' ? 'कोल्ड स्टोरेज तापमान' : 'Cold Storage Temp'}
+          value={`${activeHub.temperatureCelsius} °C`}
+          subtitle={`${language === 'hi' ? 'आर्द्रता' : 'Humidity'}: ${activeHub.humidityPercent}% RH`}
           icon={Thermometer}
           colorScheme="blue"
           onClick={() => setActiveSubTab('storage')}
         />
 
         <StatCard
-          title="Fleet & Vehicles"
-          value={`${vehicles.length} Registered`}
-          subtitle={`${vehicles.filter(v => v.currentStatus === 'Available').length} Ready for Loading`}
+          title={language === 'hi' ? 'लॉजिस्टिक्स बेड़ा' : 'Fleet & Vehicles'}
+          value={`${vehicles.length} ${language === 'hi' ? 'पंजीकृत' : 'Registered'}`}
+          subtitle={`${vehicles.filter(v => v.currentStatus === 'Available').length} ${language === 'hi' ? 'लोडिंग हेतु उपलब्ध' : 'Ready for Loading'}`}
           icon={Truck}
           colorScheme="purple"
           onClick={() => setActiveSubTab('fleet')}
@@ -419,12 +551,13 @@ export const CollectionCentreView: React.FC = () => {
       {/* Operations Navigation Tabs */}
       <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
         {[
-          { id: 'incoming', label: 'Incoming Produce Intake', icon: PackageSearch, count: incomingOrders.length },
-          { id: 'verification', label: 'QC Lab & Grading', icon: ShieldCheck },
-          { id: 'storage', label: 'Storage & Silos Status', icon: Warehouse },
-          { id: 'dispatch', label: 'Fleet Dispatch Manager', icon: SendHorizontal, count: readyForDispatch.length },
-          { id: 'fleet', label: 'Fleet & Vehicle Registry', icon: Truck, count: vehicles.length },
-          { id: 'fci_network', label: 'All-India FCI Centres (अखिल भारतीय FCI केंद्र)', icon: Building2, count: collectionHubs.length }
+          { id: 'overview', label: language === 'hi' ? 'हब कमांड सेंटर' : 'Hub Command Overview', icon: Building2 },
+          { id: 'incoming', label: language === 'hi' ? 'आवक फसल कतार' : 'Incoming Produce Intake', icon: PackageSearch, count: incomingOrders.length },
+          { id: 'verification', label: language === 'hi' ? 'प्रयोगशाला व गुणवत्ता जांच' : 'QC Lab & Grading', icon: ShieldCheck },
+          { id: 'storage', label: language === 'hi' ? 'भंडारण व साइलो स्थिति' : 'Storage & Silos Status', icon: Warehouse },
+          { id: 'dispatch', label: language === 'hi' ? 'वाहन प्रेषण व रवानगी' : 'Fleet Dispatch Manager', icon: SendHorizontal, count: readyForDispatch.length },
+          { id: 'fleet', label: language === 'hi' ? 'लॉजिस्टिक्स वाहन बेड़ा' : 'Fleet & Vehicle Registry', icon: Truck, count: vehicles.length },
+          { id: 'fci_network', label: language === 'hi' ? 'अखिल भारतीय FCI केंद्र (54 हब)' : 'All-India FCI Centres (54 Hubs)', icon: MapPin, count: collectionHubs.length }
         ].map(tab => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
@@ -449,6 +582,530 @@ export const CollectionCentreView: React.FC = () => {
           );
         })}
       </div>
+
+      {/* Sub-Tab 0: Hub Command Overview Dashboard */}
+      {activeSubTab === 'overview' && (
+        <div className="space-y-6">
+          {/* Executive Storage & Capacity Sensor Banner */}
+          {(() => {
+            const totalCap = activeHub.capacityTons || 10000;
+            const currentOcc = activeHub.currentOccupancyTons || 6500;
+            const pct = Math.min(100, Math.round((currentOcc / Math.max(1, totalCap)) * 100));
+            const chamber1Cap = Math.round(totalCap * 0.35);
+            const chamber1Occ = Math.min(chamber1Cap, Math.round(currentOcc * 0.40));
+            const chamber1Pct = Math.round((chamber1Occ / Math.max(1, chamber1Cap)) * 100);
+            const silo2Cap = Math.round(totalCap * 0.45);
+            const silo2Occ = Math.min(silo2Cap, Math.round(currentOcc * 0.45));
+            const silo2Pct = Math.round((silo2Occ / Math.max(1, silo2Cap)) * 100);
+            const chamber3Cap = Math.round(totalCap * 0.20);
+            const chamber3Occ = Math.min(chamber3Cap, Math.round(currentOcc * 0.15));
+            const chamber3Pct = Math.round((chamber3Occ / Math.max(1, chamber3Cap)) * 100);
+
+            return (
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-soft space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="p-2 rounded-xl bg-amber-50 text-amber-700">
+                        <Warehouse className="w-5 h-5" />
+                      </span>
+                      <h2 className="text-lg font-extrabold text-slate-900">
+                        {language === 'hi' ? 'डिपो साइलो अधिभोग व सेंसर टेलीमेट्री' : 'Depot Storage Capacity & Telemetry Overview'}
+                      </h2>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {language === 'hi'
+                        ? 'अखिल भारतीय खाद्यान्न सुरक्षा बफर एवं आधुनिक वातानुकूलित साइलो भंडार'
+                        : 'Real-time grain silos, cold storage chambers, and buffer stock utilization'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsWeighbridgeModalOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+                    >
+                      <Scale className="w-4 h-4" />
+                      <span>{language === 'hi' ? '+ धर्मकांटा आवक' : '+ Weighbridge Intake'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveSubTab('storage')}
+                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <span>{language === 'hi' ? 'विस्तृत दृश्य' : 'Chambers'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Main Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">
+                      {language === 'hi' ? 'कुल भंडारण:' : 'Total Storage Utilization:'}{' '}
+                      <strong className="text-slate-900">{currentOcc.toLocaleString('en-IN')} MT</strong> of{' '}
+                      <span className="text-slate-500">{totalCap.toLocaleString('en-IN')} MT</span>
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded-full font-extrabold text-[11px] ${
+                      pct > 85 ? 'bg-red-100 text-red-700' : pct > 65 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {pct}% {language === 'hi' ? 'भरा हुआ' : 'Occupied'}
+                    </span>
+                  </div>
+
+                  <div className="h-4 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 flex gap-1">
+                    <div
+                      style={{ width: `${Math.round(pct * 0.4)}%` }}
+                      className="h-full bg-emerald-500 rounded-full transition-all"
+                      title={`Cold Chamber: ${chamber1Occ} MT (${chamber1Pct}%)`}
+                    />
+                    <div
+                      style={{ width: `${Math.round(pct * 0.45)}%` }}
+                      className="h-full bg-amber-500 rounded-full transition-all"
+                      title={`Steel Silo: ${silo2Occ} MT (${silo2Pct}%)`}
+                    />
+                    <div
+                      style={{ width: `${Math.round(pct * 0.15)}%` }}
+                      className="h-full bg-blue-500 rounded-full transition-all"
+                      title={`Buffer Stock: ${chamber3Occ} MT (${chamber3Pct}%)`}
+                    />
+                  </div>
+
+                  {/* Chamber Mini Badges */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+                    <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-emerald-900 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          {language === 'hi' ? 'कोल्ड स्टोरेज #1' : 'Cold Chamber #1'}
+                        </span>
+                        <span className="font-mono text-emerald-700 font-extrabold">{chamber1Pct}%</span>
+                      </div>
+                      <div className="text-[11px] text-emerald-700">
+                        {chamber1Occ.toLocaleString('en-IN')} / {chamber1Cap.toLocaleString('en-IN')} MT • {activeHub.temperatureCelsius}°C
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-100 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-900 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          {language === 'hi' ? 'स्टील साइलो #2' : 'Steel Silos #2'}
+                        </span>
+                        <span className="font-mono text-amber-700 font-extrabold">{silo2Pct}%</span>
+                      </div>
+                      <div className="text-[11px] text-amber-700">
+                        {silo2Occ.toLocaleString('en-IN')} / {silo2Cap.toLocaleString('en-IN')} MT • 21.8°C (Aerated)
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-blue-50/70 border border-blue-100 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-blue-900 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-blue-500" />
+                          {language === 'hi' ? 'नाइट्रोजन बफर #3' : 'Buffer Reserve #3'}
+                        </span>
+                        <span className="font-mono text-blue-700 font-extrabold">{chamber3Pct}%</span>
+                      </div>
+                      <div className="text-[11px] text-blue-700">
+                        {chamber3Occ.toLocaleString('en-IN')} / {chamber3Cap.toLocaleString('en-IN')} MT • N2 Purged
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* IoT Live Sensor Strip */}
+                <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-3 text-xs text-slate-600">
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                    ⚖️ {activeHub.weighbridgeCapacityTons || 60}T {language === 'hi' ? 'धर्मकांटा सक्रिय' : 'Weighbridge Calibrated'}
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <Thermometer className="w-3.5 h-3.5 text-blue-500" />
+                    {language === 'hi' ? 'कंप्रेसर' : 'Compressor'}: {activeHub.temperatureCelsius}°C ({activeHub.humidityPercent}% RH)
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    NABL Lab Grade A+ {language === 'hi' ? 'सक्रिय' : 'Active'}
+                  </span>
+                  {activeHub.railwaySiding && (
+                    <>
+                      <span>•</span>
+                      <span className="flex items-center gap-1.5 text-indigo-700 font-semibold">
+                        <Train className="w-3.5 h-3.5" />
+                        {language === 'hi' ? 'रेलवे साइडिंग कनेक्टेड' : 'Railhead Siding Linked'}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Operational Grid: Intake Queue & Telemetry */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left 2 Cols: Live Intake & Farmgate Queue */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+                      <PackageSearch className="w-5 h-5 text-amber-600" />
+                      <span>{language === 'hi' ? 'ताज़ा आवक व धर्मकांटा लॉट कतार' : 'Live Intake & Weighbridge Harvest Queue'}</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {language === 'hi'
+                        ? 'किसानों द्वारा सीधे हब पर लाई गई फसल और प्लेटफॉर्म ऑर्डर'
+                        : 'Direct farmer tractor/truck arrivals and platform booking dispatches'}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsWeighbridgeModalOpen(true)}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>{language === 'hi' ? '+ आवक दर्ज करें' : '+ Direct Intake'}</span>
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-y border-slate-100">
+                      <tr>
+                        <th className="py-2.5 px-3">{language === 'hi' ? 'लॉट / पर्ची ID' : 'Batch / Slip ID'}</th>
+                        <th className="py-2.5 px-3">{language === 'hi' ? 'किसान / वाहन' : 'Farmer & Vehicle'}</th>
+                        <th className="py-2.5 px-3">{language === 'hi' ? 'फसल व मात्रा' : 'Crop & Qty'}</th>
+                        <th className="py-2.5 px-3">{language === 'hi' ? 'स्थिति' : 'Stage'}</th>
+                        <th className="py-2.5 px-3 text-right">{language === 'hi' ? 'कार्रवाई' : 'Quick Actions'}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                      {orders.slice(0, 6).map(order => (
+                        <tr key={order.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3 px-3">
+                            <span className="font-mono font-bold text-slate-900 block">{order.orderNumber}</span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {new Date(order.orderDate).toLocaleDateString('en-IN')}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <div className="font-bold text-slate-900">{order.farmerName}</div>
+                            <div className="text-[10px] text-slate-500 font-mono">{order.farmerPhone}</div>
+                          </td>
+                          <td className="py-3 px-3">
+                            <div className="font-bold text-slate-900">{order.cropName}</div>
+                            <div className="text-[10px] text-emerald-700 font-bold">{order.quantity} {order.unit}</div>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              order.currentStage === 'order_placed'
+                                ? 'bg-amber-100 text-amber-800'
+                                : order.currentStage === 'collected_at_hub'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : order.currentStage === 'quality_verified'
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-purple-100 text-purple-800'
+                            }`}>
+                              {order.currentStage.replace(/_/g, ' ').toUpperCase()}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {/* View Weighbridge Slip button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setActiveWeighbridgeSlip({
+                                    slipNo: 'WB-' + (order.orderNumber.replace(/\D/g, '').slice(-6) || '884912'),
+                                    date: new Date(order.orderDate).toLocaleString('en-IN'),
+                                    farmerName: order.farmerName,
+                                    farmerPhone: order.farmerPhone,
+                                    cropName: order.cropName,
+                                    variety: order.variety || 'Certified High-Yield',
+                                    vehicleNo: 'MH-15-TC-' + Math.floor(1000 + Math.random() * 9000),
+                                    grossKg: order.quantity * 100 + 2400,
+                                    tareKg: 2400,
+                                    netKg: order.quantity * 100,
+                                    netQtl: order.quantity,
+                                    pricePerQuintal: order.pricePerUnit,
+                                    totalAmount: order.totalAmount,
+                                    bayNumber: 'Bay #2 (Automated Axle)',
+                                    moisturePercent: 11.6,
+                                    orderId: order.id,
+                                    orderNumber: order.orderNumber,
+                                    hubName: activeHub.name,
+                                    hubCode: activeHub.code,
+                                    operatorName: activeHub.operatorName
+                                  });
+                                }}
+                                className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold transition-colors cursor-pointer"
+                                title={language === 'hi' ? 'धर्मकांटा पर्ची देखें' : 'View Weighbridge Slip'}
+                              >
+                                <Scale className="w-3.5 h-3.5" />
+                              </button>
+
+                              {/* QC Lab Action */}
+                              {order.qualityInspection ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setViewingCertificateOrder(order)}
+                                  className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold transition-colors cursor-pointer"
+                                  title={language === 'hi' ? 'NABL लैब प्रमाण पत्र देखें' : 'View NABL Certificate'}
+                                >
+                                  <Award className="w-3.5 h-3.5 text-emerald-600" />
+                                </button>
+                              ) : order.currentStage === 'collected_at_hub' ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedOrderId(order.id);
+                                    setActiveSubTab('verification');
+                                  }}
+                                  className="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                                >
+                                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                                  <span>{language === 'hi' ? 'लैब भेजें' : 'QC Lab'}</span>
+                                </button>
+                              ) : null}
+
+                              {/* Dispatch / Gate Pass Action */}
+                              {order.dispatchDetails ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setViewingGatePassOrder(order)}
+                                  className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold transition-colors cursor-pointer"
+                                  title={language === 'hi' ? 'गेट पास व ई-वे बिल देखें' : 'View Gate Pass & E-Way Bill'}
+                                >
+                                  <FileText className="w-3.5 h-3.5 text-blue-600" />
+                                </button>
+                              ) : order.currentStage === 'quality_verified' ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedOrderId(order.id);
+                                    setActiveSubTab('dispatch');
+                                  }}
+                                  className="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                                >
+                                  <SendHorizontal className="w-3 h-3" />
+                                  <span>{language === 'hi' ? 'प्रेषण' : 'Dispatch'}</span>
+                                </button>
+                              ) : null}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="pt-2 flex justify-between items-center text-xs text-slate-500">
+                  <span>{orders.length} {language === 'hi' ? 'कुल बैच प्लेटफ़ॉर्म पर सक्रिय' : 'Total batches active on platform'}</span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveSubTab('incoming')}
+                    className="font-bold text-emerald-700 hover:underline flex items-center gap-1"
+                  >
+                    <span>{language === 'hi' ? 'पूरी आवक कतार देखें' : 'View Full Intake Queue'}</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* On-Highway Logistics Telemetry (Active Trips) */}
+              {vehicles.some(v => v.currentStatus === 'On Trip') && (
+                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+                        <Truck className="w-5 h-5 text-emerald-600" />
+                        <span>{language === 'hi' ? 'राष्ट्रीय राजमार्ग पर लाइव ट्रांजिट व वाहन' : 'Active Highway Freight & Cold Reefers In Transit'}</span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        {language === 'hi' ? 'डिपो से गंतव्य वेयरहाउस तक लाइव GPS व तापमान मॉनिटर' : 'Live GPS corridor tracking and refrigerated reefer temp'}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveSubTab('fleet')}
+                      className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1"
+                    >
+                      <span>{language === 'hi' ? 'पूरा बेड़ा' : 'All Fleet'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {vehicles
+                    .filter(v => v.currentStatus === 'On Trip')
+                    .slice(0, 1)
+                    .map(veh => (
+                      <RouteTripTracker
+                        key={veh.id}
+                        dispatchDetails={{
+                          vehicleNo: veh.vehicleNo,
+                          vehicleType: veh.vehicleType,
+                          modelName: veh.modelName,
+                          transporterName: veh.transporterName,
+                          driverName: veh.driverName,
+                          driverPhone: veh.driverPhone,
+                          temperatureCelsius: veh.temperatureCelsius || 14.0,
+                          gpsDeviceId: veh.gpsDeviceId,
+                          originHub: veh.originHub || activeHub.name,
+                          destinationWarehouse: veh.destinationWarehouse || 'Regional Mandi Depot',
+                          eWayBillNo: 'EWB-2026-LIVE',
+                          dispatchedAt: new Date().toISOString(),
+                          estimatedArrival: new Date().toISOString(),
+                          gpsLiveLat: 19.9975,
+                          gpsLiveLng: 73.7898,
+                          coveredDistanceKm: veh.activeTrip?.coveredDistanceKm || 88,
+                          totalDistanceKm: veh.activeTrip?.totalDistanceKm || 128,
+                          routeHighway: veh.activeTrip?.routeHighway || 'NH-44 Freight Corridor'
+                        }}
+                        compact={false}
+                        showControls={true}
+                      />
+                    ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right 1 Col: Silo Environmental Telemetry & Depot Manager */}
+            <div className="space-y-6">
+              {/* Telemetry Sensor Gauges */}
+              <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
+                <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+                  <Radio className="w-5 h-5 text-emerald-600 animate-pulse" />
+                  <span>{language === 'hi' ? 'लाइव साइलो सेंसर टेलीमेट्री' : 'Live Silo & Chamber Sensors'}</span>
+                </h3>
+
+                <div className="space-y-3 text-xs">
+                  {/* Chamber 1 */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-slate-800">
+                        {language === 'hi' ? 'कोल्ड स्टोरेज चैंबर #1' : 'Cold Storage Chamber #1'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                        {language === 'hi' ? 'सामान्य' : 'OPTIMAL'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div>
+                        <span className="text-slate-400 block">{language === 'hi' ? 'तापमान' : 'Temperature'}</span>
+                        <strong className="text-emerald-700 font-extrabold text-sm">{activeHub.temperatureCelsius}°C</strong>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">{language === 'hi' ? 'आर्द्रता' : 'Humidity'}</span>
+                        <strong className="text-blue-700 font-extrabold text-sm">{activeHub.humidityPercent}% RH</strong>
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200/60">
+                      {language === 'hi' ? 'एथिलीन स्तर' : 'Ethylene'}: 0.12 ppm (Safe) • {language === 'hi' ? 'कूलिंग यूनिट' : 'Compressor'}: Active
+                    </div>
+                  </div>
+
+                  {/* Silo 2 */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-slate-800">
+                        {language === 'hi' ? 'स्टील साइलो #2 (अनाज)' : 'Steel Grain Silo #2 (Wheat)'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                        {language === 'hi' ? 'सक्रिय' : 'AERATION ON'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div>
+                        <span className="text-slate-400 block">{language === 'hi' ? 'अनाज तापमान' : 'Grain Core Temp'}</span>
+                        <strong className="text-slate-900 font-extrabold text-sm">21.8°C</strong>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">{language === 'hi' ? 'अनाज नमी' : 'Grain Moisture'}</span>
+                        <strong className="text-amber-700 font-extrabold text-sm">11.4%</strong>
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200/60">
+                      {language === 'hi' ? 'हवा परिसंचरण' : 'Air Aeration'}: 4 Fans Running • Static Pressure: 1.8 in WG
+                    </div>
+                  </div>
+
+                  {/* Silo 3 */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-slate-800">
+                        {language === 'hi' ? 'नाइट्रोजन बफर #3' : 'Nitrogen Silo #3 (Pulses)'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">
+                        INERT PURGED
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div>
+                        <span className="text-slate-400 block">N2 Purity</span>
+                        <strong className="text-blue-700 font-extrabold text-sm">99.4%</strong>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block">Oxygen (O2)</span>
+                        <strong className="text-slate-700 font-extrabold text-sm">&lt; 0.8%</strong>
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-200/60">
+                      Zero Pest Risk • Certified for Long-term Strategic Food Security Buffer
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Station Master & Depot Info */}
+              <div className="bg-gradient-to-br from-slate-900 to-emerald-950 text-white rounded-3xl p-6 shadow-xl space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 font-black text-lg">
+                    {activeHub.operatorName.charAt(0)}
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono text-emerald-300 uppercase tracking-wider block font-bold">
+                      {language === 'hi' ? 'डिपो प्रभारी अधिकारी' : 'Depot Officer Incharge'}
+                    </span>
+                    <h4 className="font-extrabold text-sm text-white">{activeHub.operatorName}</h4>
+                    <p className="text-[11px] text-slate-300">{activeHub.code} • {activeHub.district}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-xs text-slate-300 pt-2 border-t border-white/10">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">{language === 'hi' ? 'कार्यालय फोन:' : 'Direct Phone:'}</span>
+                    <strong className="text-white font-mono">{activeHub.phone}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">{language === 'hi' ? 'कार्य समय:' : 'Operating Hours:'}</span>
+                    <span className="text-emerald-300 font-bold">{activeHub.operatingHours}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">{language === 'hi' ? 'सुरक्षा गेट पोस्ट:' : 'Security Gate:'}</span>
+                    <span className="text-slate-200">Main Bay #1 (Ext. 201)</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsHubSwitcherModalOpen(true)}
+                  className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/15 transition-all cursor-pointer"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{language === 'hi' ? 'अखिल भारतीय डिपो सूची (54 केंद्र)' : 'Switch FCI Depot (54 Hubs)'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Sub-Tab 5: Fleet & Vehicle Registry */}
       {activeSubTab === 'fleet' && (
@@ -830,36 +1487,50 @@ export const CollectionCentreView: React.FC = () => {
       {/* Tab 1: Incoming Produce Intake */}
       {activeSubTab === 'incoming' && (
         <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <PackageSearch className="w-5 h-5 text-amber-600" />
-                Incoming Farmer Harvest Queue
+                <span>{language === 'hi' ? 'आवक किसान फसल व धर्मकांटा कतार' : 'Incoming Farmer Harvest & Weighbridge Queue'}</span>
               </h2>
               <p className="text-xs text-slate-500">
-                Farmers depositing harvest at Bay #1 - Bay #4 for calibrated weighbridge verification
+                {language === 'hi'
+                  ? 'बे #1 - बे #4 पर स्वचालित धर्मकांटा वजन सत्यापन व आवक लॉट'
+                  : 'Farmers depositing harvest at Bay #1 - Bay #4 for calibrated weighbridge verification'}
               </p>
             </div>
-            <span className="text-xs font-bold text-slate-500">{orders.length} Total Platform Batches</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsWeighbridgeModalOpen(true)}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-emerald-700/20 cursor-pointer"
+              >
+                <Scale className="w-4 h-4" />
+                <span>{language === 'hi' ? '+ धर्मकांटा आवक पर्ची' : '+ Direct Farmer Intake'}</span>
+              </button>
+              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-2 rounded-xl">
+                {orders.length} {language === 'hi' ? 'कुल लॉट' : 'Batches'}
+              </span>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-y border-slate-100">
                 <tr>
-                  <th className="py-3 px-4">Order ID</th>
-                  <th className="py-3 px-4">Farmer</th>
-                  <th className="py-3 px-4">Crop & Variety</th>
-                  <th className="py-3 px-4">Booked Qty</th>
-                  <th className="py-3 px-4">Stage</th>
-                  <th className="py-3 px-4">Action</th>
+                  <th className="py-3 px-4">{language === 'hi' ? 'ऑर्डर / पर्ची संख्या' : 'Order / Slip No'}</th>
+                  <th className="py-3 px-4">{language === 'hi' ? 'किसान विवरण' : 'Farmer Details'}</th>
+                  <th className="py-3 px-4">{language === 'hi' ? 'फसल व किस्म' : 'Crop & Variety'}</th>
+                  <th className="py-3 px-4">{language === 'hi' ? 'मात्रा (क्विंटल)' : 'Booked Qty'}</th>
+                  <th className="py-3 px-4">{language === 'hi' ? 'चरण' : 'Stage'}</th>
+                  <th className="py-3 px-4 text-right">{language === 'hi' ? 'कार्रवाई' : 'Action'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {orders.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-slate-400">
-                      No produce batches in incoming queue.
+                      {language === 'hi' ? 'आवक कतार में कोई फसल लॉट नहीं है।' : 'No produce batches in incoming queue.'}
                     </td>
                   </tr>
                 ) : (
@@ -868,7 +1539,7 @@ export const CollectionCentreView: React.FC = () => {
                       <td className="py-3 px-4 font-mono font-bold text-slate-900">{order.orderNumber}</td>
                       <td className="py-3 px-4">
                         <div className="font-bold text-slate-800">{order.farmerName}</div>
-                        <div className="text-[10px] text-slate-400">{order.farmerPhone}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">{order.farmerPhone}</div>
                       </td>
                       <td className="py-3 px-4">
                         <div className="font-bold text-slate-900">{order.cropName}</div>
@@ -886,38 +1557,74 @@ export const CollectionCentreView: React.FC = () => {
                           {order.currentStage.replace(/_/g, ' ').toUpperCase()}
                         </span>
                       </td>
-                      <td className="py-3 px-4">
-                        {order.currentStage === 'order_placed' ? (
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {/* Weighbridge Slip Button */}
                           <button
-                            onClick={() => updateOrderStage(order.id, 'collected_at_hub')}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                            type="button"
+                            onClick={() => {
+                              setActiveWeighbridgeSlip({
+                                slipNo: 'WB-' + (order.orderNumber.replace(/\D/g, '').slice(-6) || '884912'),
+                                date: new Date(order.orderDate).toLocaleString('en-IN'),
+                                farmerName: order.farmerName,
+                                farmerPhone: order.farmerPhone,
+                                cropName: order.cropName,
+                                variety: order.variety || 'Certified High-Yield',
+                                vehicleNo: 'MH-15-TC-' + Math.floor(1000 + Math.random() * 9000),
+                                grossKg: order.quantity * 100 + 2400,
+                                tareKg: 2400,
+                                netKg: order.quantity * 100,
+                                netQtl: order.quantity,
+                                pricePerQuintal: order.pricePerUnit,
+                                totalAmount: order.totalAmount,
+                                bayNumber: 'Bay #2 (Automated Axle)',
+                                moisturePercent: 11.6,
+                                orderId: order.id,
+                                orderNumber: order.orderNumber,
+                                hubName: activeHub.name,
+                                hubCode: activeHub.code,
+                                operatorName: activeHub.operatorName
+                              });
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                            title={language === 'hi' ? 'धर्मकांटा पर्ची देखें' : 'View Weighbridge Slip'}
                           >
                             <Scale className="w-3.5 h-3.5" />
-                            <span>Confirm Bay Intake</span>
+                            <span>{language === 'hi' ? 'पर्ची' : 'Slip'}</span>
                           </button>
-                        ) : order.currentStage === 'collected_at_hub' ? (
-                          <button
-                            onClick={() => {
-                              setSelectedOrderId(order.id);
-                              setActiveSubTab('verification');
-                            }}
-                            className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
-                          >
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>Send to QC Lab</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setActiveTrackingOrderId(order.id);
-                              setActiveTab('track_delivery');
-                            }}
-                            className="text-xs text-emerald-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                          >
-                            <span>Track Pipeline</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+
+                          {order.currentStage === 'order_placed' ? (
+                            <button
+                              onClick={() => updateOrderStage(order.id, 'collected_at_hub')}
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              <span>{language === 'hi' ? 'आवक स्वीकारें' : 'Confirm Bay Intake'}</span>
+                            </button>
+                          ) : order.currentStage === 'collected_at_hub' ? (
+                            <button
+                              onClick={() => {
+                                setSelectedOrderId(order.id);
+                                setActiveSubTab('verification');
+                              }}
+                              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>{language === 'hi' ? 'लैब भेजें' : 'Send to QC Lab'}</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setActiveTrackingOrderId(order.id);
+                                setActiveTab('track_delivery');
+                              }}
+                              className="text-xs text-emerald-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>{language === 'hi' ? 'ट्रैकिंग' : 'Track Pipeline'}</span>
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -982,9 +1689,19 @@ export const CollectionCentreView: React.FC = () => {
                     </p>
                   </div>
                   {selectedOrder.qualityInspection && (
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                      Certified: {selectedOrder.qualityInspection.assignedGrade}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                        Certified: {selectedOrder.qualityInspection.assignedGrade}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setViewingCertificateOrder(selectedOrder)}
+                        className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+                      >
+                        <Award className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{language === 'hi' ? 'NABL प्रमाण पत्र देखें' : 'View NABL Certificate'}</span>
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -1074,57 +1791,189 @@ export const CollectionCentreView: React.FC = () => {
       )}
 
       {/* Tab 3: Storage & Chamber Status */}
-      {activeSubTab === 'storage' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
-            <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
-              <Warehouse className="w-5 h-5 text-emerald-600" />
-              Cold Storage Chamber #1 (Perishables)
-            </h3>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Chamber Temperature:</span>
-                <span className="font-extrabold text-emerald-700">{activeHub.temperatureCelsius}°C (Normal)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Relative Humidity:</span>
-                <span className="font-bold text-blue-700">{activeHub.humidityPercent}% RH</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Current Occupancy:</span>
-                <span className="font-bold text-slate-900">420 / 600 Tons (70%)</span>
-              </div>
-            </div>
-            <p className="text-xs text-slate-500">
-              Chamber 1 is designated for high-value perishables including Onions, Tomatoes, and Table Grapes.
-            </p>
-          </div>
+      {activeSubTab === 'storage' && (() => {
+        const totalCap = activeHub.capacityTons || 10000;
+        const currentOcc = activeHub.currentOccupancyTons || 6500;
+        const chamber1Cap = Math.round(totalCap * 0.35);
+        const chamber1Occ = Math.min(chamber1Cap, Math.round(currentOcc * 0.40));
+        const chamber1Pct = Math.round((chamber1Occ / Math.max(1, chamber1Cap)) * 100);
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft space-y-4">
-            <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
-              <Warehouse className="w-5 h-5 text-amber-600" />
-              Dry Aerated Silos #2 (Grains & Pulses)
-            </h3>
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Ambient Temperature:</span>
-                <span className="font-extrabold text-slate-800">22.4°C</span>
+        const silo2Cap = Math.round(totalCap * 0.45);
+        const silo2Occ = Math.min(silo2Cap, Math.round(currentOcc * 0.45));
+        const silo2Pct = Math.round((silo2Occ / Math.max(1, silo2Cap)) * 100);
+
+        const chamber3Cap = Math.round(totalCap * 0.20);
+        const chamber3Occ = Math.min(chamber3Cap, Math.round(currentOcc * 0.15));
+        const chamber3Pct = Math.round((chamber3Occ / Math.max(1, chamber3Cap)) * 100);
+
+        return (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-soft">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+                    <Warehouse className="w-5 h-5 text-emerald-600" />
+                    <span>{language === 'hi' ? 'डिपो साइलो व भंडारण चैंबर विन्यास' : 'Depot Silo & Storage Chambers Configuration'}</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {language === 'hi'
+                      ? `${activeHub.name} • कुल क्षमता: ${totalCap.toLocaleString('en-IN')} MT • लाइव ऑक्यूपेंसी: ${currentOcc.toLocaleString('en-IN')} MT (${Math.round((currentOcc/Math.max(1, totalCap))*100)}%)`
+                      : `${activeHub.name} • Total Capacity: ${totalCap.toLocaleString('en-IN')} MT • Live Occupancy: ${currentOcc.toLocaleString('en-IN')} MT (${Math.round((currentOcc/Math.max(1, totalCap))*100)}%)`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                    🟢 {language === 'hi' ? 'सभी 3 चैंबर सक्रिय' : 'All 3 Chambers Active'}
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Aeration Humidity:</span>
-                <span className="font-bold text-slate-700">44% RH</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Current Occupancy:</span>
-                <span className="font-bold text-slate-900">420 / 600 Tons (70%)</span>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+                {/* Chamber 1 */}
+                <div className="p-5 rounded-3xl bg-slate-50 border border-slate-100 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <Warehouse className="w-4 h-4 text-emerald-600" />
+                      <span>{language === 'hi' ? 'कोल्ड स्टोरेज चैंबर #1' : 'Cold Storage #1'}</span>
+                    </h4>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                      {chamber1Pct}% Full
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'तापमान:' : 'Chamber Temp:'}</span>
+                      <strong className="text-emerald-700 font-mono">{activeHub.temperatureCelsius}°C (Normal)</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'आर्द्रता:' : 'Relative Humidity:'}</span>
+                      <strong className="text-blue-700 font-mono">{activeHub.humidityPercent}% RH</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'लाइव ऑक्यूपेंसी:' : 'Current Occupancy:'}</span>
+                      <strong className="text-slate-900">{chamber1Occ.toLocaleString('en-IN')} / {chamber1Cap.toLocaleString('en-IN')} MT</strong>
+                    </div>
+                  </div>
+
+                  <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-emerald-500 h-full rounded-full transition-all" style={{ width: `${chamber1Pct}%` }} />
+                  </div>
+
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    {language === 'hi'
+                      ? 'नाशपाती, प्याज, टमाटर, अनार व फल-सब्जियों हेतु नियंत्रित तापमान व एथिलीन अवशोषक युक्त।'
+                      : 'Designated for high-value perishables including Onions, Tomatoes, Apples, and Grapes with Ethylene scrubber.'}
+                  </p>
+                </div>
+
+                {/* Silo 2 */}
+                <div className="p-5 rounded-3xl bg-slate-50 border border-slate-100 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <Warehouse className="w-4 h-4 text-amber-600" />
+                      <span>{language === 'hi' ? 'स्टील ग्रेन साइलो #2' : 'Steel Grain Silos #2'}</span>
+                    </h4>
+                    <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
+                      {silo2Pct}% Full
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'कोर तापमान:' : 'Core Ambient Temp:'}</span>
+                      <strong className="text-slate-800 font-mono">21.8°C</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'वायु संवातन:' : 'Aeration Humidity:'}</span>
+                      <strong className="text-slate-700 font-mono">44% RH</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'लाइव ऑक्यूपेंसी:' : 'Current Occupancy:'}</span>
+                      <strong className="text-slate-900">{silo2Occ.toLocaleString('en-IN')} / {silo2Cap.toLocaleString('en-IN')} MT</strong>
+                    </div>
+                  </div>
+
+                  <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-amber-500 h-full rounded-full transition-all" style={{ width: `${silo2Pct}%` }} />
+                  </div>
+
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    {language === 'hi'
+                      ? 'गेहूं, बासमती धान व सोयाबीन हेतु स्वचालित एयरेशन फैन व न्यूमेटिक सैंपलिंग सिस्टम युक्त स्टील साइलो।'
+                      : 'High-grade galvanized steel silos with continuous forced-air aeration for Basmati Paddy, Sharbati Wheat, and Soybeans.'}
+                  </p>
+                </div>
+
+                {/* Chamber 3 */}
+                <div className="p-5 rounded-3xl bg-slate-50 border border-slate-100 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <Warehouse className="w-4 h-4 text-blue-600" />
+                      <span>{language === 'hi' ? 'नाइट्रोजन बफर साइलो #3' : 'Buffer Reserve #3'}</span>
+                    </h4>
+                    <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">
+                      {chamber3Pct}% Full
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'N2 शुद्धता:' : 'N2 Purity:'}</span>
+                      <strong className="text-blue-700 font-mono">99.4% (Inert)</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'ऑक्सीजन स्तर:' : 'Oxygen Level:'}</span>
+                      <strong className="text-slate-700 font-mono">&lt; 0.8% O2</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">{language === 'hi' ? 'लाइव ऑक्यूपेंसी:' : 'Current Occupancy:'}</span>
+                      <strong className="text-slate-900">{chamber3Occ.toLocaleString('en-IN')} / {chamber3Cap.toLocaleString('en-IN')} MT</strong>
+                    </div>
+                  </div>
+
+                  <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-blue-500 h-full rounded-full transition-all" style={{ width: `${chamber3Pct}%` }} />
+                  </div>
+
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    {language === 'hi'
+                      ? 'दलहन (चना, मूंग, अरहर) व तिलहन के दीर्घकालिक कीट-मुक्त राष्ट्रीय खाद्य सुरक्षा भंडारण हेतु।'
+                      : 'Hermetically sealed nitrogen-purged atmosphere for zero-chemical strategic grain buffer protection.'}
+                  </p>
+                </div>
               </div>
             </div>
-            <p className="text-xs text-slate-500">
-              Silo Section 2 is designated for moisture-controlled storage of Basmati Paddy, Sharbati Wheat, and Soybeans.
-            </p>
+
+            {/* Hub Auxiliary Systems & Compliance Strip */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+              <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-soft">
+                <span className="text-slate-400 block">{language === 'hi' ? 'धर्मकांटा अंशांकन' : 'Weighbridge Calib'}</span>
+                <strong className="text-emerald-700 block text-sm mt-0.5">Valid till 2027</strong>
+                <span className="text-[10px] text-slate-500">Legal Metrology Dept</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-soft">
+                <span className="text-slate-400 block">{language === 'hi' ? 'बैकअप जनरेटर' : 'Diesel DG Backup'}</span>
+                <strong className="text-slate-800 block text-sm mt-0.5">250 kVA Standby</strong>
+                <span className="text-[10px] text-slate-500">Auto-start on Grid Loss</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-soft">
+                <span className="text-slate-400 block">{language === 'hi' ? 'कीट नियंत्रण प्रमाणन' : 'Pest Fumigation'}</span>
+                <strong className="text-emerald-700 block text-sm mt-0.5">Zero Infestation</strong>
+                <span className="text-[10px] text-slate-500">Certified by CWC/FCI</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-soft">
+                <span className="text-slate-400 block">{language === 'hi' ? 'अग्नि सुरक्षा प्रणाली' : 'Fire Suppression'}</span>
+                <strong className="text-slate-800 block text-sm mt-0.5">Hydrant Tested</strong>
+                <span className="text-[10px] text-slate-500">Pressure: 7.2 bar OK</span>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Tab 4: Fleet Dispatch Manager */}
       {activeSubTab === 'dispatch' && (
@@ -1137,26 +1986,128 @@ export const CollectionCentreView: React.FC = () => {
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
                 <div>
                   <h3 className="font-extrabold text-slate-900 text-lg font-display flex items-center gap-2">
                     <SendHorizontal className="w-5 h-5 text-emerald-600" />
-                    Fleet Loading & Consignment Dispatch
+                    <span>{language === 'hi' ? 'फ्लीट लोडिंग व खेप रवानगी (डिस्पैच मैनेजर)' : 'Fleet Loading & Consignment Dispatch'}</span>
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Assign transporter vehicle, calibrate reefer van temperature, and initialize live GPS telemetry
+                    {language === 'hi' 
+                      ? 'ट्रांसपोर्टर वाहन आवंटित करें, रीफर वैन तापमान सेट करें और लाइव GPS टेलीमेट्री चालू करें'
+                      : 'Assign transporter vehicle, calibrate reefer van temperature, and initialize live GPS telemetry'}
                   </p>
                 </div>
 
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                  Target: {selectedOrder.orderNumber}
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    {language === 'hi' ? 'लक्षित:' : 'Target:'} {selectedOrder.orderNumber}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleAiAutoAssignDispatch}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 cursor-pointer"
+                    title={language === 'hi' ? 'फसल व वजन के अनुसार सर्वोत्तम ट्रक स्वतः आवंटित करें' : 'Auto-match optimal reefer truck based on cargo & route'}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                    <span>{language === 'hi' ? '⚡ AI वाहन ऑटो-मैच' : '⚡ AI Auto-Match Truck'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setViewingGatePassOrder(selectedOrder)}
+                    className="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs flex items-center gap-1.5 border border-blue-200 transition-colors cursor-pointer"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-blue-600" />
+                    <span>{language === 'hi' ? 'गेट पास व ई-वे बिल' : 'View Gate Pass & E-Way Bill'}</span>
+                  </button>
+                </div>
               </div>
+
+              {aiMatchedBadge && (
+                <div className="p-3 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100 border border-emerald-300 rounded-2xl flex items-center justify-between text-xs text-emerald-950 font-bold shadow-xs">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    <span>{language === 'hi' ? 'AI द्वारा अनुशंसित रीफर वाहन आवंटित किया गया:' : 'AI Optimized Fleet Assigned:'} <strong>{aiMatchedBadge}</strong></span>
+                  </div>
+                </div>
+              )}
 
               {dispatchSuccessMsg && (
                 <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-2xl text-emerald-900 text-xs font-bold flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <span>Consignment successfully dispatched! Live GPS telemetry is now broadcasting to the buyer.</span>
+                  <span>
+                    {language === 'hi' 
+                      ? 'खेप सफलतापूर्वक रवाना कर दी गई है! लाइव GPS टेलीमेट्री अब खरीदार और किसान दोनों को प्रसारित हो रही है।'
+                      : 'Consignment successfully dispatched! Live GPS telemetry is now broadcasting to buyer and farmer.'}
+                  </span>
+                </div>
+              )}
+
+              {/* Active Trip Live Monitor & Telemetry Simulator */}
+              {selectedOrder.currentStage === 'in_transit' && (
+                <div className="p-4 bg-gradient-to-r from-slate-900 via-slate-850 to-emerald-950 text-white rounded-2xl shadow-md border border-emerald-500/30 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
+                        {language === 'hi' ? 'खेप सक्रिय मार्ग पर है (GPS लाइव)' : 'Consignment In Transit (GPS Live)'}
+                      </span>
+                      <span className="text-xs font-mono text-slate-300">
+                        • {selectedOrder.dispatchDetails?.vehicleNo || vehicleNo}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => updateTripProgress(selectedOrder.id, (selectedOrder.dispatchDetails?.coveredDistanceKm || 0) + 25)}
+                        className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer"
+                        title={language === 'hi' ? 'सिम्युलेशन: 25 किमी आगे बढ़ाएं' : 'Simulate +25 km Progress'}
+                      >
+                        <Navigation className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{language === 'hi' ? '+25 किमी आगे बढ़ाएं' : '+25 km Sim'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => markOrderDelivered(selectedOrder.id)}
+                        className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                        <span>{language === 'hi' ? 'डिलीवरी पूर्ण दर्ज करें' : 'Mark Delivered'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTrackingOrderId(selectedOrder.id);
+                          setActiveTab('track_delivery');
+                        }}
+                        className="px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer"
+                      >
+                        <span>{language === 'hi' ? 'लाइव मैप खोलें' : 'Open Live Map'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] text-slate-300">
+                      <span>{language === 'hi' ? 'तय दूरी:' : 'Progress:'} {selectedOrder.dispatchDetails?.coveredDistanceKm || 0} / {selectedOrder.dispatchDetails?.totalDistanceKm || totalDistanceKm} km</span>
+                      <span>
+                        {Math.min(100, Math.round(((selectedOrder.dispatchDetails?.coveredDistanceKm || 0) / (selectedOrder.dispatchDetails?.totalDistanceKm || totalDistanceKm || 1)) * 100))}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-emerald-400 to-teal-400 h-full rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(100, Math.round(((selectedOrder.dispatchDetails?.coveredDistanceKm || 0) / (selectedOrder.dispatchDetails?.totalDistanceKm || totalDistanceKm || 1)) * 100))}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -1164,16 +2115,18 @@ export const CollectionCentreView: React.FC = () => {
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <label className="block text-xs font-bold text-slate-800">
-                    Select from Registered Fleet Vehicles (Auto-fills all vehicle, driver & RC details)
+                    {language === 'hi' 
+                      ? 'पंजीकृत फ्लीट वाहनों में से चुनें (वाहन, चालक व RC विवरण स्वतः भर जाता है)' 
+                      : 'Select from Registered Fleet Vehicles (Auto-fills all vehicle, driver & RC details)'}
                   </label>
                   <div className="flex items-center gap-1.5 text-xs">
-                    <span className="text-[10px] text-slate-400 font-bold">State:</span>
+                    <span className="text-[10px] text-slate-400 font-bold">{language === 'hi' ? 'राज्य:' : 'State:'}</span>
                     <select
                       value={dispatchStateFilter}
                       onChange={e => setDispatchStateFilter(e.target.value)}
                       className="px-2 py-1 rounded-lg border border-slate-200 text-xs bg-white font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500"
                     >
-                      <option value="All">All States ({vehicles.length})</option>
+                      <option value="All">{language === 'hi' ? `सभी राज्य (${vehicles.length})` : `All States (${vehicles.length})`}</option>
                       {['Maharashtra', 'Punjab', 'Haryana', 'Uttar Pradesh', 'Madhya Pradesh', 'Gujarat', 'Karnataka', 'Tamil Nadu', 'Rajasthan', 'Andhra Pradesh', 'Telangana', 'West Bengal', 'Bihar', 'Kerala', 'Odisha', 'Himachal Pradesh', 'Jammu & Kashmir', 'Delhi-NCR'].map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -1206,7 +2159,9 @@ export const CollectionCentreView: React.FC = () => {
               <form onSubmit={handleDispatchFleet} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Target Order Batch</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'लक्षित ऑर्डर लॉट' : 'Target Order Batch'}
+                    </label>
                     <select
                       value={selectedOrderId}
                       onChange={e => setSelectedOrderId(e.target.value)}
@@ -1214,14 +2169,16 @@ export const CollectionCentreView: React.FC = () => {
                     >
                       {orders.map(o => (
                         <option key={o.id} value={o.id}>
-                          {o.orderNumber} - {o.cropName} ({o.quantity} {o.unit}) - Status: {o.currentStage}
+                          {o.orderNumber} - {o.cropName} ({o.quantity} {o.unit}) - [Stage: {o.currentStage}]
                         </option>
                       ))}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Route & Freight Corridor *</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'रूट व माल ढुलाई कॉरिडोर *' : 'Route & Freight Corridor *'}
+                    </label>
                     <select
                       value={selectedRouteKey}
                       onChange={e => handleRouteChange(e.target.value)}
@@ -1243,7 +2200,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Plate Number (GPS Enabled) *</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'वाहन नंबर (GPS युक्त) *' : 'Vehicle Plate Number (GPS Enabled) *'}
+                    </label>
                     <input
                       type="text"
                       required
@@ -1254,7 +2213,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Truck Model & Body Type</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'ट्रक मॉडल व बॉडी प्रकार' : 'Truck Model & Body Type'}
+                    </label>
                     <input
                       type="text"
                       value={modelName || vehicleType}
@@ -1267,7 +2228,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Transporter Logistics Agency *</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'लॉजिस्टिक्स एजेंसी / ट्रांसपोर्टर *' : 'Transporter Logistics Agency *'}
+                    </label>
                     <input
                       type="text"
                       required
@@ -1278,7 +2241,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Driver Full Name *</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'चालक का पूरा नाम *' : 'Driver Full Name *'}
+                    </label>
                     <input
                       type="text"
                       required
@@ -1289,7 +2254,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Driver Mobile Number *</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'चालक मोबाइल नंबर *' : 'Driver Mobile Number *'}
+                    </label>
                     <input
                       type="text"
                       required
@@ -1300,7 +2267,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Driver License No (DL)</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'चालक लाइसेंस नंबर (DL)' : 'Driver License No (DL)'}
+                    </label>
                     <input
                       type="text"
                       value={driverLicenseNo}
@@ -1310,7 +2279,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle RC Registration No</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'वाहन RC रजिस्ट्रेशन नंबर' : 'Vehicle RC Registration No'}
+                    </label>
                     <input
                       type="text"
                       value={rcNumber}
@@ -1320,7 +2291,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">GPS Telemetry Unit ID</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'GPS टेलीमेट्री यूनिट आईडी' : 'GPS Telemetry Unit ID'}
+                    </label>
                     <input
                       type="text"
                       value={gpsDeviceId}
@@ -1330,7 +2303,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Reefer Container Temp (°C)</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'रीफर कंटेनर तापमान (°C)' : 'Reefer Container Temp (°C)'}
+                    </label>
                     <input
                       type="number"
                       step="0.5"
@@ -1342,7 +2317,9 @@ export const CollectionCentreView: React.FC = () => {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Destination Delivery Warehouse</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      {language === 'hi' ? 'गंतव्य वितरण वेयरहाउस' : 'Destination Delivery Warehouse'}
+                    </label>
                     <input
                       type="text"
                       disabled
@@ -1357,7 +2334,11 @@ export const CollectionCentreView: React.FC = () => {
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-extrabold text-sm shadow-md shadow-emerald-700/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <Truck className="w-4 h-4" />
-                  <span>Dispatch Consignment & Start GPS Telemetry ({totalDistanceKm} km Route)</span>
+                  <span>
+                    {language === 'hi' 
+                      ? `खेप रवाना करें व GPS ट्रैकिंग शुरू करें (${totalDistanceKm} किमी रूट)` 
+                      : `Dispatch Consignment & Start GPS Telemetry (${totalDistanceKm} km Route)`}
+                  </span>
                 </button>
               </form>
 
@@ -1365,7 +2346,7 @@ export const CollectionCentreView: React.FC = () => {
               <div className="pt-4 border-t border-slate-100 space-y-3">
                 <h4 className="font-bold text-xs text-slate-700 flex items-center gap-2">
                   <Route className="w-4 h-4 text-emerald-600" />
-                  <span>Route Highway & Waypoint Preview</span>
+                  <span>{language === 'hi' ? 'रूट हाईवे व वे-पॉइंट पूर्वावलोकन' : 'Route Highway & Waypoint Preview'}</span>
                 </h4>
                 <RouteTripTracker
                   dispatchDetails={{
@@ -1848,6 +2829,641 @@ export const CollectionCentreView: React.FC = () => {
                 className="font-bold text-emerald-700 hover:underline"
               >
                 View Full Interactive Network Directory →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 1. Direct Farmer Weighbridge Intake Modal */}
+      {isWeighbridgeModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 via-amber-950 to-orange-950 text-white flex items-center justify-between">
+              <div>
+                <h3 className="font-extrabold text-lg flex items-center gap-2">
+                  <Scale className="w-5 h-5 text-amber-400" />
+                  <span>{language === 'hi' ? 'धर्मकांटा आवक प्रविष्टि (Direct Farmer Intake)' : 'Direct Farmer Weighbridge Intake'}</span>
+                </h3>
+                <p className="text-xs text-slate-300 mt-1">
+                  {language === 'hi'
+                    ? `हब: ${activeHub.name} • 60-टन कैलिब्रेटेड धर्मकांटा आवक रसीद`
+                    : `Hub: ${activeHub.name} • Calibrated 60-Ton Gross & Tare Weighment Slip`}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsWeighbridgeModalOpen(false)}
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateWeighbridgeIntake} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    {language === 'hi' ? 'किसान का पूरा नाम *' : 'Farmer Full Name *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={wbFarmerName}
+                    onChange={e => setWbFarmerName(e.target.value)}
+                    placeholder="e.g. Rajinder Singh"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    {language === 'hi' ? 'किसान मोबाइल नंबर *' : 'Farmer Mobile Number *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={wbFarmerPhone}
+                    onChange={e => setWbFarmerPhone(e.target.value)}
+                    placeholder="e.g. +91 98140 12345"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono focus:ring-2 focus:ring-emerald-500 font-semibold text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    {language === 'hi' ? 'फसल का नाम *' : 'Crop Commodity *'}
+                  </label>
+                  <select
+                    value={wbCropName}
+                    onChange={e => setWbCropName(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 bg-white focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="Sharbati Wheat (शरबती गेहूं)">Sharbati Wheat (शरबती गेहूं)</option>
+                    <option value="Basmati 1121 Paddy (बासमती धान)">Basmati 1121 Paddy (बासमती धान)</option>
+                    <option value="Red Onions (लाल प्याज)">Red Onions (लाल प्याज)</option>
+                    <option value="Desi Chana (देसी चना)">Desi Chana (देसी चना)</option>
+                    <option value="Mustard Seeds (सरसों)">Mustard Seeds (सरसों)</option>
+                    <option value="Soybean (सोयाबीन)">Soybean (सोयाबीन)</option>
+                    <option value="Table Tomatoes (टमाटर)">Table Tomatoes (टमाटर)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    {language === 'hi' ? 'किस्म / प्रजाति' : 'Crop Variety'}
+                  </label>
+                  <input
+                    type="text"
+                    value={wbVariety}
+                    onChange={e => setWbVariety(e.target.value)}
+                    placeholder="e.g. Sehore Golden Grain"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    {language === 'hi' ? 'वाहन / ट्रैक्टर नंबर *' : 'Vehicle / Trolley Plate *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={wbVehicleNo}
+                    onChange={e => setWbVehicleNo(e.target.value.toUpperCase())}
+                    placeholder="e.g. PB-10-DF-7890"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500 text-slate-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    {language === 'hi' ? 'धर्मकांटा वे-बे (Bay)' : 'Weighbridge Intake Bay'}
+                  </label>
+                  <select
+                    value={wbBayNumber}
+                    onChange={e => setWbBayNumber(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="Bay #1 (Heavy Multi-Axle Trailer)">Bay #1 (Heavy Multi-Axle Trailer)</option>
+                    <option value="Bay #2 (Automated Heavy Axle)">Bay #2 (Automated Heavy Axle)</option>
+                    <option value="Bay #3 (Tractor Trolley Intake)">Bay #3 (Tractor Trolley Intake)</option>
+                    <option value="Bay #4 (Rail Siding Conveyor)">Bay #4 (Rail Siding Conveyor)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Weight & Moisture Section */}
+              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-3">
+                <div className="font-extrabold text-amber-950 text-xs flex items-center gap-1.5">
+                  <Scale className="w-4 h-4 text-amber-700" />
+                  <span>{language === 'hi' ? 'धर्मकांटा वजन अंशांकन (Weighbridge Scale)' : 'Calibrated Weighbridge Gross & Tare Readings'}</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-amber-900 mb-1">
+                      {language === 'hi' ? 'सकल वजन (Gross Kg) *' : 'Gross Weight (Kg) *'}
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="100"
+                      value={wbGrossKg}
+                      onChange={e => setWbGrossKg(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-amber-300 font-mono font-extrabold text-slate-900 text-sm focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-amber-900 mb-1">
+                      {language === 'hi' ? 'खाली गाड़ी (Tare Kg) *' : 'Tare Empty Weight (Kg) *'}
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={wbTareKg}
+                      onChange={e => setWbTareKg(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-amber-300 font-mono font-extrabold text-slate-900 text-sm focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-amber-900 mb-1">
+                      {language === 'hi' ? 'दर प्रति क्विंटल (₹/Qtl) *' : 'MSP Rate (₹/Qtl) *'}
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={wbPricePerQuintal}
+                      onChange={e => setWbPricePerQuintal(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-amber-300 font-mono font-extrabold text-slate-900 text-sm focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Real-time Calculated Net Weight & Valuation */}
+                {(() => {
+                  const netKg = Math.max(0, wbGrossKg - wbTareKg);
+                  const netQtl = (netKg / 100).toFixed(2);
+                  const totalVal = Math.round(Number(netQtl) * wbPricePerQuintal);
+
+                  return (
+                    <div className="p-3 bg-white rounded-xl border border-amber-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-500 block uppercase font-bold">
+                          {language === 'hi' ? 'शुद्ध फसल वजन' : 'Net Produce Weight'}
+                        </span>
+                        <strong className="text-emerald-700 text-base font-extrabold font-mono">
+                          {netKg.toLocaleString('en-IN')} Kg ({netQtl} Quintals)
+                        </strong>
+                      </div>
+
+                      <div className="border-l border-slate-200 pl-3">
+                        <span className="text-[10px] text-slate-500 block uppercase font-bold">
+                          {language === 'hi' ? 'अनुमानित कुल भुगतान' : 'Estimated Total Payout'}
+                        </span>
+                        <strong className="text-slate-900 text-base font-extrabold font-mono">
+                          ₹{totalVal.toLocaleString('en-IN')}
+                        </strong>
+                      </div>
+
+                      <div className="border-l border-slate-200 pl-3">
+                        <span className="text-[10px] text-slate-500 block uppercase font-bold">
+                          {language === 'hi' ? 'नमी मीटर' : 'Moisture'}
+                        </span>
+                        <strong className="text-blue-700 text-base font-extrabold font-mono">
+                          {wbMoisture}% (Norm &lt; 12%)
+                        </strong>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsWeighbridgeModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
+                >
+                  {language === 'hi' ? 'रद्द करें' : 'Cancel'}
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-extrabold text-xs shadow-lg shadow-emerald-700/20 flex items-center gap-2 transition-all cursor-pointer"
+                >
+                  <Scale className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'धर्मकांटा पर्ची जारी करें व आवक दर्ज करें' : 'Generate Weighbridge Slip & Confirm Intake'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Computerized Weighbridge Deposit Slip Modal */}
+      {activeWeighbridgeSlip && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+            <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
+                <Printer className="w-4 h-4" />
+                <span>{language === 'hi' ? 'कंप्यूटरीकृत धर्मकांटा आवक पर्ची' : 'Computerized Weighbridge Deposit Slip'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveWeighbridgeSlip(null)}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Slip Printable Body */}
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-slate-900 font-sans" id="printable-weighbridge-slip">
+              <div className="text-center pb-3 border-b-2 border-slate-900 space-y-1">
+                <div className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
+                  FOOD CORPORATION OF INDIA / STATE APMC MANDI BOARD
+                </div>
+                <h3 className="text-lg font-black tracking-tight text-slate-950 font-display">
+                  {activeWeighbridgeSlip.hubName}
+                </h3>
+                <p className="text-[11px] text-slate-600">
+                  Depot Code: <strong className="font-mono">{activeWeighbridgeSlip.hubCode}</strong> • Electronic Heavy Vehicle Weighbridge Bay
+                </p>
+                <span className="inline-block mt-1 px-3 py-0.5 rounded-full bg-slate-900 text-amber-300 font-mono font-bold text-xs">
+                  SLIP NO: {activeWeighbridgeSlip.slipNo}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Date & Time / दिनांक</span>
+                  <span className="font-mono font-semibold text-slate-800">{activeWeighbridgeSlip.date}</span>
+                </div>
+                <div className="space-y-1 text-right">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Weighbridge Bay</span>
+                  <span className="font-semibold text-slate-800">{activeWeighbridgeSlip.bayNumber}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Farmer Partner / किसान</span>
+                  <span className="font-bold text-slate-900">{activeWeighbridgeSlip.farmerName}</span>
+                  <span className="block text-[10px] font-mono text-slate-500">{activeWeighbridgeSlip.farmerPhone}</span>
+                </div>
+                <div className="space-y-1 text-right">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Vehicle Plate / गाड़ी नं.</span>
+                  <span className="font-mono font-black text-slate-900 text-sm">{activeWeighbridgeSlip.vehicleNo}</span>
+                </div>
+              </div>
+
+              {/* Weight Breakdown Table */}
+              <div className="border border-slate-300 rounded-xl overflow-hidden text-xs">
+                <div className="bg-slate-100 p-2.5 font-bold text-slate-700 flex justify-between border-b border-slate-300">
+                  <span>WEIGHT SPECIFICATION / वजन विवरण</span>
+                  <span>RECORDED (KG)</span>
+                </div>
+                <div className="p-3 space-y-2 text-slate-800">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Gross Loaded Truck (सकल वजन):</span>
+                    <span className="font-mono font-bold">{activeWeighbridgeSlip.grossKg.toLocaleString('en-IN')} Kg</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Empty Tare Truck (खाली गाड़ी वजन):</span>
+                    <span className="font-mono font-bold">{activeWeighbridgeSlip.tareKg.toLocaleString('en-IN')} Kg</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t-2 border-dashed border-slate-300 font-extrabold text-sm text-slate-950">
+                    <span className="text-emerald-800">NET PRODUCE WEIGHT (शुद्ध फसल):</span>
+                    <span className="font-mono text-emerald-800">{activeWeighbridgeSlip.netKg.toLocaleString('en-IN')} Kg ({activeWeighbridgeSlip.netQtl} Qtl)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Valuation & Quality */}
+              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-amber-900">Crop Commodity / फसल:</span>
+                  <strong className="text-slate-900">{activeWeighbridgeSlip.cropName} ({activeWeighbridgeSlip.variety})</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-amber-900">Agreed Rate / दर:</span>
+                  <strong className="font-mono text-slate-900">₹{activeWeighbridgeSlip.pricePerQuintal} / Quintal</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-amber-900">Tested Moisture (नमी):</span>
+                  <strong className="font-mono text-blue-700">{activeWeighbridgeSlip.moisturePercent}% (Norm &lt; 12%)</strong>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-amber-200 text-sm font-extrabold text-slate-950">
+                  <span>Total Payable Amount (कुल देय राशि):</span>
+                  <span className="font-mono text-emerald-700">₹{activeWeighbridgeSlip.totalAmount.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+
+              {/* Signatures & Seal */}
+              <div className="pt-4 border-t border-slate-200 grid grid-cols-2 gap-4 text-[11px] text-slate-500">
+                <div className="text-center pt-8 border-t border-dashed border-slate-300">
+                  <span className="block font-bold text-slate-800">Farmer Signature</span>
+                  <span>(किसान के हस्ताक्षर)</span>
+                </div>
+                <div className="text-center pt-8 border-t border-dashed border-slate-300">
+                  <span className="block font-bold text-slate-800">{activeWeighbridgeSlip.operatorName}</span>
+                  <span>Weighbridge Incharge Stamp</span>
+                </div>
+              </div>
+
+              <div className="text-center text-[10px] text-slate-400 font-mono pt-1">
+                Verified under Legal Metrology Act (0.05% Accuracy Class III Scale) • System Generated
+              </div>
+            </div>
+
+            {/* Slip Modal Footer Actions */}
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveWeighbridgeSlip(null)}
+                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs"
+              >
+                {language === 'hi' ? 'बंद करें' : 'Close'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-6 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-md"
+              >
+                <Printer className="w-4 h-4 text-amber-400" />
+                <span>{language === 'hi' ? 'पर्ची प्रिंट करें (Print Slip)' : 'Print Weighbridge Slip'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. NABL Quality Inspection Certificate Modal */}
+      {viewingCertificateOrder && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+            <div className="p-4 bg-gradient-to-r from-emerald-950 to-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                <Award className="w-4 h-4" />
+                <span>{language === 'hi' ? 'गुणवत्ता व श्रेणी प्रमाण पत्र (NABL Accredited)' : 'Quality Certificate & Grade Assignment'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingCertificateOrder(null)}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-slate-900 font-sans">
+              <div className="text-center pb-3 border-b-2 border-emerald-900 space-y-1">
+                <div className="text-[10px] uppercase font-bold tracking-widest text-emerald-700">
+                  NABL ACCREDITED AGRI-COMMODITY TESTING LABORATORY
+                </div>
+                <h3 className="text-lg font-black tracking-tight text-slate-950 font-display">
+                  CERTIFICATE OF QUALITY & GRADE ASSIGNMENT
+                </h3>
+                <p className="text-[11px] text-slate-600">
+                  Testing Facility: <strong className="text-slate-900">{activeHub.name}</strong> • ISO/IEC 17025 Certified
+                </p>
+                <span className="inline-block mt-1 px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold text-xs border border-emerald-300">
+                  CERTIFICATE ID: {viewingCertificateOrder.qualityInspection?.certificateId || 'QC-CERT-MH-8821'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Order Reference / लॉट</span>
+                  <span className="font-mono font-bold text-slate-900">{viewingCertificateOrder.orderNumber}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Date of Inspection / तिथि</span>
+                  <span className="font-mono text-slate-700">
+                    {new Date(viewingCertificateOrder.qualityInspection?.inspectedAt || viewingCertificateOrder.orderDate).toLocaleString('en-IN')}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Commodity / फसल</span>
+                  <span className="font-bold text-slate-900">{viewingCertificateOrder.cropName}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Quantity Tested</span>
+                  <span className="font-bold text-slate-900">{viewingCertificateOrder.quantity} {viewingCertificateOrder.unit}</span>
+                </div>
+              </div>
+
+              {/* Quality Grade Highlight Banner */}
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-1">
+                <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Assigned Commodity Grade</span>
+                <div className="text-2xl font-black text-emerald-800 font-display">
+                  {viewingCertificateOrder.qualityInspection?.assignedGrade || 'Grade A+ (Premium / Export Quality)'}
+                </div>
+                <span className="text-xs text-emerald-700">
+                  Visual Score: <strong className="font-mono">{viewingCertificateOrder.qualityInspection?.visualQualityScore || 96} / 100</strong>
+                </span>
+              </div>
+
+              {/* Lab Parameters Table */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                <div className="bg-slate-100 p-2.5 font-bold text-slate-700 flex justify-between">
+                  <span>TEST PARAMETER</span>
+                  <span>OBSERVED VALUE</span>
+                  <span>FSSAI / FCI LIMIT</span>
+                </div>
+                <div className="divide-y divide-slate-100 p-2 text-slate-800">
+                  <div className="flex justify-between py-1.5">
+                    <span>Moisture Content (% w/w)</span>
+                    <strong className="font-mono text-emerald-700">{viewingCertificateOrder.qualityInspection?.moisturePercent || 11.8}%</strong>
+                    <span className="text-slate-500 font-mono">Max 12.0%</span>
+                  </div>
+                  <div className="flex justify-between py-1.5">
+                    <span>Foreign Matter / Dust (% w/w)</span>
+                    <strong className="font-mono text-emerald-700">{viewingCertificateOrder.qualityInspection?.foreignMatterPercent || 0.2}%</strong>
+                    <span className="text-slate-500 font-mono">Max 0.5%</span>
+                  </div>
+                  <div className="flex justify-between py-1.5">
+                    <span>Pest / Weevil Infestation</span>
+                    <strong className="font-mono text-emerald-700">0.0% (NIL)</strong>
+                    <span className="text-slate-500 font-mono">0.0% Nil</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                <span className="text-[10px] text-slate-400 font-bold block uppercase">Inspector Remarks / प्रयोगशाला टिप्पणी</span>
+                <p className="text-slate-700 italic mt-0.5">
+                  "{viewingCertificateOrder.qualityInspection?.notes || 'Clean lot, uniform kernel size, zero foreign odors. Certified for immediate distribution.'}"
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 grid grid-cols-2 gap-4 text-[11px] text-slate-500">
+                <div className="text-center pt-6 border-t border-dashed border-slate-300">
+                  <span className="block font-bold text-slate-800">{viewingCertificateOrder.qualityInspection?.inspectorName || 'Suresh Verma'}</span>
+                  <span>Authorized Quality Assessor</span>
+                </div>
+                <div className="text-center pt-6 border-t border-dashed border-slate-300">
+                  <span className="block font-bold text-emerald-800">DIGITALLY SIGNED</span>
+                  <span>NABL Lab Seal & QR Hash</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setViewingCertificateOrder(null)}
+                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs"
+              >
+                {language === 'hi' ? 'बंद करें' : 'Close'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-6 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-md"
+              >
+                <Printer className="w-4 h-4" />
+                <span>{language === 'hi' ? 'प्रमाण पत्र प्रिंट करें' : 'Print Certificate'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Gate Pass & E-Way Bill Modal */}
+      {viewingGatePassOrder && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+            <div className="p-4 bg-gradient-to-r from-blue-950 to-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-400">
+                <FileText className="w-4 h-4" />
+                <span>{language === 'hi' ? 'गेट पास व ई-वे बिल (Gate Pass & E-Way Bill)' : 'Official Outward Gate Pass & E-Way Bill'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingGatePassOrder(null)}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-slate-900 font-sans">
+              <div className="text-center pb-3 border-b-2 border-blue-900 space-y-1">
+                <div className="text-[10px] uppercase font-bold tracking-widest text-blue-700">
+                  GOVERNMENT OF INDIA • GOODS & SERVICES TAX NETWORK (GSTN)
+                </div>
+                <h3 className="text-lg font-black tracking-tight text-slate-950 font-display">
+                  OUTWARD CONSIGNMENT GATE PASS & E-WAY BILL
+                </h3>
+                <p className="text-[11px] text-slate-600">
+                  Consignor Hub: <strong className="text-slate-900">{activeHub.name}</strong> ({activeHub.code})
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+                  <span className="px-3 py-0.5 rounded-full bg-blue-100 text-blue-800 font-mono font-bold text-xs border border-blue-300">
+                    E-WAY BILL: {viewingGatePassOrder.dispatchDetails?.eWayBillNo || 'EWB-2026-99214412'}
+                  </span>
+                  <span className="px-3 py-0.5 rounded-full bg-slate-900 text-amber-300 font-mono font-bold text-xs">
+                    GATE PASS: GP-FCI-{viewingGatePassOrder.orderNumber}
+                  </span>
+                </div>
+              </div>
+
+              {/* Consignor & Consignee */}
+              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Consignor (भेजने वाला)</span>
+                  <strong className="text-slate-900 block">{activeHub.name}</strong>
+                  <span className="text-[11px] text-slate-600 block">{activeHub.address}, {activeHub.district}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Consignee (प्राप्तकर्ता)</span>
+                  <strong className="text-slate-900 block">{viewingGatePassOrder.buyerName}</strong>
+                  <span className="text-[11px] text-slate-600 block">{viewingGatePassOrder.deliveryAddress}</span>
+                </div>
+              </div>
+
+              {/* Transporter & Vehicle Info */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                <div className="bg-slate-100 p-2.5 font-bold text-slate-700">
+                  TRANSPORTER & VEHICLE COMPLIANCE / वाहन विवरण
+                </div>
+                <div className="p-3 space-y-2 text-slate-800">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Transporter Agency:</span>
+                    <strong className="text-slate-900">{viewingGatePassOrder.dispatchDetails?.transporterName || 'GreenWheels Cold Agri-Logistics'}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Vehicle Registration:</span>
+                    <strong className="font-mono text-emerald-800 text-sm font-black">{viewingGatePassOrder.dispatchDetails?.vehicleNo || 'MH-15-EG-4401'}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Driver Name & Mobile:</span>
+                    <span className="font-semibold text-slate-800">
+                      {viewingGatePassOrder.dispatchDetails?.driverName || 'Prakash Shinde'} ({viewingGatePassOrder.dispatchDetails?.driverPhone || '+91 99223 34455'})
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Driver License (DL):</span>
+                    <span className="font-mono text-slate-700">{viewingGatePassOrder.dispatchDetails?.driverLicenseNo || 'MH-1520190045123'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Reefer Container Temp:</span>
+                    <strong className="text-blue-700 font-mono">{viewingGatePassOrder.dispatchDetails?.temperatureCelsius || 14.0}°C</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Designated Freight Corridor:</span>
+                    <span className="font-semibold text-slate-800">{viewingGatePassOrder.dispatchDetails?.routeHighway || 'NH-60 Mumbai-Nashik Corridor'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cargo Details */}
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] text-emerald-700 font-bold uppercase block">Cargo Commodity</span>
+                  <strong className="text-slate-900 text-sm">{viewingGatePassOrder.cropName}</strong>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-emerald-700 font-bold uppercase block">Net Dispatched Qty</span>
+                  <strong className="text-emerald-800 text-sm font-mono">{viewingGatePassOrder.quantity} {viewingGatePassOrder.unit}</strong>
+                </div>
+              </div>
+
+              {/* Signatures */}
+              <div className="pt-4 border-t border-slate-200 grid grid-cols-2 gap-4 text-[11px] text-slate-500">
+                <div className="text-center pt-6 border-t border-dashed border-slate-300">
+                  <span className="block font-bold text-slate-800">Security Gate #1 Outward Stamp</span>
+                  <span>Vehicle Inspected & Cleared</span>
+                </div>
+                <div className="text-center pt-6 border-t border-dashed border-slate-300">
+                  <span className="block font-bold text-slate-800">Driver Signature</span>
+                  <span>Goods Received in Sound Condition</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setViewingGatePassOrder(null)}
+                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs"
+              >
+                {language === 'hi' ? 'बंद करें' : 'Close'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-6 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-md"
+              >
+                <Printer className="w-4 h-4" />
+                <span>{language === 'hi' ? 'गेट पास प्रिंट करें' : 'Print Gate Pass'}</span>
               </button>
             </div>
           </div>

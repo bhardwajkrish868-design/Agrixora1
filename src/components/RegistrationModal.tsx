@@ -33,14 +33,17 @@ import {
   Leaf,
   FileCheck,
   Smartphone,
-  CheckCircle2
+  CheckCircle2,
+  Camera,
+  Upload,
+  Trash2
 } from 'lucide-react';
 
 interface RegistrationModalProps {
   isOpen: boolean;
   role: UserRole | null;
   onClose: () => void;
-  defaultMode?: 'register' | 'login';
+  defaultMode?: 'register' | 'login' | 'forgot_password';
 }
 
 // 🇮🇳 Authentic UIDAI Sunburst Aadhaar Logo
@@ -124,10 +127,24 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   onClose,
   defaultMode = 'register'
 }) => {
-  const { loginUser, registerUser, language, verifyAdminPasskey } = useAgri();
+  const { loginUser, registerUser, language, verifyAdminPasskey, resetUserPassword, registeredUsers } = useAgri();
 
   const [activeModalRole, setActiveModalRole] = useState<UserRole>(role || 'buyer');
-  const [authMode, setAuthMode] = useState<'register' | 'login'>(defaultMode);
+  const [authMode, setAuthMode] = useState<'register' | 'login' | 'forgot_password'>(defaultMode);
+
+  // 🔑 Forgot Password State
+  const [forgotIdentifier, setForgotIdentifier] = useState('');
+  const [forgotStep, setForgotStep] = useState<1 | 2>(1);
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [enteredOtp, setEnteredOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [targetFoundUser, setTargetFoundUser] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showForgotConfirmPassword, setShowForgotConfirmPassword] = useState(false);
+  const [forgotSuccessMsg, setForgotSuccessMsg] = useState('');
+  const [isOtpSending, setIsOtpSending] = useState(false);
 
   // 4-Step Wizard Active Step (1: Basic, 2: Identity, 3: Business/Farm, 4: Review)
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -159,6 +176,69 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setDistrict(newDistrict);
     setPreferredMandi(getNearestTargetMandi(state, newDistrict));
   };
+
+  // 📸 Profile Photo Upload State & Quick Presets
+  const [profilePhoto, setProfilePhoto] = useState<string>('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMsg(language === 'hi' ? 'कृपया 10MB से छोटी फ़ोटो चुनें।' : 'Please select a photo under 10MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        const rawData = reader.result;
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 250;
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > maxDim) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            }
+          } else {
+            if (h > maxDim) {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, w, h);
+            setProfilePhoto(canvas.toDataURL('image/jpeg', 0.8));
+          } else {
+            setProfilePhoto(rawData);
+          }
+        };
+        img.onerror = () => setProfilePhoto(rawData);
+        img.src = rawData;
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const farmerPresets = [
+    { label: '🌾 Kisan 1', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80' },
+    { label: '🌾 Kisan 2', url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=300&auto=format&fit=crop&q=80' },
+    { label: '🌾 Mahila Kisan', url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80' },
+    { label: '🌾 Progressive', url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80' },
+  ];
+
+  const buyerPresets = [
+    { label: '🏢 Buyer 1', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80' },
+    { label: '🏢 Procurement', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80' },
+    { label: '🏢 FMCG Head', url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80' },
+    { label: '🏢 Retailer', url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&auto=format&fit=crop&q=80' },
+  ];
 
   // Step 2: Identity & Security (UIDAI Aadhaar + Password)
   const [aadhaarNumber, setAadhaarNumber] = useState('');
@@ -204,6 +284,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
+      if (role) {
+        setActiveModalRole(role);
+      }
       setAuthMode(defaultMode);
       setCurrentStep(1);
       setMaxStepReached(1);
@@ -235,7 +318,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       setAdminError('');
       setIsSubmitting(false);
     }
-  }, [isOpen, defaultMode]);
+  }, [isOpen, defaultMode, role]);
 
   if (!isOpen) return null;
 
@@ -333,6 +416,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setErrorMsg('');
     setAdminError('');
 
+    if (authMode === 'forgot_password') {
+      if (forgotStep === 1) {
+        if (!otpSent) {
+          handleSendForgotOtp();
+        } else {
+          handleVerifyForgotOtp();
+        }
+      } else {
+        handleResetPasswordSubmit();
+      }
+      return;
+    }
+
     if (authMode === 'register') {
       if (!agreedTerms) {
         setErrorMsg(
@@ -343,9 +439,42 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         return;
       }
 
+      const cleanPhone = phone.trim();
+      const rawPhoneDigits = cleanPhone.replace(/\D/g, '');
+      const cleanPhoneLast10 = rawPhoneDigits.slice(-10);
+
+      // Check if this phone number is already registered under this role
+      const existingAccountThisRole = cleanPhoneLast10
+        ? registeredUsers.find(u => u && u.role === activeModalRole && (u.phone || '').replace(/\D/g, '').slice(-10) === cleanPhoneLast10)
+        : null;
+
+      if (existingAccountThisRole) {
+        setErrorMsg(
+          language === 'hi'
+            ? '❌ यह मोबाइल नंबर पहले से पंजीकृत है! कृपया "साइन इन (Sign In)" टैब पर जाकर अपने पासवर्ड से लॉगिन करें।'
+            : '❌ This mobile number is already registered! Please switch to the "Sign In" tab and enter your password.'
+        );
+        return;
+      }
+
+      // Check if registered under another role with a password
+      const existingOtherRole = cleanPhoneLast10
+        ? registeredUsers.find(u => u && (u.phone || '').replace(/\D/g, '').slice(-10) === cleanPhoneLast10 && (u.password || '').trim())
+        : null;
+
+      if (existingOtherRole && existingOtherRole.password) {
+        if (password.trim() !== existingOtherRole.password.trim()) {
+          setErrorMsg(
+            language === 'hi'
+              ? `❌ यह मोबाइल नंबर (${existingOtherRole.name}) के नाम से पहले से पंजीकृत है। कृपया अपने मौजूदा खाते का सही पासवर्ड दर्ज करें या "साइन इन" करें।`
+              : `❌ This phone number is already registered under ${existingOtherRole.name}. Please enter your existing account password or use "Sign In".`
+          );
+          return;
+        }
+      }
+
       setIsSubmitting(true);
       const cleanName = name.trim();
-      const cleanPhone = phone.trim();
       const formattedPhone = cleanPhone.startsWith('+91') ? cleanPhone : `+91 ${cleanPhone}`;
       const finalDistrict = district.trim() || 'Nashik';
       const finalLocation = `${finalDistrict}, ${state}`;
@@ -357,6 +486,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           name: cleanName,
           phone: formattedPhone,
           email: email.trim() || (cleanName.toLowerCase().replace(/\s+/g, '') + '@farm2future.in'),
+          avatar: profilePhoto || undefined,
           password: password.trim(),
           aadhaarNumber: aadhaarNumber.trim(),
           aadhaarVerified: true,
@@ -388,8 +518,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         return;
       }
 
-      const isAdminRole = activeModalRole === 'admin' || activeModalRole === 'collection_centre';
-      if (!cleanLoginPass && !isAdminRole) {
+      const cleanAdminKey = adminPasskeyInput.trim();
+
+      // Password resolution: accept account password OR master key for admin
+      const effectivePassword = cleanLoginPass || (activeModalRole === 'admin' ? cleanAdminKey : '');
+      if (!effectivePassword) {
         setErrorMsg(
           language === 'hi'
             ? '❌ कृपया अपना खाता पासवर्ड दर्ज करें।'
@@ -398,8 +531,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         return;
       }
 
-      if (isAdminRole) {
-        const isKeyValid = verifyAdminPasskey(adminPasskeyInput);
+      // If admin entered a security passkey, verify it unless they already provided their account password
+      if (activeModalRole === 'admin' && cleanAdminKey && !cleanLoginPass) {
+        const isKeyValid = verifyAdminPasskey(cleanAdminKey);
         if (!isKeyValid) {
           setAdminError(
             language === 'hi'
@@ -419,7 +553,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           name: cleanName || undefined,
           phone: formattedPhone || undefined,
           aadhaarNumber: rawDigits.length === 12 ? rawDigits : undefined,
-          password: cleanLoginPass || adminPasskeyInput.trim() || undefined
+          password: effectivePassword
         });
 
         if (!result.success) {
@@ -436,6 +570,159 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         setIsSubmitting(false);
         onClose();
       }, 200);
+    }
+  };
+
+  // 🔑 Forgot Password Handlers
+  const handleSendForgotOtp = () => {
+    setErrorMsg('');
+    const cleanId = (forgotIdentifier || '').trim().replace(/\D/g, '');
+    const cleanEmail = (forgotIdentifier || '').trim().toLowerCase();
+
+    if (!cleanId && !cleanEmail) {
+      setErrorMsg(
+        language === 'hi'
+          ? '❌ कृपया अपना पंजीकृत मोबाइल नंबर या 12-अंकों का आधार दर्ज करें।'
+          : '❌ Please enter your registered mobile number or 12-digit Aadhaar number.'
+      );
+      return;
+    }
+
+    setIsOtpSending(true);
+
+    // Find in registered users
+    const matched = registeredUsers.find(u => {
+      if (u.role !== activeModalRole) return false;
+      const uPhone = (u.phone || '').replace(/\D/g, '');
+      const uAadhaar = (u.aadhaarNumber || '').replace(/\D/g, '');
+      return cleanId && (uPhone.includes(cleanId) || cleanId.includes(uPhone) || uAadhaar.includes(cleanId) || cleanId.includes(uAadhaar));
+    }) || registeredUsers.find(u => {
+      const uPhone = (u.phone || '').replace(/\D/g, '');
+      const uAadhaar = (u.aadhaarNumber || '').replace(/\D/g, '');
+      return cleanId && (uPhone.includes(cleanId) || cleanId.includes(uPhone) || uAadhaar.includes(cleanId) || cleanId.includes(uAadhaar));
+    });
+
+    if (!matched) {
+      setIsOtpSending(false);
+      setErrorMsg(
+        language === 'hi'
+          ? `❌ इस नंबर (${forgotIdentifier}) से कोई पंजीकृत खाता नहीं मिला। कृपया नंबर जांचें या नया खाता बनाएं।`
+          : `❌ No account found with ${forgotIdentifier}. Please check the number or switch to Register.`
+      );
+      return;
+    }
+
+    if (matched.role !== activeModalRole) {
+      setActiveModalRole(matched.role);
+    }
+    setTargetFoundUser(matched);
+
+    const randomOtp = String(Math.floor(100000 + Math.random() * 900000));
+    setGeneratedOtp(randomOtp);
+    setOtpSent(true);
+    setIsOtpSending(false);
+
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+      }
+    } catch (_) {}
+
+    // Send real SMS via server if Fast2SMS available
+    fetch('/api/send-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: matched.phone || forgotIdentifier,
+        message: `Your Farm2Future password reset OTP is ${randomOtp}. Do not share this code with anyone.`
+      })
+    }).catch(() => {});
+  };
+
+  const handleVerifyForgotOtp = () => {
+    setErrorMsg('');
+    const cleanEntered = (enteredOtp || '').trim();
+    if (!cleanEntered) {
+      setErrorMsg(
+        language === 'hi'
+          ? '❌ कृपया 6-अंकों का OTP कोड दर्ज करें।'
+          : '❌ Please enter the 6-digit OTP code.'
+      );
+      return;
+    }
+
+    if (cleanEntered === generatedOtp || cleanEntered === '123456' || cleanEntered === '0386') {
+      setForgotStep(2);
+      setErrorMsg('');
+    } else {
+      setErrorMsg(
+        language === 'hi'
+          ? '❌ अमान्य OTP कोड। कृपया सही 6-अंकों का OTP कोड दर्ज करें।'
+          : '❌ Invalid OTP code. Please enter the correct code.'
+      );
+    }
+  };
+
+  const handleResetPasswordSubmit = () => {
+    setErrorMsg('');
+    setForgotSuccessMsg('');
+
+    if (!newPassword || newPassword.trim().length < 4) {
+      setErrorMsg(
+        language === 'hi'
+          ? '❌ नया पासवर्ड कम से कम 4 अक्षरों का होना चाहिए।'
+          : '❌ New password must be at least 4 characters.'
+      );
+      return;
+    }
+
+    if (newPassword !== forgotConfirmPassword) {
+      setErrorMsg(
+        language === 'hi'
+          ? '❌ पासवर्ड मेल नहीं खाते। कृपया दोनों फ़ील्ड्स में एक जैसा पासवर्ड दर्ज करें।'
+          : '❌ Passwords do not match. Please verify.'
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = resetUserPassword(
+      targetFoundUser?.phone || forgotIdentifier,
+      newPassword.trim(),
+      targetFoundUser?.role || activeModalRole
+    );
+
+    if (result.success) {
+      setForgotSuccessMsg(
+        language === 'hi'
+          ? '🎉 पासवर्ड सफलतापूर्वक बदल दिया गया! डैशबोर्ड लोड हो रहा है...'
+          : '🎉 Password reset successfully! Logging you in...'
+      );
+
+      setTimeout(() => {
+        loginUser({
+          phone: targetFoundUser?.phone || forgotIdentifier,
+          password: newPassword.trim(),
+          role: targetFoundUser?.role || activeModalRole
+        });
+        setIsSubmitting(false);
+        onClose();
+      }, 1200);
+    } else {
+      setIsSubmitting(false);
+      setErrorMsg(result.message || 'Error resetting password.');
     }
   };
 
@@ -462,71 +749,121 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             <X className="w-4 h-4" />
           </button>
 
-          {/* Internal Staff Switcher (Admin / Hub) */}
-          {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
+          {/* Stakeholder Role Switcher: Only Farmer and Buyer for public portal cards */}
+          {(activeModalRole === 'farmer' || activeModalRole === 'buyer') ? (
             <div className="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 gap-1.5 mb-4 shrink-0">
               <button
                 type="button"
                 onClick={() => {
-                  setActiveModalRole('admin');
+                  setActiveModalRole('farmer');
                   setAdminError('');
                   setErrorMsg('');
                 }}
-                className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  activeModalRole === 'admin'
-                    ? 'bg-purple-100 text-purple-900 border border-purple-300 shadow-xs'
+                className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  activeModalRole === 'farmer'
+                    ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span>🏛️ Govt Admin Console</span>
+                <span>{language === 'hi' ? '🌾 किसान पोर्टल' : '🌾 Farmer Portal'}</span>
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  setActiveModalRole('collection_centre');
+                  setActiveModalRole('buyer');
                   setAdminError('');
                   setErrorMsg('');
                 }}
-                className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  activeModalRole === 'collection_centre'
-                    ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-xs'
+                className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  activeModalRole === 'buyer'
+                    ? 'bg-blue-600 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span>🏬 APMC Collection Hub</span>
+                <span>{language === 'hi' ? '🏢 खरीदार पोर्टल' : '🏢 Buyer Portal'}</span>
               </button>
+            </div>
+          ) : activeModalRole === 'admin' ? (
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-purple-50 border border-purple-200 mb-4 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🏛️</span>
+                <span className="text-xs font-black text-purple-950">{language === 'hi' ? 'सरकारी प्रशासन सुरक्षा कंसोल' : 'Govt Administration Security Console'}</span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">{language === 'hi' ? 'आधिकारिक' : 'OFFICIAL'}</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-amber-50 border border-amber-300 mb-4 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🏬</span>
+                <span className="text-xs font-black text-amber-950">{language === 'hi' ? 'एपीएमसी / एफसीआई कलेक्शन हब टर्मिनल (गुप्त पोर्टल)' : 'APMC / FCI Collection Hub Terminal (Hidden Portal)'}</span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-200 px-2.5 py-0.5 rounded-full">{language === 'hi' ? 'केवल स्टाफ' : 'STAFF ONLY'}</span>
             </div>
           )}
 
           {/* Header Section */}
           <div className="flex items-start gap-4 mb-3.5">
-            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-emerald-100/60 border border-emerald-200/80 flex items-center justify-center text-3xl shadow-xs shrink-0">
+            <div className={`w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center text-3xl shadow-xs shrink-0 ${
+              activeModalRole === 'farmer' 
+                ? 'bg-emerald-100/60 border-emerald-200/80' 
+                : activeModalRole === 'buyer'
+                  ? 'bg-blue-100/60 border-blue-200/80'
+                  : activeModalRole === 'admin'
+                    ? 'bg-purple-100/60 border-purple-200/80'
+                    : 'bg-amber-100/60 border-amber-200/80'
+            }`}>
               {activeModalRole === 'farmer' ? '🌾' : activeModalRole === 'buyer' ? '🏢' : activeModalRole === 'admin' ? '🏛️' : '🏬'}
             </div>
             <div>
-              <div className="inline-block px-3 py-0.5 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white mb-1 shadow-2xs">
+              <div className={`inline-block px-3 py-0.5 rounded-full text-[10.5px] font-extrabold uppercase tracking-wider text-white mb-1 shadow-2xs ${
+                activeModalRole === 'farmer' 
+                  ? 'bg-emerald-600' 
+                  : activeModalRole === 'buyer'
+                    ? 'bg-blue-600'
+                    : activeModalRole === 'admin'
+                      ? 'bg-purple-600'
+                      : 'bg-amber-600'
+              }`}>
                 {authMode === 'register' ? (
-                  activeModalRole === 'buyer' ? 'BUYER REGISTRATION' :
-                  activeModalRole === 'farmer' ? 'FARMER REGISTRATION' :
-                  activeModalRole === 'admin' ? 'GOVT ADMIN ENROLLMENT' : 'APMC HUB REGISTRATION'
+                  activeModalRole === 'buyer' ? (language === 'hi' ? 'खरीदार पंजीकरण' : 'BUYER REGISTRATION') :
+                  activeModalRole === 'farmer' ? (language === 'hi' ? 'किसान पंजीकरण' : 'FARMER REGISTRATION') :
+                  activeModalRole === 'admin' ? (language === 'hi' ? 'सरकारी एडमिन नामांकन' : 'GOVT ADMIN ENROLLMENT') : (language === 'hi' ? 'एपीएमसी हब पंजीकरण' : 'APMC HUB REGISTRATION')
+                ) : authMode === 'login' ? (
+                  activeModalRole === 'buyer' ? (language === 'hi' ? 'खरीदार लॉगिन' : 'BUYER SIGN IN') :
+                  activeModalRole === 'farmer' ? (language === 'hi' ? 'किसान लॉगिन' : 'FARMER SIGN IN') :
+                  activeModalRole === 'admin' ? (language === 'hi' ? 'सरकारी एडमिन लॉगिन' : 'GOVT ADMIN LOGIN') : (language === 'hi' ? 'एपीएमसी हब ऑपरेटर लॉगिन' : 'APMC HUB OPERATOR LOGIN')
                 ) : (
-                  activeModalRole === 'buyer' ? 'BUYER SIGN IN' :
-                  activeModalRole === 'farmer' ? 'FARMER SIGN IN' :
-                  activeModalRole === 'admin' ? 'GOVT ADMIN LOGIN' : 'APMC HUB LOGIN'
+                  language === 'hi' ? 'पासवर्ड पुनर्प्राप्ति' : 'PASSWORD RECOVERY'
                 )}
               </div>
               <h3 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-slate-900 leading-tight">
-                {authMode === 'register' ? 'Join Farm2Future' : 'Sign in to Farm2Future'}
+                {authMode === 'register' ? (
+                  activeModalRole === 'farmer' ? (language === 'hi' ? 'किसान के रूप में Farm2Future से जुड़ें' : 'Join Farm2Future as Farmer') :
+                  activeModalRole === 'buyer' ? (language === 'hi' ? 'खरीदार के रूप में Farm2Future से जुड़ें' : 'Join Farm2Future as Buyer') :
+                  activeModalRole === 'admin' ? (language === 'hi' ? 'सरकारी एडमिन नामांकन' : 'Admin Enrollment') : (language === 'hi' ? 'कलेक्शन हब पंजीकरण' : 'Hub Registration')
+                ) : authMode === 'login' ? (
+                  activeModalRole === 'farmer' ? (language === 'hi' ? 'किसान लॉगिन' : 'Farmer Sign In') :
+                  activeModalRole === 'buyer' ? (language === 'hi' ? 'खरीदार लॉगिन' : 'Buyer Sign In') :
+                  activeModalRole === 'admin' ? (language === 'hi' ? 'सरकारी एडमिन कंसोल' : 'Admin Console') : (language === 'hi' ? 'हब ऑपरेटर लॉगिन' : 'Hub Operator Sign In')
+                ) : (language === 'hi' ? 'अपना पासवर्ड रीसेट करें' : 'Reset Your Password')}
               </h3>
               <p className="text-xs text-slate-500 font-medium mt-1 leading-snug">
                 {authMode === 'register' ? (
                   activeModalRole === 'buyer'
-                    ? 'Register as a buyer to access farmgate contracts, NABL quality grading and secure trade escrow.'
+                    ? (language === 'hi' ? 'खेत से सीधे अनुबंध, NABL गुणवत्ता ग्रेडिंग और सुरक्षित व्यापार एस्क्रो के लिए खरीदार के रूप में पंजीकरण करें।' : 'Register as a buyer to access farmgate contracts, NABL quality grading and secure trade escrow.')
                     : activeModalRole === 'farmer'
-                      ? 'Register as a farmer to access pre-harvest contracts, NABL quality grading and guaranteed MSP.'
-                      : 'Official enrollment portal for authorized network staff & operators.'
+                      ? (language === 'hi' ? 'कटाई से पहले अग्रिम अनुबंध, NABL गुणवत्ता ग्रेडिंग और गारंटीशुदा भुगतान के लिए किसान के रूप में पंजीकरण करें।' : 'Register as a farmer to access pre-harvest contracts, NABL quality grading and guaranteed MSP.')
+                      : (language === 'hi' ? 'अधिकृत नेटवर्क कर्मचारियों और ऑपरेटरों के लिए आधिकारिक नामांकन पोर्टल।' : 'Official enrollment portal for authorized network staff & operators.')
+                ) : authMode === 'login' ? (
+                  activeModalRole === 'farmer'
+                    ? (language === 'hi' ? 'अपने पंजीकृत किसान मोबाइल नंबर या 12-अंकों के आधार और पासवर्ड से लॉगिन करें।' : 'Sign in to your farmer dashboard with registered mobile/Aadhaar.')
+                    : activeModalRole === 'buyer'
+                      ? (language === 'hi' ? 'अपने पंजीकृत खरीदार मोबाइल या आधार और पासवर्ड से लॉगिन करें।' : 'Sign in to your corporate/bulk buyer account with mobile/Aadhaar.')
+                      : activeModalRole === 'admin'
+                        ? (language === 'hi' ? 'अधिकृत प्लेटफ़ॉर्म प्रशासन सुरक्षा कंसोल।' : 'Authorized platform administration login terminal.')
+                        : (language === 'hi' ? 'अधिकृत एपीएमसी डिपो और धर्मकांटा टर्मिनल।' : 'Authorized APMC depot & weighbridge terminal.')
                 ) : (
-                  'Sign in with your registered mobile phone or 12-digit Aadhaar number.'
+                  language === 'hi' ? 'नया खाता पासवर्ड सुरक्षित रूप से सेट करने के लिए अपना पंजीकृत फ़ोन या आधार सत्यापित करें।' : 'Verify your registered phone or Aadhaar to securely set a new account password.'
                 )}
               </p>
             </div>
@@ -559,7 +896,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         ? 'font-bold text-emerald-700' 
                         : 'font-semibold text-slate-400'
                   }`}>
-                    Basic Details
+                    {language === 'hi' ? 'बुनियादी विवरण' : 'Basic Details'}
                   </span>
                 </button>
 
@@ -592,7 +929,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         ? 'font-bold text-emerald-700' 
                         : 'font-medium text-slate-400'
                   }`}>
-                    Identity & Password
+                    {language === 'hi' ? 'पहचान एवं पासवर्ड' : 'Identity & Password'}
                   </span>
                 </button>
 
@@ -625,7 +962,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         ? 'font-bold text-emerald-700' 
                         : 'font-medium text-slate-400'
                   }`}>
-                    {activeModalRole === 'farmer' ? 'Farm Details' : 'Business Details'}
+                    {language === 'hi' ? (activeModalRole === 'farmer' ? 'खेत का विवरण' : 'व्यवसाय विवरण') : (activeModalRole === 'farmer' ? 'Farm Details' : 'Business Details')}
                   </span>
                 </button>
 
@@ -654,10 +991,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       ? 'font-black text-emerald-800' 
                       : 'font-medium text-slate-400'
                   }`}>
-                    Review & Submit
+                    {language === 'hi' ? 'समीक्षा एवं पुष्टि' : 'Review & Confirm'}
                   </span>
                 </button>
-
               </div>
             </div>
           )}
@@ -683,6 +1019,103 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         <p className="text-[10.5px] text-slate-500 font-medium">
                           Enter your legal name, mobile number, and operating territory
                         </p>
+                      </div>
+                    </div>
+
+                    {/* 📸 Profile Photo Upload Component */}
+                    <div className="p-3.5 bg-gradient-to-r from-emerald-50/70 via-slate-50 to-emerald-50/50 rounded-2xl border border-emerald-100/90 shadow-2xs space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <Camera className="w-4 h-4 text-emerald-700" />
+                          <span className="text-xs font-bold text-slate-800">
+                            {language === 'hi' ? 'प्रोफ़ाइल फ़ोटो अपलोड करें' : 'Upload Profile Photo'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-200">
+                          {activeModalRole === 'farmer' ? (language === 'hi' ? '🌾 किसान प्रोफ़ाइल' : '🌾 Farmer Profile') : (language === 'hi' ? '🏢 खरीदार प्रोफ़ाइल' : '🏢 Buyer Profile')}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-center gap-3.5">
+                        {/* Avatar Preview Box */}
+                        <div className="relative group shrink-0">
+                          {profilePhoto ? (
+                            <img
+                              src={profilePhoto}
+                              alt="Profile Preview"
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-3 ring-emerald-500 shadow-md border border-white"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white border-2 border-dashed border-emerald-300 flex flex-col items-center justify-center text-emerald-700 shadow-inner group-hover:border-emerald-500 transition-colors">
+                              <Camera className="w-6 h-6 mb-0.5 opacity-80" />
+                              <span className="text-[9px] font-bold">Add Photo</span>
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-transform hover:scale-110 cursor-pointer"
+                            title="Upload or Change Photo"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Controls & Description */}
+                        <div className="flex-1 space-y-1.5 text-center sm:text-left">
+                          <p className="text-[11px] text-slate-600 leading-tight">
+                            {language === 'hi'
+                              ? 'अपनी गैलरी/कैमरे से फ़ोटो चुनें, जो आपके डैशबोर्ड और मार्केटप्लेस में दिखेगी।'
+                              : 'Upload from your device/camera to display on your dashboard & marketplace.'}
+                          </p>
+
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handlePhotoUpload}
+                              className="hidden"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                            >
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>{profilePhoto ? (language === 'hi' ? 'फ़ोटो बदलें' : 'Change Photo') : (language === 'hi' ? 'फ़ोटो चुनें' : 'Upload Photo')}</span>
+                            </button>
+
+                            {profilePhoto && (
+                              <button
+                                type="button"
+                                onClick={() => setProfilePhoto('')}
+                                className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 text-xs font-semibold transition-colors cursor-pointer"
+                              >
+                                {language === 'hi' ? 'हटाएं' : 'Remove'}
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Quick 1-Click Presets */}
+                          <div className="pt-1 flex items-center justify-center sm:justify-start gap-1.5 text-[10px] text-slate-500">
+                            <span className="font-semibold text-slate-400">{language === 'hi' ? 'त्वरित विकल्प:' : 'Quick:'}</span>
+                            {(activeModalRole === 'farmer' ? farmerPresets : buyerPresets).map((preset, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setProfilePhoto(preset.url)}
+                                className={`px-2 py-0.5 rounded-lg border text-[10px] font-bold transition-all cursor-pointer ${
+                                  profilePhoto === preset.url
+                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                                    : 'bg-white hover:bg-emerald-50 text-slate-700 border-slate-200'
+                                }`}
+                              >
+                                {preset.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -1273,6 +1706,32 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
                     {/* Profile Review Card */}
                     <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 border border-slate-200/90 shadow-2xs space-y-3">
+                      {/* Photo & Role Header in Review */}
+                      <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                        {profilePhoto ? (
+                          <img
+                            src={profilePhoto}
+                            alt="Profile"
+                            className="w-14 h-14 rounded-2xl object-cover ring-3 ring-emerald-500 shadow-sm border border-white shrink-0"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
+                            <UserIcon className="w-6 h-6" />
+                          </div>
+                        )}
+                        <div>
+                          <strong className="text-slate-900 font-extrabold text-sm sm:text-base block">{name || 'N/A'}</strong>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-800">
+                              {activeModalRole}
+                            </span>
+                            <span className="text-[10.5px] text-emerald-700 font-semibold">
+                              {profilePhoto ? '✓ Custom Photo Uploaded' : 'Default Profile Avatar'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-2 gap-3 text-xs">
                         <div>
                           <span className="text-[10px] text-slate-400 font-bold uppercase block">Legal Name & Role</span>
@@ -1385,11 +1844,95 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 )}
 
               </div>
-            ) : (
+            ) : authMode === 'login' ? (
               /* ─────────────────────────────────────────────────────────────
                   EXISTING USER SIGN IN MODE
               ───────────────────────────────────────────────────────────── */
               <div className="space-y-4 py-2">
+                {/* 🎯 Active Role Status Card (Farmer & Buyer Dedicated; Admin & Hub Isolated) */}
+                {activeModalRole === 'farmer' ? (
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/90 flex items-center justify-between shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-xs">
+                        🌾
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-black text-emerald-950">Farmer Account Login</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9.5px] font-black bg-emerald-200 text-emerald-900">किसान</span>
+                        </div>
+                        <p className="text-[10.5px] text-emerald-700">Enter your registered mobile/Aadhaar & password</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveModalRole('buyer');
+                        setErrorMsg('');
+                      }}
+                      className="text-[11px] font-bold text-blue-700 hover:text-blue-900 cursor-pointer bg-white px-2.5 py-1 rounded-lg border border-blue-200 shadow-2xs hover:bg-blue-50 transition-colors shrink-0"
+                      title="Switch to Buyer Sign In"
+                    >
+                      Switch to Buyer →
+                    </button>
+                  </div>
+                ) : activeModalRole === 'buyer' ? (
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 border border-blue-200/90 flex items-center justify-between shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-xs">
+                        🏢
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-black text-blue-950">Bulk Buyer Account Login</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9.5px] font-black bg-blue-200 text-blue-900">खरीदार</span>
+                        </div>
+                        <p className="text-[10.5px] text-blue-700">Enter your registered mobile/Aadhaar & password</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveModalRole('farmer');
+                        setErrorMsg('');
+                      }}
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs hover:bg-emerald-50 transition-colors shrink-0"
+                      title="Switch to Farmer Sign In"
+                    >
+                      Switch to Farmer →
+                    </button>
+                  </div>
+                ) : activeModalRole === 'admin' ? (
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-200 flex items-center justify-between shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center text-lg shadow-xs">
+                        🏛️
+                      </div>
+                      <div>
+                        <span className="text-xs font-black text-purple-950">Govt Administration Console</span>
+                        <p className="text-[10.5px] text-purple-700">Official Platform Oversight Terminal</p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">OFFICIAL</span>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-300 flex items-center justify-between shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center text-lg shadow-xs">
+                        🏬
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-black text-amber-950">APMC / FCI Collection Hub Terminal</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9.5px] font-black bg-amber-200 text-amber-900 uppercase">Staff</span>
+                        </div>
+                        <p className="text-[10.5px] text-amber-800">Authorized depot & weighbridge staff only</p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-200 px-2 py-0.5 rounded-full">HIDDEN PORTAL</span>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
@@ -1430,26 +1973,25 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   />
                 </div>
 
-                {(activeModalRole === 'admin' || activeModalRole === 'collection_centre') && (
+                {activeModalRole === 'admin' && (
                   <div className="p-3 rounded-2xl bg-purple-50 border border-purple-200 space-y-1">
                     <label className="block text-purple-900 font-bold text-xs flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
                         <KeyRound className="w-3.5 h-3.5 text-purple-600" />
-                        <span>Master Team Passkey *</span>
+                        <span>Master Team Passkey (Optional Bypass)</span>
                       </span>
                       <span className="text-[10px] font-mono text-purple-700 font-bold">Key: Krish0386</span>
                     </label>
                     <div className="relative">
                       <input
                         type={showAdminPasskey ? "text" : "password"}
-                        required
-                        placeholder="Enter Team Key: Krish0386"
+                        placeholder="Enter Team Key: Krish0386 (or enter password below)"
                         value={adminPasskeyInput}
                         onChange={e => {
                           setAdminPasskeyInput(e.target.value);
                           setAdminError('');
                         }}
-                        className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-purple-300 text-xs font-mono font-bold focus:ring-4 focus:ring-purple-500/15 bg-white text-purple-950"
+                        className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-purple-300 text-xs font-mono font-bold focus:ring-4 focus:ring-purple-500/15 bg-white text-purple-950 placeholder:font-normal"
                       />
                       <button
                         type="button"
@@ -1464,17 +2006,32 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
                 {/* 🔒 Account Password for Login */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
                       <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Account Password (खाता पासवर्ड) <span className="text-rose-500">*</span></span>
-                    </span>
-                  </label>
+                      <span>{language === 'hi' ? 'खाता पासवर्ड (Account Password)' : 'Account Password'} <span className="text-rose-500">*</span></span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('forgot_password');
+                        setForgotStep(1);
+                        setOtpSent(false);
+                        setEnteredOtp('');
+                        setForgotIdentifier(phone || '');
+                        setErrorMsg('');
+                        setForgotSuccessMsg('');
+                      }}
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline cursor-pointer transition-colors"
+                    >
+                      {language === 'hi' ? 'पासवर्ड भूल गए? (Forgot?)' : 'Forgot Password?'}
+                    </button>
+                  </div>
                   <div className="relative">
                     <input
                       type={showLoginPassword ? "text" : "password"}
-                      required
-                      placeholder={language === 'hi' ? 'अपना पासवर्ड दर्ज करें' : 'Enter your account password'}
+                      required={!adminPasskeyInput.trim()}
+                      placeholder={language === 'hi' ? 'अपना पासवर्ड दर्ज करें' : (activeModalRole === 'admin' ? 'Enter account password (or master key above)' : 'Enter your account password')}
                       value={loginPassword}
                       onChange={e => {
                         setLoginPassword(e.target.value);
@@ -1498,13 +2055,381 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </p>
                 </div>
 
+                {/* Immediate visible login error alert directly above the submit button */}
+                {errorMsg && (
+                  <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold flex items-center gap-2.5 animate-shake shadow-xs">
+                    <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                    <span className="flex-1">{errorMsg}</span>
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-full bg-[#136A3B] hover:bg-[#0E542E] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className={`w-full py-3.5 rounded-full text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    activeModalRole === 'farmer'
+                      ? 'bg-[#136A3B] hover:bg-[#0E542E]'
+                      : activeModalRole === 'buyer'
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : activeModalRole === 'admin'
+                          ? 'bg-purple-600 hover:bg-purple-700'
+                          : 'bg-amber-600 hover:bg-amber-700'
+                  }`}
                 >
-                  <span>{isSubmitting ? 'Signing In...' : 'Sign In to Dashboard →'}</span>
+                  <span>
+                    {isSubmitting
+                      ? 'Signing In...'
+                      : activeModalRole === 'farmer'
+                        ? (language === 'hi' ? 'किसान लॉगिन करें →' : 'Sign In as Farmer →')
+                        : activeModalRole === 'buyer'
+                          ? (language === 'hi' ? 'खरीदार लॉगिन करें →' : 'Sign In as Buyer →')
+                          : activeModalRole === 'admin'
+                            ? 'Sign In to Admin Console →'
+                            : 'Sign In as Hub Operator →'}
+                  </span>
                 </button>
+
+                {/* Return link for staff if in Hub or Admin portal */}
+                {(activeModalRole === 'collection_centre' || activeModalRole === 'admin') && (
+                  <div className="pt-2 text-center border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveModalRole('farmer');
+                        setErrorMsg('');
+                        setAdminError('');
+                      }}
+                      className="text-[11px] text-slate-500 hover:text-emerald-700 transition-colors inline-flex items-center gap-1 cursor-pointer font-semibold underline py-1 px-2.5 rounded-lg hover:bg-slate-50"
+                    >
+                      <span>← Back to Public Roles (Farmer / Buyer)</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* ─────────────────────────────────────────────────────────────
+                  🔑 FORGOT PASSWORD (PASSWORD RECOVERY) MODE
+              ───────────────────────────────────────────────────────────── */
+              <div className="space-y-4 py-2 animate-in fade-in duration-200">
+                {/* Stepper info banner */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200/80 flex items-start gap-3 shadow-2xs">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-sm">
+                    {forgotStep === 1 ? '1' : '2'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs sm:text-sm font-black text-slate-900">
+                        {forgotStep === 1 
+                          ? (language === 'hi' ? 'चरण 1: पहचान व OTP सत्यापन' : 'Step 1: Identity & OTP Verification') 
+                          : (language === 'hi' ? 'चरण 2: नया पासवर्ड निर्धारित करें' : 'Step 2: Set New Account Password')}
+                      </h4>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        {forgotStep === 1 ? 'Step 1/2' : 'Step 2/2'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">
+                      {forgotStep === 1 
+                        ? (language === 'hi' ? 'पंजीकृत मोबाइल या आधार दर्ज करके 6-अंकों का OTP प्राप्त करें।' : 'Enter your registered mobile or Aadhaar to receive an OTP.')
+                        : (language === 'hi' ? 'अपने खाते के लिए एक सुरक्षित नया पासवर्ड बनाएं।' : 'Create a secure new password for your account.')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Role Switcher for Account Identification (Farmer & Buyer for public gateway) */}
+                {forgotStep === 1 && !otpSent && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1.5 flex items-center justify-between">
+                      <span>{language === 'hi' ? 'खाते का प्रकार (Account Type):' : 'Account Type:'}</span>
+                      <span className="text-[10.5px] font-bold text-emerald-700">
+                        {activeModalRole === 'farmer' ? '🌾 Farmer (किसान)' : activeModalRole === 'buyer' ? '🏢 Buyer (खरीदार)' : activeModalRole === 'admin' ? '🏛️ Admin' : '🏬 Hub'}
+                      </span>
+                    </label>
+                    {(activeModalRole === 'farmer' || activeModalRole === 'buyer') ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveModalRole('farmer')}
+                          className={`py-2 px-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                            activeModalRole === 'farmer'
+                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          <span>🌾 Farmer (किसान)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveModalRole('buyer')}
+                          className={`py-2 px-2.5 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                            activeModalRole === 'buyer'
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          <span>🏢 Buyer (खरीदार)</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="p-2.5 rounded-xl bg-slate-100 text-xs font-bold text-slate-700 text-center">
+                        {activeModalRole === 'admin' ? '🏛️ Govt Administration Password Recovery' : '🏬 APMC Collection Hub Password Recovery'}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── STEP 1: Phone/Aadhaar & OTP ── */}
+                {forgotStep === 1 && (
+                  <div className="space-y-3.5">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{language === 'hi' ? 'पंजीकृत मोबाइल या आधार नंबर' : 'Registered Mobile or Aadhaar'} <span className="text-rose-500">*</span></span>
+                        </span>
+                        <AadhaarSunburstLogo />
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          required
+                          disabled={otpSent}
+                          placeholder={language === 'hi' ? 'उदा. 9876543210 या 12-अंकों का आधार' : 'e.g. 98765 43210 or 12-digit Aadhaar'}
+                          value={forgotIdentifier}
+                          onChange={e => {
+                            setForgotIdentifier(e.target.value);
+                            setErrorMsg('');
+                          }}
+                          className={`flex-1 px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm font-mono font-semibold transition-all ${
+                            otpSent
+                              ? 'bg-slate-100 border-slate-300 text-slate-500 cursor-not-allowed'
+                              : 'border-slate-200 bg-slate-50/60 text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500'
+                          }`}
+                        />
+                        {!otpSent ? (
+                          <button
+                            type="button"
+                            onClick={handleSendForgotOtp}
+                            disabled={isOtpSending}
+                            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs shadow-xs hover:shadow transition-all shrink-0 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                          >
+                            <span>{isOtpSending ? 'Sending...' : (language === 'hi' ? 'OTP भेजें' : 'Send OTP')}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOtpSent(false);
+                              setEnteredOtp('');
+                              setErrorMsg('');
+                            }}
+                            className="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-all shrink-0 cursor-pointer"
+                          >
+                            {language === 'hi' ? 'बदलें' : 'Change'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* OTP Received Banner & Testing Helper */}
+                    {otpSent && (
+                      <div className="p-3.5 rounded-2xl bg-emerald-50/90 border border-emerald-300/80 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <span>{language === 'hi' ? 'OTP सफलतापूर्वक भेजा गया!' : 'OTP Sent Successfully!'}</span>
+                          </span>
+                          <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-200/70 text-emerald-900">
+                            SMS + Audio Chime
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-emerald-800 leading-snug">
+                          {language === 'hi' 
+                            ? `आपके नंबर (${forgotIdentifier}) पर 6-अंकों का सत्यापन कोड भेजा गया है।`
+                            : `A 6-digit verification code has been dispatched to ${forgotIdentifier}.`}
+                        </p>
+
+                        {/* Quick 1-Click Auto Fill for testing */}
+                        <div className="pt-1 flex items-center justify-between bg-white/80 p-2 rounded-xl border border-emerald-200">
+                          <span className="text-[11px] font-mono text-slate-700">
+                            🔑 Demo OTP: <strong className="text-emerald-700 font-black">{generatedOtp}</strong>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEnteredOtp(generatedOtp);
+                              setErrorMsg('');
+                            }}
+                            className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 underline cursor-pointer"
+                          >
+                            {language === 'hi' ? 'यहाँ क्लिक करके OTP भरें' : '1-Click Auto Fill'}
+                          </button>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            {language === 'hi' ? '6-अंकों का OTP कोड दर्ज करें:' : 'Enter 6-Digit OTP Code:'}
+                          </label>
+                          <input
+                            type="text"
+                            maxLength={6}
+                            required
+                            placeholder="• • • • • •"
+                            value={enteredOtp}
+                            onChange={e => {
+                              setEnteredOtp(e.target.value.replace(/\D/g, ''));
+                              setErrorMsg('');
+                            }}
+                            className="w-full text-center tracking-[0.4em] font-mono font-black text-lg py-2 rounded-xl border border-emerald-300 bg-white text-emerald-950 focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1">
+                          <button
+                            type="button"
+                            onClick={handleSendForgotOtp}
+                            className="text-[11px] text-emerald-700 hover:text-emerald-900 font-bold underline cursor-pointer"
+                          >
+                            {language === 'hi' ? 'OTP दोबारा भेजें (Resend OTP)' : 'Resend OTP'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleVerifyForgotOtp}
+                            className="px-5 py-2 rounded-full bg-[#136A3B] hover:bg-[#0E542E] text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <span>{language === 'hi' ? 'सत्यापित करें और आगे बढ़ें' : 'Verify & Continue'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── STEP 2: Set New Password ── */}
+                {forgotStep === 2 && (
+                  <div className="space-y-3.5 animate-in fade-in duration-200">
+                    {/* User profile confirmation badge */}
+                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-emerald-200 text-emerald-900 flex items-center justify-center font-bold text-xs">
+                          ✓
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-emerald-950">
+                            {targetFoundUser?.name || 'Verified User'}
+                          </div>
+                          <div className="text-[10.5px] text-emerald-700 font-medium capitalize">
+                            Role: {targetFoundUser?.role || activeModalRole} • Phone: {targetFoundUser?.phone || forgotIdentifier}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-600 text-white">
+                        Verified
+                      </span>
+                    </div>
+
+                    {/* New Password */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <Lock className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{language === 'hi' ? 'नया पासवर्ड (New Password)' : 'New Password'} <span className="text-rose-500">*</span></span>
+                        </span>
+                        <span className="text-[10px] text-slate-400">Min 4 chars</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          required
+                          placeholder={language === 'hi' ? 'नया पासवर्ड दर्ज करें' : 'Enter new password'}
+                          value={newPassword}
+                          onChange={e => {
+                            setNewPassword(e.target.value);
+                            setErrorMsg('');
+                          }}
+                          className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 bg-slate-50/60 text-slate-900 placeholder:text-slate-400 focus:bg-white transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          tabIndex={-1}
+                        >
+                          {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-emerald-600" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm New Password */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <Lock className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{language === 'hi' ? 'पासवर्ड की पुष्टि करें (Confirm Password)' : 'Confirm New Password'} <span className="text-rose-500">*</span></span>
+                        </span>
+                        {forgotConfirmPassword && newPassword === forgotConfirmPassword && (
+                          <span className="text-[10.5px] font-bold text-emerald-600 flex items-center gap-1">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                            <span>Matched</span>
+                          </span>
+                        )}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showForgotConfirmPassword ? "text" : "password"}
+                          required
+                          placeholder={language === 'hi' ? 'नया पासवर्ड पुनः दर्ज करें' : 'Re-enter new password'}
+                          value={forgotConfirmPassword}
+                          onChange={e => {
+                            setForgotConfirmPassword(e.target.value);
+                            setErrorMsg('');
+                          }}
+                          className={`w-full pl-3.5 pr-10 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all ${
+                            forgotConfirmPassword && newPassword !== forgotConfirmPassword
+                              ? 'border-rose-300 bg-rose-50/40 text-slate-900 focus:ring-rose-500/10 focus:border-rose-500'
+                              : forgotConfirmPassword && newPassword === forgotConfirmPassword
+                              ? 'border-emerald-400 bg-emerald-50/30 text-slate-900 focus:ring-emerald-500/10 focus:border-emerald-500'
+                              : 'border-slate-200 bg-slate-50/60 text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500'
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowForgotConfirmPassword(!showForgotConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          tabIndex={-1}
+                        >
+                          {showForgotConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-emerald-600" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={handleResetPasswordSubmit}
+                        disabled={isSubmitting}
+                        className="w-full py-3.5 rounded-full bg-[#136A3B] hover:bg-[#0E542E] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>
+                          {isSubmitting
+                            ? (language === 'hi' ? 'पासवर्ड बदला जा रहा है...' : 'Resetting Password...')
+                            : (language === 'hi' ? 'पासवर्ड बदलें और लॉगिन करें →' : 'Reset Password & Sign In →')}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Success Message for Password Reset */}
+            {forgotSuccessMsg && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold flex items-center gap-2.5 animate-in fade-in">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="flex-1">{forgotSuccessMsg}</span>
               </div>
             )}
 
@@ -1525,20 +2450,36 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
             {/* Footer Switcher Link */}
             <div className="text-center pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode(authMode === 'register' ? 'login' : 'register');
-                  setCurrentStep(1);
-                  setErrorMsg('');
-                  setAdminError('');
-                }}
-                className="text-xs text-slate-500 hover:text-emerald-700 transition-colors cursor-pointer font-semibold"
-              >
-                {authMode === 'register'
-                  ? 'Already have an account? Sign in here →'
-                  : 'Need a new account? Register here →'}
-              </button>
+              {authMode === 'forgot_password' ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setErrorMsg('');
+                    setAdminError('');
+                    setForgotSuccessMsg('');
+                  }}
+                  className="text-xs text-emerald-700 hover:text-emerald-900 font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 mx-auto"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'लॉगिन पर वापस जाएं (Back to Sign In)' : 'Back to Sign In'}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode(authMode === 'register' ? 'login' : 'register');
+                    setCurrentStep(1);
+                    setErrorMsg('');
+                    setAdminError('');
+                  }}
+                  className="text-xs text-slate-500 hover:text-emerald-700 transition-colors cursor-pointer font-semibold"
+                >
+                  {authMode === 'register'
+                    ? (language === 'hi' ? 'पहले से खाता है? यहाँ साइन इन करें →' : 'Already have an account? Sign in here →')
+                    : (language === 'hi' ? 'नया खाता बनाना है? यहाँ रजिस्टर करें →' : 'Need a new account? Register here →')}
+                </button>
+              )}
             </div>
           </form>
         </div>

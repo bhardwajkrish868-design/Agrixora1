@@ -113,7 +113,7 @@ const DigitalIndiaLogo: React.FC = () => (
 
 
 export const WelcomeGatewayView: React.FC = () => {
-  const { language, setLanguage, bulkDemands } = useAgri();
+  const { language, setLanguage } = useAgri();
 
   // Cloud Database Modal & Status
   const [isCloudDbOpen, setIsCloudDbOpen] = useState(false);
@@ -198,7 +198,7 @@ export const WelcomeGatewayView: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative h-screen w-full flex flex-col justify-between overflow-y-auto md:overflow-hidden font-sans select-none bg-slate-50 text-slate-900">
+    <div className="relative min-h-screen xl:h-screen w-full flex flex-col justify-between overflow-y-auto font-sans select-none bg-slate-50 text-slate-900">
       
       {/* 🌾 Cinematic Scenic Farm Background */}
       <div 
@@ -215,7 +215,7 @@ export const WelcomeGatewayView: React.FC = () => {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a08_1px,transparent_1px),linear-gradient(to_bottom,#0f172a08_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
 
       {/* 🌟 Top Navigation Bar */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-2.5 flex items-center justify-between shrink-0 border-b border-emerald-900/10 bg-white/80 backdrop-blur-md shadow-xs">
+      <header className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 py-2 sm:py-2.5 flex items-center justify-between shrink-0 border-b border-emerald-900/10 bg-white/80 backdrop-blur-md shadow-xs">
         <div 
           onClick={handleLogoClick}
           className="flex items-center gap-2.5 cursor-pointer select-none group"
@@ -234,22 +234,43 @@ export const WelcomeGatewayView: React.FC = () => {
         {/* Top Right Actions */}
         <div className="flex items-center gap-2.5 sm:gap-3">
 
-          <button
-            onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 text-xs font-bold shadow-xs border border-slate-200/80 transition-all cursor-pointer hover:scale-105"
-          >
-            <Globe className="w-3.5 h-3.5 text-emerald-600" />
-            <span>{language === 'en' ? 'English' : 'हिंदी'}</span>
-          </button>
+          {/* Language Selector Dual Pill */}
+          <div className="flex items-center bg-white/95 rounded-full p-0.5 border border-slate-200/90 shadow-xs">
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                language === 'en'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+              title="Switch to English"
+            >
+              <Globe className={`w-3 h-3 ${language === 'en' ? 'text-white' : 'text-emerald-600'}`} />
+              <span>English</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('hi')}
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                language === 'hi'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+              title="हिंदी में बदलें"
+            >
+              <span>हिंदी</span>
+            </button>
+          </div>
         </div>
       </header>
 
       {/* 🚀 SINGLE UNIFIED HOME PAGE */}
-      <main className="relative z-10 w-full max-w-5xl mx-auto px-4 text-center my-auto py-2 sm:py-3 space-y-3 sm:space-y-4 animate-in fade-in duration-300 flex-1 flex flex-col justify-center">
+      <main className="relative z-10 w-full max-w-5xl lg:max-w-6xl mx-auto px-4 text-center my-auto py-2 sm:py-2.5 space-y-2.5 sm:space-y-3 lg:space-y-3.5 animate-in fade-in duration-300 flex-1 flex flex-col justify-center">
         
         {/* Main Hero Header */}
-        <div className="space-y-1.5 sm:space-y-2 max-w-3xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display tracking-tight text-slate-900 leading-snug">
+        <div className="space-y-1 sm:space-y-1.5 max-w-4xl mx-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-[2rem] font-black font-display tracking-tight text-slate-900 leading-snug">
             {language === 'hi' ? (
               <>
                 भारतीय कृषि का <span className="text-emerald-700 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">स्मार्ट डिजिटल नेटवर्क</span>
@@ -261,13 +282,13 @@ export const WelcomeGatewayView: React.FC = () => {
             )}
           </h1>
 
-          <p className="text-xs sm:text-sm text-slate-700 font-semibold max-w-2xl mx-auto leading-normal line-clamp-2">
+          <p className="text-xs sm:text-sm text-slate-700 font-semibold max-w-2xl lg:max-w-3xl mx-auto leading-normal line-clamp-2">
             {language === 'hi'
               ? '4 महीने पहले अग्रिम अनुबंध, ₹0 खेत से परिवहन, NABL प्रमाणित गुणवत्ता और 100% सुरक्षित भुगतान प्रणाली के साथ किसान और खरीदार को सीधे जोड़ने वाला एकीकृत मंच।'
               : 'Direct farm-to-enterprise procurement with 4-month pre-harvest contracts, ₹0 farmgate logistics pickup, NABL quality grading, and automated escrow settlement.'}
           </p>
 
-          <div className="pt-1 flex items-center justify-center gap-2">
+          <div className="pt-0.5 flex items-center justify-center gap-2">
             <span className="h-px w-10 bg-emerald-600/30" />
             <span className="text-[10px] sm:text-xs font-extrabold tracking-wider uppercase text-emerald-900 bg-emerald-100/90 px-3 py-0.5 rounded-full border border-emerald-300 shadow-xs">
               🌱 {language === 'hi' ? 'रजिस्ट्रेशन या लॉगिन के लिए अपना पोर्टल चुनें' : 'Select your stakeholder portal to Register or Sign In'}
@@ -276,43 +297,8 @@ export const WelcomeGatewayView: React.FC = () => {
           </div>
         </div>
 
-        {/* ⚡ Live Bulk Demands Alert Banner (Visible to any visitor on any device immediately) */}
-        {bulkDemands && bulkDemands.length > 0 && (
-          <div 
-            onClick={() => handleOpenRoleModal('farmer', 'login')}
-            className="max-w-4xl mx-auto w-full bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-2xl p-3 sm:p-4 border border-emerald-500/40 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-left cursor-pointer hover:border-emerald-400 transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0 text-lg">
-                📦
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
-                    Live Bulk Demands ({bulkDemands.length})
-                  </span>
-                  <span className="text-xs font-bold text-emerald-300">
-                    100% Escrow Funded
-                  </span>
-                </div>
-                <p className="text-xs text-slate-200 mt-0.5 font-medium line-clamp-1">
-                  {bulkDemands.map(b => `${b.demandNumber}: ${b.cropName} (${b.targetQuantityTons}T @ ₹${b.pricePerTon.toLocaleString('en-IN')}/T by ${b.buyerName})`).join(' • ')}
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-500 group-hover:bg-emerald-400 text-slate-950 font-black text-xs shrink-0 flex items-center gap-1 shadow-sm cursor-pointer"
-            >
-              <span>{language === 'hi' ? 'किसान लॉगिन करके सप्लाई करें' : 'Login as Farmer to Supply'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
-
         {/* 🌟 2 PRIMARY PUBLIC CARDS (FOR ALL VISITORS COMING ON THE WEBSITE) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 text-left max-w-4xl mx-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 lg:gap-6 text-left max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto w-full">
           
           {/* Primary Public Card 1: Farmer */}
           <div 
@@ -320,8 +306,8 @@ export const WelcomeGatewayView: React.FC = () => {
             className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-emerald-500/40 hover:border-emerald-600 shadow-[0_10px_30px_rgba(16,185,129,0.14)] hover:shadow-[0_16px_36px_rgba(16,185,129,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform">
                   👨‍🌾
                 </div>
                 <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
@@ -329,31 +315,31 @@ export const WelcomeGatewayView: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-emerald-700 transition-colors font-display leading-tight">
+              <h3 className="text-base sm:text-lg lg:text-xl font-black text-slate-900 group-hover:text-emerald-700 transition-colors font-display leading-tight">
                 {language === 'hi' ? 'भारतीय किसान (Kisan Portal)' : 'Farmers & Producers'}
               </h3>
               
-              <p className="text-xs text-slate-600 font-medium mt-1.5 leading-snug line-clamp-2">
+              <p className="text-xs text-slate-600 font-medium mt-1 leading-snug line-clamp-2">
                 {language === 'hi'
                   ? '4 महीने पहले अग्रिम कॉर्पोरेट अनुबंध, शून्य (₹0) खेत से परिवहन खर्च, NABL गुणवत्ता जांच और सीधे बैंक खाते में सुरक्षित एस्क्रो भुगतान।'
                   : 'Get guaranteed advance procurement contracts, ₹0 farmgate pickup logistics, transparent grading, and direct escrow bank payouts.'}
               </p>
 
               {/* Feature Pills */}
-              <div className="flex flex-wrap gap-1.5 mt-2.5">
+              <div className="flex flex-wrap gap-1.5 mt-2">
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
-                  ✓ ₹0 Farmgate Pickup
+                  {language === 'hi' ? '✓ ₹0 खेत से पिकअप' : '✓ ₹0 Farmgate Pickup'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
-                  ✓ 4-Month Contracts
+                  {language === 'hi' ? '✓ 4-माह अग्रिम अनुबंध' : '✓ 4-Month Contracts'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
-                  ✓ Guaranteed Escrow
+                  {language === 'hi' ? '✓ गारंटीशुदा एस्क्रो' : '✓ Guaranteed Escrow'}
                 </span>
               </div>
             </div>
 
-            <div className="pt-3 flex flex-col gap-2 border-t border-slate-100 mt-3">
+            <div className="pt-2.5 flex flex-col gap-1.5 border-t border-slate-100 mt-2.5">
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -361,7 +347,7 @@ export const WelcomeGatewayView: React.FC = () => {
                     e.stopPropagation();
                     handleOpenRoleModal('farmer', 'register');
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                  className="py-2 sm:py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <UserIcon className="w-3.5 h-3.5" />
                   <span>{language === 'hi' ? 'नया खाता बनाएं' : 'Register'}</span>
@@ -372,13 +358,13 @@ export const WelcomeGatewayView: React.FC = () => {
                     e.stopPropagation();
                     handleOpenRoleModal('farmer', 'login');
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                  className="py-2 sm:py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>{language === 'hi' ? 'लॉगिन करें' : 'Sign In'}</span>
                 </button>
               </div>
-              <div className="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-semibold pt-0.5">
+              <div className="flex items-center justify-center gap-1 text-[10.5px] text-slate-500 font-semibold pt-0.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Authentication'}</span>
               </div>
@@ -391,8 +377,8 @@ export const WelcomeGatewayView: React.FC = () => {
             className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-blue-500/40 hover:border-blue-600 shadow-[0_10px_30px_rgba(37,99,235,0.14)] hover:shadow-[0_16px_36px_rgba(37,99,235,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
           >
             <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform">
                   🏢
                 </div>
                 <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-blue-100 text-blue-800 border border-blue-300">
@@ -400,31 +386,31 @@ export const WelcomeGatewayView: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-blue-700 transition-colors font-display leading-tight">
+              <h3 className="text-base sm:text-lg lg:text-xl font-black text-slate-900 group-hover:text-blue-700 transition-colors font-display leading-tight">
                 {language === 'hi' ? 'थोक खरीदार एवं कॉर्पोरेट (Buyer Portal)' : 'Bulk Buyers & Retailers'}
               </h3>
               
-              <p className="text-xs text-slate-600 font-medium mt-1.5 leading-snug line-clamp-2">
+              <p className="text-xs text-slate-600 font-medium mt-1 leading-snug line-clamp-2">
                 {language === 'hi'
                   ? '50T–500T थोक मांग पूलिंग, NABL मान्यता प्राप्त प्रयोगशाला जांच, लाइव जीपीएस वाहन ट्रैकिंग और सुरक्षित एस्क्रो फंड सुरक्षा।'
                   : 'Pool 50T-500T bulk crop requirements, verify NABL lab quality parameters, track refrigerated delivery fleets, and secure payment via escrow.'}
               </p>
 
               {/* Feature Pills */}
-              <div className="flex flex-wrap gap-1.5 mt-2.5">
+              <div className="flex flex-wrap gap-1.5 mt-2">
                 <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
-                  ✓ 50T–500T Pooling
+                  {language === 'hi' ? '✓ 50T–500T मांग पूलिंग' : '✓ 50T–500T Pooling'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
-                  ✓ NABL Lab Quality
+                  {language === 'hi' ? '✓ NABL लैब गुणवत्ता' : '✓ NABL Lab Quality'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
-                  ✓ Escrow Protection
+                  {language === 'hi' ? '✓ एस्क्रो सुरक्षा' : '✓ Escrow Protection'}
                 </span>
               </div>
             </div>
 
-            <div className="pt-3 flex flex-col gap-2 border-t border-slate-100 mt-3">
+            <div className="pt-2.5 flex flex-col gap-1.5 border-t border-slate-100 mt-2.5">
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -432,7 +418,7 @@ export const WelcomeGatewayView: React.FC = () => {
                     e.stopPropagation();
                     handleOpenRoleModal('buyer', 'register');
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-blue-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                  className="py-2 sm:py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-blue-700/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <Building2 className="w-3.5 h-3.5" />
                   <span>{language === 'hi' ? 'नया खाता बनाएं' : 'Register'}</span>
@@ -443,13 +429,13 @@ export const WelcomeGatewayView: React.FC = () => {
                     e.stopPropagation();
                     handleOpenRoleModal('buyer', 'login');
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                  className="py-2 sm:py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>{language === 'hi' ? 'लॉगिन करें' : 'Sign In'}</span>
                 </button>
               </div>
-              <div className="flex items-center justify-center gap-1 text-[11px] text-slate-500 font-semibold pt-0.5">
+              <div className="flex items-center justify-center gap-1 text-[10.5px] text-slate-500 font-semibold pt-0.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
                 <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Authentication'}</span>
               </div>
@@ -460,45 +446,56 @@ export const WelcomeGatewayView: React.FC = () => {
       </main>
 
       {/* 🌿 Bottom Pillar Ribbon */}
-      <footer className="relative z-10 w-full max-w-4xl mx-auto px-4 pb-2.5 pt-1 shrink-0">
+      <footer className="relative z-10 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 pb-2 pt-1 shrink-0">
         <div className="bg-white/85 backdrop-blur-md text-slate-700 rounded-xl sm:rounded-full py-1.5 sm:py-2 px-4 sm:px-6 border border-white/60 shadow-md flex items-center justify-around gap-2 text-[11px] sm:text-xs font-bold">
           
           <div className="flex items-center gap-1.5 text-emerald-800">
             <span className="text-sm">🌱</span>
-            <span className="font-extrabold tracking-wide">Stronger Farms</span>
+            <span className="font-extrabold tracking-wide">{language === 'hi' ? 'सशक्त किसान' : 'Stronger Farms'}</span>
           </div>
 
           <span className="text-slate-300 hidden sm:inline">|</span>
 
           <div className="flex items-center gap-1.5 text-blue-800">
             <span className="text-sm">👥</span>
-            <span className="font-extrabold tracking-wide">Fairer Markets</span>
+            <span className="font-extrabold tracking-wide">{language === 'hi' ? 'पारदर्शी बाज़ार' : 'Fairer Markets'}</span>
           </div>
 
           <span className="text-slate-300 hidden sm:inline">|</span>
 
           <div className="flex items-center gap-1.5 text-teal-800">
             <span className="text-sm">🍃</span>
-            <span className="font-extrabold tracking-wide">Cleaner Planet</span>
+            <span className="font-extrabold tracking-wide">{language === 'hi' ? 'स्वच्छ पर्यावरण' : 'Cleaner Planet'}</span>
           </div>
 
           <span className="text-slate-300 hidden sm:inline">|</span>
 
           <div className="flex items-center gap-1.5 text-amber-800">
             <span className="text-sm">📊</span>
-            <span className="font-extrabold tracking-wide">Brighter Futures</span>
+            <span className="font-extrabold tracking-wide">{language === 'hi' ? 'उज्ज्वल भविष्य' : 'Brighter Futures'}</span>
           </div>
 
-          {/* Discreet Team Staff Access Icon (subtle, non-intrusive) */}
-          <button 
-            type="button"
-            onClick={() => handleOpenRoleModal('admin')} 
-            className="opacity-30 hover:opacity-100 text-slate-400 hover:text-amber-600 transition-opacity p-1 cursor-pointer"
-            title=""
-            aria-label="Staff Portal"
-          >
-            <Lock className="w-3 h-3" />
-          </button>
+          {/* Discreet Staff & Hub Hidden Portal Access (subtle, non-intrusive) */}
+          <div className="flex items-center gap-1">
+            <button 
+              type="button"
+              onClick={() => handleOpenRoleModal('admin', 'login')} 
+              className="opacity-25 hover:opacity-100 text-slate-400 hover:text-purple-600 transition-opacity p-1 cursor-pointer"
+              title="Govt Admin Console"
+              aria-label="Govt Admin Console"
+            >
+              <Lock className="w-3 h-3" />
+            </button>
+            <button 
+              type="button"
+              onClick={() => handleOpenRoleModal('collection_centre', 'login')} 
+              className="opacity-25 hover:opacity-100 text-slate-400 hover:text-amber-600 transition-opacity p-1 cursor-pointer"
+              title="APMC / FCI Collection Hub Hidden Portal (Alt+H)"
+              aria-label="Collection Hub Hidden Portal"
+            >
+              <span className="text-[10px] grayscale hover:grayscale-0">🏬</span>
+            </button>
+          </div>
 
         </div>
       </footer>

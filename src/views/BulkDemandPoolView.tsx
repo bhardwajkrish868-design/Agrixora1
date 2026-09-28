@@ -30,7 +30,8 @@ import {
   Bot,
   BadgePercent,
   Check,
-  Trash2
+  Trash2,
+  Lock
 } from 'lucide-react';
 
 export const BulkDemandPoolView: React.FC = () => {
@@ -44,7 +45,8 @@ export const BulkDemandPoolView: React.FC = () => {
     isAdminAuthenticated,
     setActiveTab, 
     vehicles,
-    addNotification
+    addNotification,
+    language
   } = useAgri();
 
   // Dynamic 4-Month in Advance Date Calculator
@@ -103,19 +105,37 @@ export const BulkDemandPoolView: React.FC = () => {
   const [newMoistureLimit, setNewMoistureLimit] = useState<number>(12.0);
   const [newDescription, setNewDescription] = useState('4-Month Advance Pre-Harvest Bulk Contract. Total Escrow pre-funded in advance.');
 
+  // Active Tab Mode: 'open_demands' vs 'my_pledges'
+  const [activeViewTab, setActiveViewTab] = useState<'open_demands' | 'my_pledges'>('open_demands');
+
+  // Filter farmer's own pledged commitments across all bulk pools
+  const myPledges = useMemo(() => {
+    if (!currentUser) return [];
+    return bulkDemands.flatMap(pool => 
+      (pool.contributions || [])
+        .filter(c => 
+          c.contributorId === currentUser.id ||
+          (currentUser.phone && c.contributorPhone === currentUser.phone) ||
+          (currentUser.name && c.contributorName?.toLowerCase().includes(currentUser.name.toLowerCase()))
+        )
+        .map(c => ({ ...c, pool }))
+    );
+  }, [bulkDemands, currentUser]);
+
   const categories = ['All', 'Cereals & Grains', 'Vegetables', 'Fruits', 'Pulses', 'Oilseeds', 'Spices'];
   const states = ['All', ...ALL_INDIAN_STATES];
 
-  // Filtered Bulk Demands
+  // Filtered Bulk Demands with 100% null-safe property access
   const filteredDemands = bulkDemands.filter(demand => {
-    const matchesSearch = 
-      demand.cropName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      demand.variety.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      demand.buyerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      demand.buyerOrg.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      demand.demandNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      demand.deliveryCity.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      demand.deliveryState.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = (searchQuery || '').toLowerCase().trim();
+    const matchesSearch = !q || 
+      (demand.cropName || '').toLowerCase().includes(q) ||
+      (demand.variety || '').toLowerCase().includes(q) ||
+      (demand.buyerName || '').toLowerCase().includes(q) ||
+      (demand.buyerOrg || '').toLowerCase().includes(q) ||
+      (demand.demandNumber || '').toLowerCase().includes(q) ||
+      (demand.deliveryCity || '').toLowerCase().includes(q) ||
+      (demand.deliveryState || '').toLowerCase().includes(q);
 
     const matchesCat = selectedCategory === 'All' || demand.category === selectedCategory;
     const matchesStatus = selectedStatus === 'All' || demand.status === selectedStatus;
@@ -125,20 +145,26 @@ export const BulkDemandPoolView: React.FC = () => {
   });
 
   // Global pool stats
-  const totalTargetTons = bulkDemands.reduce((sum, d) => sum + d.targetQuantityTons, 0);
-  const totalCommittedTons = bulkDemands.reduce((sum, d) => sum + d.committedQuantityTons, 0);
-  const totalEscrowPoolValue = bulkDemands.reduce((sum, d) => sum + d.totalBudget, 0);
+  const totalTargetTons = bulkDemands.reduce((sum, d) => sum + (d.targetQuantityTons || 0), 0);
+  const totalCommittedTons = bulkDemands.reduce((sum, d) => sum + (d.committedQuantityTons || 0), 0);
+  const totalEscrowPoolValue = bulkDemands.reduce((sum, d) => sum + (d.totalBudget || (d.targetQuantityTons * d.pricePerTon)), 0);
 
-  // Open Supply Modal with context
+  // Open Supply Modal with context (Farmers Only)
   const handleOpenSupplyModal = (pool: BulkDemandPool) => {
+    if (activeRole === 'buyer' || currentUser?.role === 'buyer') {
+      alert(language === 'hi'
+        ? '🌾 केवल सत्यापित किसान ही बल्क ऑर्डर में फसल का योगदान कर सकते हैं। खरीददार केवल थोक मांग (Bulk Demand) पोस्ट कर सकते हैं।'
+        : '🌾 Only verified farmers can supply produce to bulk demand orders. Buyers can post bulk demand contracts.');
+      return;
+    }
     setSupplyModalPool(pool);
     const suggestedQty = Math.min(pool.remainingQuantityTons > 0 ? pool.remainingQuantityTons : 25, 50);
     setSupplyQtyTons(suggestedQty);
     setSupplyGrade(pool.qualityGradeRequirement || 'Grade A');
     setSupplyMoisture(pool.moistureLimitPercent || 12.0);
-    setSupplyLocation(currentUser?.location || 'Nashik Farm Cluster');
-    setSupplyState(currentUser?.state || 'Maharashtra');
-    setSupplyDistrict(currentUser?.district || 'Nashik');
+    setSupplyLocation(currentUser?.location || 'Vaishali Farmgate Hub');
+    setSupplyState(currentUser?.state || 'Bihar');
+    setSupplyDistrict(currentUser?.district || 'Vaishali');
     setSupplyDispatchDate(pool.expectedDispatchStart || defaultDispatchDate);
     setSupplySuccessMessage(null);
   };
@@ -205,61 +231,299 @@ export const BulkDemandPoolView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Search & Filter Controls */}
-      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-soft space-y-4">
-        <div className="flex flex-col lg:flex-row gap-3 items-center justify-between">
-          <div className="relative w-full lg:w-96">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search by crop, buyer (ITC, Reliance), order ID, destination..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 bg-slate-50/50"
-            />
+      {/* 📥 Top Hero: "Receive Bulk Orders & Institutional Demand Pools" */}
+      <div className="bg-gradient-to-br from-slate-950 via-emerald-950 to-teal-950 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden border border-emerald-900/40">
+        <div className="absolute -right-16 -top-16 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+        
+        <div className="relative z-10 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                ⚡ 4-Month Advance Contracts
+              </span>
+              <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-xs font-bold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                100% Pre-Funded Escrow
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {(activeRole === 'buyer' || activeRole === 'admin') && (
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>+ Create Bulk Demand</span>
+                </button>
+              )}
+              <button
+                onClick={() => setActiveTab('transport_services')}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Truck className="w-4 h-4 text-emerald-300" />
+                <span>State Fleet Map</span>
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 w-full lg:w-auto items-center">
-            <select
-              value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500"
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>Category: {cat}</option>
-              ))}
-            </select>
+          <div className="max-w-3xl space-y-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display tracking-tight text-white flex items-center gap-3">
+              <span className="p-2.5 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30">
+                <Boxes className="w-7 h-7 sm:w-8 sm:h-8" />
+              </span>
+              <span>Receive Bulk Orders & Institutional Pools</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Institutional corporate buyers (ITC, Mother Dairy SAFAL, Reliance Fresh) have pre-funded 100% Escrow for bulk procurement. Directly accept and supply your harvest produce for guaranteed premium rates with free collection hub delivery!
+            </p>
+          </div>
 
-            <select
-              value={selectedState}
-              onChange={e => setSelectedState(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500"
-            >
-              {states.map(st => (
-                <option key={st} value={st}>Destination: {st}</option>
-              ))}
-            </select>
+          {/* Stat Badges */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-white/10">
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Live Demand Pools</span>
+              <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                {bulkDemands.length} <span className="text-xs text-emerald-400 font-semibold">Active</span>
+              </div>
+            </div>
 
-            {(activeRole === 'buyer' || activeRole === 'admin') && (
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>+ Create Advance Demand</span>
-              </button>
-            )}
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Total Volume Target</span>
+              <div className="text-xl sm:text-2xl font-black text-emerald-400 mt-0.5">
+                {totalTargetTons.toLocaleString('en-IN')} <span className="text-xs text-slate-300 font-normal">Tons</span>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Already Committed</span>
+              <div className="text-xl sm:text-2xl font-black text-teal-300 mt-0.5">
+                {totalCommittedTons.toLocaleString('en-IN')} <span className="text-xs text-slate-300 font-normal">Tons</span>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Escrow Vault Secured</span>
+              <div className="text-xl sm:text-2xl font-black text-amber-300 mt-0.5">
+                ₹{(totalEscrowPoolValue / 10000000).toFixed(2)} <span className="text-xs text-slate-300 font-normal">Cr</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Mode Switcher: Live Demands vs My Pledged Commitments */}
+          <div className="flex items-center gap-2 pt-2">
+            <button
+              onClick={() => setActiveViewTab('open_demands')}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 ${
+                activeViewTab === 'open_demands'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+            >
+              <Boxes className="w-4 h-4" />
+              <span>Explore Live Demands ({filteredDemands.length})</span>
+            </button>
 
             <button
-              onClick={() => setActiveTab('transport_services')}
-              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              onClick={() => setActiveViewTab('my_pledges')}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 ${
+                activeViewTab === 'my_pledges'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
             >
-              <Truck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>State Transport Fleet</span>
+              <CheckCircle2 className="w-4 h-4" />
+              <span>My Committed Bulk Lots ({myPledges.length})</span>
             </button>
           </div>
         </div>
       </div>
+
+      {activeViewTab === 'my_pledges' ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>My Committed Bulk Lots ({myPledges.length})</span>
+            </h3>
+            <span className="text-xs text-slate-500">
+              Total Promised Payout: <strong className="text-emerald-700">₹{myPledges.reduce((s, p) => s + (p.totalPayout || 0), 0).toLocaleString('en-IN')}</strong>
+            </span>
+          </div>
+
+          {myPledges.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                <Boxes className="w-8 h-8" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-bold text-slate-800 text-base">No Committed Bulk Orders Yet</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  You haven't committed harvest tonnage to any institutional bulk orders yet. Explore open demands below from ITC, Mother Dairy SAFAL, and Reliance Agro to lock in 100% Escrow-secured advance contracts!
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveViewTab('open_demands')}
+                className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
+              >
+                <Boxes className="w-4 h-4" />
+                <span>Explore Open Bulk Demands ({bulkDemands.length})</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {myPledges.map((item, idx) => (
+                <div 
+                  key={item.id || idx}
+                  className="bg-white rounded-3xl p-6 border border-slate-200 shadow-soft hover:shadow-card transition-all space-y-4"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md">
+                        {item.pool.demandNumber}
+                      </span>
+                      <span className="text-xs font-bold text-slate-500">•</span>
+                      <span className="text-xs font-black text-emerald-800">
+                        {item.pool.cropName}
+                      </span>
+                    </div>
+
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">
+                      ✓ {item.status || 'Accepted'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Buyer Entity:</span>
+                      <strong className="text-slate-900">{item.pool.buyerOrg || item.pool.buyerName}</strong>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Your Harvest Quota:</span>
+                      <strong className="text-slate-900">{item.quantityTons} Metric Tons ({item.quantityTons * 10} Quintals)</strong>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span>Contract Rate:</span>
+                      <strong className="text-slate-900">₹{item.pricePerTon.toLocaleString('en-IN')} / Ton</strong>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50 border border-emerald-200/80">
+                      <span className="font-bold text-emerald-900">Locked Escrow Payout:</span>
+                      <span className="text-base font-black text-emerald-700">₹{item.totalPayout.toLocaleString('en-IN')}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] text-slate-500">
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span className="block text-[10px] text-slate-400 font-bold uppercase">Dispatch Schedule</span>
+                        <strong className="text-slate-800">{item.expectedDispatchDate}</strong>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span className="block text-[10px] text-slate-400 font-bold uppercase">Vehicle Assigned</span>
+                        <strong className="text-indigo-700 font-mono">{item.vehicleAssigned || 'Hub Pool Fleet'}</strong>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span className="block text-[10px] text-slate-400 font-bold uppercase">Quality Standard</span>
+                        <strong className="text-slate-800">{item.qualityGrade} ({item.moisturePercent}% Moisture)</strong>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <span className="block text-[10px] text-slate-400 font-bold uppercase">Delivery Hub</span>
+                        <strong className="text-slate-800 truncate block">{item.pool.deliveryCity}, {item.pool.deliveryState}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => alert(`📜 CONTRACT ACKNOWLEDGEMENT SLIP\n\nPool: #${item.pool.demandNumber}\nCrop: ${item.pool.cropName} (${item.pool.variety})\nBuyer: ${item.pool.buyerOrg || item.pool.buyerName}\nFarmer: ${item.contributorName} (${item.location}, ${item.state})\nTonnage: ${item.quantityTons} Tons\nGuaranteed Payout: ₹${item.totalPayout.toLocaleString('en-IN')}\nDispatch Date: ${item.expectedDispatchDate}\nEscrow Status: 100% Pre-funded & Guaranteed`)}
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Contract Slip</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveViewTab('open_demands');
+                        setExpandedPoolId(item.pool.id);
+                      }}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <span>View Pool & Fleet</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Search & Filter Controls */}
+          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-soft space-y-4">
+            <div className="flex flex-col lg:flex-row gap-3 items-center justify-between">
+              <div className="relative w-full lg:w-96">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by crop, buyer (ITC, Reliance), order ID, destination..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 bg-slate-50/50"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2 w-full lg:w-auto items-center">
+                <select
+                  value={selectedCategory}
+                  onChange={e => setSelectedCategory(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>Category: {cat}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedState}
+                  onChange={e => setSelectedState(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500"
+                >
+                  {states.map(st => (
+                    <option key={st} value={st}>Destination: {st}</option>
+                  ))}
+                </select>
+
+                {(activeRole === 'buyer' || activeRole === 'admin') && (
+                  <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5" />
+                    <span>+ Create Advance Demand</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setActiveTab('transport_services')}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Truck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>State Transport Fleet</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
       {/* Bulk Demands Cards List */}
       <div className="space-y-5">
@@ -361,11 +625,11 @@ export const BulkDemandPoolView: React.FC = () => {
                     <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-1">
                       <span className="flex items-center gap-1">
                         <Users className="w-3.5 h-3.5 text-emerald-600" />
-                        <strong>{pool.contributions.length} Farmer Clusters</strong> contributed
+                        <strong>{(pool.contributions || []).length} Farmer Clusters</strong> contributed
                       </span>
                       <span className="flex items-center gap-1">
                         <Truck className="w-3.5 h-3.5 text-indigo-600" />
-                        Target: ~{pool.targetTrucksCount} Multi-Axle Trucks (20T each)
+                        Target: ~{pool.targetTrucksCount || Math.ceil((pool.targetQuantityTons || 0) / 20)} Multi-Axle Trucks (20T each)
                       </span>
                     </div>
                   </div>
@@ -374,20 +638,20 @@ export const BulkDemandPoolView: React.FC = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Delivery Destination</span>
-                      <span className="font-extrabold text-slate-900 block truncate">{pool.deliveryCity}, {pool.deliveryState}</span>
-                      <span className="text-[10px] text-slate-500 truncate block">{pool.deliveryLocation}</span>
+                      <span className="font-extrabold text-slate-900 block truncate">{pool.deliveryCity || 'Central Hub'}, {pool.deliveryState || 'India'}</span>
+                      <span className="text-[10px] text-slate-500 truncate block">{pool.deliveryLocation || 'FCI / APMC Silo'}</span>
                     </div>
 
                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Quality Requirement</span>
-                      <span className="font-extrabold text-emerald-700 block">{pool.qualityGradeRequirement}</span>
-                      <span className="text-[10px] text-slate-500 block">Moisture &lt; {pool.moistureLimitPercent}%</span>
+                      <span className="font-extrabold text-emerald-700 block">{pool.qualityGradeRequirement || 'Grade A'}</span>
+                      <span className="text-[10px] text-slate-500 block">Moisture &lt; {pool.moistureLimitPercent || 12.0}%</span>
                     </div>
 
                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Dispatch Timeline</span>
-                      <span className="font-extrabold text-slate-900 block">{pool.expectedDispatchStart}</span>
-                      <span className="text-[10px] text-slate-500 block">Deadline: {pool.deadlineDate}</span>
+                      <span className="font-extrabold text-slate-900 block">{pool.expectedDispatchStart || '4-Month Advance'}</span>
+                      <span className="text-[10px] text-slate-500 block">Deadline: {pool.deadlineDate || 'Open'}</span>
                     </div>
 
                     <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
@@ -405,7 +669,7 @@ export const BulkDemandPoolView: React.FC = () => {
                         className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        <span>{isExpanded ? 'Hide' : 'View'} Contributions ({pool.contributions.length})</span>
+                        <span>{isExpanded ? 'Hide' : 'View'} Contributions ({(pool.contributions || []).length})</span>
                       </button>
 
                       <button
@@ -417,51 +681,88 @@ export const BulkDemandPoolView: React.FC = () => {
                       </button>
                     </div>
 
-                    {/* Actions: Admin Delete + Primary Button */}
                     <div className="flex items-center gap-2">
-                      {(activeRole === 'admin' || currentUser?.role === 'admin' || isAdminAuthenticated || activeRole === 'buyer' || currentUser?.role === 'buyer' || (currentUser && pool.buyerId === currentUser.id)) && (
+                      {/* Actions: Admin or Owner Delete Only */}
+                      {(() => {
+                        const isAdmin = activeRole === 'admin' || currentUser?.role === 'admin' || isAdminAuthenticated;
+                        const isOwner = Boolean(
+                          currentUser && (
+                            pool.buyerId === currentUser.id ||
+                            (currentUser.phone && pool.buyerPhone && currentUser.phone.replace(/\D/g, '').slice(-10) === pool.buyerPhone.replace(/\D/g, '').slice(-10))
+                          )
+                        );
+                        // 🔒 STRICT SECURITY: No buyer can delete someone else's bulk order. Only admin or creator can delete!
+                        if (!isAdmin && !isOwner) return null;
+
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const confirmed = typeof window !== 'undefined' && window.confirm 
+                                ? window.confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This cannot be undone.`)
+                                : true;
+                              if (confirmed) {
+                                deleteBulkDemand(pool.id);
+                                addNotification({
+                                  title: isAdmin ? 'Bulk Order Removed by Admin' : 'Bulk Order Cancelled',
+                                  message: `Bulk order #${pool.demandNumber} (${pool.cropName}) was permanently removed from database.`,
+                                  type: 'alert',
+                                  recipientRole: 'all'
+                                });
+                              }
+                            }}
+                            className="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                            title={isAdmin ? "Admin Delete Bulk Order" : "Delete Your Own Bulk Demand"}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>
+                              {isAdmin 
+                                ? (language === 'hi' ? 'हटाएं (Admin)' : 'Delete Order (Admin)') 
+                                : (language === 'hi' ? 'मेरी मांग हटाएं' : 'Delete My Demand')}
+                            </span>
+                          </button>
+                        );
+                      })()}
+
+                      {/* Farmer vs Buyer Action Indicator */}
+                      {activeRole === 'buyer' ? (
+                        pool.buyerId === currentUser?.id ? (
+                          <div className="px-4 py-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 font-bold text-xs flex items-center gap-2 shadow-xs">
+                            <Building2 className="w-4 h-4 text-blue-600 shrink-0" />
+                            <span>
+                              {language === 'hi'
+                                ? `📦 आपकी पोस्ट की गई मांग (${pool.committedQuantityTons}/${pool.targetQuantityTons}T प्राप्त)`
+                                : `📦 Your Posted Demand (${pool.committedQuantityTons}/${pool.targetQuantityTons}T committed)`}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="px-4 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 font-bold text-xs flex items-center gap-2 cursor-not-allowed" title="खरीददार फसल आपूर्ति नहीं कर सकते">
+                            <Lock className="w-4 h-4 text-slate-400 shrink-0" />
+                            <span>
+                              {language === 'hi'
+                                ? '🌾 केवल किसान फसल योगदान कर सकते हैं'
+                                : '🌾 Farmers Only Supply Contribution'}
+                            </span>
+                          </div>
+                        )
+                      ) : (
                         <button
-                          type="button"
-                          onClick={() => {
-                            const confirmed = typeof window !== 'undefined' && window.confirm 
-                              ? window.confirm(`Are you sure you want to permanently delete bulk order #${pool.demandNumber} (${pool.cropName} - ${pool.targetQuantityTons}T)? This cannot be undone.`)
-                              : true;
-                            if (confirmed) {
-                              deleteBulkDemand(pool.id);
-                              addNotification({
-                                title: 'Bulk Order Deleted',
-                                message: `Bulk order #${pool.demandNumber} (${pool.cropName}) was permanently removed from database.`,
-                                type: 'alert',
-                                recipientRole: 'all'
-                              });
-                            }
-                          }}
-                          className="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                          title="Delete Bulk Order"
+                          onClick={() => handleOpenSupplyModal(pool)}
+                          disabled={isFullyFilled}
+                          className={`px-6 py-2.5 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                            isFullyFilled
+                              ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                              : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/25 hover:scale-105'
+                          }`}
                         >
-                          <Trash2 className="w-4 h-4" />
-                          <span>Delete Order</span>
+                          <SendHorizontal className="w-4 h-4" />
+                          <span>
+                            {isFullyFilled 
+                              ? (language === 'hi' ? 'कोटा पूर्ण (500T संपन्न)' : 'Quota Full (500T Complete)')
+                              : (language === 'hi' ? '📥 फसल योगदान करें (मात्रा भेजें)' : '📥 Supply Produce & Accept Quota')}
+                          </span>
                         </button>
                       )}
-
-                      <button
-                        onClick={() => handleOpenSupplyModal(pool)}
-                        disabled={isFullyFilled}
-                        className={`px-6 py-2.5 rounded-xl font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer ${
-                          isFullyFilled
-                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/25 hover:scale-105'
-                        }`}
-                      >
-                        <SendHorizontal className="w-4 h-4" />
-                        <span>
-                          {isFullyFilled 
-                            ? 'Quota Full (500T Complete)' 
-                            : activeRole === 'farmer' 
-                              ? '📥 Receive & Accept Order (मात्रा भेजें)' 
-                              : 'Commit Supply Allocation'}
-                        </span>
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -472,14 +773,14 @@ export const BulkDemandPoolView: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                         <Users className="w-4 h-4 text-emerald-600" />
-                        Contributing Farmers & Aggregation Hubs ({pool.contributions.length})
+                        Contributing Farmers & Aggregation Hubs ({(pool.contributions || []).length})
                       </h3>
                       <span className="text-[11px] text-slate-500">
-                        Total Supplied: <strong>{pool.committedQuantityTons} Tons</strong> (₹{(pool.contributions.reduce((s, c) => s + c.totalPayout, 0) / 100000).toFixed(2)} Lakhs)
+                        Total Supplied: <strong>{pool.committedQuantityTons} Tons</strong> (₹{((pool.contributions || []).reduce((s, c) => s + (c.totalPayout || 0), 0) / 100000).toFixed(2)} Lakhs)
                       </span>
                     </div>
 
-                    {pool.contributions.length === 0 ? (
+                    {(pool.contributions || []).length === 0 ? (
                       <p className="text-xs text-slate-500 italic py-2">No contributions submitted yet. Click Send Produce to add your harvest quantity!</p>
                     ) : (
                       <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
@@ -498,7 +799,7 @@ export const BulkDemandPoolView: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
-                            {pool.contributions.map((contrib, idx) => (
+                            {(pool.contributions || []).map((contrib, idx) => (
                               <tr key={contrib.id || idx} className="hover:bg-slate-50 transition-colors">
                                 <td className="p-3 font-bold text-slate-900">
                                   <div>{contrib.contributorName}</div>
@@ -571,6 +872,8 @@ export const BulkDemandPoolView: React.FC = () => {
           })
         )}
       </div>
+        </>
+      )}
 
       {/* ========================================================================= */}
       {/* 📥 MODAL: "Receive & Accept 4-Month Advance Bulk Order (Farmer Modal)" */}

@@ -8,7 +8,9 @@ import {
   MapPin, 
   Trash2, 
   ShieldCheck,
-  ArrowLeft
+  ArrowLeft,
+  Building2,
+  Store
 } from 'lucide-react';
 
 export const FarmerListingsView: React.FC = () => {
@@ -72,8 +74,8 @@ export const FarmerListingsView: React.FC = () => {
               <div>
                 <div className="relative h-48 overflow-hidden bg-slate-100">
                   <img
-                    src={item.images[0]}
-                    alt={item.cropName}
+                    src={(item.images && item.images[0]) || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'}
+                    alt={item.cropName || 'Crop'}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
@@ -121,6 +123,31 @@ export const FarmerListingsView: React.FC = () => {
                       </span>
                     </div>
                   </div>
+
+                  {/* 🏛️ Assigned FCI Procurement Hub & Mandi */}
+                  <div className="p-2.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Building2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="font-extrabold text-emerald-950 text-xs block truncate">
+                          {item.fciHubName || 'FCI Central Silo'}
+                        </span>
+                        <span className="text-[10px] text-emerald-700 block truncate">
+                          {item.fciHubCode || 'FCI Depot'} • {item.fciHubDistanceKm !== undefined ? `${item.fciHubDistanceKm} km away` : 'Assigned Hub'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 bg-emerald-200 text-emerald-950 rounded-md font-mono text-[10px] font-bold shrink-0">
+                      {item.fciHubDistanceKm !== undefined ? `${item.fciHubDistanceKm} km` : 'FCI'}
+                    </span>
+                  </div>
+
+                  {item.nearestMandi && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-600 px-0.5">
+                      <Store className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">Target Mandi: <strong className="text-slate-800">{item.nearestMandi}</strong></span>
+                    </div>
+                  )}
 
                   <div className="space-y-1.5 text-xs text-slate-500 pt-1">
                     <div className="flex items-center gap-1.5">

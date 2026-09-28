@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAgri } from '../context/AgriContext';
 import { MandiPriceTrend } from '../types';
 import { 
@@ -14,7 +14,10 @@ import {
   Calculator,
   Info,
   ShieldCheck,
-  ArrowLeft
+  ArrowLeft,
+  Store,
+  RotateCcw,
+  CheckCircle2
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -26,11 +29,23 @@ import {
   CartesianGrid, 
   Legend 
 } from 'recharts';
+import { 
+  ALL_INDIAN_STATES, 
+  getDistrictsForState, 
+  getDefaultDistrictForState, 
+  getNearestTargetMandi 
+} from '../data/indiaLocations';
 
 export const MarketPriceIntelligenceView: React.FC = () => {
-  const { mandiPrices, setActiveTab, navigateBack } = useAgri();
+  const { mandiPrices, refreshMandiPrices, currentUser, userLocation, setActiveTab, navigateBack } = useAgri();
 
-  const [selectedCrop, setSelectedCrop] = useState<MandiPriceTrend>(mandiPrices[0]);
+  const profileState = currentUser?.state || userLocation.state || 'Maharashtra';
+  const profileDistrict = currentUser?.district || userLocation.district || 'Nashik';
+
+  const [viewState, setViewState] = useState<string>(profileState);
+  const [viewDistrict, setViewDistrict] = useState<string>(profileDistrict);
+
+  const [selectedCrop, setSelectedCrop] = useState<MandiPriceTrend>(mandiPrices[0] || ({} as MandiPriceTrend));
   const [searchFilter, setSearchFilter] = useState('');
   const [chartMode, setChartMode] = useState<'7days' | '30days'>('7days');
 
@@ -38,14 +53,57 @@ export const MarketPriceIntelligenceView: React.FC = () => {
   const [calcQty, setCalcQty] = useState(100);
   const [calcUnit, setCalcUnit] = useState('Quintals');
 
+  // Keep location synced with logged-in user profile
+  useEffect(() => {
+    const s = currentUser?.state || userLocation.state || 'Maharashtra';
+    const d = currentUser?.district || userLocation.district || 'Nashik';
+    setViewState(s);
+    setViewDistrict(d);
+  }, [currentUser?.id, currentUser?.state, currentUser?.district]);
+
+  // Keep selectedCrop updated whenever mandiPrices array changes
+  useEffect(() => {
+    if (mandiPrices && mandiPrices.length > 0) {
+      setSelectedCrop(prev => {
+        const found = mandiPrices.find(c => c.cropName === prev?.cropName);
+        return found || mandiPrices[0];
+      });
+    }
+  }, [mandiPrices]);
+
+  const handleStateChange = (newState: string) => {
+    setViewState(newState);
+    const districts = getDistrictsForState(newState);
+    const defaultDist = getDefaultDistrictForState(newState) || districts[0] || '';
+    setViewDistrict(defaultDist);
+    refreshMandiPrices(newState, defaultDist);
+  };
+
+  const handleDistrictChange = (newDistrict: string) => {
+    setViewDistrict(newDistrict);
+    refreshMandiPrices(viewState, newDistrict);
+  };
+
+  const handleResetToProfile = () => {
+    setViewState(profileState);
+    setViewDistrict(profileDistrict);
+    refreshMandiPrices(profileState, profileDistrict);
+  };
+
+  const activeMandiName = getNearestTargetMandi(viewState, viewDistrict);
+  const isProfileLocation = (viewState.toLowerCase() === profileState.toLowerCase()) && 
+                            (viewDistrict.toLowerCase() === profileDistrict.toLowerCase());
+  const availableDistricts = getDistrictsForState(viewState);
+
   const filteredCrops = mandiPrices.filter(c => 
     c.cropName.toLowerCase().includes(searchFilter.toLowerCase()) ||
     c.mandiName.toLowerCase().includes(searchFilter.toLowerCase()) ||
     c.state.toLowerCase().includes(searchFilter.toLowerCase())
   );
 
-  const estimatedMandiTotal = calcQty * selectedCrop.currentPrice;
-  const estimatedPlatformTotal = calcQty * selectedCrop.recommendedFarmerSellingPrice;
+  const currentSelectedCrop = selectedCrop?.cropName ? selectedCrop : (mandiPrices[0] || ({} as MandiPriceTrend));
+  const estimatedMandiTotal = calcQty * (currentSelectedCrop.currentPrice || 0);
+  const estimatedPlatformTotal = calcQty * (currentSelectedCrop.recommendedFarmerSellingPrice || 0);
   const estimatedGain = estimatedPlatformTotal - estimatedMandiTotal;
 
   return (
@@ -81,6 +139,81 @@ export const MarketPriceIntelligenceView: React.FC = () => {
         </button>
       </div>
 
+      {/* 📍 Current APMC Mandi & Location Intelligence Card */}
+      <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-3xl p-6 text-white shadow-lg space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0 shadow-inner">
+              <Store className="w-6 h-6 text-emerald-300" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15">
+                  Benchmark APMC Krishi Mandi
+                </span>
+                {isProfileLocation ? (
+                  <span className="text-[11px] font-semibold text-emerald-200 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-400/30 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                    Matched to your Profile ({currentUser.name || 'You'})
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleResetToProfile}
+                    className="text-[11px] font-bold text-amber-200 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 px-2.5 py-0.5 rounded-full border border-amber-400/40 flex items-center gap-1 transition-colors cursor-pointer"
+                    title={`Reset to profile location: ${profileDistrict}, ${profileState}`}
+                  >
+                    <RotateCcw className="w-3 h-3 text-amber-300" />
+                    Reset to Profile ({profileDistrict})
+                  </button>
+                )}
+              </div>
+              <h2 className="text-xl sm:text-2xl font-extrabold font-display text-white mt-1">
+                {activeMandiName}
+              </h2>
+              <p className="text-xs text-emerald-100/80 flex items-center gap-1 mt-0.5">
+                <MapPin className="w-3.5 h-3.5 text-emerald-300" />
+                <span>{viewDistrict}, {viewState}</span>
+                <span className="mx-1">•</span>
+                <span>Live 2026 AGMARKNET / eNAM Modal Rates</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Location Filters / Dropdowns */}
+          <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase text-emerald-200 block px-1">State</label>
+              <select
+                value={viewState}
+                onChange={e => handleStateChange(e.target.value)}
+                className="bg-slate-900/90 text-white font-semibold text-xs rounded-xl px-3 py-2 border border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
+              >
+                {ALL_INDIAN_STATES.map(s => (
+                  <option key={s} value={s} className="bg-slate-900 text-white">
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase text-emerald-200 block px-1">District</label>
+              <select
+                value={viewDistrict}
+                onChange={e => handleDistrictChange(e.target.value)}
+                className="bg-slate-900/90 text-white font-semibold text-xs rounded-xl px-3 py-2 border border-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer max-w-[180px] truncate"
+              >
+                {availableDistricts.map(d => (
+                  <option key={d} value={d} className="bg-slate-900 text-white">
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Grid: Crop Selector + Price Graph & AI Advisor */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 1 Col: Searchable Crop Mandi Ticker */}
@@ -106,7 +239,7 @@ export const MarketPriceIntelligenceView: React.FC = () => {
 
           <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
             {filteredCrops.map(crop => {
-              const isSelected = selectedCrop.cropName === crop.cropName;
+              const isSelected = currentSelectedCrop.cropName === crop.cropName;
               return (
                 <div
                   key={crop.cropName}
@@ -153,13 +286,13 @@ export const MarketPriceIntelligenceView: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-extrabold text-slate-900 font-display">{selectedCrop.cropName}</h2>
+                  <h2 className="text-xl font-extrabold text-slate-900 font-display">{currentSelectedCrop.cropName}</h2>
                   <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
-                    {selectedCrop.category}
+                    {currentSelectedCrop.category}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Benchmark APMC: <span className="font-semibold text-slate-700">{selectedCrop.mandiName} ({selectedCrop.state})</span>
+                  Benchmark APMC: <span className="font-semibold text-slate-700">{currentSelectedCrop.mandiName} ({currentSelectedCrop.state})</span>
                 </p>
               </div>
 
@@ -187,19 +320,19 @@ export const MarketPriceIntelligenceView: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="p-3 bg-slate-50 rounded-2xl">
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Today's Modal Rate</span>
-                <span className="text-base font-extrabold text-slate-900">₹{selectedCrop.currentPrice}/Q</span>
+                <span className="text-base font-extrabold text-slate-900">₹{currentSelectedCrop.currentPrice}/Q</span>
               </div>
               <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
                 <span className="text-[10px] text-emerald-800 uppercase font-semibold block">AI Recommended</span>
-                <span className="text-base font-extrabold text-emerald-700">₹{selectedCrop.recommendedFarmerSellingPrice}/Q</span>
+                <span className="text-base font-extrabold text-emerald-700">₹{currentSelectedCrop.recommendedFarmerSellingPrice}/Q</span>
               </div>
               <div className="p-3 bg-slate-50 rounded-2xl">
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Min - Max Range</span>
-                <span className="text-sm font-bold text-slate-800">₹{selectedCrop.minPrice} - ₹{selectedCrop.maxPrice}</span>
+                <span className="text-sm font-bold text-slate-800">₹{currentSelectedCrop.minPrice} - ₹{currentSelectedCrop.maxPrice}</span>
               </div>
               <div className="p-3 bg-slate-50 rounded-2xl">
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Demand / Supply</span>
-                <span className="text-xs font-bold text-slate-800">{selectedCrop.demandTrend} / {selectedCrop.supplyTrend}</span>
+                <span className="text-xs font-bold text-slate-800">{currentSelectedCrop.demandTrend} / {currentSelectedCrop.supplyTrend}</span>
               </div>
             </div>
 
@@ -207,7 +340,7 @@ export const MarketPriceIntelligenceView: React.FC = () => {
             <div className="h-64 w-full pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 {chartMode === '7days' ? (
-                  <LineChart data={selectedCrop.historical7Days} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <LineChart data={currentSelectedCrop.historical7Days} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                     <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} domain={['auto', 'auto']} tickFormatter={(v) => `₹${v}`} />
@@ -218,7 +351,7 @@ export const MarketPriceIntelligenceView: React.FC = () => {
                     <Line type="monotone" dataKey="price" stroke="#059669" strokeWidth={3} dot={{ r: 4, fill: '#059669' }} activeDot={{ r: 6 }} />
                   </LineChart>
                 ) : (
-                  <LineChart data={selectedCrop.historical30Days} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <LineChart data={currentSelectedCrop.historical30Days} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                     <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} domain={['auto', 'auto']} tickFormatter={(v) => `₹${v}`} />
@@ -263,7 +396,7 @@ export const MarketPriceIntelligenceView: React.FC = () => {
               <div className="p-3 bg-slate-50 rounded-2xl text-xs space-y-1">
                 <span className="text-slate-400 block uppercase font-semibold text-[10px]">Local Mandi Return:</span>
                 <span className="text-base font-bold text-slate-700">₹{estimatedMandiTotal.toLocaleString('en-IN')}</span>
-                <span className="text-[10px] text-slate-500 block">@ ₹{selectedCrop.currentPrice}/Q</span>
+                <span className="text-[10px] text-slate-500 block">@ ₹{currentSelectedCrop.currentPrice || 0}/Q</span>
               </div>
 
               <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs space-y-1">

@@ -16,7 +16,7 @@ export type PaymentStatus =
   | 'refunded'
   | 'pending';
 
-export type CropCategory = 'Cereals & Grains' | 'Vegetables' | 'Fruits' | 'Pulses' | 'Oilseeds' | 'Spices';
+export type CropCategory = 'Cereals & Grains' | 'Vegetables' | 'Fruits' | 'Pulses' | 'Oilseeds' | 'Spices' | 'Commercial' | 'Medicinal';
 
 export interface User {
   id: string;
@@ -79,6 +79,13 @@ export interface CropListing {
   description: string;
   status: 'Active' | 'Under Offer' | 'Sold Out' | 'Sold' | 'Expired';
   collectionCentreId?: string;
+  fciHubName?: string;
+  fciHubCode?: string;
+  fciHubDistanceKm?: number;
+  fciHubType?: string;
+  fciHubDistrict?: string;
+  fciHubState?: string;
+  nearestMandi?: string;
   createdAt: string;
   organicCertified?: boolean;
   mandiBenchmarkPrice?: number;

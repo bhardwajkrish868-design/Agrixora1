@@ -78,6 +78,20 @@ export const dbService = {
     }
   },
 
+  async deleteOrder(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/api/orders/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      return res.ok;
+    } catch (err) {
+      console.warn('Backend delete order failed', err);
+      return false;
+    }
+  },
+
   async clearAllOrders(): Promise<boolean> {
     try {
       const res = await fetch(`${API_BASE}/api/orders/clear`, {
