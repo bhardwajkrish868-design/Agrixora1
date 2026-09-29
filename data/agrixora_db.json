@@ -1,24 +1,6 @@
 {
   "users": [
     {
-      "id": "usr_farmer_1790348392240",
-      "name": "Ankit",
-      "phone": "+91 62002320921",
-      "email": "ankit@agrixora.in",
-      "role": "farmer",
-      "password": "Ankit@123",
-      "location": "Bokaro, Jharkhand",
-      "district": "Bokaro",
-      "state": "Jharkhand",
-      "verified": true,
-      "aadhaarVerified": true,
-      "aadhaarNumber": "5988 4655 4444",
-      "rating": 4.9,
-      "memberSince": "2026",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
-      "farmSizeAcres": 5
-    },
-    {
       "id": "usr_admin_1790345133665",
       "name": "Krish Bhardwaj",
       "phone": "+91 9631359486",
@@ -471,6 +453,24 @@
       "rating": 4.9,
       "memberSince": "2026",
       "avatar": "data:image/jpeg;base64,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",
+      "farmSizeAcres": 5
+    },
+    {
+      "id": "usr_farmer_1790348392240",
+      "name": "Ankit",
+      "phone": "+91 62002320921",
+      "email": "ankit@agrixora.in",
+      "role": "farmer",
+      "password": "Ankit@123",
+      "location": "Bokaro, Jharkhand",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "verified": true,
+      "aadhaarVerified": true,
+      "aadhaarNumber": "5988 4655 4444",
+      "rating": 4.9,
+      "memberSince": "2026",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
       "farmSizeAcres": 5
     }
   ],
@@ -2000,94 +2000,384 @@
   ],
   "activityHistory": [
     {
-      "id": "act_1790693824432_jo7i0",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
+      "id": "act_1790592884254_isndh",
+      "userId": "usr_buyer_1790448537989",
+      "userName": "KRISH BHARDWAJ",
       "userRole": "buyer",
       "actionType": "login",
+      "title": "User Logged Out",
+      "description": "KRISH BHARDWAJ signed out.",
+      "timestamp": "2026-09-28T10:54:44.254Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790616395123_3wecl",
+      "userId": "usr_farmer_1790532496880",
+      "userName": "captain",
+      "userRole": "farmer",
+      "actionType": "profile_update",
+      "title": "Profile Updated",
+      "description": "captain updated profile details & avatar permanently.",
+      "timestamp": "2026-09-28T17:26:35.123Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790616375480_mrpu2",
+      "userId": "usr_farmer_1790532496880",
+      "userName": "captain",
+      "userRole": "farmer",
+      "actionType": "login",
       "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into buyer portal.",
-      "timestamp": "2026-09-29T14:57:04.432Z",
+      "description": "captain logged into farmer portal.",
+      "timestamp": "2026-09-28T17:26:15.480Z",
       "metadata": {
-        "phone": "+91 9631359486",
-        "role": "buyer"
+        "phone": "+91 9431369829",
+        "role": "farmer"
       }
     },
     {
-      "id": "act_1790693812481_izsnq",
+      "id": "act_1790608045628_r3n9t",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged Out",
       "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-29T14:56:52.481Z",
+      "timestamp": "2026-09-28T15:07:25.628Z",
       "metadata": {}
     },
     {
-      "id": "act_1790693769990_ibxr7",
+      "id": "act_1790607895183_endxv",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "add_produce",
+      "title": "Produce Listed: Sharbati Wheat (Grade A)",
+      "description": "Krish Bhardwaj posted 60 Kg of Sharbati Wheat (Grade A) (Grade A Quality Harvest) at ₹27/K.",
+      "timestamp": "2026-09-28T15:04:55.183Z",
+      "metadata": {
+        "listingId": "LST-894950-622",
+        "quantity": 60,
+        "cropName": "Sharbati Wheat (Grade A)"
+      }
+    },
+    {
+      "id": "act_1790606299356_32vbj",
       "userId": "usr_farmer_1790199790561",
       "userName": "Krish Bhardwaj",
       "userRole": "farmer",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-29T14:56:09.990Z",
+      "timestamp": "2026-09-28T14:38:19.356Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "farmer"
       }
     },
     {
-      "id": "act_1790671446784_93edu",
+      "id": "act_1790606288297_ywurz",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T14:38:08.297Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790606272777_gd3ld",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into buyer portal.",
+      "timestamp": "2026-09-28T14:37:52.777Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1790592863534_3qqyx",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T10:54:23.534Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790592852241_4lyop",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T10:54:12.241Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790592842321_qntu5",
+      "userId": "usr_farmer_1790448537989",
+      "userName": "KRISH BHARDWAJ",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "KRISH BHARDWAJ signed out.",
+      "timestamp": "2026-09-28T10:54:02.321Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790592827134_9ei6q",
+      "userId": "usr_farmer_1790448537989",
+      "userName": "KRISH BHARDWAJ",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "KRISH BHARDWAJ logged into farmer portal.",
+      "timestamp": "2026-09-28T10:53:47.134Z",
+      "metadata": {
+        "phone": "+91 8809845947",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790592818412_8dvi5",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T10:53:38.412Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790592814754_6avsm",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T10:53:34.754Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790604656706_81pv5",
+      "userId": "usr_farmer_1790589815296",
+      "userName": "Shashank Shekhar Naik",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Shashank Shekhar Naik logged into farmer portal.",
+      "timestamp": "2026-09-28T14:10:56.706Z",
+      "metadata": {
+        "phone": "+91 8260903090",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790593954060_vn8ul",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T11:12:34.061Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790593155063_21bqc",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T10:59:15.063Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790592894249_gsd7p",
       "userId": "usr_admin_1790345133665",
       "userName": "Krish Bhardwaj",
       "userRole": "admin",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-29T08:44:06.784Z",
+      "timestamp": "2026-09-28T10:54:54.249Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "admin"
       }
     },
     {
-      "id": "act_1790626689249_g0igq",
+      "id": "act_1790623101892_ryoh1",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-28T19:18:21.892Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790589824110_tg9br",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T10:03:44.110Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790589815342_xei6f",
+      "userId": "usr_farmer_1790589815296",
+      "userName": "Shashank Shekhar Naik",
+      "userRole": "farmer",
+      "actionType": "register",
+      "title": "New Account Registered",
+      "description": "Shashank Shekhar Naik created a new farmer account from Sundergarh, Odisha.",
+      "timestamp": "2026-09-28T10:03:35.342Z",
+      "metadata": {
+        "phone": "+91 8260903090",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790589613554_ale99",
+      "userId": "usr_buyer_1790370389880",
+      "userName": "Krish Bhardwaj",
+      "userRole": "buyer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into buyer portal.",
+      "timestamp": "2026-09-28T10:00:13.554Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "buyer"
+      }
+    },
+    {
+      "id": "act_1790592805733_1bg1e",
+      "userId": "usr_admin_1790557419802",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T10:53:25.733Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790592553851_8l5m6",
       "userId": "usr_admin_1790557419802",
       "userName": "Krish Bhardwaj",
       "userRole": "admin",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-28T20:18:09.249Z",
+      "timestamp": "2026-09-28T10:49:13.851Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "admin"
       }
     },
     {
-      "id": "act_1790626674111_iykud",
-      "userId": "usr_buyer_1790534660861",
-      "userName": "Ankit Kumar Mahato",
-      "userRole": "buyer",
+      "id": "act_1790592515869_2ti52",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
       "actionType": "login",
       "title": "User Logged Out",
-      "description": "Ankit Kumar Mahato signed out.",
-      "timestamp": "2026-09-28T20:17:54.111Z",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T10:48:35.869Z",
       "metadata": {}
     },
     {
-      "id": "act_1790626289595_vi4hw",
-      "userId": "usr_buyer_1790534660861",
-      "userName": "Ankit Kumar Mahato",
+      "id": "act_1790592478073_3c4jk",
+      "userId": "usr_collection_centre_1789738899022",
+      "userName": "Krish Bhardwaj",
+      "userRole": "collection_centre",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into collection_centre portal.",
+      "timestamp": "2026-09-28T10:47:58.073Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "collection_centre"
+      }
+    },
+    {
+      "id": "act_1790590111485_rzfyr",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-28T10:08:31.485Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790590089001_0q7t8",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "admin_action",
+      "title": "User Profile Deleted",
+      "description": "Admin deleted user profile ID usr_farmer_1790586563315 from database.",
+      "timestamp": "2026-09-28T10:08:09.001Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790589837891_253g3",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-28T10:03:57.891Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790592876172_1ncfe",
+      "userId": "usr_buyer_1790448537989",
+      "userName": "KRISH BHARDWAJ",
       "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged In",
-      "description": "Ankit Kumar Mahato logged into buyer portal.",
-      "timestamp": "2026-09-28T20:11:29.595Z",
+      "description": "KRISH BHARDWAJ logged into buyer portal.",
+      "timestamp": "2026-09-28T10:54:36.172Z",
       "metadata": {
-        "phone": "+91 9631289876",
+        "phone": "+91 8809845947",
         "role": "buyer"
       }
     },
@@ -2260,384 +2550,94 @@
       }
     },
     {
-      "id": "act_1790623101892_ryoh1",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T19:18:21.892Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790589824110_tg9br",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T10:03:44.110Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790589815342_xei6f",
-      "userId": "usr_farmer_1790589815296",
-      "userName": "Shashank Shekhar Naik",
-      "userRole": "farmer",
-      "actionType": "register",
-      "title": "New Account Registered",
-      "description": "Shashank Shekhar Naik created a new farmer account from Sundergarh, Odisha.",
-      "timestamp": "2026-09-28T10:03:35.342Z",
-      "metadata": {
-        "phone": "+91 8260903090",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790589613554_ale99",
+      "id": "act_1790693824432_jo7i0",
       "userId": "usr_buyer_1790370389880",
       "userName": "Krish Bhardwaj",
       "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into buyer portal.",
-      "timestamp": "2026-09-28T10:00:13.554Z",
+      "timestamp": "2026-09-29T14:57:04.432Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "buyer"
       }
     },
     {
-      "id": "act_1790592805733_1bg1e",
+      "id": "act_1790693812481_izsnq",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged Out",
+      "description": "Krish Bhardwaj signed out.",
+      "timestamp": "2026-09-29T14:56:52.481Z",
+      "metadata": {}
+    },
+    {
+      "id": "act_1790693769990_ibxr7",
+      "userId": "usr_farmer_1790199790561",
+      "userName": "Krish Bhardwaj",
+      "userRole": "farmer",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into farmer portal.",
+      "timestamp": "2026-09-29T14:56:09.990Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "farmer"
+      }
+    },
+    {
+      "id": "act_1790671446784_93edu",
+      "userId": "usr_admin_1790345133665",
+      "userName": "Krish Bhardwaj",
+      "userRole": "admin",
+      "actionType": "login",
+      "title": "User Logged In",
+      "description": "Krish Bhardwaj logged into admin portal.",
+      "timestamp": "2026-09-29T08:44:06.784Z",
+      "metadata": {
+        "phone": "+91 9631359486",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "act_1790626689249_g0igq",
       "userId": "usr_admin_1790557419802",
       "userName": "Krish Bhardwaj",
       "userRole": "admin",
       "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T10:53:25.733Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790592553851_8l5m6",
-      "userId": "usr_admin_1790557419802",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
       "title": "User Logged In",
       "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-28T10:49:13.851Z",
+      "timestamp": "2026-09-28T20:18:09.249Z",
       "metadata": {
         "phone": "+91 9631359486",
         "role": "admin"
       }
     },
     {
-      "id": "act_1790592515869_2ti52",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T10:48:35.869Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790592478073_3c4jk",
-      "userId": "usr_collection_centre_1789738899022",
-      "userName": "Krish Bhardwaj",
-      "userRole": "collection_centre",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into collection_centre portal.",
-      "timestamp": "2026-09-28T10:47:58.073Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "collection_centre"
-      }
-    },
-    {
-      "id": "act_1790590111485_rzfyr",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T10:08:31.485Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790590089001_0q7t8",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "admin_action",
-      "title": "User Profile Deleted",
-      "description": "Admin deleted user profile ID usr_farmer_1790586563315 from database.",
-      "timestamp": "2026-09-28T10:08:09.001Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790589837891_253g3",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-28T10:03:57.891Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790592876172_1ncfe",
-      "userId": "usr_buyer_1790448537989",
-      "userName": "KRISH BHARDWAJ",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "KRISH BHARDWAJ logged into buyer portal.",
-      "timestamp": "2026-09-28T10:54:36.172Z",
-      "metadata": {
-        "phone": "+91 8809845947",
-        "role": "buyer"
-      }
-    },
-    {
-      "id": "act_1790592863534_3qqyx",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T10:54:23.534Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790592852241_4lyop",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T10:54:12.241Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790592842321_qntu5",
-      "userId": "usr_farmer_1790448537989",
-      "userName": "KRISH BHARDWAJ",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "KRISH BHARDWAJ signed out.",
-      "timestamp": "2026-09-28T10:54:02.321Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790592827134_9ei6q",
-      "userId": "usr_farmer_1790448537989",
-      "userName": "KRISH BHARDWAJ",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "KRISH BHARDWAJ logged into farmer portal.",
-      "timestamp": "2026-09-28T10:53:47.134Z",
-      "metadata": {
-        "phone": "+91 8809845947",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790592818412_8dvi5",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T10:53:38.412Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790592814754_6avsm",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T10:53:34.754Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790604656706_81pv5",
-      "userId": "usr_farmer_1790589815296",
-      "userName": "Shashank Shekhar Naik",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Shashank Shekhar Naik logged into farmer portal.",
-      "timestamp": "2026-09-28T14:10:56.706Z",
-      "metadata": {
-        "phone": "+91 8260903090",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790593954060_vn8ul",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T11:12:34.061Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790593155063_21bqc",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T10:59:15.063Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790592894249_gsd7p",
-      "userId": "usr_admin_1790345133665",
-      "userName": "Krish Bhardwaj",
-      "userRole": "admin",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into admin portal.",
-      "timestamp": "2026-09-28T10:54:54.249Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "admin"
-      }
-    },
-    {
-      "id": "act_1790592884254_isndh",
-      "userId": "usr_buyer_1790448537989",
-      "userName": "KRISH BHARDWAJ",
+      "id": "act_1790626674111_iykud",
+      "userId": "usr_buyer_1790534660861",
+      "userName": "Ankit Kumar Mahato",
       "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged Out",
-      "description": "KRISH BHARDWAJ signed out.",
-      "timestamp": "2026-09-28T10:54:44.254Z",
+      "description": "Ankit Kumar Mahato signed out.",
+      "timestamp": "2026-09-28T20:17:54.111Z",
       "metadata": {}
     },
     {
-      "id": "act_1790616395123_3wecl",
-      "userId": "usr_farmer_1790532496880",
-      "userName": "captain",
-      "userRole": "farmer",
-      "actionType": "profile_update",
-      "title": "Profile Updated",
-      "description": "captain updated profile details & avatar permanently.",
-      "timestamp": "2026-09-28T17:26:35.123Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790616375480_mrpu2",
-      "userId": "usr_farmer_1790532496880",
-      "userName": "captain",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "captain logged into farmer portal.",
-      "timestamp": "2026-09-28T17:26:15.480Z",
-      "metadata": {
-        "phone": "+91 9431369829",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790608045628_r3n9t",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T15:07:25.628Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790607895183_endxv",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "add_produce",
-      "title": "Produce Listed: Sharbati Wheat (Grade A)",
-      "description": "Krish Bhardwaj posted 60 Kg of Sharbati Wheat (Grade A) (Grade A Quality Harvest) at ₹27/K.",
-      "timestamp": "2026-09-28T15:04:55.183Z",
-      "metadata": {
-        "listingId": "LST-894950-622",
-        "quantity": 60,
-        "cropName": "Sharbati Wheat (Grade A)"
-      }
-    },
-    {
-      "id": "act_1790606299356_32vbj",
-      "userId": "usr_farmer_1790199790561",
-      "userName": "Krish Bhardwaj",
-      "userRole": "farmer",
-      "actionType": "login",
-      "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into farmer portal.",
-      "timestamp": "2026-09-28T14:38:19.356Z",
-      "metadata": {
-        "phone": "+91 9631359486",
-        "role": "farmer"
-      }
-    },
-    {
-      "id": "act_1790606288297_ywurz",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
-      "userRole": "buyer",
-      "actionType": "login",
-      "title": "User Logged Out",
-      "description": "Krish Bhardwaj signed out.",
-      "timestamp": "2026-09-28T14:38:08.297Z",
-      "metadata": {}
-    },
-    {
-      "id": "act_1790606272777_gd3ld",
-      "userId": "usr_buyer_1790370389880",
-      "userName": "Krish Bhardwaj",
+      "id": "act_1790626289595_vi4hw",
+      "userId": "usr_buyer_1790534660861",
+      "userName": "Ankit Kumar Mahato",
       "userRole": "buyer",
       "actionType": "login",
       "title": "User Logged In",
-      "description": "Krish Bhardwaj logged into buyer portal.",
-      "timestamp": "2026-09-28T14:37:52.777Z",
+      "description": "Ankit Kumar Mahato logged into buyer portal.",
+      "timestamp": "2026-09-28T20:11:29.595Z",
       "metadata": {
-        "phone": "+91 9631359486",
+        "phone": "+91 9631289876",
         "role": "buyer"
       }
     },
@@ -8543,7 +8543,7 @@
     }
   ],
   "adminPasskey": "Krish0386",
-  "lastUpdated": "2026-09-29T14:57:24.247Z",
+  "lastUpdated": "2026-09-29T15:05:32.806Z",
   "vehicles": [
     {
       "id": "veh_ts_1",

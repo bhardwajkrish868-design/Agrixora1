@@ -33,7 +33,8 @@ import {
   ChevronDown,
   BarChart3,
   Users,
-  Leaf
+  Leaf,
+  Landmark
 } from 'lucide-react';
 
 // 🇮🇳 Authentic UIDAI Sunburst Aadhaar Logo
@@ -113,7 +114,7 @@ const DigitalIndiaLogo: React.FC = () => (
 
 
 export const WelcomeGatewayView: React.FC = () => {
-  const { language, setLanguage } = useAgri();
+  const { language, setLanguage, enterPortal, setActiveTab } = useAgri();
 
   // Cloud Database Modal & Status
   const [isCloudDbOpen, setIsCloudDbOpen] = useState(false);
@@ -232,7 +233,26 @@ export const WelcomeGatewayView: React.FC = () => {
         </div>
 
         {/* Top Right Actions */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+
+          {/* 💼 Dedicated Standalone AI Business Advisory & 35% Subsidy Button */}
+          <button
+            type="button"
+            onClick={() => {
+              enterPortal('farmer');
+              setActiveTab('rural_advisory');
+            }}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-emerald-600 to-teal-700 hover:from-amber-600 hover:to-teal-800 text-white font-extrabold text-xs shadow-md shadow-emerald-700/20 transition-all hover:scale-105 cursor-pointer border border-amber-300/50 group"
+            title="AI Rural Business Advisory & 35% Subsidy (ग्रामीण बिज़नेस व सब्सिडी AI)"
+          >
+            <Landmark className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
+            <span className="font-bold">
+              {language === 'hi' ? '💼 बिज़नेस व 35% सब्सिडी AI' : '💼 Rural Business & Subsidy AI'}
+            </span>
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-amber-400 text-slate-950 ml-0.5 shadow-xs">
+              35% GRANT
+            </span>
+          </button>
 
           {/* Language Selector Dual Pill */}
           <div className="flex items-center bg-white/95 rounded-full p-0.5 border border-slate-200/90 shadow-xs">
@@ -442,6 +462,42 @@ export const WelcomeGatewayView: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* 💼 3RD DEDICATED STANDALONE CARD: AI RURAL MICRO-ENTERPRISE & SUBSIDY ADVISOR */}
+        <div 
+          onClick={() => {
+            enterPortal('farmer');
+            setActiveTab('rural_advisory');
+          }}
+          className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 text-white border-2 border-amber-400/60 hover:border-amber-300 shadow-[0_10px_30px_rgba(245,158,11,0.18)] hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md relative overflow-hidden group text-left"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-500 border border-amber-300/60 flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-110 transition-transform shrink-0">
+              💼
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base sm:text-lg font-black text-white font-display">
+                  {language === 'hi'
+                    ? 'ग्रामीण सूक्ष्म-उद्यम व FPO वित्तीय सलाहकार'
+                    : 'Rural Micro-Enterprise & FPO Financial Advisory'}
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 animate-pulse">
+                  35% SUBSIDY + AIF 3%
+                </span>
+              </div>
+              <p className="text-xs text-slate-200 mt-1 font-medium leading-relaxed">
+                {language === 'hi'
+                  ? 'दाल मिल, सोलर कोल्ड स्टोरेज, तेल मिल व मशरूम फार्मिंग की लागत, PM-FME 35% सब्सिडी व 1-क्लिक बैंक लोन DPR रिपोर्ट।'
+                  : 'Explore 8+ agro-business models (Dal Mill, Cold Storage, Oil Expeller), calculate 35% PM-FME grants & generate Bank DPR.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-600 text-slate-950 font-black text-xs sm:text-sm shadow-md group-hover:from-amber-400 group-hover:to-emerald-500 transition-all shrink-0">
+            <span>{language === 'hi' ? 'बिज़नेस AI खोलें →' : 'Launch Advisory AI →'}</span>
+          </div>
         </div>
       </main>
 
