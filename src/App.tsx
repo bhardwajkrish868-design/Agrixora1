@@ -26,6 +26,7 @@ import { ProfileView } from './views/ProfileView';
 import { NotificationsView } from './views/NotificationsView';
 import { StateTransportDirectoryView } from './views/StateTransportDirectoryView';
 import { BulkDemandPoolView } from './views/BulkDemandPoolView';
+import { RuralBusinessAdvisoryView } from './views/RuralBusinessAdvisoryView';
 import { NotificationToast } from './components/NotificationToast';
 import { KisanAIVoiceAssistant } from './components/KisanAIVoiceAssistant';
 
@@ -46,6 +47,7 @@ const MainLayout: React.FC = () => {
   // Render view based on active role and tab
   const renderCurrentView = () => {
     // Global views accessible from anywhere
+    if (activeTab === 'rural_advisory') return <RuralBusinessAdvisoryView />;
     if (activeTab === 'profile') return <ProfileView />;
     if (activeTab === 'market_prices') return <MarketPriceIntelligenceView />;
     if (activeTab === 'track_delivery') return <SupplyChainTracker />;

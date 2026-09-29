@@ -30,7 +30,8 @@ import {
   Printer,
   X,
   Info,
-  Warehouse
+  Warehouse,
+  Landmark
 } from 'lucide-react';
 import { findNearestFciHub } from '../utils/geoUtils';
 import { getNearestTargetMandi } from '../data/indiaLocations';
@@ -235,15 +236,15 @@ export const FarmerDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 🌟 DUAL HERO FEATURE BANNERS (Kisan Voice AI + Live GPS Reefer) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* 🌟 TRIO HERO FEATURE BANNERS (Kisan Voice AI + Rural Business & Subsidy AI + Live GPS Reefer) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {/* 🎙️ 1. Kisan AI Voice Assistant Banner */}
         <div 
           onClick={() => openVoiceAssistant()}
-          className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-emerald-500/40 group relative overflow-hidden"
+          className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white flex flex-col justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-emerald-500/40 group relative overflow-hidden"
         >
           <div className="flex items-center gap-3.5">
-            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 border border-emerald-300/40 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-lg shadow-emerald-900/50">
+            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 border border-emerald-300/40 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-lg shadow-emerald-900/50 shrink-0">
               <Mic className="w-6 h-6 animate-pulse" />
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -261,25 +262,57 @@ export const FarmerDashboard: React.FC = () => {
               </div>
               <p className="text-xs text-emerald-300/90 mt-0.5">
                 {language === 'hi'
-                  ? 'बोलकर पूछें: आज का मंडी भाव, 3-दिन का मौसम, फसल रोग व सरकारी योजनाएं'
-                  : 'Speak to ask: Live Mandi rates, 3-day weather, crop remedies & PM-Kisan'}
+                  ? 'बोलकर पूछें: आज का मंडी भाव, 3-दिन का मौसम व फसल रोग'
+                  : 'Speak to ask: Live Mandi rates, weather & crop remedies'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-900/60 px-4 py-2 rounded-xl border border-emerald-500/40 group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
+          <div className="flex items-center justify-between gap-2 text-xs font-bold text-emerald-300 bg-emerald-900/60 px-4 py-2 rounded-xl border border-emerald-500/40 group-hover:bg-emerald-600 group-hover:text-white transition-all">
             <span>{language === 'hi' ? 'बोलकर पूछें' : 'Start Voice'}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
 
-        {/* 🚛 2. Live GPS Reefer Radar Banner */}
+        {/* 💼 2. Rural Business Advisory & Subsidy AI Banner */}
         <div 
-          onClick={() => setActiveTab('tracker')}
-          className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-950 text-white flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-cyan-500/30 group"
+          onClick={() => setActiveTab('rural_advisory')}
+          className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 text-white flex flex-col justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-emerald-400/40 group relative overflow-hidden"
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-md">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 border border-emerald-300/40 flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md shrink-0">
+              <Landmark className="w-6 h-6 text-amber-300" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-extrabold text-sm sm:text-base text-white">
+                  {language === 'hi' ? '💼 ग्रामीण बिज़नेस व सब्सिडी AI' : '💼 Rural Business & Subsidy AI'}
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-slate-950">
+                  35% GRANT
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                {language === 'hi'
+                  ? 'दाल मिल, कोल्ड स्टोरेज व तेल मिल हेतु PM-FME/AIF सब्सिडी व बैंक DPR'
+                  : 'Dal Mill, Cold Storage & Oil Mill: PM-FME 35% subsidy & Bank DPR'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 text-xs font-bold text-emerald-300 bg-emerald-950/70 px-4 py-2 rounded-xl border border-emerald-500/40 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+            <span>{language === 'hi' ? 'सब्सिडी व DPR देखें' : 'Calculate Subsidy & DPR'}</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </div>
+
+        {/* 🚛 3. Live GPS Reefer Radar Banner */}
+        <div 
+          onClick={() => setActiveTab('tracker')}
+          className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-950 text-white flex flex-col justify-between gap-4 cursor-pointer hover:shadow-xl transition-all border border-cyan-500/30 group"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-md shrink-0">
               🚚
             </div>
             <div>
@@ -294,12 +327,12 @@ export const FarmerDashboard: React.FC = () => {
               <p className="text-xs text-slate-300 mt-0.5">
                 {language === 'hi'
                   ? '4.1°C कोल्ड-चेन तापमान, राजमार्ग चेकपॉइंट और ई-वे बिल लाइव देखें'
-                  : 'Monitor 4.1°C cold-chain sensors, toll checkpoints & e-Way bill in real-time'}
+                  : 'Monitor 4.1°C cold-chain sensors, toll checkpoints & e-Way bill'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 bg-cyan-950/60 px-4 py-2 rounded-xl border border-cyan-600/40 group-hover:bg-cyan-600 group-hover:text-white transition-all shrink-0">
+          <div className="flex items-center justify-between gap-2 text-xs font-bold text-cyan-400 bg-cyan-950/60 px-4 py-2 rounded-xl border border-cyan-600/40 group-hover:bg-cyan-600 group-hover:text-white transition-all">
             <span>{language === 'hi' ? 'मैप खोलें' : 'Open GPS Radar'}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>

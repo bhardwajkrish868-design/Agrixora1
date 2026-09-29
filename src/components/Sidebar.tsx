@@ -25,7 +25,9 @@ import {
   PhoneCall,
   Lock,
   ChevronRight,
-  Database
+  Database,
+  Landmark,
+  Briefcase
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       case 'farmer':
         return [
           { id: 'overview', label: language === 'hi' ? 'डैशबोर्ड' : 'Overview', icon: LayoutDashboard },
+          { id: 'rural_advisory', label: language === 'hi' ? '💼 ग्रामीण बिज़नेस व सब्सिडी AI' : '💼 Rural Business & Finance AI', icon: Landmark, highlight: true },
           { id: 'bulk_pooling', label: language === 'hi' ? '📥 थोक खरीद मांग' : '📥 Receive Bulk Orders', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
           { id: 'add_produce', label: language === 'hi' ? 'फसल जोड़ें' : 'Add Produce', icon: PlusCircle },
           { id: 'my_listings', label: language === 'hi' ? 'मेरी फसलें' : 'My Listings', icon: Layers, badge: listings.filter(l => isFarmerListing(l, currentUser)).length },
@@ -59,6 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         const buyerOrdersCount = orders.filter(o => isBuyerOrder(o, currentUser)).length;
         return [
           { id: 'overview', label: language === 'hi' ? 'डैशबोर्ड' : 'Dashboard', icon: LayoutDashboard },
+          { id: 'rural_advisory', label: language === 'hi' ? '💼 एग्री-बिज़नेस व वित्तीय AI' : '💼 Agri-Business & Finance AI', icon: Landmark, highlight: true },
           { id: 'bulk_pooling', label: language === 'hi' ? '⚡ 4-माह थोक खरीद' : '⚡ 4-Mo Bulk Orders', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
           { id: 'marketplace', label: language === 'hi' ? 'फसल मार्केटप्लेस' : 'Marketplace', icon: Store, badge: listings.filter(l => l.status === 'Active').length },
           { id: 'my_orders', label: language === 'hi' ? 'मेरे ऑर्डर' : 'My Orders', icon: ShoppingBag, badge: buyerOrdersCount, highlight: orders.some(o => isBuyerOrder(o, currentUser) && o.currentStage === 'in_transit') },
@@ -75,6 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         const hubReadyDispatchCount = orders.filter(o => o.currentStage === 'quality_verified').length;
         return [
           { id: 'overview', label: language === 'hi' ? 'हब कमांड डैशबोर्ड' : 'Hub Command Dashboard', icon: LayoutDashboard },
+          { id: 'rural_advisory', label: language === 'hi' ? '💼 एग्री-बिज़नेस व AIF फंड' : '💼 Agri-Business & AIF Fund', icon: Landmark, highlight: true },
           { id: 'incoming', label: language === 'hi' ? 'आवक फसल (धर्मकांटा)' : 'Incoming Harvest Intake', icon: PackageSearch, badge: hubIncomingCount },
           { id: 'verification', label: language === 'hi' ? 'NABL लैब व ग्रेडिंग' : 'QC Lab & Grading', icon: ShieldCheck },
           { id: 'storage', label: language === 'hi' ? 'साइलो व कोल्ड स्टोरेज' : 'Cold Storage & Silos', icon: Warehouse },
@@ -90,6 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       case 'admin':
         return [
           { id: 'overview', label: language === 'hi' ? 'डैशबोर्ड' : 'Dashboard', icon: LayoutDashboard },
+          { id: 'rural_advisory', label: language === 'hi' ? '💼 ग्रामीण बिज़नेस व वित्तीय AI' : '💼 Rural Business & Finance AI', icon: Landmark, highlight: true },
           { id: 'users', label: language === 'hi' ? 'उपयोगकर्ता व हितधारक' : 'Users & Stakeholders', icon: Users },
           { id: 'listings', label: language === 'hi' ? 'सभी फसल लिस्टिंग' : 'All Listings', icon: Boxes, badge: listings.length },
           { id: 'bulk_pooling', label: language === 'hi' ? '500T+ थोक मांग पूल' : '500T+ Bulk Demand Pools', icon: Boxes, badge: bulkDemands?.length || 0, highlight: true },
