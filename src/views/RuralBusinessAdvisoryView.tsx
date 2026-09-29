@@ -29,7 +29,21 @@ import {
   VolumeX,
   RefreshCw,
   AlertCircle,
-  Briefcase
+  Briefcase,
+  ArrowLeft,
+  Truck,
+  Store,
+  Users,
+  Award,
+  Check,
+  Phone,
+  BarChart3,
+  ExternalLink,
+  Sliders,
+  DollarSign,
+  FileCheck,
+  Building2,
+  Info
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -41,10 +55,13 @@ import {
   Legend,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  CartesianGrid,
+  AreaChart,
+  Area
 } from 'recharts';
 
-interface BusinessModel {
+export interface BusinessModel {
   id: string;
   nameEn: string;
   nameHi: string;
@@ -67,9 +84,10 @@ interface BusinessModel {
   descriptionHi: string;
   marketDemandRating: 'Very High' | 'High' | 'Moderate';
   offtakeChannel: string;
+  icon: string;
 }
 
-const BUSINESS_MODELS: BusinessModel[] = [
+export const BUSINESS_MODELS: BusinessModel[] = [
   {
     id: 'mini_dal_mill',
     nameEn: 'Mini Dal Mill & Pulse Processing Unit',
@@ -92,7 +110,8 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'De-husking, splitting, polishing and 1kg-50kg automated packaging of pulses with direct off-take to institutional buyers and local retail networks.',
     descriptionHi: 'दालों की डी-हस्किंग, ग्रेडिंग, पॉलिशिंग एवं 1kg-50kg ऑटोमैटिक पैकेजिंग। स्थानीय बाजारों और संस्थागत खरीदारों के लिए उच्च मांग।',
     marketDemandRating: 'Very High',
-    offtakeChannel: 'Agrixora Institutional Buyers, BigBasket, Local Mandi Wholesalers'
+    offtakeChannel: 'Agrixora Institutional Buyers, BigBasket, Local Mandi Wholesalers',
+    icon: '🌾'
   },
   {
     id: 'cold_pressed_oil',
@@ -116,7 +135,8 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'High-margin chemical-free virgin cold-pressed edible oil extraction with oilcake (खली) sold as premium cattle feed.',
     descriptionHi: 'शुद्ध प्राकृतिक कच्ची घानी तेल निष्कर्षण। तेल के साथ-साथ उच्च गुणवत्ता वाली खल पशु आहार के रूप में तुरंत बिकती है।',
     marketDemandRating: 'Very High',
-    offtakeChannel: 'D2C Organic Brands, Supermarket Chains, Local Grocery Networks'
+    offtakeChannel: 'D2C Organic Brands, Supermarket Chains, Local Grocery Networks',
+    icon: '🌻'
   },
   {
     id: 'solar_micro_cold_storage',
@@ -140,7 +160,8 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'Decentralized farmgate cold room preserving fresh fruits/vegetables for 15-45 days, preventing distress selling and earning steady rental fees from neighboring farmers.',
     descriptionHi: 'खेत के पास सौर ऊर्जा संचालित कोल्ड रूम। फलों-सब्जियों को 15-45 दिन सुरक्षित रखकर फसल का उचित भाव और किराये से नियमित आय।',
     marketDemandRating: 'Very High',
-    offtakeChannel: 'Farmer Lot Aggregation, Agrixora Reefer Dispatch, Exporters'
+    offtakeChannel: 'Farmer Lot Aggregation, Agrixora Reefer Dispatch, Exporters',
+    icon: '❄️'
   },
   {
     id: 'spice_dehydration_grinding',
@@ -164,7 +185,8 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'Hygienic solar drying of raw spices followed by pulverizing, sieving and nitrogen-flushed pouch packaging for maximum aroma retention.',
     descriptionHi: 'मसालों की सोलर ड्राइंग, माइक्रोन पिसाई और नाइट्रोजन-पैकिंग। हल्दी, मिर्च और धनिए में भारी वैल्यू-एडिशन।',
     marketDemandRating: 'High',
-    offtakeChannel: 'Spice Retailers, Hotel Chains, Agrixora Bulk Procurement'
+    offtakeChannel: 'Spice Retailers, Hotel Chains, Agrixora Bulk Procurement',
+    icon: '🌶️'
   },
   {
     id: 'polyhouse_horticulture',
@@ -188,7 +210,8 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'Climate-controlled cultivation yielding 4x-6x higher output with year-round harvest cycles and premium tier-1 hotel/supermarket contracting.',
     descriptionHi: 'साल भर नियंत्रित तापमान में रंगीन शिमला मिर्च, खीरा व विदेशी फूलों की खेती। खुले खेत की तुलना में 4 से 6 गुना अधिक उत्पादन।',
     marketDemandRating: 'High',
-    offtakeChannel: 'Gourmet Retailers, Star Hotels, Wholesale Urban Mandis'
+    offtakeChannel: 'Gourmet Retailers, Star Hotels, Wholesale Urban Mandis',
+    icon: '🍅'
   },
   {
     id: 'mushroom_cultivation',
@@ -212,7 +235,8 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'Rapid 35-45 day harvesting cycle utilizing vertical tray racks inside insulated chambers. Extremely low land requirement with high daily cash flow.',
     descriptionHi: 'कम जमीन में वर्टिकल रैक पर 35-45 दिनों में तैयार होने वाली उच्च प्रोटीन फसल। दैनिक नकदी प्रवाह और अत्यधिक मांग।',
     marketDemandRating: 'Very High',
-    offtakeChannel: 'Local Vegetable Markets, Cloud Kitchens, Agrixora Buyers'
+    offtakeChannel: 'Local Vegetable Markets, Cloud Kitchens, Agrixora Buyers',
+    icon: '🍄'
   },
   {
     id: 'agri_drone_custom_hiring',
@@ -236,7 +260,8 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'Pesticide, nano-urea and liquid micronutrient spraying covering 25-35 acres/day at ₹350-₹500/acre service fee. Zero chemical contact for operators.',
     descriptionHi: '1 दिन में 25-35 एकड़ में नैनो यूरिया व कीटनाशक छिड़काव। ₹350-₹500 प्रति एकड़ शुल्क से तीव्र दैनिक आमदनी।',
     marketDemandRating: 'Very High',
-    offtakeChannel: 'Direct Village Farmers, FPO Contract spraying, Sugar Mills'
+    offtakeChannel: 'Direct Village Farmers, FPO Contract spraying, Sugar Mills',
+    icon: '🚜'
   },
   {
     id: 'bulk_milk_chilling',
@@ -260,11 +285,62 @@ const BUSINESS_MODELS: BusinessModel[] = [
     descriptionEn: 'Rapid chilling to 4°C preventing bacterial spoilage, plus value-addition into Paneer, Curd (दही), Desi Ghee and Butter with guaranteed dairy tie-ups.',
     descriptionHi: 'दूध को तुरंत 4°C पर ठंडा कर पनीर, खोया, दही व शुद्ध घी बनाना। अमूल, मदर डेयरी व स्थानीय मिष्ठान्न विक्रेताओं से सीधा अनुबंध।',
     marketDemandRating: 'High',
-    offtakeChannel: 'Dairy Cooperatives, Sweet Manufacturers, Agrixora FMCG buyers'
+    offtakeChannel: 'Dairy Cooperatives, Sweet Manufacturers, Agrixora FMCG buyers',
+    icon: '🥛'
+  },
+  {
+    id: 'cattle_feed_pellet',
+    nameEn: 'High-Protein Cattle & Poultry Feed Pellet Plant',
+    nameHi: 'पशु एवं मुर्गी संतुलित आहार (कैटल फीड) पेलेट प्लांट',
+    category: 'processing',
+    categoryLabelEn: 'Animal Nutrition',
+    categoryLabelHi: 'पशु पोषण',
+    minCapex: 10,
+    maxCapex: 26,
+    recommendedCapex: 16,
+    workingCapitalMonths: 2,
+    landRequiredSqFt: 1800,
+    powerHp: 18,
+    setupDays: 40,
+    marginPercent: 20,
+    paybackMonths: 15,
+    bestStates: ['Haryana', 'Punjab', 'Uttar Pradesh', 'Rajasthan', 'Bihar'],
+    keyRawMaterials: 'Mustard cake, Maize (मक्का), Rice Bran (डीओसी), Mineral mixture',
+    applicableSchemes: ['PM-FME', 'AHIDF', 'PMEGP'],
+    descriptionEn: 'Utilizing local agri-byproducts like bran, oilcake and broken grains into enriched feed pellets with strong local dairy farmer demand.',
+    descriptionHi: 'स्थानीय अनाज, चोकर व खली से उच्च गुणवत्ता वाला पौष्टिक पशु आहार। स्थानीय डेयरी फार्मों में नकद बिक्री।',
+    marketDemandRating: 'High',
+    offtakeChannel: 'Dairy Farms, Village Livestock Owners, Feed Dealers',
+    icon: '🌾'
+  },
+  {
+    id: 'honey_processing',
+    nameEn: 'Raw Honey Processing, Filtration & Bottling Unit',
+    nameHi: 'शहद (हनी) निष्कर्षण, फिल्ट्रेशन व बॉटलिंग यूनिट',
+    category: 'allied',
+    categoryLabelEn: 'Apiculture & Bee Products',
+    categoryLabelHi: 'मधुमक्खी पालन व शहद',
+    minCapex: 4,
+    maxCapex: 14,
+    recommendedCapex: 7,
+    workingCapitalMonths: 3,
+    landRequiredSqFt: 800,
+    powerHp: 5,
+    setupDays: 20,
+    marginPercent: 40,
+    paybackMonths: 9,
+    bestStates: ['Punjab', 'Bihar', 'West Bengal', 'Himachal Pradesh', 'Uttar Pradesh'],
+    keyRawMaterials: 'Raw apiary comb honey, Food-grade glass jars, Induction seals',
+    applicableSchemes: ['National Beekeeping & Honey Mission (NBHM - 80% Subsidy)', 'PM-FME', 'PMEGP'],
+    descriptionEn: 'Gentle moisture reduction (<18%), micro-filtration and automated jar packaging of monofloral virgin honey for organic wellness brands.',
+    descriptionHi: 'कच्चे शहद की नमी नियंत्रण, फिल्ट्रेशन और आधुनिक बॉटलिंग। कम लागत और 40% तक का भारी मुनाफा।',
+    marketDemandRating: 'Very High',
+    offtakeChannel: 'Ayurvedic Brands, Organic Retail Chains, Direct E-commerce',
+    icon: '🍯'
   }
 ];
 
-interface SchemeDetails {
+export interface SchemeDetails {
   id: string;
   name: string;
   shortTag: string;
@@ -274,9 +350,10 @@ interface SchemeDetails {
   interestSubvention: string;
   eligibility: string;
   portalUrl: string;
+  badgeColor: string;
 }
 
-const SCHEMES_DATABASE: SchemeDetails[] = [
+export const SCHEMES_DATABASE: SchemeDetails[] = [
   {
     id: 'pm_fme',
     name: 'PM Formalisation of Micro Food Processing Enterprises (PM-FME)',
@@ -286,7 +363,8 @@ const SCHEMES_DATABASE: SchemeDetails[] = [
     maxSubsidyAmount: 'Up to ₹10.00 Lakhs per enterprise',
     interestSubvention: 'Eligible for interest subvention via AIF convergence',
     eligibility: 'Micro food processing units, individual farmers, SHGs, FPOs, Cooperatives',
-    portalUrl: 'https://pmfme.mofpi.gov.in'
+    portalUrl: 'https://pmfme.mofpi.gov.in',
+    badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300'
   },
   {
     id: 'aif',
@@ -297,7 +375,8 @@ const SCHEMES_DATABASE: SchemeDetails[] = [
     maxSubsidyAmount: 'Interest relief on loans up to ₹2.00 Crores for 7 years',
     interestSubvention: '3.0% per annum rebate on commercial bank interest rate',
     eligibility: 'Farmers, FPOs, PACS, Agri-entrepreneurs, Startups, Primary Processing units',
-    portalUrl: 'https://agriinfra.dac.gov.in'
+    portalUrl: 'https://agriinfra.dac.gov.in',
+    badgeColor: 'bg-blue-100 text-blue-800 border-blue-300'
   },
   {
     id: 'pmegp',
@@ -308,7 +387,8 @@ const SCHEMES_DATABASE: SchemeDetails[] = [
     maxSubsidyAmount: 'Up to ₹17.50 Lakhs (35% of max ₹50 Lakhs project cost in rural areas)',
     interestSubvention: 'Normal priority sector lending rates',
     eligibility: 'Individuals aged 18+, Rural youth, Women, SC/ST/OBC/Differently-abled',
-    portalUrl: 'https://www.kviconline.gov.in/pmegp'
+    portalUrl: 'https://www.kviconline.gov.in/pmegp',
+    badgeColor: 'bg-purple-100 text-purple-800 border-purple-300'
   },
   {
     id: 'mudra',
@@ -319,7 +399,8 @@ const SCHEMES_DATABASE: SchemeDetails[] = [
     maxSubsidyAmount: 'Tarun: ₹5 Lakh to ₹10 Lakh | Tarun Plus: up to ₹20 Lakh',
     interestSubvention: 'Concessional priority lending rates without property mortgage',
     eligibility: 'Non-farm rural micro enterprises, small food processing, repair shops, packaging',
-    portalUrl: 'https://www.mudra.org.in'
+    portalUrl: 'https://www.mudra.org.in',
+    badgeColor: 'bg-amber-100 text-amber-800 border-amber-300'
   },
   {
     id: 'smam_drone',
@@ -330,29 +411,34 @@ const SCHEMES_DATABASE: SchemeDetails[] = [
     maxSubsidyAmount: 'Up to ₹5.00 Lakhs for individual agri-graduates / ₹10L for FPOs',
     interestSubvention: 'Linked with bank loan via state agriculture department',
     eligibility: 'Agri-graduates, Rural youth, Women SHGs, Farmer Producer Organizations',
-    portalUrl: 'https://agrimachinery.nic.in'
+    portalUrl: 'https://agrimachinery.nic.in',
+    badgeColor: 'bg-teal-100 text-teal-800 border-teal-300'
   }
 ];
 
 export const RuralBusinessAdvisoryView: React.FC = () => {
-  const { currentUser, language, setActiveTab } = useAgri();
+  const { currentUser, language, setLanguage, openGateway, setActiveTab, listings } = useAgri();
 
   // Active sub-tab state
-  const [activeSubTab, setActiveSubTab] = useState<'advisor' | 'schemes' | 'dpr_generator' | 'ai_chat'>('advisor');
+  const [activeSubTab, setActiveSubTab] = useState<'models' | 'loan_structuring' | 'dpr_dossier' | 'supply_chain' | 'schemes_vault' | 'ai_copilot'>('models');
 
   // Selected State & District
   const [selectedState, setSelectedState] = useState<string>(currentUser?.state || 'Maharashtra');
   const [selectedDistrict, setSelectedDistrict] = useState<string>(currentUser?.district || 'Nashik');
   
+  // Selected Category filter
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+
   // Selected Business Model
   const [selectedModelId, setSelectedModelId] = useState<string>('mini_dal_mill');
   
-  // Custom Financial Sliders State
   const activeModel = useMemo(() => {
     return BUSINESS_MODELS.find(m => m.id === selectedModelId) || BUSINESS_MODELS[0];
   }, [selectedModelId]);
 
+  // Custom Financial Sliders State
   const [customCapexLakhs, setCustomCapexLakhs] = useState<number>(activeModel.recommendedCapex);
+  const [workingCapitalMonths, setWorkingCapitalMonths] = useState<number>(activeModel.workingCapitalMonths || 2);
   const [entrepreneurCategory, setEntrepreneurCategory] = useState<'general' | 'women' | 'sc_st' | 'fpo'>('women');
   const [isRuralArea, setIsRuralArea] = useState<boolean>(true);
   const [chosenSchemeId, setChosenSchemeId] = useState<string>('pm_fme');
@@ -361,63 +447,102 @@ export const RuralBusinessAdvisoryView: React.FC = () => {
   const handleSelectBusinessModel = (model: BusinessModel) => {
     setSelectedModelId(model.id);
     setCustomCapexLakhs(model.recommendedCapex);
+    setWorkingCapitalMonths(model.workingCapitalMonths);
   };
 
-  // Financial calculations
+  // Automatic Loan Tier Classification (SIH 26091 Core Spec)
+  const isMicroFinanceTier = customCapexLakhs <= 1.40;
+  const loanTierInfo = useMemo(() => {
+    if (isMicroFinanceTier) {
+      return {
+        tierNameEn: 'Micro Finance Scheme',
+        tierNameHi: 'सूक्ष्म वित्त योजना (Micro Finance)',
+        maxProjectCost: '₹1.40 Lakh',
+        maxFundingCap: '₹1.25 Lakh (up to 90%)',
+        interestRate: 6.5,
+        tenureYears: 3,
+        tenureMonths: 36,
+        moratoriumMonths: 3,
+        descriptionEn: 'Concessional 6.5% interest rate, 3-year repayment including 3-month moratorium.',
+        descriptionHi: '6.5% रियायती ब्याज दर, 3 महीने के अधिस्थगन (Moratorium) सहित 3 वर्ष की चुकौती अवधि।'
+      };
+    } else {
+      return {
+        tierNameEn: 'Term Loan Scheme',
+        tierNameHi: 'सावधि ऋण योजना (Term Loan)',
+        maxProjectCost: '₹1.40 Lakh to ₹50.00 Lakh',
+        maxFundingCap: '₹45.00 Lakh (up to 90%)',
+        interestRate: 8.0,
+        tenureYears: 7,
+        tenureMonths: 84,
+        moratoriumMonths: 6,
+        descriptionEn: '8.0% p.a. interest rate, 7-year repayment including 6-month moratorium.',
+        descriptionHi: '8.0% वार्षिक ब्याज दर, 6 महीने के अधिस्थगन (Moratorium) सहित 7 वर्ष की चुकौती अवधि।'
+      };
+    }
+  }, [isMicroFinanceTier]);
+
+  // Comprehensive Financial Structuring Calculations
   const financialStructure = useMemo(() => {
     const totalCost = customCapexLakhs * 100000;
     
-    // Calculate Subsidy Rate based on scheme & category
-    let subsidyPercent = 35; // Default PM-FME / PMEGP
-    let maxSubsidyCap = 1000000; // ₹10 Lakhs max for PM-FME
+    // 1. Mandatory Margin: 10% for special/women/FPO, 15% for general
+    const promoterMarginPercent = entrepreneurCategory === 'general' ? 15 : 10;
+    const promoterContribution = Math.round((totalCost * promoterMarginPercent) / 100);
+
+    // 2. Subsidy calculation based on selected scheme
+    let subsidyPercent = 35;
+    let maxSubsidyCap = 1000000; // ₹10L for PM-FME
 
     if (chosenSchemeId === 'pm_fme') {
       subsidyPercent = 35;
-      maxSubsidyCap = 1000000; // ₹10L cap
+      maxSubsidyCap = 1000000;
     } else if (chosenSchemeId === 'pmegp') {
-      if (entrepreneurCategory === 'general') {
-        subsidyPercent = isRuralArea ? 25 : 15;
-      } else {
-        subsidyPercent = isRuralArea ? 35 : 25; // Special category (women, SC/ST, rural)
-      }
+      subsidyPercent = entrepreneurCategory === 'general' 
+        ? (isRuralArea ? 25 : 15) 
+        : (isRuralArea ? 35 : 25);
       maxSubsidyCap = 1750000; // 35% of 50 Lakhs
     } else if (chosenSchemeId === 'aif') {
-      subsidyPercent = 0; // AIF gives interest subvention rather than direct capex subsidy
+      subsidyPercent = 0; // AIF is 3% interest subvention rather than direct capex subsidy
       maxSubsidyCap = 0;
     } else if (chosenSchemeId === 'smam_drone') {
       subsidyPercent = entrepreneurCategory === 'fpo' ? 75 : 50;
       maxSubsidyCap = 500000;
+    } else if (chosenSchemeId === 'mudra') {
+      subsidyPercent = 0;
+      maxSubsidyCap = 0;
     }
 
-    const calculatedSubsidy = Math.min((totalCost * subsidyPercent) / 100, maxSubsidyCap);
+    const calculatedSubsidy = Math.min(Math.round((totalCost * subsidyPercent) / 100), maxSubsidyCap);
     
-    // Promoter Contribution (Margin Money: 10% for special/women, 15% for general)
-    const promoterMarginPercent = entrepreneurCategory === 'general' ? 15 : 10;
-    const promoterContribution = (totalCost * promoterMarginPercent) / 100;
+    // 3. Bank Loan: Up to 90% of Project Cost (capped per scheme)
+    const theoreticalLoan = totalCost - promoterContribution - calculatedSubsidy;
+    const maxLoanCap = isMicroFinanceTier ? 125000 : 4500000;
+    const bankLoan = Math.max(0, Math.min(theoreticalLoan, maxLoanCap));
 
-    // Bank Term Loan
-    const bankLoan = Math.max(0, totalCost - calculatedSubsidy - promoterContribution);
-
-    // Interest & EMI estimation (9.5% standard interest rate, 5 year tenure)
-    const baseInterestRate = 0.095;
+    // 4. Interest & EMI Calculation with Moratorium
+    const baseInterestRate = loanTierInfo.interestRate / 100;
     const aifInterestSubvention = (chosenSchemeId === 'aif' || chosenSchemeId === 'pm_fme') ? 0.03 : 0.0;
     const effectiveInterestRate = Math.max(0.04, baseInterestRate - aifInterestSubvention);
 
-    const tenureMonths = 60; // 5 years
+    const repaymentMonths = loanTierInfo.tenureMonths - loanTierInfo.moratoriumMonths;
     const monthlyInterestRate = effectiveInterestRate / 12;
-    const monthlyEmi = bankLoan > 0 
-      ? Math.round((bankLoan * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, tenureMonths)) / (Math.pow(1 + monthlyInterestRate, tenureMonths) - 1))
+    
+    const monthlyEmi = (bankLoan > 0 && repaymentMonths > 0)
+      ? Math.round((bankLoan * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, repaymentMonths)) / (Math.pow(1 + monthlyInterestRate, repaymentMonths) - 1))
       : 0;
 
-    const totalInterestPayable = (monthlyEmi * tenureMonths) - bankLoan;
+    const monthlyInterestDuringMoratorium = Math.round(bankLoan * monthlyInterestRate);
+    const totalInterestPayable = (monthlyEmi * repaymentMonths) + (monthlyInterestDuringMoratorium * loanTierInfo.moratoriumMonths) - bankLoan;
     const interestSavedViaSubvention = (chosenSchemeId === 'aif' || chosenSchemeId === 'pm_fme')
-      ? Math.round((bankLoan * 0.03 * 5))
+      ? Math.round(bankLoan * 0.03 * loanTierInfo.tenureYears)
       : 0;
 
-    // Estimated monthly economics
-    const estimatedMonthlyTurnover = Math.round((totalCost * 0.35)); // Typical 35% monthly asset turnover
-    const grossProfitMonthly = Math.round((estimatedMonthlyTurnover * (activeModel.marginPercent / 100)));
-    const netProfitMonthly = Math.max(15000, grossProfitMonthly - monthlyEmi - (totalCost * 0.03)); // After EMI and utilities
+    // 5. Operating Economics & DSCR
+    const estimatedMonthlyTurnover = Math.round(totalCost * 0.38); // 38% asset turnover
+    const grossProfitMonthly = Math.round(estimatedMonthlyTurnover * (activeModel.marginPercent / 100));
+    const operatingExpensesMonthly = Math.round(totalCost * 0.04);
+    const netProfitMonthly = Math.max(18000, grossProfitMonthly - monthlyEmi - operatingExpensesMonthly);
     const annualNetIncome = netProfitMonthly * 12;
     const paybackYears = Number((totalCost / (annualNetIncome + (monthlyEmi * 12))).toFixed(1));
     const dscr = Number(((netProfitMonthly + monthlyEmi) / Math.max(1, monthlyEmi)).toFixed(2));
@@ -431,44 +556,48 @@ export const RuralBusinessAdvisoryView: React.FC = () => {
       bankLoan,
       effectiveInterestRate: (effectiveInterestRate * 100).toFixed(1),
       monthlyEmi,
+      monthlyInterestDuringMoratorium,
       totalInterestPayable,
       interestSavedViaSubvention,
       estimatedMonthlyTurnover,
       grossProfitMonthly,
+      operatingExpensesMonthly,
       netProfitMonthly,
       annualNetIncome,
       paybackYears,
       dscr
     };
-  }, [customCapexLakhs, chosenSchemeId, entrepreneurCategory, isRuralArea, activeModel]);
+  }, [customCapexLakhs, chosenSchemeId, entrepreneurCategory, isRuralArea, activeModel, isMicroFinanceTier, loanTierInfo]);
 
-  // Chart data for Capital Structure
+  // Capital Structure Breakdown Data
   const capitalBreakdownChartData = [
-    { name: language === 'hi' ? 'सरकारी सब्सिडी (Grant)' : 'Govt Subsidy (Grant)', value: financialStructure.calculatedSubsidy, color: '#10b981' },
-    { name: language === 'hi' ? 'बैंक सावधि ऋण (Bank Loan)' : 'Bank Term Loan', value: financialStructure.bankLoan, color: '#3b82f6' },
-    { name: language === 'hi' ? 'स्वयं का अंशदान (Own Equity)' : 'Promoter Margin', value: financialStructure.promoterContribution, color: '#f59e0b' }
-  ];
+    { name: language === 'hi' ? 'सरकारी अनुदान (Grant)' : 'Govt Subsidy Grant', value: financialStructure.calculatedSubsidy, color: '#10b981' },
+    { name: language === 'hi' ? 'बैंक ऋण (90% Loan)' : 'Bank Loan (90%)', value: financialStructure.bankLoan, color: '#3b82f6' },
+    { name: language === 'hi' ? 'उद्यमी मार्जिन (Own 10%)' : 'Promoter Margin (10%)', value: financialStructure.promoterContribution, color: '#f59e0b' }
+  ].filter(item => item.value > 0);
 
-  // Chart data for 5-Year Projected Revenue & Net Profit
+  // 5-Year Financial Projection Data
   const fiveYearProjectionData = useMemo(() => {
-    const baseRevenue = financialStructure.estimatedMonthlyTurnover * 12;
-    const baseNetProfit = financialStructure.annualNetIncome;
+    const baseRev = financialStructure.estimatedMonthlyTurnover * 12;
+    const baseProf = financialStructure.annualNetIncome;
+    const annualEmi = financialStructure.monthlyEmi * 12;
+
     return [
-      { year: 'Year 1', revenue: Math.round(baseRevenue * 0.75 / 100000), profit: Math.round(baseNetProfit * 0.70 / 100000), emi: Math.round((financialStructure.monthlyEmi * 12) / 100000) },
-      { year: 'Year 2', revenue: Math.round(baseRevenue * 1.00 / 100000), profit: Math.round(baseNetProfit * 1.00 / 100000), emi: Math.round((financialStructure.monthlyEmi * 12) / 100000) },
-      { year: 'Year 3', revenue: Math.round(baseRevenue * 1.25 / 100000), profit: Math.round(baseNetProfit * 1.30 / 100000), emi: Math.round((financialStructure.monthlyEmi * 12) / 100000) },
-      { year: 'Year 4', revenue: Math.round(baseRevenue * 1.50 / 100000), profit: Math.round(baseNetProfit * 1.60 / 100000), emi: Math.round((financialStructure.monthlyEmi * 12) / 100000) },
-      { year: 'Year 5', revenue: Math.round(baseRevenue * 1.80 / 100000), profit: Math.round(baseNetProfit * 1.95 / 100000), emi: Math.round((financialStructure.monthlyEmi * 12) / 100000) }
+      { year: 'Year 1', revenue: Math.round(baseRev * 0.80 / 100000), profit: Math.round(baseProf * 0.75 / 100000), emi: Math.round(annualEmi / 100000) },
+      { year: 'Year 2', revenue: Math.round(baseRev * 1.05 / 100000), profit: Math.round(baseProf * 1.00 / 100000), emi: Math.round(annualEmi / 100000) },
+      { year: 'Year 3', revenue: Math.round(baseRev * 1.30 / 100000), profit: Math.round(baseProf * 1.30 / 100000), emi: Math.round(annualEmi / 100000) },
+      { year: 'Year 4', revenue: Math.round(baseRev * 1.55 / 100000), profit: Math.round(baseProf * 1.60 / 100000), emi: loanTierInfo.tenureYears >= 4 ? Math.round(annualEmi / 100000) : 0 },
+      { year: 'Year 5', revenue: Math.round(baseRev * 1.85 / 100000), profit: Math.round(baseProf * 1.95 / 100000), emi: loanTierInfo.tenureYears >= 5 ? Math.round(annualEmi / 100000) : 0 }
     ];
-  }, [financialStructure]);
+  }, [financialStructure, loanTierInfo]);
 
   // AI Conversational Chat State
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'ai' | 'user'; text: string; timestamp: string }>>([
     {
       role: 'ai',
       text: language === 'hi'
-        ? `नमस्ते! मैं आपका एआई ग्रामीण व्यापार व वित्तीय सलाहकार हूँ। आप ${selectedDistrict} जिले में खाद्य प्रसंस्करण, कोल्ड स्टोरेज, दाल मिल या किसी भी सूक्ष्म-उद्यम के लिए सरकारी सब्सिडी (PM-FME, AIF), लागत और बैंक ऋण के बारे में मुझसे पूछ सकते हैं।`
-        : `Namaste! I am your AI Rural Enterprise & Financial Structuring Assistant. Ask me anything about project setup costs, government subsidies (PM-FME, AIF, PMEGP), Bankable DPRs, or raw material availability in ${selectedDistrict}.`,
+        ? `नमस्ते! मैं आपका एआई ग्रामीण उद्यम एवं वित्तीय संरचना सलाहकार हूँ। ${selectedDistrict} में किसी भी कृषि-उद्योग (जैसे दाल मिल, कोल्ड स्टोरेज, कच्ची घानी तेल) की लागत, 10% मार्जिन पर 90% बैंक ऋण संरचना, 35% PM-FME सब्सिडी और बैंक DPR के संबंध में कोई भी प्रश्न पूछें।`
+        : `Namaste! I am your AI Rural Enterprise & Financial Structuring Copilot. Ask me anything about setting up agro-enterprises in ${selectedDistrict}, 10% margin vs 90% loan structuring, 35% PM-FME grants, or Bankable DPR generation.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -493,881 +622,1275 @@ export const RuralBusinessAdvisoryView: React.FC = () => {
       let aiReply = '';
       const qLower = query.toLowerCase();
 
-      if (qLower.includes('dal') || qLower.includes('दाल')) {
+      if (qLower.includes('margin') || qLower.includes('10%') || qLower.includes('मार्जिन') || qLower.includes('loan')) {
         aiReply = language === 'hi'
-          ? `मिनी दाल मिल के लिए ₹15-₹20 लाख का निवेश पर्याप्त है। इसमें PM-FME योजना के तहत 35% (अधिकतम ₹10 लाख) क्रेडिट-लिंक्ड सब्सिडी मिलती है। यदि आप AIF से जोड़ते हैं तो 3% ब्याज छूट भी मिलेगी। आपको 15 HP बिजली कनेक्शन और 1500 वर्ग फुट जगह की आवश्यकता होगी।`
-          : `For a Mini Dal Mill, a budget of ₹15-₹20 Lakhs is optimal. Under the PM-FME scheme, you receive a 35% credit-linked capital subsidy (up to ₹10 Lakhs). You also qualify for 3% interest subvention under AIF. Land requirement is ~1,500 sq ft with 15 HP power.`;
-      } else if (qLower.includes('cold') || qLower.includes('कोल्ड')) {
+          ? `SIH 26091 के तहत वित्तीय संरचना: ₹1.40 लाख तक के प्रोजेक्ट के लिए 'माइक्रो फाइनेंस स्कीम' (6.5% ब्याज, 3 वर्ष अवधि, 3 माह अधिस्थगन) में 90% तक ऋण मिलता है। ₹1.40L से ₹50L के लिए 'टर्म लोन स्कीम' (8.0% ब्याज, 7 वर्ष अवधि, 6 माह अधिस्थगन) लागू होती है। आपको केवल 10% मार्जिन मनी (Own Equity) देनी होती है।`
+          : `Financial Structuring under SIH 26091: Projects $\le$ ₹1.40 Lakh qualify for Micro Finance Scheme (6.5% interest, 3-yr tenure, 3-mo moratorium, up to 90% funding). Projects > ₹1.40 Lakh to ₹50 Lakh qualify for Term Loan Scheme (8.0% interest, 7-yr tenure, 6-mo moratorium). You only provide 10% promoter margin!`;
+      } else if (qLower.includes('pm-fme') || qLower.includes('subsidy') || qLower.includes('सब्सिडी')) {
         aiReply = language === 'hi'
-          ? `20-30 मीट्रिक टन सोलर कोल्ड स्टोरेज के लिए लगभग ₹20-₹25 लाख लागत आती है। AIF (एग्रीकल्चर इंफ्रास्ट्रक्चर फंड) के तहत 3% ब्याज छूट 7 साल के लिए और बिना किसी गारंटी के CGTMSE कवर मिलता है। यह टमाटर, प्याज और फलों के लिए अत्यधिक लाभदायक है।`
-          : `A 20-30 MT solar-powered cold room costs approx ₹20-₹25 Lakhs. Under the Agriculture Infrastructure Fund (AIF), you get a 3% annual interest subvention for 7 years plus full CGTMSE credit guarantee coverage. Payback period is under 20 months.`;
-      } else if (qLower.includes('oil') || qLower.includes('सरसों') || qLower.includes('तेल')) {
+          ? `PM-FME योजना के तहत खाद्य प्रसंस्करण इकाइयों (दाल मिल, तेल मिल, मसाला पिसाई) को 35% क्रेडिट-लिंक्ड कैपिटल सब्सिडी (अधिकतम ₹10 लाख) दी जाती है। इसके साथ ही AIF के तहत 3% ब्याज छूट (Interest Subvention) और CGTMSE क्रेडिट गारंटी भी मिलती है।`
+          : `Under PM-FME, micro food processing units (Dal Mills, Oil Expellers, Spice Processing) receive a 35% credit-linked capital subsidy up to ₹10 Lakhs. Combined with AIF, you also get a 3% interest subvention and CGTMSE collateral coverage.`;
+      } else if (qLower.includes('dpr') || qLower.includes('डीपीआर') || qLower.includes('bank')) {
         aiReply = language === 'hi'
-          ? `कच्ची घानी सरसों/मूंगफली तेल मिल ₹10-₹15 लाख में शुरू हो सकती है। PMEGP या PM-FME में महिलाओं/ग्रामीण उद्यमियों को 35% तक सब्सिडी मिलती है। खली (Oilcake) की स्थानीय डेयरी में तुरंत नकद बिक्री होती है, जिससे 25-28% शुद्ध मार्जिन मिलता है।`
-          : `A Cold-Pressed Oil Expeller unit can be established for ₹10-₹15 Lakhs. Special category & rural entrepreneurs get up to 35% margin subsidy via PMEGP/PM-FME. Oilcake (खल) provides instant daily cash flow from local dairies with a 26% net profit margin.`;
-      } else if (qLower.includes('subsidy') || qLower.includes('सब्सिडी') || qLower.includes('योजना')) {
-        aiReply = language === 'hi'
-          ? `वर्तमान में शीर्ष 3 योजनाएं हैं: 1. PM-FME (खाद्य प्रसंस्करण पर 35% सब्सिडी), 2. AIF (₹2 करोड़ तक 3% ब्याज छूट), 3. PMEGP (ग्रामीण क्षेत्रों में 35% तक मार्जिन मनी)। आप नीचे दिए गए 'DPR जनरेटर' से बैंक-प्रस्तुत योग्य प्रोजेक्ट रिपोर्ट डाउनलोड कर सकते हैं।`
-          : `Top 3 active schemes for rural entrepreneurs: 1. PM-FME (35% capital subsidy for food processing), 2. AIF (3% interest rebate on loans up to ₹2 Cr), 3. PMEGP (up to 35% subsidy for rural ventures). You can generate and print a bank-ready Detailed Project Report (DPR) directly from this tool.`;
+          ? `एग्रिक्सोरा का 1-क्लिक DPR जनरेटर SBI, PNB, NABARD और DIC के मानकों के अनुसार तैयार किया गया है। इसमें प्रोजेक्ट प्रोफाइल, 5-10km क्लस्टर व्यवहार्यता, 5-वर्षीय कैश फ्लो और 2.0x+ का DSCR शामिल है, जिसे बैंक प्रबंधक तुरंत स्वीकार करते हैं।`
+          : `Agrixora's 1-Click DPR Generator complies with SBI, PNB, NABARD and DIC appraisal standards. It features 5-10km cluster feasibility, means of finance, machinery matrix, 5-year cash flows, and a healthy DSCR > 2.0x.`;
       } else {
         aiReply = language === 'hi'
-          ? `आपके ${selectedDistrict} क्षेत्र में ${activeModel.nameHi} के लिए प्रोजेक्ट लागत ₹${customCapexLakhs} लाख है। इसमें ₹${(financialStructure.calculatedSubsidy / 100000).toFixed(2)} लाख की सरकारी सब्सिडी और ₹${(financialStructure.bankLoan / 100000).toFixed(2)} लाख का बैंक ऋण संरचित किया जा सकता है। क्या आप बैंक रिपोर्ट (DPR) तैयार करना चाहते हैं?`
-          : `For ${activeModel.nameEn} in ${selectedDistrict}, your project cost is structured at ₹${customCapexLakhs} Lakhs. This includes ₹${(financialStructure.calculatedSubsidy / 100000).toFixed(2)} Lakhs government subsidy and ₹${(financialStructure.bankLoan / 100000).toFixed(2)} Lakhs bank term loan. Would you like to generate a Bankable DPR dossier?`;
+          ? `${selectedDistrict} में ${activeModel.nameHi} के लिए अनुशंसित लागत ₹${activeModel.recommendedCapex} लाख है। 10% मार्जिन के साथ आपका अंशदान केवल ₹${(activeModel.recommendedCapex * 0.1).toFixed(2)} लाख होगा, बाकी 90% बैंक ऋण व 35% सरकारी सब्सिडी से संरचित किया जाएगा।`
+          : `For ${activeModel.nameEn} in ${selectedDistrict}, recommended capex is ₹${activeModel.recommendedCapex} Lakhs. With 10% margin, your initial contribution is just ₹${(activeModel.recommendedCapex * 0.1).toFixed(2)} Lakhs, with the remaining 90% structured via bank loans and 35% government subsidies.`;
       }
 
-      setChatMessages(prev => [...prev, {
-        role: 'ai',
-        text: aiReply,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }]);
+      setChatMessages(prev => [
+        ...prev,
+        {
+          role: 'ai',
+          text: aiReply,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
     }, 600);
   };
 
   const handleSpeakText = (text: string) => {
-    if (!('speechSynthesis' in window)) return;
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-      return;
+    if ('speechSynthesis' in window) {
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      setIsSpeaking(true);
+      window.speechSynthesis.speak(utterance);
     }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
-    utterance.rate = 0.95;
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
   };
 
-  const handlePrintDpr = () => {
+  const handlePrintDPR = () => {
     window.print();
   };
 
+  const filteredModels = useMemo(() => {
+    if (categoryFilter === 'all') return BUSINESS_MODELS;
+    return BUSINESS_MODELS.filter(m => m.category === categoryFilter);
+  }, [categoryFilter]);
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* 🌟 HERO BANNER */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white shadow-xl border border-emerald-500/30 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>{language === 'hi' ? 'एआई ग्रामीण सूक्ष्म-उद्यम व वित्तीय सलाहकार' : 'AI Rural Enterprise & Financial Structuring Engine'}</span>
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans pb-16">
+      
+      {/* 🌟 ULTRA HIGH-OCTANE TOP APP HEADER */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+          
+          {/* Brand & Identity */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={openGateway}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 border border-slate-200 text-slate-700 text-xs font-bold transition-all shadow-xs cursor-pointer group"
+              title="Return to Welcome Gateway"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              <span className="hidden sm:inline">{language === 'hi' ? 'मुख्य गेटवे' : 'Gateway'}</span>
+            </button>
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-600 to-emerald-600 flex items-center justify-center text-white text-lg shadow-md shadow-amber-600/20">
+                💼
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 font-display leading-tight">
+                    Agri<span className="text-emerald-600">xora</span>{' '}
+                    <span className="text-amber-600 text-xs sm:text-sm font-black bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      RURAL ADVISORY AI
+                    </span>
+                  </h1>
+                </div>
+                <p className="text-[11px] text-slate-500 font-semibold hidden md:block">
+                  {language === 'hi'
+                    ? 'ग्रामीण सूक्ष्म-उद्यमी सलाहकार एवं 90% बैंक ऋण संरचना प्रणाली (SIH 26091 & 26033)'
+                    : 'AI Hyper-Local Feasibility, 90% Loan Structuring & 1-Click Bankable DPR Platform'}
+                </p>
+              </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-display tracking-tight text-white leading-tight">
-              {language === 'hi' ? 'ग्रामीण व्यापार सलाह एवं बैंक सब्सिडी संरचना' : 'Hyper-Local Business Advisory & Bank Financial Structuring'}
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          </div>
+
+          {/* Top Actions: District Selector, Language, Export DPR */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            
+            {/* District Live Selector */}
+            <div className="hidden lg:flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">
+              <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+              <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                className="bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+              >
+                <option value="Nashik">Nashik (नाशिक), MH</option>
+                <option value="Pune">Pune (पुणे), MH</option>
+                <option value="Ludhiana">Ludhiana (लुधियाना), PB</option>
+                <option value="Indore">Indore (इंदौर), MP</option>
+                <option value="Jaipur">Jaipur (जयपुर), RJ</option>
+                <option value="Varanasi">Varanasi (वाराणसी), UP</option>
+                <option value="Patna">Patna (पटना), BR</option>
+              </select>
+            </div>
+
+            {/* Language Selector Dual Switch */}
+            <div className="flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  language === 'en' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('hi')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  language === 'hi' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                हिन्दी
+              </button>
+            </div>
+
+            {/* Quick 1-Click Print DPR Button */}
+            <button
+              type="button"
+              onClick={handlePrintDPR}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
+              title="Print Bankable DPR Dossier"
+            >
+              <Printer className="w-3.5 h-3.5 text-amber-300" />
+              <span className="hidden sm:inline">{language === 'hi' ? 'DPR प्रिंट करें' : 'Print DPR'}</span>
+            </button>
+
+          </div>
+        </div>
+      </header>
+
+      {/* 🌟 HERO STATS & SCHEME COMPLIANCE RIBBON */}
+      <section className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white py-4 px-4 sm:px-6 shadow-md">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] uppercase tracking-wider">
+                SIH 26091 & 26033 UNIFIED PLATFORM
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-700/80 text-emerald-100 font-bold text-[10px] border border-emerald-500/30">
+                10% Margin $\rightarrow$ 90% Debt Auto-Structuring
+              </span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-black font-display tracking-tight text-white">
+              {language === 'hi' 
+                ? `ग्रामीण सूक्ष्म-उद्यम एवं वित्तीय सलाहकार प्रणाली - ${selectedDistrict}`
+                : `Rural Micro-Enterprise Advisory & Financial Structuring Engine`}
+            </h2>
+            <p className="text-xs text-emerald-200 font-medium max-w-2xl mt-0.5">
               {language === 'hi'
-                ? 'किसानों, एफपीओ (FPOs) व ग्रामीण सूक्ष्म उद्यमियों के लिए प्रोजेक्ट व्यवहार्यता, PM-FME / AIF सरकारी सब्सिडी और 1-क्लिक बैंक लोन DPR रिपोर्ट।'
-                : 'Empowering farmers, FPOs & rural entrepreneurs with district-level business feasibility, 35% PM-FME/AIF subsidies, and bank-ready DPR dossiers.'}
+                ? '5-10 किमी क्लस्टर व्यवहार्यता, 35% PM-FME सब्सिडी, टर्म लोन संरचना व 1-क्लिक बैंक योग्य विस्तृत परियोजना रिपोर्ट (DPR)।'
+                : 'Hyper-local agro-enterprise feasibility, 35% PM-FME subsidies, Term Loan structuring & 1-Click Bankable DPR dossier.'}
             </p>
           </div>
 
-          {/* Quick Location Badge */}
-          <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 flex flex-col gap-2 shrink-0">
-            <div className="flex items-center gap-2 text-xs text-slate-200">
-              <MapPin className="w-4 h-4 text-emerald-400" />
-              <span className="font-bold">{language === 'hi' ? 'लक्षित जिला एवं राज्य:' : 'Target Location:'}</span>
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-3 gap-3 shrink-0">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/15 text-center min-w-[90px]">
+              <span className="text-[10px] text-emerald-200 block font-bold uppercase">{language === 'hi' ? 'सरकारी सब्सिडी' : 'Subsidy'}</span>
+              <span className="text-base sm:text-lg font-black text-amber-300">35% PM-FME</span>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={selectedDistrict}
-                onChange={(e) => setSelectedDistrict(e.target.value)}
-                placeholder="District (e.g. Nashik)"
-                className="bg-slate-900/80 text-white text-xs px-3 py-1.5 rounded-xl border border-slate-700 w-28 focus:outline-hidden focus:border-emerald-400 font-bold"
-              />
-              <input
-                type="text"
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
-                placeholder="State (e.g. Maharashtra)"
-                className="bg-slate-900/80 text-white text-xs px-3 py-1.5 rounded-xl border border-slate-700 w-32 focus:outline-hidden focus:border-emerald-400 font-bold"
-              />
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/15 text-center min-w-[90px]">
+              <span className="text-[10px] text-emerald-200 block font-bold uppercase">{language === 'hi' ? 'बैंक ऋण' : 'Bank Loan'}</span>
+              <span className="text-base sm:text-lg font-black text-emerald-300">90% Auto</span>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/15 text-center min-w-[90px]">
+              <span className="text-[10px] text-emerald-200 block font-bold uppercase">{language === 'hi' ? 'बैंक DPR मानक' : 'DPR Standard'}</span>
+              <span className="text-base sm:text-lg font-black text-white">SBI / PNB</span>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Navigation Sub-Tabs */}
-        <div className="flex flex-wrap items-center gap-2 mt-6 pt-6 border-t border-white/10">
+      {/* 🌟 6 INTERACTIVE WORKSPACE TABS */}
+      <nav className="sticky top-[61px] z-20 bg-white border-b border-slate-200 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 flex items-center gap-1.5 overflow-x-auto py-2 scrollbar-none">
+          
           <button
-            onClick={() => setActiveSubTab('advisor')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeSubTab === 'advisor'
-                ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30'
-                : 'bg-white/5 hover:bg-white/10 text-slate-200'
+            type="button"
+            onClick={() => setActiveSubTab('models')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
+              activeSubTab === 'models'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
-            <Briefcase className="w-4 h-4" />
-            <span>{language === 'hi' ? '1. व्यापार व्यवहार्यता (Feasibility)' : '1. Enterprise Feasibility'}</span>
+            <span>🏭</span>
+            <span>{language === 'hi' ? '1. उद्योग मॉडल व व्यवहार्यता (10 Models)' : '1. Feasibility Catalog (10 Models)'}</span>
           </button>
 
           <button
-            onClick={() => setActiveSubTab('schemes')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeSubTab === 'schemes'
-                ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30'
-                : 'bg-white/5 hover:bg-white/10 text-slate-200'
+            type="button"
+            onClick={() => setActiveSubTab('loan_structuring')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
+              activeSubTab === 'loan_structuring'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
-            <Coins className="w-4 h-4" />
-            <span>{language === 'hi' ? '2. सब्सिडी व लोन कैलकुलेटर' : '2. Subsidy & Loan Structuring'}</span>
+            <span>💰</span>
+            <span>{language === 'hi' ? '2. 10% मार्जिन व 90% लोन कैलकुलेटर' : '2. 10% Margin & 90% Loan Structuring'}</span>
           </button>
 
           <button
-            onClick={() => setActiveSubTab('dpr_generator')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeSubTab === 'dpr_generator'
-                ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30'
-                : 'bg-white/5 hover:bg-white/10 text-slate-200'
+            type="button"
+            onClick={() => setActiveSubTab('dpr_dossier')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
+              activeSubTab === 'dpr_dossier'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
-            <FileText className="w-4 h-4" />
-            <span>{language === 'hi' ? '3. बैंक DPR रिपोर्ट (Loan Dossier)' : '3. Bankable DPR Generator'}</span>
+            <span>📑</span>
+            <span>{language === 'hi' ? '3. आधिकारिक बैंक DPR डॉसियर' : '3. Official Bankable DPR'}</span>
           </button>
 
           <button
-            onClick={() => setActiveSubTab('ai_chat')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              activeSubTab === 'ai_chat'
-                ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30'
-                : 'bg-white/5 hover:bg-white/10 text-slate-200'
+            type="button"
+            onClick={() => setActiveSubTab('supply_chain')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
+              activeSubTab === 'supply_chain'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
             }`}
           >
-            <Bot className="w-4 h-4" />
-            <span>{language === 'hi' ? '4. एआई बिज़नेस चैट व वॉयस' : '4. AI Advisory Chat & Voice'}</span>
+            <span>🔄</span>
+            <span>{language === 'hi' ? '4. कच्चा माल व खरीदार लिंकेज' : '4. Supply Chain & Buyer Off-Take'}</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('schemes_vault')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
+              activeSubTab === 'schemes_vault'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <span>🏛️</span>
+            <span>{language === 'hi' ? '5. सरकारी योजनाएं व दस्तावेज' : '5. Schemes & Document Vault'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('ai_copilot')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer ${
+              activeSubTab === 'ai_copilot'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <Bot className="w-3.5 h-3.5 text-amber-400" />
+            <span>{language === 'hi' ? '6. एआई ग्रामीण सलाहकार Copilot' : '6. AI Advisory Voice Copilot'}</span>
+          </button>
+
         </div>
-      </div>
+      </nav>
 
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 1: ENTERPRISE FEASIBILITY ANALYZER
-      ───────────────────────────────────────────────────────────── */}
-      {activeSubTab === 'advisor' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-emerald-600" />
-                <span>{language === 'hi' ? 'उच्च-लाभकारी ग्रामीण सूक्ष्म-उद्यम मॉडल' : 'High-Potential Rural Micro-Enterprise Models'}</span>
-              </h2>
-              <p className="text-xs text-slate-500">
-                {language === 'hi'
-                  ? `स्थानिक कच्चा माल, मंडी मांग व ${selectedDistrict} जिले की कृषि परिस्थितियों के आधार पर विश्लेषण।`
-                  : `Curated bankable ventures matched to raw material catchment and market demand in ${selectedDistrict}.`}
-              </p>
-            </div>
-            <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">
-              {BUSINESS_MODELS.length} Active Feasibility Models
-            </span>
-          </div>
+      {/* 🌟 MAIN TAB CONTENT AREA */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {BUSINESS_MODELS.map((model) => {
-              const isSelected = model.id === selectedModelId;
-              return (
-                <div
-                  key={model.id}
-                  onClick={() => handleSelectBusinessModel(model)}
-                  className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden ${
-                    isSelected
-                      ? 'bg-emerald-50/70 border-emerald-500 shadow-md ring-2 ring-emerald-500/30'
-                      : 'bg-white border-slate-200 hover:border-emerald-300 hover:shadow-soft'
-                  }`}
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
-                        {language === 'hi' ? model.categoryLabelHi : model.categoryLabelEn}
-                      </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
-                        ⭐ {model.marketDemandRating}
-                      </span>
-                    </div>
-
-                    <h3 className="font-extrabold text-sm text-slate-900 leading-snug group-hover:text-emerald-700 transition-colors">
-                      {language === 'hi' ? model.nameHi : model.nameEn}
-                    </h3>
-
-                    <p className="text-xs text-slate-600 line-clamp-2">
-                      {language === 'hi' ? model.descriptionHi : model.descriptionEn}
-                    </p>
-
-                    <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-[10px] text-slate-400 block font-semibold">{language === 'hi' ? 'लागत (Capex)' : 'Est. Capex'}</span>
-                        <span className="font-black text-slate-800">₹{model.recommendedCapex} Lakhs</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-400 block font-semibold">{language === 'hi' ? 'शुद्ध मार्जिन' : 'Net Margin'}</span>
-                        <span className="font-black text-emerald-700">~{model.marginPercent}%</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-500 text-[11px]">{model.paybackMonths} Mo. Payback</span>
-                    <span className={`flex items-center gap-1 text-[11px] ${isSelected ? 'text-emerald-700 font-extrabold' : 'text-slate-400'}`}>
-                      <span>{isSelected ? (language === 'hi' ? 'चयनित ✓' : 'Selected ✓') : (language === 'hi' ? 'विश्लेषण देखें →' : 'Analyze →')}</span>
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Selected Model Detailed Deep-Dive Card */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-soft space-y-6">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-              <div>
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                  {language === 'hi' ? 'गहन व्यवहार्यता रिपोर्ट' : 'Selected Venture Feasibility Analysis'}
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-2 font-display">
-                  {language === 'hi' ? activeModel.nameHi : activeModel.nameEn}
-                </h3>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  onClick={() => setActiveSubTab('schemes')}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Coins className="w-4 h-4" />
-                  <span>{language === 'hi' ? 'सब्सिडी कैलकुलेटर खोलें' : 'Calculate Subsidy & EMI'}</span>
-                </button>
-                <button
-                  onClick={() => setActiveSubTab('dpr_generator')}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 flex items-center gap-1.5 cursor-pointer"
-                >
-                  <FileText className="w-4 h-4 text-emerald-700" />
-                  <span>{language === 'hi' ? 'बैंक DPR तैयार करें' : 'Generate Bank DPR'}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">{language === 'hi' ? 'आवश्यक भूमि/भवन' : 'Land & Shed Req.'}</span>
-                <p className="text-base font-black text-slate-900">{activeModel.landRequiredSqFt.toLocaleString()} Sq. Ft</p>
-                <span className="text-[10px] text-slate-500">{language === 'hi' ? 'स्वामित्व या 5-वर्षीय पट्टा' : 'Owned or 5-yr registered lease'}</span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">{language === 'hi' ? 'बिजली कनेक्शन' : 'Power Load Required'}</span>
-                <p className="text-base font-black text-slate-900">{activeModel.powerHp} HP / 3-Phase</p>
-                <span className="text-[10px] text-slate-500">{language === 'hi' ? 'या सोलर पीवी हाइब्रिड' : 'Or Solar-Grid Hybrid'}</span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">{language === 'hi' ? 'सेटअप व कमीशनिंग' : 'Time to Commission'}</span>
-                <p className="text-base font-black text-slate-900">{activeModel.setupDays} Days</p>
-                <span className="text-[10px] text-slate-500">{language === 'hi' ? 'मशीनरी डिलीवरी से शुरू' : 'From machinery order'}</span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase">{language === 'hi' ? 'लागू सरकारी योजनाएं' : 'Eligible Subsidies'}</span>
-                <p className="text-xs font-black text-emerald-700 leading-tight">PM-FME & AIF 3%</p>
-                <span className="text-[10px] text-slate-500">{language === 'hi' ? '35% तक पूंजीगत अनुदान' : 'Up to 35% Capital Grant'}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
-              <div className="space-y-3">
-                <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                  <Leaf className="w-4 h-4 text-emerald-600" />
-                  <span>{language === 'hi' ? 'कच्चा माल एवं आपूर्ति स्रोत' : 'Raw Material Catchment & Sourcing'}</span>
-                </h4>
-                <p className="text-xs text-slate-600 leading-relaxed bg-emerald-50/40 p-4 rounded-2xl border border-emerald-100">
-                  {activeModel.keyRawMaterials}
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                  <Boxes className="w-4 h-4 text-blue-600" />
-                  <span>{language === 'hi' ? 'बाजार मांग एवं खरीद चैनल' : 'Market Off-Take & Institutional Demand'}</span>
-                </h4>
-                <p className="text-xs text-slate-600 leading-relaxed bg-blue-50/40 p-4 rounded-2xl border border-blue-100">
-                  {activeModel.offtakeChannel}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 2: FINANCIAL STRUCTURING & SUBSIDY CALCULATOR
-      ───────────────────────────────────────────────────────────── */}
-      {activeSubTab === 'schemes' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-soft space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-              <div>
-                <h2 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
-                  <Calculator className="w-5 h-5 text-emerald-600" />
-                  <span>{language === 'hi' ? 'एआई वित्तीय संरचना व सब्सिडी कैलकुलेटर' : 'AI Capital Structuring & Subsidy Calculator'}</span>
-                </h2>
-                <p className="text-xs text-slate-500">
-                  {language === 'hi'
-                    ? `योजना, सामाजिक श्रेणी एवं पूंजीगत लागत के अनुसार सटीक सब्सिडी, ऋण व EMI गणना।`
-                    : `Dynamic breakdown of Government Grants, Bank Term Loans, and Monthly Repayments.`}
-                </p>
-              </div>
-            </div>
-
-            {/* Interactive Inputs Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Slider 1: Total Project Capex */}
-              <div className="space-y-3 bg-slate-50/80 p-5 rounded-2xl border border-slate-200/80">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs font-black text-slate-800">
-                    {language === 'hi' ? 'परियोजना लागत (Project Cost)' : 'Project Cost (Capex)'}
-                  </label>
-                  <span className="text-sm font-black text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-lg">
-                    ₹{customCapexLakhs} Lakhs
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="2"
-                  max="100"
-                  step="1"
-                  value={customCapexLakhs}
-                  onChange={(e) => setCustomCapexLakhs(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-                />
-                <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-                  <span>₹2 Lakhs</span>
-                  <span>₹50 Lakhs</span>
-                  <span>₹1.00 Crore</span>
-                </div>
-              </div>
-
-              {/* Input 2: Scheme Selector */}
-              <div className="space-y-3 bg-slate-50/80 p-5 rounded-2xl border border-slate-200/80">
-                <label className="text-xs font-black text-slate-800 block">
-                  {language === 'hi' ? 'लक्षित सरकारी योजना' : 'Select Government Scheme'}
-                </label>
-                <select
-                  value={chosenSchemeId}
-                  onChange={(e) => setChosenSchemeId(e.target.value)}
-                  className="w-full bg-white text-xs font-bold text-slate-800 p-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:border-emerald-500"
-                >
-                  {SCHEMES_DATABASE.map(s => (
-                    <option key={s.id} value={s.id}>{s.shortTag}</option>
-                  ))}
-                </select>
-                <span className="text-[10px] text-slate-500 block">
-                  {SCHEMES_DATABASE.find(s => s.id === chosenSchemeId)?.subsidyType}
-                </span>
-              </div>
-
-              {/* Input 3: Entrepreneur Category */}
-              <div className="space-y-3 bg-slate-50/80 p-5 rounded-2xl border border-slate-200/80">
-                <label className="text-xs font-black text-slate-800 block">
-                  {language === 'hi' ? 'उद्यमी श्रेणी (Category)' : 'Beneficiary Category'}
-                </label>
-                <select
-                  value={entrepreneurCategory}
-                  onChange={(e) => setEntrepreneurCategory(e.target.value as any)}
-                  className="w-full bg-white text-xs font-bold text-slate-800 p-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:border-emerald-500"
-                >
-                  <option value="women">Women Entrepreneur (महिला उद्यमी - 35%)</option>
-                  <option value="sc_st">SC / ST / Ex-Serviceman (35% Subsidy)</option>
-                  <option value="fpo">FPO / Farmer Producer Company (Up to 75%)</option>
-                  <option value="general">General Category (25% Subsidy)</option>
-                </select>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="ruralCheckbox"
-                    checked={isRuralArea}
-                    onChange={(e) => setIsRuralArea(e.target.checked)}
-                    className="rounded text-emerald-600 accent-emerald-600"
-                  />
-                  <label htmlFor="ruralCheckbox" className="text-xs text-slate-700 font-semibold cursor-pointer">
-                    {language === 'hi' ? 'ग्रामीण क्षेत्र (Rural Location +10%)' : 'Rural Location (+10% Subsidy)'}
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Output Financial Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Subsidy Amount */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 space-y-1">
-                <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
-                  {language === 'hi' ? 'सरकारी सब्सिडी (Capital Grant)' : 'Govt Capital Subsidy'}
-                </span>
-                <p className="text-2xl font-black text-emerald-900">
-                  ₹{(financialStructure.calculatedSubsidy / 100000).toFixed(2)} Lakhs
-                </p>
-                <span className="text-xs text-emerald-700 font-bold">
-                  {financialStructure.subsidyPercent}% Credit-Linked Grant
-                </span>
-              </div>
-
-              {/* Bank Term Loan */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 space-y-1">
-                <span className="text-[10px] font-black uppercase text-blue-800 tracking-wider">
-                  {language === 'hi' ? 'बैंक सावधि ऋण (Bank Loan)' : 'Bank Term Loan'}
-                </span>
-                <p className="text-2xl font-black text-blue-900">
-                  ₹{(financialStructure.bankLoan / 100000).toFixed(2)} Lakhs
-                </p>
-                <span className="text-xs text-blue-700 font-bold">
-                  @ {financialStructure.effectiveInterestRate}% Effective Rate
-                </span>
-              </div>
-
-              {/* Promoter Own Equity */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 space-y-1">
-                <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider">
-                  {language === 'hi' ? 'स्वयं का अंशदान (Own Margin)' : 'Promoter Equity (Margin)'}
-                </span>
-                <p className="text-2xl font-black text-amber-900">
-                  ₹{(financialStructure.promoterContribution / 100000).toFixed(2)} Lakhs
-                </p>
-                <span className="text-xs text-amber-700 font-bold">
-                  {financialStructure.promoterMarginPercent}% Own Investment
-                </span>
-              </div>
-
-              {/* Monthly EMI & Profit */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-50 to-slate-50 border border-purple-200 space-y-1">
-                <span className="text-[10px] font-black uppercase text-purple-800 tracking-wider">
-                  {language === 'hi' ? 'मासिक EMI एवं शुद्ध लाभ' : 'Monthly EMI & Net Profit'}
-                </span>
-                <p className="text-2xl font-black text-purple-900">
-                  ₹{financialStructure.monthlyEmi.toLocaleString('en-IN')}
-                </p>
-                <span className="text-xs text-purple-700 font-bold">
-                  Net Profit: ₹{financialStructure.netProfitMonthly.toLocaleString('en-IN')}/mo
-                </span>
-              </div>
-            </div>
-
-            {/* Visual Charts: Capital Breakdown & 5-Year Financial Projections */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-              <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200 space-y-3">
-                <h4 className="font-black text-xs text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <PieIcon className="w-4 h-4 text-emerald-600" />
-                  <span>{language === 'hi' ? 'पूंजी संरचना अनुपात (Means of Finance)' : 'Capital Structure Breakdown'}</span>
-                </h4>
-                <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={capitalBreakdownChartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {capitalBreakdownChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value: any) => `₹${(Number(value) / 100000).toFixed(2)} Lakhs`} />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="bg-slate-50/70 p-5 rounded-2xl border border-slate-200 space-y-3">
-                <h4 className="font-black text-xs text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-blue-600" />
-                  <span>{language === 'hi' ? '5-वर्षीय अनुमानित कारोबार व लाभ (Lakhs)' : '5-Year Revenue & Net Profit Projection (Lakhs)'}</span>
-                </h4>
-                <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={fiveYearProjectionData}>
-                      <XAxis dataKey="year" textAnchor="middle" tick={{ fontSize: 10 }} />
-                      <YAxis tick={{ fontSize: 10 }} />
-                      <Tooltip formatter={(value: any) => `₹${value} Lakhs`} />
-                      <Legend />
-                      <Bar dataKey="revenue" name={language === 'hi' ? 'टर्नओवर (Turnover)' : 'Turnover'} fill="#0ea5e9" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="profit" name={language === 'hi' ? 'शुद्ध लाभ (Net Profit)' : 'Net Profit'} fill="#10b981" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="emi" name={language === 'hi' ? 'वार्षिक EMI' : 'Annual EMI'} fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 3: BANKABLE DETAILED PROJECT REPORT (DPR) GENERATOR
-      ───────────────────────────────────────────────────────────── */}
-      {activeSubTab === 'dpr_generator' && (
-        <div className="space-y-6">
-          {/* Action Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-soft">
-            <div>
-              <h2 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
-                <FileText className="w-5 h-5 text-emerald-600" />
-                <span>{language === 'hi' ? 'बैंक-प्रस्तुत योग्य विस्तृत प्रोजेक्ट रिपोर्ट (DPR)' : 'Bankable Detailed Project Report (DPR Dossier)'}</span>
-              </h2>
-              <p className="text-xs text-slate-500">
-                {language === 'hi'
-                  ? 'यह रिपोर्ट राष्ट्रीयकृत बैंकों, नाबार्ड (NABARD) व जिला उद्योग केंद्र (DIC) में ऋण आवेदन के लिए मान्य है।'
-                  : 'Official financial dossier compliant with SBI, PNB, NABARD and District Industry Centre (DIC) standards.'}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrintDpr}
-                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md flex items-center gap-2 cursor-pointer"
-              >
-                <Printer className="w-4 h-4" />
-                <span>{language === 'hi' ? 'प्रिंट / PDF सेव करें' : 'Print / Save PDF'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Printable Bank Dossier Document */}
-          <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-soft space-y-8 print:shadow-none print:border-none print:p-0">
-            {/* Dossier Header */}
-            <div className="border-b-2 border-slate-900 pb-6 flex flex-col sm:flex-row justify-between items-start gap-4">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 block">
-                  AGRIXORA RURAL ENTERPRISE DEVELOPMENT INITIATIVE
-                </span>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-display mt-1">
-                  DETAILED PROJECT APPRAISAL REPORT (DPR)
-                </h1>
-                <p className="text-xs text-slate-600 mt-1">
-                  Scheme: <strong>{SCHEMES_DATABASE.find(s => s.id === chosenSchemeId)?.name}</strong>
-                </p>
-              </div>
-
-              <div className="text-right sm:border-l sm:pl-6 border-slate-200 text-xs space-y-1">
-                <p><strong>DPR Reference:</strong> AGRI-DPR-{Math.floor(100000 + Math.random() * 900000)}</p>
-                <p><strong>Location:</strong> {selectedDistrict}, {selectedState}</p>
-                <p><strong>Date:</strong> {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-              </div>
-            </div>
-
-            {/* 1. Executive Summary Table */}
-            <div className="space-y-3">
-              <h3 className="font-extrabold text-sm text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-1">
-                1. Project At A Glance
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="space-y-2">
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Proposed Enterprise Name:</span>
-                    <span className="font-bold text-slate-900">{activeModel.nameEn}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Promoter / Applicant:</span>
-                    <span className="font-bold text-slate-900">{currentUser?.name || 'Verified Rural Entrepreneur'}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Beneficiary Category:</span>
-                    <span className="font-bold text-slate-900 capitalize">{entrepreneurCategory.replace('_', ' ')}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Land & Civil Premises:</span>
-                    <span className="font-bold text-slate-900">{activeModel.landRequiredSqFt} Sq. Ft Shed</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Total Project Cost:</span>
-                    <span className="font-bold text-emerald-800">₹{customCapexLakhs}.00 Lakhs (₹{financialStructure.totalCost.toLocaleString()})</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Eligible Govt. Capital Subsidy:</span>
-                    <span className="font-bold text-emerald-700">₹{(financialStructure.calculatedSubsidy / 100000).toFixed(2)} Lakhs</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Promoter Margin Contribution:</span>
-                    <span className="font-bold text-slate-900">₹{(financialStructure.promoterContribution / 100000).toFixed(2)} Lakhs ({financialStructure.promoterMarginPercent}%)</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Bank Term Loan Required:</span>
-                    <span className="font-bold text-blue-800">₹{(financialStructure.bankLoan / 100000).toFixed(2)} Lakhs</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. Means of Finance & Repayment Schedule */}
-            <div className="space-y-3">
-              <h3 className="font-extrabold text-sm text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-1">
-                2. Means of Finance & Viability Metrics
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-100 text-slate-700 font-bold uppercase">
-                    <tr>
-                      <th className="p-2.5">Financial Head</th>
-                      <th className="p-2.5">Amount (INR)</th>
-                      <th className="p-2.5">% Share</th>
-                      <th className="p-2.5">Remarks / Source</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    <tr>
-                      <td className="p-2.5 font-bold">1. Govt. Capital Grant (Subsidy)</td>
-                      <td className="p-2.5 font-mono text-emerald-700 font-bold">₹{financialStructure.calculatedSubsidy.toLocaleString('en-IN')}</td>
-                      <td className="p-2.5">{financialStructure.subsidyPercent}%</td>
-                      <td className="p-2.5 text-slate-600">Credit-linked subsidy credited to Bank TDR A/c</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2.5 font-bold">2. Promoter's Equity (Own Funds)</td>
-                      <td className="p-2.5 font-mono font-bold">₹{financialStructure.promoterContribution.toLocaleString('en-IN')}</td>
-                      <td className="p-2.5">{financialStructure.promoterMarginPercent}%</td>
-                      <td className="p-2.5 text-slate-600">Deposited in borrower current account</td>
-                    </tr>
-                    <tr>
-                      <td className="p-2.5 font-bold">3. Bank Term Loan</td>
-                      <td className="p-2.5 font-mono text-blue-700 font-bold">₹{financialStructure.bankLoan.toLocaleString('en-IN')}</td>
-                      <td className="p-2.5">{((financialStructure.bankLoan / financialStructure.totalCost) * 100).toFixed(1)}%</td>
-                      <td className="p-2.5 text-slate-600">5-Year Repayment (60 monthly installments)</td>
-                    </tr>
-                    <tr className="bg-slate-50 font-black">
-                      <td className="p-2.5">Total Cost of Project</td>
-                      <td className="p-2.5 font-mono text-slate-900">₹{financialStructure.totalCost.toLocaleString('en-IN')}</td>
-                      <td className="p-2.5">100.0%</td>
-                      <td className="p-2.5">Plant, Machinery, Civil & Initial Working Capital</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* 3. Key Financial Ratios & DSCR */}
-            <div className="space-y-3">
-              <h3 className="font-extrabold text-sm text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-1">
-                3. Key Financial Ratios & Bankability Indicators
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-slate-500 block">Debt Service Coverage (DSCR):</span>
-                  <span className="text-base font-black text-emerald-700">{financialStructure.dscr} (High Bankability)</span>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-slate-500 block">Estimated Payback Period:</span>
-                  <span className="text-base font-black text-slate-900">{financialStructure.paybackYears} Years</span>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-slate-500 block">Annual Net Profit (Year 1):</span>
-                  <span className="text-base font-black text-emerald-700">₹{(financialStructure.annualNetIncome / 100000).toFixed(2)} Lakhs</span>
-                </div>
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span className="text-slate-500 block">Interest Subvention Saved:</span>
-                  <span className="text-base font-black text-blue-700">₹{financialStructure.interestSavedViaSubvention.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Bank Checklist */}
-            <div className="space-y-3">
-              <h3 className="font-extrabold text-sm text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-1">
-                4. Mandatory Document Checklist for Bank Loan Application
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Aadhaar Card, PAN Card & 3 Passport Photographs</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Land 7/12 Extract or Registered 5-Year Rent Lease Agreement</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Quotations for Plant & Machinery from ISO Certified Vendors</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Udyam MSME Registration Certificate & FSSAI / Pollution NOC</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Stamp & Verification */}
-            <div className="pt-6 border-t border-slate-200 flex justify-between items-end text-xs text-slate-500">
-              <div>
-                <p className="font-bold text-slate-800">Generated via Agrixora AI Advisory Engine</p>
-                <p>Groundwater, Mandi & APMC Feasibility Verified for {selectedDistrict}.</p>
-              </div>
-              <div className="text-right">
-                <div className="w-32 border-b border-slate-400 mb-1"></div>
-                <p>Signature of Applicant</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          TAB 4: AI CONVERSATIONAL ADVISOR & VOICE GUIDE
-      ───────────────────────────────────────────────────────────── */}
-      {activeSubTab === 'ai_chat' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Quick Scenario Prompts */}
-          <div className="space-y-4">
-            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-soft space-y-3">
-              <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                <span>{language === 'hi' ? 'त्वरित सलाह विषय' : 'Quick Advisory Prompts'}</span>
-              </h3>
-              <div className="space-y-2">
+        {/* ─────────────────────────────────────────────────────────────
+            TAB 1: AGRO-ENTERPRISE MODELS & FEASIBILITY STUDIO
+        ───────────────────────────────────────────────────────────── */}
+        {activeSubTab === 'models' && (
+          <div className="space-y-6">
+            
+            {/* Category Filter Pills */}
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {[
-                  {
-                    titleEn: 'Mini Dal Mill in Nashik: Subsidy & Cost',
-                    titleHi: 'मिनी दाल मिल: लागत व 35% सब्सिडी',
-                    query: 'What is the setup cost and subsidy for a Mini Dal Mill in Nashik under PM-FME?'
-                  },
-                  {
-                    titleEn: 'Solar Cold Storage: AIF 3% Interest Relief',
-                    titleHi: 'सोलर कोल्ड स्टोरेज: AIF ब्याज छूट',
-                    query: 'How much subsidy and interest subvention can I get for a 20 MT solar cold storage under AIF?'
-                  },
-                  {
-                    titleEn: 'Cold-Pressed Mustard Oil Mill',
-                    titleHi: 'कच्ची घानी सरसों तेल मिल: PMEGP योजना',
-                    query: 'What is the profit margin and PMEGP subsidy for a cold-pressed mustard oil mill?'
-                  },
-                  {
-                    titleEn: 'FPO / SHG Group Business Schemes',
-                    titleHi: 'FPO और महिला समूहों के लिए योजनाएं',
-                    query: 'Which government scheme gives highest subsidy for FPO agricultural processing units?'
-                  }
-                ].map((item, idx) => (
+                  { id: 'all', labelEn: 'All Enterprises (10)', labelHi: 'सभी उद्यम (10)' },
+                  { id: 'processing', labelEn: 'Food & Pulse Processing', labelHi: 'दाल व खाद्य प्रसंस्करण' },
+                  { id: 'storage', labelEn: 'Cold Chain & Storage', labelHi: 'कोल्ड चेन व स्टोरेज' },
+                  { id: 'horticulture', labelEn: 'Polyhouse & Protected', labelHi: 'पॉलीहाउस बागवानी' },
+                  { id: 'allied', labelEn: 'Dairy, Mushroom & Honey', labelHi: 'डेयरी, मशरूम व शहद' },
+                  { id: 'mechanization', labelEn: 'Drone & CHC Machinery', labelHi: 'ड्रोन व कस्टम हायरिंग' }
+                ].map(cat => (
                   <button
-                    key={idx}
-                    onClick={() => handleSendChatMessage(item.query)}
-                    className="w-full text-left p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 border border-slate-200 transition-all text-xs font-bold text-slate-800 flex items-center justify-between group cursor-pointer"
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setCategoryFilter(cat.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                      categoryFilter === cat.id
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                    }`}
                   >
-                    <span>{language === 'hi' ? item.titleHi : item.titleEn}</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+                    {language === 'hi' ? cat.labelHi : cat.labelEn}
                   </button>
                 ))}
               </div>
-            </div>
 
-            {/* Scheme Helpline Card */}
-            <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white space-y-2 border border-emerald-500/30">
-              <h4 className="font-bold text-xs text-emerald-300 uppercase">National Agritech Support</h4>
-              <p className="text-xs text-slate-200">
-                PM-FME National Helpline: <strong>1800-11-2026</strong>
-              </p>
-              <p className="text-xs text-slate-200">
-                AIF Portal: <strong>agriinfra.dac.gov.in</strong>
-              </p>
-            </div>
-          </div>
-
-          {/* Right Column: Interactive Chat Assistant */}
-          <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-soft flex flex-col h-[560px] overflow-hidden">
-            {/* Chat Header */}
-            <div className="p-4 px-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
-                  <Bot className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-sm text-slate-900">
-                    {language === 'hi' ? 'ग्रामीण व्यापार एआई सलाहकार' : 'Rural Enterprise AI Advisor'}
-                  </h3>
-                  <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Live Mandi & Scheme Intelligence</span>
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-medium">📍 {selectedDistrict}</span>
+              <div className="text-xs text-slate-500 font-bold">
+                📍 {language === 'hi' ? `क्लस्टर: ${selectedDistrict} (5-10 KM रेडियस)` : `Cluster: ${selectedDistrict} (5-10 KM Radius)`}
               </div>
             </div>
 
-            {/* Chat Messages Body */}
-            <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
-              {chatMessages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  {msg.role === 'ai' && (
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 text-xs font-bold mt-1">
-                      AI
-                    </div>
-                  )}
-
+            {/* Grid of Enterprise Blueprints */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {filteredModels.map((model) => {
+                const isSelected = model.id === selectedModelId;
+                return (
                   <div
-                    className={`max-w-md p-4 rounded-2xl text-xs sm:text-sm leading-relaxed space-y-1.5 shadow-2xs ${
-                      msg.role === 'user'
-                        ? 'bg-emerald-600 text-white rounded-tr-xs'
-                        : 'bg-slate-100 text-slate-800 rounded-tl-xs border border-slate-200/60'
+                    key={model.id}
+                    onClick={() => handleSelectBusinessModel(model)}
+                    className={`relative rounded-3xl p-5 border-2 transition-all duration-300 flex flex-col justify-between cursor-pointer group bg-white ${
+                      isSelected
+                        ? 'border-emerald-600 shadow-xl shadow-emerald-700/10 ring-2 ring-emerald-500/20 -translate-y-1'
+                        : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
                     }`}
                   >
-                    <p>{msg.text}</p>
-                    <div className="flex items-center justify-between gap-2 pt-1">
-                      <span className={`text-[10px] ${msg.role === 'user' ? 'text-emerald-200' : 'text-slate-400'}`}>
-                        {msg.timestamp}
-                      </span>
-                      {msg.role === 'ai' && (
-                        <button
-                          onClick={() => handleSpeakText(msg.text)}
-                          className="text-slate-500 hover:text-emerald-700 p-1 rounded-md transition-colors"
-                          title="Listen in Voice"
-                        >
-                          {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-emerald-600" /> : <Volume2 className="w-3.5 h-3.5" />}
-                        </button>
-                      )}
+                    <div>
+                      {/* Model Header */}
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform">
+                          {model.icon}
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            {model.marketDemandRating} Demand
+                          </span>
+                          <span className="text-[11px] font-bold text-slate-500">
+                            {model.categoryLabelEn}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Title & Description */}
+                      <h3 className="font-extrabold text-base text-slate-900 group-hover:text-emerald-700 transition-colors font-display leading-snug">
+                        {language === 'hi' ? model.nameHi : model.nameEn}
+                      </h3>
+                      <p className="text-xs text-slate-600 mt-1.5 leading-relaxed line-clamp-2 font-medium">
+                        {language === 'hi' ? model.descriptionHi : model.descriptionEn}
+                      </p>
+
+                      {/* Capex & Economics Badge */}
+                      <div className="grid grid-cols-2 gap-2 mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'अनुशंसित लागत' : 'Recommended Capex'}</span>
+                          <span className="text-sm font-black text-slate-900">₹{model.recommendedCapex} Lakhs</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'अनुमानित मुनाफा' : 'Gross Margin'}</span>
+                          <span className="text-sm font-black text-emerald-600">{model.marginPercent}% P.A.</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'बिजली आवश्यकता' : 'Power Required'}</span>
+                          <span className="text-xs font-extrabold text-slate-700">{model.powerHp} HP (3-Phase)</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'पेबैक अवधि' : 'Payback Period'}</span>
+                          <span className="text-xs font-extrabold text-amber-700">{model.paybackMonths} Months</span>
+                        </div>
+                      </div>
+
+                      {/* Raw Material & Offtake Tag */}
+                      <div className="mt-3 space-y-1 text-[11px]">
+                        <div className="flex items-center gap-1.5 text-slate-600">
+                          <span className="font-bold text-slate-800">🌾 {language === 'hi' ? 'कच्चा माल:' : 'Raw Grain:'}</span>
+                          <span className="truncate">{model.keyRawMaterials}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-600">
+                          <span className="font-bold text-slate-800">🚚 {language === 'hi' ? 'बिक्री चैनल:' : 'Offtake:'}</span>
+                          <span className="truncate text-emerald-700 font-semibold">{model.offtakeChannel}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Actions */}
+                    <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectBusinessModel(model);
+                          setActiveSubTab('loan_structuring');
+                        }}
+                        className={`w-full py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-700/20'
+                            : 'bg-slate-100 hover:bg-emerald-50 text-slate-800 hover:text-emerald-800 border border-slate-200'
+                        }`}
+                      >
+                        <Calculator className="w-3.5 h-3.5" />
+                        <span>{language === 'hi' ? '90% लोन व सब्सिडी देखें' : 'Structure 90% Loan & Subsidy'}</span>
+                        <ChevronRight className="w-3.5 h-3.5 ml-auto" />
+                      </button>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────
+            TAB 2: FINANCIAL STRUCTURING & 10% MARGIN / 90% LOAN ENGINE
+        ───────────────────────────────────────────────────────────── */}
+        {activeSubTab === 'loan_structuring' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Left Controls Column (5 cols) */}
+            <div className="lg:col-span-5 space-y-5">
+              
+              {/* Selected Model Card Header */}
+              <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-2xl">{activeModel.icon}</span>
+                    <div>
+                      <h3 className="font-black text-slate-900 text-sm sm:text-base font-display">
+                        {language === 'hi' ? activeModel.nameHi : activeModel.nameEn}
+                      </h3>
+                      <span className="text-xs text-emerald-700 font-bold">
+                        📍 {selectedDistrict} Cluster Feasible (94.2% Score)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Loan Scheme Category Badge (Micro Finance vs Term Loan) */}
+                <div className={`p-3 rounded-2xl border text-xs leading-relaxed ${
+                  isMicroFinanceTier 
+                    ? 'bg-amber-50 border-amber-300 text-amber-950'
+                    : 'bg-blue-50 border-blue-300 text-blue-950'
+                }`}>
+                  <div className="flex items-center gap-1.5 font-black text-sm mb-1">
+                    <Landmark className="w-4 h-4" />
+                    <span>{loanTierInfo.tierNameEn} ({loanTierInfo.interestRate}% P.A.)</span>
+                  </div>
+                  <p className="text-[11px] font-medium opacity-90">
+                    {language === 'hi' ? loanTierInfo.descriptionHi : loanTierInfo.descriptionEn}
+                  </p>
+                </div>
+              </div>
+
+              {/* Dynamic Sliders Form */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-5">
+                <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-emerald-600" />
+                  <span>{language === 'hi' ? 'परियोजना लागत व ऋण समायोजन' : 'Project Cost & Loan Sliders'}</span>
+                </h4>
+
+                {/* 1. Project Cost (Capex) Slider */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">{language === 'hi' ? 'कुल परियोजना लागत (Capex):' : 'Total Project Cost (Capex):'}</span>
+                    <span className="font-black text-base text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                      ₹{customCapexLakhs.toFixed(2)} Lakhs
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="50.0"
+                    step="0.25"
+                    value={customCapexLakhs}
+                    onChange={(e) => setCustomCapexLakhs(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  />
+                  
+                  {/* Preset quick chips */}
+                  <div className="flex items-center gap-1.5 pt-1 overflow-x-auto">
+                    {[
+                      { val: 1.25, label: '₹1.25L (Micro)' },
+                      { val: 5.0, label: '₹5L (PMMY)' },
+                      { val: 14.0, label: '₹14L (Oil)' },
+                      { val: 18.0, label: '₹18L (Dal)' },
+                      { val: 24.0, label: '₹24L (Cold)' },
+                      { val: 50.0, label: '₹50L (Max)' }
+                    ].map(chip => (
+                      <button
+                        key={chip.val}
+                        type="button"
+                        onClick={() => setCustomCapexLakhs(chip.val)}
+                        className={`px-2 py-1 rounded-md text-[10px] font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                          customCapexLakhs === chip.val
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {chip.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Beneficiary Category (Auto-sets Margin to 10% vs 15%) */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-700 block">
+                    {language === 'hi' ? 'लाभार्थी श्रेणी (10% मार्जिन पात्रता):' : 'Beneficiary Category (10% Margin Eligibility):'}
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'women', label: '👩 Women (10% Margin)' },
+                      { id: 'fpo', label: '👥 FPO / SHG (10% Margin)' },
+                      { id: 'sc_st', label: '🎖️ SC / ST / OBC (10%)' },
+                      { id: 'general', label: '👨 General (15% Margin)' }
+                    ].map(cat => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setEntrepreneurCategory(cat.id as any)}
+                        className={`p-2 rounded-xl text-xs font-bold text-left transition-all border cursor-pointer ${
+                          entrepreneurCategory === cat.id
+                            ? 'bg-emerald-50 border-emerald-500 text-emerald-900 shadow-xs'
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Government Scheme Router Selection */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-700 block">
+                    {language === 'hi' ? 'सरकारी अनुदान योजना का चयन:' : 'Select Government Scheme Subsidy:'}
+                  </label>
+                  <select
+                    value={chosenSchemeId}
+                    onChange={(e) => setChosenSchemeId(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-300 text-xs font-extrabold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    <option value="pm_fme">PM-FME (35% Subsidy up to ₹10 Lakhs + AIF 3% Relief)</option>
+                    <option value="pmegp">PMEGP (Up to 35% Margin Money Grant)</option>
+                    <option value="aif">AIF Scheme (3% Interest Subvention + CGTMSE)</option>
+                    <option value="mudra">PMMY MUDRA (100% Collateral-Free)</option>
+                    <option value="smam_drone">SMAM (40%-50% Drone & CHC Subsidy)</option>
+                  </select>
+                </div>
+
+                {/* 4. Working Capital Cycle */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">{language === 'hi' ? 'कार्यशील पूंजी (कच्चा माल चक्र):' : 'Working Capital Buffer:'}</span>
+                    <span className="font-extrabold text-slate-800">{workingCapitalMonths} Months</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="6"
+                    step="1"
+                    value={workingCapitalMonths}
+                    onChange={(e) => setWorkingCapitalMonths(parseInt(e.target.value))}
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  />
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Right Financial Intelligence Breakdown (7 cols) */}
+            <div className="lg:col-span-7 space-y-5">
+              
+              {/* Means of Finance 3-Pillar Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                
+                {/* Pillar 1: Promoter Margin (10%) */}
+                <div className="p-4 rounded-3xl bg-amber-50 border-2 border-amber-300 flex flex-col justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 block">
+                    {language === 'hi' ? '1. उद्यमी मार्जिन (Own Equity)' : '1. Promoter Margin'}
+                  </span>
+                  <div className="my-2">
+                    <span className="text-xl sm:text-2xl font-black text-amber-950">
+                      ₹{financialStructure.promoterContribution.toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-xs text-amber-800 font-bold block mt-0.5">
+                      {financialStructure.promoterMarginPercent}% of Total Project
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-amber-900 font-semibold bg-amber-100/80 px-2 py-0.5 rounded-md self-start border border-amber-200">
+                    ✓ 10% Initial Deposit
+                  </span>
+                </div>
+
+                {/* Pillar 2: Government Subsidy */}
+                <div className="p-4 rounded-3xl bg-emerald-50 border-2 border-emerald-300 flex flex-col justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-emerald-900 block">
+                    {language === 'hi' ? '2. सरकारी अनुदान (Govt Grant)' : '2. Eligible Capital Subsidy'}
+                  </span>
+                  <div className="my-2">
+                    <span className="text-xl sm:text-2xl font-black text-emerald-950">
+                      ₹{financialStructure.calculatedSubsidy.toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-xs text-emerald-800 font-bold block mt-0.5">
+                      {financialStructure.subsidyPercent}% via {chosenSchemeId.toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-emerald-900 font-semibold bg-emerald-100/80 px-2 py-0.5 rounded-md self-start border border-emerald-200">
+                    ✓ Non-Refundable Grant
+                  </span>
+                </div>
+
+                {/* Pillar 3: Net Bank Loan */}
+                <div className="p-4 rounded-3xl bg-blue-50 border-2 border-blue-300 flex flex-col justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-blue-900 block">
+                    {language === 'hi' ? '3. बैंक सावधि ऋण (Bank Loan)' : '3. Bank Term Loan'}
+                  </span>
+                  <div className="my-2">
+                    <span className="text-xl sm:text-2xl font-black text-blue-950">
+                      ₹{financialStructure.bankLoan.toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-xs text-blue-800 font-bold block mt-0.5">
+                      @{financialStructure.effectiveInterestRate}% Interest P.A.
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-blue-900 font-semibold bg-blue-100/80 px-2 py-0.5 rounded-md self-start border border-blue-200">
+                    ✓ {loanTierInfo.tenureYears} Yrs + {loanTierInfo.moratoriumMonths}m Moratorium
+                  </span>
+                </div>
+
+              </div>
+
+              {/* Monthly EMI & Cash Flow Economics Card */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-emerald-600" />
+                    <span>{language === 'hi' ? 'मासिक EMI, शुद्ध लाभ एवं DSCR सुरक्षा अनुपात' : 'Monthly EMI, Profit & DSCR Health'}</span>
+                  </h4>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    DSCR {financialStructure.dscr}x (Bank Safe)
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'मासिक EMI' : 'Monthly EMI'}</span>
+                    <span className="text-base font-black text-slate-900">₹{financialStructure.monthlyEmi.toLocaleString('en-IN')}</span>
+                    <span className="text-[10px] text-slate-500 block">Post Moratorium</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'अनुमानित मासिक बिक्री' : 'Monthly Turnover'}</span>
+                    <span className="text-base font-black text-blue-700">₹{financialStructure.estimatedMonthlyTurnover.toLocaleString('en-IN')}</span>
+                    <span className="text-[10px] text-slate-500 block">Agrixora Off-take</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'मासिक शुद्ध बचत' : 'Net Monthly Profit'}</span>
+                    <span className="text-base font-black text-emerald-700">₹{financialStructure.netProfitMonthly.toLocaleString('en-IN')}</span>
+                    <span className="text-[10px] text-emerald-600 font-bold block">After EMI deduction</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase block">{language === 'hi' ? 'पेबैक अवधि' : 'Payback Period'}</span>
+                    <span className="text-base font-black text-amber-700">{financialStructure.paybackYears} Years</span>
+                    <span className="text-[10px] text-slate-500 block">Full Capital Recovery</span>
+                  </div>
+                </div>
+
+                {/* 5-Year Financial Projection Chart */}
+                <div className="pt-2">
+                  <span className="text-xs font-bold text-slate-700 block mb-2">
+                    📈 {language === 'hi' ? '5-वर्षीय अनुमानित आय एवं शुद्ध लाभ (₹ Lakhs में):' : '5-Year Projected Revenue vs Net Profit (in ₹ Lakhs):'}
+                  </span>
+                  <div className="h-56 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={fiveYearProjectionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                        <XAxis dataKey="year" tick={{ fontSize: 11, fontWeight: 700 }} stroke="#64748b" />
+                        <YAxis tick={{ fontSize: 11 }} stroke="#64748b" />
+                        <Tooltip 
+                          formatter={(val: any) => [`₹${val} Lakhs`, '']}
+                          contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', color: '#fff', border: 'none', fontSize: '11px' }}
+                        />
+                        <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
+                        <Bar dataKey="revenue" name={language === 'hi' ? 'कुल वार्षिक आय (Revenue)' : 'Annual Revenue'} fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="profit" name={language === 'hi' ? 'शुद्ध वार्षिक लाभ (Net Profit)' : 'Net Profit'} fill="#10b981" radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="emi" name={language === 'hi' ? 'वार्षिक EMI भुगतान (Debt Service)' : 'Annual EMI'} fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* 1-Click Generate Official DPR Button */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-xs text-slate-500 font-semibold">
+                    {language === 'hi' ? 'बैंक प्रबंधक को प्रस्तुत करने हेतु तैयार' : 'Ready for DIC & Bank Appraisal'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveSubTab('dpr_dossier')}
+                    className="py-2.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-extrabold text-xs shadow-md shadow-emerald-700/20 flex items-center gap-2 hover:scale-[1.02] transition-all cursor-pointer"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span>{language === 'hi' ? 'बैंक DPR डॉसियर देखें' : 'View Bankable DPR Dossier'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────
+            TAB 3: OFFICIAL 1-CLICK BANKABLE DPR DOSSIER
+        ───────────────────────────────────────────────────────────── */}
+        {activeSubTab === 'dpr_dossier' && (
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 sm:p-10 max-w-5xl mx-auto space-y-8 print:p-0 print:border-none print:shadow-none font-serif">
+            
+            {/* Dossier Header */}
+            <div className="border-b-2 border-slate-900 pb-6 flex items-start justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-sans font-black tracking-widest text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
+                  OFFICIAL BANKABLE DETAILED PROJECT REPORT (DPR)
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-950 font-display mt-2 tracking-tight">
+                  {language === 'hi' ? activeModel.nameHi : activeModel.nameEn}
+                </h2>
+                <p className="text-xs font-sans text-slate-600 mt-1">
+                  Appraisal Code: <strong>AGRI-DPR-{selectedDistrict.toUpperCase()}-2026-8819</strong> • Format Compliant with SBI, PNB, NABARD & DIC
+                </p>
+              </div>
+
+              <div className="text-right font-sans shrink-0">
+                <button
+                  type="button"
+                  onClick={handlePrintDPR}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md flex items-center gap-1.5 ml-auto print:hidden cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'प्रिंट / PDF डाउनलोड' : 'Print / Download PDF'}</span>
+                </button>
+                <span className="text-[11px] text-slate-500 block mt-2 font-bold">
+                  Date: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
+              </div>
+            </div>
+
+            {/* Section 1.0: Executive Summary */}
+            <div className="space-y-3 font-sans">
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-1 flex items-center gap-2">
+                <span className="text-emerald-700">1.0</span>
+                <span>Executive Project Profile & Promoter Particulars</span>
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="text-slate-500 font-bold block">Proposed Unit:</span>
+                  <span className="font-extrabold text-slate-900">{activeModel.nameEn}</span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="text-slate-500 font-bold block">Target Location:</span>
+                  <span className="font-extrabold text-slate-900">{selectedDistrict}, {selectedState}</span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="text-slate-500 font-bold block">Promoter Margin (10%):</span>
+                  <span className="font-extrabold text-amber-700">₹{financialStructure.promoterContribution.toLocaleString('en-IN')}</span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <span className="text-slate-500 font-bold block">Target Bank Loan (90%):</span>
+                  <span className="font-extrabold text-blue-700">₹{financialStructure.bankLoan.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2.0: Means of Finance */}
+            <div className="space-y-3 font-sans">
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-1 flex items-center gap-2">
+                <span className="text-emerald-700">2.0</span>
+                <span>Cost of Project & Means of Finance (Financial Structuring)</span>
+              </h3>
+              <table className="w-full text-xs text-left border-collapse border border-slate-200">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-800 font-bold">
+                    <th className="border border-slate-200 p-2.5">Component / Financial Head</th>
+                    <th className="border border-slate-200 p-2.5 text-right">Amount (₹)</th>
+                    <th className="border border-slate-200 p-2.5 text-right">% Contribution</th>
+                    <th className="border border-slate-200 p-2.5">Statutory Guidelines / Scheme Policy</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  <tr>
+                    <td className="border border-slate-200 p-2.5 font-bold">Total Capital Cost (Plant, Machinery & Civil)</td>
+                    <td className="border border-slate-200 p-2.5 text-right font-black">₹{financialStructure.totalCost.toLocaleString('en-IN')}</td>
+                    <td className="border border-slate-200 p-2.5 text-right">100.0%</td>
+                    <td className="border border-slate-200 p-2.5 text-slate-600">Standard Project Outlay</td>
+                  </tr>
+                  <tr className="bg-amber-50/50">
+                    <td className="border border-slate-200 p-2.5 font-bold text-amber-900">Promoter Margin Money (Beneficiary Contribution)</td>
+                    <td className="border border-slate-200 p-2.5 text-right font-black text-amber-900">₹{financialStructure.promoterContribution.toLocaleString('en-IN')}</td>
+                    <td className="border border-slate-200 p-2.5 text-right font-bold text-amber-900">{financialStructure.promoterMarginPercent}%</td>
+                    <td className="border border-slate-200 p-2.5 text-amber-800 font-semibold">10% Concessional Own Equity for Women / FPO / SC-ST</td>
+                  </tr>
+                  <tr className="bg-emerald-50/50">
+                    <td className="border border-slate-200 p-2.5 font-bold text-emerald-900">Capital Subsidy Grant ({chosenSchemeId.toUpperCase()})</td>
+                    <td className="border border-slate-200 p-2.5 text-right font-black text-emerald-900">₹{financialStructure.calculatedSubsidy.toLocaleString('en-IN')}</td>
+                    <td className="border border-slate-200 p-2.5 text-right font-bold text-emerald-900">{financialStructure.subsidyPercent}%</td>
+                    <td className="border border-slate-200 p-2.5 text-emerald-800 font-semibold">Credit-Linked Capital Grant under MoFPI / MSME</td>
+                  </tr>
+                  <tr className="bg-blue-50/50">
+                    <td className="border border-slate-200 p-2.5 font-bold text-blue-900">Commercial Bank Term Loan</td>
+                    <td className="border border-slate-200 p-2.5 text-right font-black text-blue-900">₹{financialStructure.bankLoan.toLocaleString('en-IN')}</td>
+                    <td className="border border-slate-200 p-2.5 text-right font-bold text-blue-900">{(financialStructure.bankLoan / financialStructure.totalCost * 100).toFixed(1)}%</td>
+                    <td className="border border-slate-200 p-2.5 text-blue-800 font-semibold">@{financialStructure.effectiveInterestRate}% Interest with {loanTierInfo.moratoriumMonths}m Moratorium</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Section 3.0: 5-10km Cluster Feasibility Matrix */}
+            <div className="space-y-3 font-sans">
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-1 flex items-center gap-2">
+                <span className="text-emerald-700">3.0</span>
+                <span>Hyper-Local Cluster Feasibility & Agro-Raw Material Matrix (5-10 KM)</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                  <span className="font-extrabold text-slate-900 block">🌾 Local Surplus Availability</span>
+                  <p className="text-slate-600">
+                    {selectedDistrict} APMC handles over 12,000 MT of {activeModel.keyRawMaterials.split(',')[0]} annually with direct farmgate pickup.
+                  </p>
+                </div>
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                  <span className="font-extrabold text-slate-900 block">⚡ Infrastructure & Power</span>
+                  <p className="text-slate-600">
+                    {activeModel.powerHp} HP 3-Phase connected load with dedicated feeder line and 1,500 sq ft shed space availability.
+                  </p>
+                </div>
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                  <span className="font-extrabold text-slate-900 block">🚚 Guaranteed Off-Take Linkage</span>
+                  <p className="text-emerald-800 font-semibold">
+                    Integrated forward contracts with Agrixora institutional bulk buyers & retail supermarkets.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 4.0: Repayment Schedule & DSCR Safety */}
+            <div className="space-y-3 font-sans">
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-1 flex items-center gap-2">
+                <span className="text-emerald-700">4.0</span>
+                <span>Bank Appraisal Ratios & Debt Service Coverage Ratio (DSCR)</span>
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-center">
+                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                  <span className="text-slate-600 font-bold block">DSCR Ratio:</span>
+                  <span className="text-lg font-black text-emerald-800">{financialStructure.dscr}x</span>
+                  <span className="text-[10px] text-emerald-700 font-semibold block">Benchmark &gt; 1.50x</span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <span className="text-slate-600 font-bold block">Monthly EMI:</span>
+                  <span className="text-lg font-black text-slate-900">₹{financialStructure.monthlyEmi.toLocaleString('en-IN')}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">{loanTierInfo.tenureMonths} Months Tenure</span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <span className="text-slate-600 font-bold block">Moratorium Period:</span>
+                  <span className="text-lg font-black text-slate-900">{loanTierInfo.moratoriumMonths} Months</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block">Only Interest Payable</span>
+                </div>
+                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                  <span className="text-slate-600 font-bold block">AIF Interest Saved:</span>
+                  <span className="text-lg font-black text-amber-800">₹{financialStructure.interestSavedViaSubvention.toLocaleString('en-IN')}</span>
+                  <span className="text-[10px] text-amber-700 font-semibold block">3% Relief for 7 Years</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Official Stamp & Signatures */}
+            <div className="pt-6 border-t-2 border-slate-900 flex justify-between items-end text-xs font-sans text-slate-600">
+              <div>
+                <p className="font-extrabold text-slate-950">Agrixora AI Rural Advisory System</p>
+                <p>Groundwater, Mandi surplus & APMC Feasibility Verified for {selectedDistrict}.</p>
+                <p className="text-[10px] text-slate-400 mt-1">Certified Digital Signature: SHA256-AGRI-DPR-{Date.now()}</p>
+              </div>
+              <div className="text-right space-y-1">
+                <div className="w-36 border-b border-slate-400 mb-1 ml-auto"></div>
+                <p className="font-bold text-slate-900">Signature of Applicant / FPO Head</p>
+                <p className="text-[10px] text-slate-500">Submitted to SBI / PNB / DIC Cell</p>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────
+            TAB 4: AGRI SUPPLY CHAIN & BUYER OFF-TAKE LINKAGE
+        ───────────────────────────────────────────────────────────── */}
+        {activeSubTab === 'supply_chain' && (
+          <div className="space-y-6">
+            
+            {/* Backward & Forward Architecture Banner */}
+            <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white space-y-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black uppercase">
+                CLOSED-LOOP AGRI SUPPLY CHAIN
+              </span>
+              <h3 className="text-lg sm:text-xl font-black font-display text-white">
+                {language === 'hi' ? 'खेत से फैक्ट्री और फैक्ट्री से थोक खरीदार लिंकेज' : 'Farm-to-Factory & Factory-to-Enterprise Procurement Network'}
+              </h3>
+              <p className="text-xs text-emerald-200 font-medium max-w-3xl">
+                {language === 'hi'
+                  ? 'स्थानीय किसानों से सीधे ₹0 परिवहन खर्च पर कच्चा माल प्राप्त करें और प्रसंस्कृत तैयार माल को एग्रिक्सोरा के संस्थागत थोक खरीदारों को एस्क्रो सुरक्षा के साथ बेचें।'
+                  : 'Source raw agricultural crops directly from verified local farmers with ₹0 farmgate pickup, and supply finished packaged goods to verified bulk buyers via guaranteed escrow.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Backward Linkage (Raw Material Sourcing) */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-lg">
+                      👨‍🌾
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900">
+                        {language === 'hi' ? 'कच्चा माल आपूर्ति (Backward Linkage)' : 'Raw Crop Farmgate Sourcing'}
+                      </h4>
+                      <span className="text-[11px] text-emerald-700 font-bold">10-25 KM Cluster Radius</span>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
+                    {listings.length} Active Lots
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {listings.slice(0, 3).map((lot) => (
+                    <div key={lot.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+                      <div>
+                        <span className="font-black text-slate-900 block">{lot.cropName}</span>
+                        <span className="text-slate-500 text-[11px]">
+                          📍 {lot.farmerLocation} • {lot.quantity} {lot.unit}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-black text-emerald-700 block">₹{lot.pricePerUnit}/{lot.unit}</span>
+                        <span className="text-[10px] text-slate-500 font-semibold">₹0 Pickup Logistics</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('marketplace')}
+                  className="w-full py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold text-xs border border-emerald-300 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'सभी स्थानीय किसान लिस्टिंग देखें' : 'Browse Local Farmgate Listings'}</span>
+                </button>
+              </div>
+
+              {/* Forward Linkage (Institutional Buyer Off-Take) */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-lg">
+                      🏢
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900">
+                        {language === 'hi' ? 'तैयार माल बिक्री (Forward Off-Take)' : 'Institutional Off-Take Contracts'}
+                      </h4>
+                      <span className="text-[11px] text-blue-700 font-bold">Guaranteed Escrow Payouts</span>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-800">
+                    50T - 500T Pools
+                  </span>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-200 space-y-1">
+                    <div className="flex justify-between font-black text-slate-900">
+                      <span>BigBasket & Reliance Fresh Agro</span>
+                      <span className="text-blue-700">150 Quintals / Mo</span>
+                    </div>
+                    <p className="text-slate-600 text-[11px]">
+                      Pre-harvest off-take contract for Grade-A Polished Pulses at fixed minimum support pricing.
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-200 space-y-1">
+                    <div className="flex justify-between font-black text-slate-900">
+                      <span>Local FMCG Retail Distributor Pool</span>
+                      <span className="text-blue-700">80 Quintals / Mo</span>
+                    </div>
+                    <p className="text-slate-600 text-[11px]">
+                      Automated 1kg cold-pressed oil bottle distribution across 45 village grocery retail stores.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('bulk_pooling')}
+                  className="w-full py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 font-extrabold text-xs border border-blue-300 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Boxes className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'थोक मांग अनुबंध देखें' : 'View Bulk Demand Off-Take Contracts'}</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────
+            TAB 5: CENTRAL & STATE SCHEMES VAULT & CHECKLIST
+        ───────────────────────────────────────────────────────────── */}
+        {activeSubTab === 'schemes_vault' && (
+          <div className="space-y-6">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {SCHEMES_DATABASE.map((scheme) => (
+                <div key={scheme.id} className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                  <div className="space-y-2">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${scheme.badgeColor}`}>
+                      {scheme.shortTag}
+                    </span>
+                    <h4 className="font-extrabold text-sm text-slate-900 leading-snug">
+                      {scheme.name}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      🏛️ {scheme.ministry}
+                    </p>
+                    
+                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1 text-xs mt-3">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-bold">Subsidy Grant:</span>
+                        <span className="font-extrabold text-emerald-700">{scheme.maxSubsidyAmount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-bold">Interest Relief:</span>
+                        <span className="font-extrabold text-blue-700">{scheme.interestSubvention}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a
+                    href={scheme.portalUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <span>{language === 'hi' ? 'आधिकारिक पोर्टल पर आवेदन करें' : 'Apply on National Portal'}</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                  </a>
                 </div>
               ))}
             </div>
 
-            {/* Chat Input Bar */}
-            <div className="p-4 border-t border-slate-100 bg-white">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendChatMessage();
-                }}
-                className="flex items-center gap-2"
-              >
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder={
-                    language === 'hi'
-                      ? 'यहाँ पूछें (जैसे: दाल मिल पर PM-FME सब्सिडी कितनी मिलेगी?)...'
-                      : 'Ask about subsidies, machinery costs, AIF loans, or business feasibility...'
-                  }
-                  className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-100 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm border border-slate-200 focus:outline-hidden focus:border-emerald-500"
-                />
-                <button
-                  type="submit"
-                  className="p-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <Send className="w-4 h-4" />
-                  <span className="hidden sm:inline">{language === 'hi' ? 'पूछें' : 'Send'}</span>
-                </button>
-              </form>
+            {/* Mandatory DIC & Bank Appraisal Document Checklist */}
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+              <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <FileCheck className="w-4 h-4 text-emerald-600" />
+                <span>{language === 'hi' ? 'बैंक लोन व DIC सब्सिडी हेतु आवश्यक दस्तावेज चेकलिस्ट' : 'Mandatory Bank Loan & DIC Document Checklist'}</span>
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                {[
+                  { title: '1. Bankable Detailed Project Report (DPR)', desc: 'Generated via Agrixora with DSCR > 2.0x' },
+                  { title: '2. Aadhaar & PAN KYC of Promoter', desc: 'UIDAI verified identity credentials' },
+                  { title: '3. Udyam MSME Registration Certificate', desc: 'Free online micro enterprise registration' },
+                  { title: '4. Land Ownership / 5-Yr Lease Deed', desc: 'Registered deed for proposed site' },
+                  { title: '5. Machinery Quotations (Proforma Invoice)', desc: 'From certified equipment manufacturers' },
+                  { title: '6. FSSAI Food License / Registration', desc: 'Mandatory for food processing units' },
+                  { title: '7. Electricity Connection Feasibility NOC', desc: 'Discom sanction for 3-Phase load' },
+                  { title: '8. 6-Month Bank Account Statements', desc: 'Savings / current account transaction trail' }
+                ].map((doc, idx) => (
+                  <div key={idx} className="p-3 rounded-2xl bg-emerald-50/50 border border-emerald-200 flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-extrabold text-slate-900 block">{doc.title}</span>
+                      <span className="text-[11px] text-slate-600">{doc.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+
           </div>
-        </div>
-      )}
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────
+            TAB 6: AI CONVERSATIONAL ADVISOR & VOICE COPILOT
+        ───────────────────────────────────────────────────────────── */}
+        {activeSubTab === 'ai_copilot' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Left Column: Quick Scenario Prompts (4 cols) */}
+            <div className="lg:col-span-4 space-y-4">
+              <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <span>{language === 'hi' ? 'त्वरित सलाह विषय' : 'Quick Advisory Prompts'}</span>
+                </h3>
+                <div className="space-y-2">
+                  {[
+                    {
+                      titleEn: '10% Margin vs 90% Loan Structuring',
+                      titleHi: '10% मार्जिन पर 90% लोन कैसे मिलेगा?',
+                      query: 'Explain how the 10% promoter margin and 90% bank loan structuring works under SIH 26091.'
+                    },
+                    {
+                      titleEn: 'PM-FME 35% Capital Subsidy Rules',
+                      titleHi: 'PM-FME में 35% सब्सिडी के नियम व शर्तें',
+                      query: 'What are the eligibility criteria and maximum subsidy amount under PM-FME for food processing?'
+                    },
+                    {
+                      titleEn: 'Solar Cold Storage AIF 3% Relief',
+                      titleHi: 'सोलर कोल्ड स्टोरेज: AIF 3% ब्याज छूट',
+                      query: 'How much interest subvention and CGTMSE guarantee do I get for a solar micro cold storage under AIF?'
+                    },
+                    {
+                      titleEn: 'Cold-Pressed Mustard Oil Profitability',
+                      titleHi: 'कच्ची घानी तेल मिल की मासिक कमाई व खली बिक्री',
+                      query: 'What is the monthly turnover, gross margin and payback period for a cold-pressed oil expeller unit?'
+                    }
+                  ].map((item, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleSendChatMessage(item.query)}
+                      className="w-full text-left p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 border border-slate-200 transition-all text-xs font-bold text-slate-800 flex items-center justify-between group cursor-pointer"
+                    >
+                      <span>{language === 'hi' ? item.titleHi : item.titleEn}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* National Agritech Helplines Card */}
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white space-y-2 border border-emerald-500/30">
+                <h4 className="font-bold text-xs text-emerald-300 uppercase">National Agritech Support</h4>
+                <p className="text-xs text-slate-200">
+                  PM-FME National Helpline: <strong>1800-11-2026</strong>
+                </p>
+                <p className="text-xs text-slate-200">
+                  AIF Portal: <strong>agriinfra.dac.gov.in</strong>
+                </p>
+                <p className="text-xs text-slate-200">
+                  PMEGP Portal: <strong>kviconline.gov.in</strong>
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column: Interactive Chat Assistant (8 cols) */}
+            <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col h-[560px] overflow-hidden">
+              
+              {/* Chat Header */}
+              <div className="p-4 px-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                    <Bot className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm text-slate-900">
+                      {language === 'hi' ? 'ग्रामीण व्यापार एआई सलाहकार' : 'Rural Enterprise AI Copilot'}
+                    </h3>
+                    <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span>Live Mandi & Scheme Intelligence Active</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 font-bold">📍 {selectedDistrict} Cluster</span>
+                </div>
+              </div>
+
+              {/* Chat Messages Body */}
+              <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+                {chatMessages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    {msg.role === 'ai' && (
+                      <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 text-xs font-bold mt-1">
+                        AI
+                      </div>
+                    )}
+
+                    <div
+                      className={`max-w-md p-4 rounded-2xl text-xs sm:text-sm leading-relaxed space-y-1.5 shadow-xs ${
+                        msg.role === 'user'
+                          ? 'bg-emerald-600 text-white rounded-tr-xs'
+                          : 'bg-slate-100 text-slate-800 rounded-tl-xs border border-slate-200/60'
+                      }`}
+                    >
+                      <p>{msg.text}</p>
+                      <div className="flex items-center justify-between gap-2 pt-1">
+                        <span className={`text-[10px] ${msg.role === 'user' ? 'text-emerald-200' : 'text-slate-400'}`}>
+                          {msg.timestamp}
+                        </span>
+                        {msg.role === 'ai' && (
+                          <button
+                            type="button"
+                            onClick={() => handleSpeakText(msg.text)}
+                            className="text-slate-500 hover:text-emerald-700 p-1 rounded-md transition-colors cursor-pointer"
+                            title="Listen in Voice"
+                          >
+                            {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-emerald-600" /> : <Volume2 className="w-3.5 h-3.5" />}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Chat Input Bar */}
+              <div className="p-4 border-t border-slate-100 bg-white">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendChatMessage();
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder={
+                      language === 'hi'
+                        ? 'यहाँ पूछें (जैसे: 10% मार्जिन पर ₹18 लाख की दाल मिल के लिए कितना लोन मिलेगा?)...'
+                        : 'Ask about subsidies, machinery costs, AIF loans, or business feasibility...'
+                    }
+                    className="flex-1 px-4 py-2.5 rounded-2xl bg-slate-100 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm border border-slate-200 focus:outline-hidden focus:border-emerald-500"
+                  />
+                  <button
+                    type="submit"
+                    className="p-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span className="hidden sm:inline">{language === 'hi' ? 'पूछें' : 'Send'}</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+      </main>
+
     </div>
   );
 };

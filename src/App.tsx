@@ -44,10 +44,14 @@ const MainLayout: React.FC = () => {
     return <WelcomeGatewayView />;
   }
 
+  // 💼 Dedicated Standalone Rural Micro-Enterprise & Advisory Workspace
+  if (activeTab === 'rural_advisory') {
+    return <RuralBusinessAdvisoryView />;
+  }
+
   // Render view based on active role and tab
   const renderCurrentView = () => {
     // Global views accessible from anywhere
-    if (activeTab === 'rural_advisory') return <RuralBusinessAdvisoryView />;
     if (activeTab === 'profile') return <ProfileView />;
     if (activeTab === 'market_prices') return <MarketPriceIntelligenceView />;
     if (activeTab === 'track_delivery') return <SupplyChainTracker />;
