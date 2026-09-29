@@ -317,8 +317,8 @@ export const WelcomeGatewayView: React.FC = () => {
           </div>
         </div>
 
-        {/* 🌟 2 PRIMARY PUBLIC CARDS (FOR ALL VISITORS COMING ON THE WEBSITE) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 lg:gap-6 text-left max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto w-full">
+        {/* 🌟 3 PRIMARY STAKEHOLDER PORTAL CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-5 text-left max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto w-full">
           
           {/* Primary Public Card 1: Farmer */}
           <div 
@@ -335,7 +335,7 @@ export const WelcomeGatewayView: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="text-base sm:text-lg lg:text-xl font-black text-slate-900 group-hover:text-emerald-700 transition-colors font-display leading-tight">
+              <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-emerald-700 transition-colors font-display leading-tight">
                 {language === 'hi' ? 'भारतीय किसान (Kisan Portal)' : 'Farmers & Producers'}
               </h3>
               
@@ -351,10 +351,10 @@ export const WelcomeGatewayView: React.FC = () => {
                   {language === 'hi' ? '✓ ₹0 खेत से पिकअप' : '✓ ₹0 Farmgate Pickup'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
-                  {language === 'hi' ? '✓ 4-माह अग्रिम अनुबंध' : '✓ 4-Month Contracts'}
+                  {language === 'hi' ? '✓ 4-माह अनुबंध' : '✓ 4-Month Contracts'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] sm:text-[11px] font-bold border border-emerald-200">
-                  {language === 'hi' ? '✓ गारंटीशुदा एस्क्रो' : '✓ Guaranteed Escrow'}
+                  {language === 'hi' ? '✓ सुरक्षित एस्क्रो' : '✓ Guaranteed Escrow'}
                 </span>
               </div>
             </div>
@@ -386,7 +386,7 @@ export const WelcomeGatewayView: React.FC = () => {
               </div>
               <div className="flex items-center justify-center gap-1 text-[10.5px] text-slate-500 font-semibold pt-0.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Authentication'}</span>
+                <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Auth'}</span>
               </div>
             </div>
           </div>
@@ -406,8 +406,8 @@ export const WelcomeGatewayView: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="text-base sm:text-lg lg:text-xl font-black text-slate-900 group-hover:text-blue-700 transition-colors font-display leading-tight">
-                {language === 'hi' ? 'थोक खरीदार एवं कॉर्पोरेट (Buyer Portal)' : 'Bulk Buyers & Retailers'}
+              <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-blue-700 transition-colors font-display leading-tight">
+                {language === 'hi' ? 'थोक खरीदार एवं कॉर्पोरेट' : 'Bulk Buyers & Retailers'}
               </h3>
               
               <p className="text-xs text-slate-600 font-medium mt-1 leading-snug line-clamp-2">
@@ -419,10 +419,10 @@ export const WelcomeGatewayView: React.FC = () => {
               {/* Feature Pills */}
               <div className="flex flex-wrap gap-1.5 mt-2">
                 <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
-                  {language === 'hi' ? '✓ 50T–500T मांग पूलिंग' : '✓ 50T–500T Pooling'}
+                  {language === 'hi' ? '✓ 50T–500T पूलिंग' : '✓ 50T–500T Pooling'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
-                  {language === 'hi' ? '✓ NABL लैब गुणवत्ता' : '✓ NABL Lab Quality'}
+                  {language === 'hi' ? '✓ NABL लैब जांच' : '✓ NABL Lab Quality'}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[10px] sm:text-[11px] font-bold border border-blue-200">
                   {language === 'hi' ? '✓ एस्क्रो सुरक्षा' : '✓ Escrow Protection'}
@@ -457,47 +457,87 @@ export const WelcomeGatewayView: React.FC = () => {
               </div>
               <div className="flex items-center justify-center gap-1 text-[10.5px] text-slate-500 font-semibold pt-0.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Authentication'}</span>
+                <span>{language === 'hi' ? 'पासवर्ड से सुरक्षित प्रमाणन' : 'Password Protected Auth'}</span>
               </div>
             </div>
           </div>
 
-        </div>
-
-        {/* 💼 3RD DEDICATED STANDALONE CARD: AI RURAL MICRO-ENTERPRISE & SUBSIDY ADVISOR */}
-        <div 
-          onClick={() => {
-            enterPortal('farmer');
-            setActiveTab('rural_advisory');
-          }}
-          className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 text-white border-2 border-amber-400/60 hover:border-amber-300 shadow-[0_10px_30px_rgba(245,158,11,0.18)] hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md relative overflow-hidden group text-left"
-        >
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-500 border border-amber-300/60 flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-110 transition-transform shrink-0">
-              💼
-            </div>
+          {/* Primary Public Card 3: Rural Micro-Entrepreneurs & FPOs (PS 26091) */}
+          <div 
+            onClick={() => {
+              enterPortal('farmer');
+              setActiveTab('rural_advisory');
+            }}
+            className="group relative bg-white/90 hover:bg-white/98 rounded-2xl p-4 sm:p-5 border-2 border-amber-500/40 hover:border-amber-600 shadow-[0_10px_30px_rgba(245,158,11,0.14)] hover:shadow-[0_16px_36px_rgba(245,158,11,0.24)] flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 cursor-pointer backdrop-blur-md"
+          >
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base sm:text-lg font-black text-white font-display">
-                  {language === 'hi'
-                    ? 'ग्रामीण सूक्ष्म-उद्यम व FPO वित्तीय सलाहकार'
-                    : 'Rural Micro-Enterprise & FPO Financial Advisory'}
-                </h3>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 animate-pulse">
-                  35% SUBSIDY + AIF 3%
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-50 border-2 border-amber-200 flex items-center justify-center text-2xl sm:text-3xl shadow-xs group-hover:scale-105 transition-transform">
+                  💼
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-900 border border-amber-300">
+                  {language === 'hi' ? '💼 ग्रामीण बिज़नेस AI' : '💼 Rural Enterprise AI'}
                 </span>
               </div>
-              <p className="text-xs text-slate-200 mt-1 font-medium leading-relaxed">
+
+              <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-amber-700 transition-colors font-display leading-tight">
+                {language === 'hi' ? 'ग्रामीण सूक्ष्म-उद्यमी व FPO' : 'Rural Micro-Entrepreneurs'}
+              </h3>
+              
+              <p className="text-xs text-slate-600 font-medium mt-1 leading-snug line-clamp-2">
                 {language === 'hi'
-                  ? 'दाल मिल, सोलर कोल्ड स्टोरेज, तेल मिल व मशरूम फार्मिंग की लागत, PM-FME 35% सब्सिडी व 1-क्लिक बैंक लोन DPR रिपोर्ट।'
-                  : 'Explore 8+ agro-business models (Dal Mill, Cold Storage, Oil Expeller), calculate 35% PM-FME grants & generate Bank DPR.'}
+                  ? '5-10 किमी व्यवहार्यता अध्ययन, 90% ऋण संरचना (माइक्रो फाइनेंस vs टर्म लोन), 35% PM-FME सब्सिडी व 1-क्लिक बैंक DPR रिपोर्ट।'
+                  : 'AI 5-10km feasibility, 90% loan auto-routing (Micro Finance vs Term Loan), 35% PM-FME grants & 1-click Bank DPR.'}
               </p>
+
+              {/* Feature Pills */}
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 text-[10px] sm:text-[11px] font-bold border border-amber-200">
+                  {language === 'hi' ? '✓ 90% बैंक ऋण' : '✓ 90% Loan Structuring'}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 text-[10px] sm:text-[11px] font-bold border border-amber-200">
+                  {language === 'hi' ? '✓ 35% PM-FME अनुदान' : '✓ 35% PM-FME Subsidy'}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 text-[10px] sm:text-[11px] font-bold border border-amber-200">
+                  {language === 'hi' ? '✓ बैंक DPR रिपोर्ट' : '✓ 1-Click Bank DPR'}
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-2.5 flex flex-col gap-1.5 border-t border-slate-100 mt-2.5">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    enterPortal('farmer');
+                    setActiveTab('rural_advisory');
+                  }}
+                  className="py-2 sm:py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-amber-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                  <span>{language === 'hi' ? 'बिज़नेस AI खोलें' : 'Launch AI'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    enterPortal('farmer');
+                    setActiveTab('rural_advisory');
+                  }}
+                  className="py-2 sm:py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <Landmark className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'DPR कैलकुलेटर' : 'Calculator'}</span>
+                </button>
+              </div>
+              <div className="flex items-center justify-center gap-1 text-[10.5px] text-slate-500 font-semibold pt-0.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                <span>{language === 'hi' ? 'बैंक लोन व DIC प्रमाणित' : 'Bank Appraisal Ready'}</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-600 text-slate-950 font-black text-xs sm:text-sm shadow-md group-hover:from-amber-400 group-hover:to-emerald-500 transition-all shrink-0">
-            <span>{language === 'hi' ? 'बिज़नेस AI खोलें →' : 'Launch Advisory AI →'}</span>
-          </div>
         </div>
       </main>
 
