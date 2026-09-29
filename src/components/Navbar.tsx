@@ -193,22 +193,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
               {/* User Profile Pill & Actions */}
               <div className="flex items-center gap-2">
 
-                {/* 💼 Dedicated Standalone AI Business & Finance Advisory Button */}
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('rural_advisory')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-emerald-600 to-teal-700 hover:from-amber-600 hover:to-teal-800 text-white font-extrabold text-xs shadow-md shadow-emerald-700/20 transition-all hover:scale-105 cursor-pointer border border-amber-300/40 relative group"
-                  title="AI Rural Business Advisory & Financial Structuring (ग्रामीण बिज़नेस व सब्सिडी AI)"
-                >
-                  <Landmark className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
-                  <span className="hidden md:inline font-bold">
-                    {language === 'hi' ? '💼 बिज़नेस व सब्सिडी AI' : '💼 Business & Finance AI'}
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-amber-400 text-slate-950 ml-0.5 shadow-xs">
-                    35% GRANT
-                  </span>
-                </button>
-
                 {/* 1-Click Quick Login / Persona Switcher Trigger */}
                 <button
                   type="button"

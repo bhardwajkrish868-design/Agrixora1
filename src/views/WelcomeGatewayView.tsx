@@ -234,26 +234,6 @@ export const WelcomeGatewayView: React.FC = () => {
 
         {/* Top Right Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-
-          {/* 💼 Dedicated Standalone AI Business Advisory & 35% Subsidy Button */}
-          <button
-            type="button"
-            onClick={() => {
-              enterPortal('farmer');
-              setActiveTab('rural_advisory');
-            }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-emerald-600 to-teal-700 hover:from-amber-600 hover:to-teal-800 text-white font-extrabold text-xs shadow-md shadow-emerald-700/20 transition-all hover:scale-105 cursor-pointer border border-amber-300/50 group"
-            title="AI Rural Business Advisory & 35% Subsidy (ग्रामीण बिज़नेस व सब्सिडी AI)"
-          >
-            <Landmark className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
-            <span className="font-bold">
-              {language === 'hi' ? '💼 बिज़नेस व 35% सब्सिडी AI' : '💼 Rural Business & Subsidy AI'}
-            </span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-amber-400 text-slate-950 ml-0.5 shadow-xs">
-              35% GRANT
-            </span>
-          </button>
-
           {/* Language Selector Dual Pill */}
           <div className="flex items-center bg-white/95 rounded-full p-0.5 border border-slate-200/90 shadow-xs">
             <button
